@@ -298,7 +298,7 @@ describe('roster hero atlases (ticket 451)', () => {
       { params: freshPlanetParamsFor(SEED, 2), heroCount: 3 },
     ]
     for (const { params, heroCount } of rosters) {
-      const cells = heroAtlasOfPlanet(params.planetIndex)?.cells ?? []
+      const cells = heroAtlasOfPlanet(params.planetIndex)?.pages.flatMap((page) => page.cells) ?? []
       const heroes = shownLooks(params).filter((look) => look.isHero)
       expect(heroes.length, `planet ${params.planetIndex}`).toBe(heroCount)
       expect(heroes.filter((look) => !cells.includes(look.speciesId))).toEqual([])

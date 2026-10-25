@@ -142,15 +142,21 @@ describe('skin contact sheet of P1 to P5 (ticket 746)', () => {
     ])
   })
 
-  it('draws every hero cell of the sheet from an atlas map that ships, so a missing one fails', () => {
+  it('draws every hero cell of the sheet from an atlas page whose map ships, so a missing one fails', () => {
     const planetsDrawingCells = SHEET_PLANETS.filter((planetIndex) =>
       sheetOf(planetIndex).rows.some((row) => row.heroCell !== null),
     )
-    const maps = planetsDrawingCells.map(
-      (planetIndex) => drawnHeroAtlasOf(heroAtlasOfPlanet(planetIndex), SHIPPED_ART)?.albedo,
-    )
+    const unshipped = planetsDrawingCells.flatMap((planetIndex) => {
+      const drawn = drawnHeroAtlasOf(heroAtlasOfPlanet(planetIndex), SHIPPED_ART)
+      const missingMaps = (drawn?.albedos ?? []).filter((map) => !existsSync(new URL(map, PUBLIC)))
+      const undrawn = sheetOf(planetIndex)
+        .rows.filter((row) => row.heroCell !== null)
+        .filter((row) => drawn?.heroCells.get(row.speciesId) !== row.heroCell)
+        .map((row) => `P${planetIndex} ${row.speciesId}`)
+      return [...missingMaps, ...undrawn]
+    })
     expect(planetsDrawingCells).toEqual(SHEET_PLANETS)
-    expect(maps.filter((map) => map === undefined || !existsSync(new URL(map, PUBLIC)))).toEqual([])
+    expect(unshipped).toEqual([])
   })
 
   it("holds P2's incoming Pyrite Sun, Azurite Nodule and Argentite on the sheet", () => {

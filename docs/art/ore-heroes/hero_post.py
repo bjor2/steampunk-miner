@@ -57,7 +57,8 @@ def main():
     beside = species.heroes_sharing_acts(table, set_id)
     cells = {hero['speciesId']: read_rgba(os.path.join(HERE, hero['cell'])) for hero in beside}
     for atlas in table['atlases']:
-        write_atlas_preview(atlas, table['atlas'], cells)
+        for at, page in enumerate(species.cells_of_page(atlas)):
+            write_atlas_preview(atlas['act'], at + 1, page, table['atlas'], cells)
     strip = write_scale_strip(set_id, beside, cells)
     write_blind_copies(strip)
     report = write_distinctness(set_id, beside, cells)
@@ -83,15 +84,17 @@ def write_cell(cell):
     return padded
 
 
-def write_atlas_preview(atlas_entry, shape, cells):
-    """The act's atlas as #451 packs it, every cell read from the committed `cells/`."""
+def write_atlas_preview(act, page, page_cells, shape, cells):
+    """A page of the act's atlas as #451 packs it (ticket 852: page 1 keeps the act's name), every
+    cell read from the committed `cells/`."""
     side, size, gutter = shape['sidePx'], shape['cellPx'], shape['gutterPx']
     atlas = np.zeros((side, side, 4), dtype=np.float32)
-    for cell in atlas_entry['cells']:
+    for cell in page_cells:
         rect = cell['rect']
         x, y = rect['x'] - gutter, rect['y'] - gutter
         atlas[y:y + size, x:x + size] = cells.get(cell['speciesId'], read_rgba(os.path.join(CELL_DIR, '%s.png' % cell['speciesId'])))
-    return write_rgba(os.path.join(SHEET_DIR, 'atlas-preview.%s.png' % atlas_entry['act']), atlas)
+    name = act if page == 1 else '%s.page-%d' % (act, page)
+    return write_rgba(os.path.join(SHEET_DIR, 'atlas-preview.%s.png' % name), atlas)
 
 
 # --- the game-scale strip --------------------------------------------------------------------------------

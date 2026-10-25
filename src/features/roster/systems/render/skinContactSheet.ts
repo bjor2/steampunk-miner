@@ -27,7 +27,10 @@ export interface ContactSheetRow {
   patternCode: number
   /** The hue slot colour as the shader reads it back, `#rrggbb`. */
   colour: string
-  /** The cell of the act's atlas the hero draws from; null draws the shader look. */
+  /**
+   * The act-wide cell of the act's atlas the hero draws from, 16 a page (ticket 852); null draws
+   * the shader look.
+   */
   heroCell: number | null
   /** The gem's rank k on its planet, cheapest first (ticket 741); null for a non-gem. */
   gemRank: number | null
@@ -62,7 +65,7 @@ const MIN_CHANNELS_APART = 2
 export function planetContactSheetOf(params: PlanetParams): PlanetContactSheet {
   const roster = planetRosterOf(params)
   const looks = planetKindLooksOf(params)
-  const heroCells = heroCellsOf(heroAtlasOfPlanet(params.planetIndex)?.cells ?? [])
+  const heroCells = heroCellsOf(heroAtlasOfPlanet(params.planetIndex)?.pages ?? [])
   const gemTiers = gemSaleTiersOf(params.planetIndex, params.oreRulesVersion)
   return {
     planetIndex: params.planetIndex,

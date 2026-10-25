@@ -119,7 +119,8 @@ describe('material look table', () => {
   })
 
   it('keeps the largest glint code over the last cell and mythic exact in one float, at any rank (ticket 786)', () => {
-    const rarity = 4 + HERO_LOOK_FLAG * HERO_ATLAS_CELLS + GEM_GLINT_FLAG * largestGemGlintCodeOf()
+    const rarity =
+      4 + HERO_LOOK_FLAG * (HERO_LOOK_CELL_SPAN - 1) + GEM_GLINT_FLAG * largestGemGlintCodeOf()
     expect(Math.fround(rarity)).toBe(rarity)
     expect(HERO_ATLAS_CELLS).toBeLessThan(HERO_LOOK_CELL_SPAN)
     for (const gemRank of [0, 1, 2, 3, 1e6]) {
@@ -131,9 +132,18 @@ describe('material look table', () => {
     }
   })
 
+  it('carries a page-2 hero cell and reads it back, with its rarity and glint (ticket 852)', () => {
+    const pageTwo = HERO_ATLAS_CELLS + 3
+    const cells = new Map([['probe-gem', pageTwo]])
+    const [, , , rarity] = entryOf(kindLookTableOf([GEM], [], () => true, cells).kinds, 1)
+    expect(heroCellOfEntry(rarity)).toBe(pageTwo)
+    expect(rarityLeadOfEntry(rarity)).toBe(4)
+    expect(gemGlintOfCode(gemGlintCodeOfEntry(rarity))).toEqual(gemGlintOf(2))
+  })
+
   it('refuses a hero cell past what the entry holds', () => {
     const cells = new Map([['probe-wires', HERO_LOOK_CELL_SPAN - 1]])
-    expect(() => kindLookTableOf([WIRES], [], () => true, cells)).toThrow(/hero cell 31/)
+    expect(() => kindLookTableOf([WIRES], [], () => true, cells)).toThrow(/hero cell 1023/)
   })
 
   it('leaves a slot with no species at zeros, the family look', () => {

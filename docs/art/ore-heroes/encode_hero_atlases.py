@@ -1,8 +1,10 @@
 """
 Packs and encodes the per-act hero atlases the game ships (#451), from the committed 256 px cells
 of #452 and tickets 744 and 785 (`cells/<species>.png`) in the order the committed `hero-cells.json` packs
-them per act (`atlases`: cell i at column i mod 4, row i div 4). Each act becomes `public/assets/ground/ground-hero-atlas-<act>/
-ground-hero-atlas-<act>.albedo.ktx2`: Basis ETC1S, sRGB, as every albedo map (#52 "Formats"),
+them per act (`atlases`: cell i of its page at column i mod 4, row i div 4). Each page of an act (ticket 852)
+becomes its own map, page 1 `public/assets/ground/ground-hero-atlas-<act>/ground-hero-atlas-<act>.albedo.ktx2`
+and page n `ground-hero-atlas-<act>-page-<n>/…`, so adding a page leaves the maps of the others alone (the game
+stacks them as the layers of one texture): Basis ETC1S, sRGB, as every albedo map (#52 "Formats"),
 with four mip levels so the last keeps half a texel of gutter and a cell never samples its
 neighbour (toktx 4.4.2 builds only full chains, so the levels are written here, each a 2 x 2
 mean weighted by alpha). Before encoding, the colour of every transparent texel is bled in from
@@ -33,15 +35,28 @@ BLEED_PASSES = 16
 def main():
     with open(CELLS_PATH, encoding='utf-8') as file:
         table = json.load(file)
+    pages = 0
     for atlas in table['atlases']:
-        asset_id = asset_id_of(atlas['act'])
-        encode(asset_id, write_level_pngs(asset_id, table['atlas'], atlas['cells']))
-    print('encoded %d hero atlases for the sets %s' % (len(table['atlases']), ', '.join(table['sets'])))
+        for at, cells in enumerate(cells_of_page(atlas)):
+            asset_id = asset_id_of(atlas['act'], at + 1)
+            encode(asset_id, write_level_pngs(asset_id, table['atlas'], cells))
+            pages += 1
+    print('encoded %d pages of %d hero atlases for the sets %s'
+          % (pages, len(table['atlases']), ', '.join(table['sets'])))
 
 
-def asset_id_of(act):
-    """heroAtlasAssetIdOf in src/features/materials/systems/render/heroAtlases.ts."""
-    return 'ground-hero-atlas-%s' % act.replace('_', '-').replace('.', '-')
+def cells_of_page(atlas):
+    """hero_species.cells_of_page: the act's cells by page, page 1 first."""
+    pages = [[] for _ in range(max((cell['page'] for cell in atlas['cells']), default=0))]
+    for cell in atlas['cells']:
+        pages[cell['page'] - 1].append(cell)
+    return pages
+
+
+def asset_id_of(act, page):
+    """heroAtlasAssetIdOf in src/features/mineral-skins/systems/heroAtlases.ts: page 1 keeps the act's id."""
+    act_asset = 'ground-hero-atlas-%s' % act.replace('_', '-').replace('.', '-')
+    return act_asset if page == 1 else '%s-page-%d' % (act_asset, page)
 
 
 def write_level_pngs(asset_id, shape, cells):

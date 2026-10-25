@@ -12,8 +12,9 @@
  * first time the player touches a cell of it (ticket 546). The debug API can show every kind's
  * rarity for eye checks and the frame A/B.
  *
- * Heroes (ticket 451): the atlas of the planet's act, from the materials slice, one object per
- * act, so the terrain swaps it only when a planet change crosses into another act.
+ * Heroes (ticket 451): the atlas of the planet's act, from the mineral skins slice with its pages
+ * (ticket 852), one object per act, so the terrain swaps it only when a planet change crosses into
+ * another act.
  *
  * Gems (ticket 786): a slot naming one of the planet's gems carries its rank k, cheapest first,
  * from the price table (`gemRankOfKind`), which the kernel's rank glint draws.
@@ -26,13 +27,13 @@ import type { KindLook, RarityLook } from '../../../../systems/render/kindLookTa
 import type { PlanetParams } from '../../../../systems/world/planetParams'
 import {
   FRAMED_RARITIES,
-  heroAtlasOfAct,
   hueSlotColourOf,
   MATERIALS,
   RARITY_LOOKS,
   type Material,
   type MaterialTable,
 } from '../../../materials'
+import { heroAtlasOfAct } from '../../../mineral-skins'
 import { rarityTiers } from '../../../ores'
 import { actOf } from '../../../planet-mix'
 import { planetRosterOf } from '../planetRoster'

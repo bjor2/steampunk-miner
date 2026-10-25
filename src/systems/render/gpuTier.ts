@@ -6,7 +6,7 @@
  * the hard minimum, the "this device can't run the game" card. Chosen by capability only, never by
  * the quality knob, and never read by the simulation: a missing capability changes only the look.
  * The per-act hero atlas (ticket 451) takes the 16th unit only on the full program, with 16 units
- * and a KTX2 target with alpha; anywhere else heroes draw the shader look and the unit stays free.
+ * and a KTX2 target with alpha it can stack as layers; anywhere else heroes draw the shader look and the unit stays free.
  */
 import {
   GPU_MIN_TEXTURE_SIZE,
@@ -46,11 +46,13 @@ export const HERO_ATLAS_UNITS = ['sampled', 'absent'] as const
 export type HeroAtlasUnit = (typeof HERO_ATLAS_UNITS)[number]
 
 /**
- * The formats three's `KTX2Loader` transcodes an ETC1S map with alpha to (#52: albedo is ETC1S):
- * BC7, BC3, ETC2 RGBA and PVRTC, at most a byte a texel. `etc1` has no alpha and Basis has no
- * ETC1S path to `astc`; with none of these the loader decodes to RGBA8, which the atlas refuses.
+ * The formats three's `KTX2Loader` transcodes an ETC1S map with alpha to (#52: albedo is ETC1S) that
+ * WebGL 2 can also upload as array layers, which the atlas's pages are (ticket 852): BC7, BC3 and
+ * ETC2 RGBA, at most a byte a texel. `etc1` has no alpha, Basis has no ETC1S path to `astc`, and
+ * PVRTC uploads only to a plain 2D texture (the loader picks it last, after ETC2); with none of
+ * these the atlas is never loaded and heroes draw the shader look.
  */
-const ALPHA_TRANSCODE_FORMATS: readonly string[] = ['bptc', 's3tc', 'etc2', 'pvrtc']
+const ALPHA_TRANSCODE_FORMATS: readonly string[] = ['bptc', 's3tc', 'etc2']
 
 export const SCENE_TARGETS = ['half_float', 'rgba8'] as const
 export type SceneTarget = (typeof SCENE_TARGETS)[number]

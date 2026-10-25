@@ -48,15 +48,10 @@ export function useAtlasTextureSet(urls: readonly string[]): Texture[] {
 }
 
 /**
- * One map by URL, outside an asset (the per-act hero atlas, ticket 451). `clearKtx2Map` drops it
- * from the loader's cache once its texture is disposed, so a released map is never handed out
- * again and only the resident one stays held.
+ * Drops one map from the loader's cache once its texture is disposed (the per-act hero atlas's
+ * pages, tickets 451 and 852, loaded with `useAtlasTextureSet`), so a released map is never handed
+ * out again and only the resident ones stay held.
  */
-export function useKtx2Map(url: string): Texture {
-  const gl = useThree((state) => state.gl)
-  return useLoader(KTX2Loader, url, (loader) => configureLoader(loader, gl))
-}
-
 export function clearKtx2Map(url: string): void {
   useLoader.clear(KTX2Loader, url)
 }

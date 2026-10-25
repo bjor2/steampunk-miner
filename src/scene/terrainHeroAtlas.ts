@@ -1,14 +1,16 @@
 /**
  * The terrain material's hero atlas (ticket 451; TD shape 6226270701 "#451 shape"): the ONLY
- * writer of `uHeroAtlas` and `heroAtlasPresence`. One atlas is resident at a time: the old one is
- * unbound and disposed before the next is bound, and the look table carries no atlas cell until
- * one is bound, so a hero never samples a released texture. An atlas the GPU would hold as RGBA8
- * is refused and disposed, and every hero keeps the shader look (no RGBA8 fallback, TD #470).
+ * writer of `uHeroAtlas` and `heroAtlasPresence`. One act's pages are resident at a time, stacked
+ * as the layers of one texture (ticket 852): the old act's are unbound and disposed before the
+ * next are bound, and the look table carries no atlas cell until they are, so a hero never samples
+ * a released texture. Pages the GPU would hold as RGBA8 are refused and disposed, and every hero
+ * keeps the shader look (no RGBA8 fallback, TD #470).
  */
 import type { IUniform, ShaderMaterial, Texture } from 'three'
 import type { HeroAtlasUnit } from '../systems/render/gpuTier'
 import type { DrawnHeroAtlas } from '../systems/render/heroAtlas'
-import { heroAtlasPresence, NO_HERO_ATLAS_CELLS } from './heroAtlasPresence'
+import { heroAtlasLayersOf } from './heroAtlasLayers'
+import { heroAtlasPresence, NO_HERO_CELLS_BOUND } from './heroAtlasPresence'
 
 export function createHeroAtlasUniforms(): Record<string, IUniform> {
   return { uHeroAtlas: { value: null } }
@@ -19,39 +21,51 @@ export function noteHeroAtlasUnit(unit: HeroAtlasUnit): void {
   heroAtlasPresence.unit = unit
 }
 
+/**
+ * Stacks the transcoded pages and binds them, answering the bound texture to release later; null
+ * when the pages were refused (then they are disposed here).
+ */
 export function bindHeroAtlas(
   material: ShaderMaterial,
-  texture: Texture,
+  pages: readonly Texture[],
   atlas: DrawnHeroAtlas,
-): void {
-  if (!isCompressed(texture)) {
-    refuseHeroAtlas(texture, atlas)
-    return
+): Texture | null {
+  const layers = heroAtlasLayersOf(pages)
+  if (layers === null) {
+    refuseHeroAtlas(pages, atlas)
+    return null
   }
-  material.uniforms.uHeroAtlas.value = texture
+  material.uniforms.uHeroAtlas.value = layers
   heroAtlasPresence.residentId = atlas.id
-  heroAtlasPresence.cells = atlas.cells
+  heroAtlasPresence.pages = pages.length
+  heroAtlasPresence.heroCells = atlas.heroCells
   heroAtlasPresence.binds++
+  return layers
 }
 
-/** Unbinds the atlas if it is the bound one, then frees its GPU copy. */
-export function releaseHeroAtlas(material: ShaderMaterial, texture: Texture): void {
-  if (material.uniforms.uHeroAtlas.value === texture) unbindHeroAtlas(material)
-  texture.dispose()
+/** Unbinds the layers if they are the bound ones, then frees them and the pages they came from. */
+export function releaseHeroAtlas(
+  material: ShaderMaterial,
+  layers: Texture | null,
+  pages: readonly Texture[],
+): void {
+  if (layers !== null && material.uniforms.uHeroAtlas.value === layers) unbindHeroAtlas(material)
+  layers?.dispose()
+  disposeAll(pages)
 }
 
 function unbindHeroAtlas(material: ShaderMaterial): void {
   material.uniforms.uHeroAtlas.value = null
   heroAtlasPresence.residentId = null
-  heroAtlasPresence.cells = NO_HERO_ATLAS_CELLS
+  heroAtlasPresence.pages = 0
+  heroAtlasPresence.heroCells = NO_HERO_CELLS_BOUND
 }
 
-function refuseHeroAtlas(texture: Texture, atlas: DrawnHeroAtlas): void {
+function refuseHeroAtlas(pages: readonly Texture[], atlas: DrawnHeroAtlas): void {
   heroAtlasPresence.refusedId = atlas.id
-  texture.dispose()
+  disposeAll(pages)
 }
 
-/** three's `CompressedTexture`; the loader decodes to a plain RGBA texture when it has no target. */
-function isCompressed(texture: Texture): boolean {
-  return (texture as Texture & { isCompressedTexture?: boolean }).isCompressedTexture === true
+function disposeAll(textures: readonly Texture[]): void {
+  for (const texture of textures) texture.dispose()
 }

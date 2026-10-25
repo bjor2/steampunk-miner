@@ -13,7 +13,6 @@ import { readAuthorityState } from '../store/authorityLink'
 import { useGameStore } from '../store/gameStore'
 import type { AuthorityState } from '../systems/authority/authorityState'
 import { flagsOf } from '../systems/authority/devFlagState'
-import { heroCellsOf } from '../systems/render/heroAtlas'
 import { hasSeenSpecies } from '../systems/render/speciesSighting'
 import { kindLookProvider, type KindLookProvider } from '../systems/registries/kindLook'
 import {
@@ -42,7 +41,7 @@ interface FittedLooks {
   sightings: unknown
   /** `codex.materialContact` (ticket 547): off, no species shows its rarity. */
   isContactShown: boolean
-  heroCells: readonly string[]
+  heroCells: ReadonlyMap<string, number>
   isEveryKindShown: boolean
 }
 
@@ -77,7 +76,7 @@ function isFittedTo(
     last.params === params &&
     last.sightings === sightings &&
     last.isContactShown === isContactShown &&
-    last.heroCells === heroAtlasPresence.cells &&
+    last.heroCells === heroAtlasPresence.heroCells &&
     last.isEveryKindShown === kindLookPresence.isEveryKindShown
   )
 }
@@ -87,7 +86,7 @@ function fitOf(params: PlanetParams, sightings: unknown, isContactShown: boolean
     params,
     sightings,
     isContactShown,
-    heroCells: heroAtlasPresence.cells,
+    heroCells: heroAtlasPresence.heroCells,
     isEveryKindShown: kindLookPresence.isEveryKindShown,
   }
 }
@@ -103,7 +102,7 @@ function kindLookTableFor(
     provider.kindLooksOf(params),
     provider.rarityLooks(),
     (look) => isRaritySeenBy(provider, state, playerId, look),
-    heroCellsOf(heroAtlasPresence.cells),
+    heroAtlasPresence.heroCells,
   )
 }
 

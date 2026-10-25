@@ -110,6 +110,19 @@ describe('mineral skins table', () => {
     ])
   })
 
+  it("loads a hero row's atlas page and refuses one that is not a whole number from 1 (ticket 852)", () => {
+    const paged = fileOf([{ ...skinRow('ironstone-brassvein'), atlasPage: 2 }])
+    expect(loadSkinTable(paged, CONTEXT).skins[0].atlasPage).toBe(2)
+    const file = fileOf([
+      { ...skinRow('ironstone-brassvein'), atlasPage: 0 },
+      { ...skinRow('verdigris-copper', 'waxy'), atlasPage: '2' },
+    ])
+    expect(skinTableProblems(file, CONTEXT)).toEqual([
+      'skins[0].atlasPage must be a whole page number from 1',
+      'skins[1].atlasPage must be a whole page number from 1',
+    ])
+  })
+
   it('refuses a palette that is not three colours running darkest first', () => {
     const palettes = [
       { id: 'umber', ramp: ['#404040', GREY] },

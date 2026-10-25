@@ -1,6 +1,7 @@
 /**
  * The schema of `mineralSkins.json` (ticket 591): a layer entry is `{ id }`, a palette's also
- * carries its `ramp` (ticket 592), a skin row is `{ species, base, vein, palette, sheen }` and a
+ * carries its `ramp` (ticket 592), a skin row is `{ species, base, vein, palette, sheen }`, with
+ * a hero's optional `atlasPage`, a whole number from 1 (ticket 852), and a
  * signature skin row `{ planet, base, vein, palette, sheen }` (ticket 603), every id kebab-case, the
  * planet a whole number from 1, and nothing else. Cross-row rules (known species and layers, one skin per species,
  * no two alike, a palette's body on its species' hue slot) live in the table.
@@ -11,7 +12,8 @@ import { SKIN_LAYER_KINDS, type SkinLayerKind } from './skinLayers'
 const KEBAB_ID = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/
 const LAYER_FIELDS: readonly string[] = ['id']
 const PALETTE_FIELDS: readonly string[] = ['id', 'ramp']
-const SKIN_FIELDS: readonly string[] = ['species', ...SKIN_LAYER_KINDS]
+const SKIN_ID_FIELDS: readonly string[] = ['species', ...SKIN_LAYER_KINDS]
+const SKIN_FIELDS: readonly string[] = [...SKIN_ID_FIELDS, 'atlasPage']
 const SIGNATURE_FIELDS: readonly string[] = ['planet', ...SKIN_LAYER_KINDS]
 
 type Raw = Record<string, unknown>
@@ -26,9 +28,12 @@ export function layerEntryShapeProblems(entry: Raw, kind: SkinLayerKind, where: 
 
 export function skinRowShapeProblems(row: Raw, where: string): string[] {
   return [
-    ...SKIN_FIELDS.filter((field) => !isKebab(row[field])).map(
+    ...SKIN_ID_FIELDS.filter((field) => !isKebab(row[field])).map(
       (field) => `${where}.${field} must be a kebab-case id`,
     ),
+    ...(row.atlasPage === undefined || isPageNumber(row.atlasPage)
+      ? []
+      : [`${where}.atlasPage must be a whole page number from 1`]),
     ...unknownFieldProblems(row, SKIN_FIELDS, where),
   ]
 }
@@ -54,5 +59,13 @@ function isKebab(value: unknown): value is string {
 }
 
 function isPlanetIndex(value: unknown): value is number {
+  return isWholeFromOne(value)
+}
+
+function isPageNumber(value: unknown): value is number {
+  return isWholeFromOne(value)
+}
+
+function isWholeFromOne(value: unknown): value is number {
   return typeof value === 'number' && Number.isSafeInteger(value) && value >= 1
 }

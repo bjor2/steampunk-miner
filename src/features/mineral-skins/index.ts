@@ -31,5 +31,18 @@ export {
   skinOfKindSlot,
   skinOfSpecies,
 } from './systems/mineralSkin'
+/**
+ * The per-act hero atlases (tickets 451 and 852): which hero species each act's atlas holds, page
+ * by page, each page's from its skin row.
+ */
+export type { HeroAtlasRow } from './systems/heroAtlases'
+export {
+  HERO_ATLASES,
+  heroAtlasArtAssets,
+  heroAtlasAssetIdOf,
+  heroAtlasOfAct,
+  heroAtlasRowProblems,
+  loadHeroAtlases,
+} from './systems/heroAtlases'
 export type { SignatureMaterial } from './systems/signatureMaterial'
 export { signatureMaterialsByPlanet } from './systems/signatureMaterial'

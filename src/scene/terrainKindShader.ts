@@ -14,7 +14,8 @@
  * never changes. The lite program (ticket 477) leaves all of it out and draws the family look.
  *
  * A hero whose sprite is in the resident act's atlas (ticket 451) draws that sprite instead,
- * upright on the planet, with the same rarity tint and glow and a frame just outside its mask.
+ * upright on the planet, with the same rarity tint and glow and a frame just outside its mask. The
+ * act's pages (ticket 852) are the layers of one array texture, so a page adds no sampler.
  * The atlas takes the 16th unit only where the startup probe allows it (`TERRAIN_HERO_ATLAS`,
  * fixed when the material is made, so the program still compiles once); without it, or for a
  * hero with no cell, the look table carries no cell and the hero draws its grains.
@@ -27,6 +28,7 @@
  */
 import {
   HERO_ATLAS_CELL_PX,
+  HERO_ATLAS_CELLS,
   HERO_ATLAS_CELLS_PER_ROW,
   HERO_ATLAS_GUTTER_PX,
   HERO_ATLAS_SIDE_PX,
@@ -66,6 +68,7 @@ export function kindLookDefines(ladder: GemGlintLadder = GEM_GLINT): Record<stri
     HERO_ATLAS_CELL_PX,
     HERO_ATLAS_GUTTER_PX,
     HERO_ATLAS_CELLS_PER_ROW,
+    HERO_ATLAS_CELLS,
     RARITY_REVEAL_FLARE,
   }
 }
@@ -81,8 +84,9 @@ uniform vec4 uRarityLooks[RARITY_LOOK_LEADS];
 // The first-contact flourish (ticket 698): the roster slot met, the uTime it started, its seconds.
 uniform vec4 uRarityReveal;
 #ifdef TERRAIN_HERO_ATLAS
-// The resident act's hero sprites (ticket 451), albedo with the mask in alpha: the 16th unit.
-uniform sampler2D uHeroAtlas;
+// The resident act's hero sprites (ticket 451), albedo with the mask in alpha: the 16th unit,
+// one layer per page (ticket 852).
+uniform sampler2DArray uHeroAtlas;
 #endif
 #endif
 `
@@ -265,16 +269,20 @@ float drawKindGrains(vec4 kind, float reveal, vec2 local, vec2 tile, float soft,
 #ifdef TERRAIN_HERO_ATLAS
 const float HERO_CONTENT_PX = float(HERO_ATLAS_CELL_PX - 2 * HERO_ATLAS_GUTTER_PX);
 
-// The atlas cell the entry carries (kindLookTable.ts), or -1 for the shader look.
+// The act-wide atlas cell the entry carries (kindLookTable.ts), or -1 for the shader look.
 float heroCellOf(vec4 kind) {
   return mod(floor(floor(kind.w + 0.5) / float(HERO_LOOK_FLAG)), float(HERO_LOOK_CELL_SPAN)) - 1.0;
 }
 
-// A point of the cell's sprite, 0 to 1 across its content with y down the image, to the atlas.
-vec2 heroAtlasUv(float cell, vec2 sprite) {
+// A point of the cell's sprite, 0 to 1 across its content with y down the image, to the atlas:
+// the uv on the cell's page and the page's layer (ticket 852: 16 cells a page, page 1 layer 0).
+vec3 heroAtlasUv(float cell, vec2 sprite) {
+  float layer = floor(cell / float(HERO_ATLAS_CELLS));
+  float onPage = cell - layer * float(HERO_ATLAS_CELLS);
   float perRow = float(HERO_ATLAS_CELLS_PER_ROW);
-  vec2 corner = vec2(mod(cell, perRow), floor(cell / perRow)) * float(HERO_ATLAS_CELL_PX);
-  return (corner + float(HERO_ATLAS_GUTTER_PX) + sprite * HERO_CONTENT_PX) / float(HERO_ATLAS_SIDE_PX);
+  vec2 corner = vec2(mod(onPage, perRow), floor(onPage / perRow)) * float(HERO_ATLAS_CELL_PX);
+  vec2 uv = (corner + float(HERO_ATLAS_GUTTER_PX) + sprite * HERO_CONTENT_PX) / float(HERO_ATLAS_SIDE_PX);
+  return vec3(uv, layer);
 }
 
 // The sprite's mask a frame's width off the point, clamped into the cell so no neighbour shows.

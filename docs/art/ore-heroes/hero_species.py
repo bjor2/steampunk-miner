@@ -5,7 +5,11 @@ authored set serves (planet-mix's `oreThemes.json`) and the cell table the per-a
 reads. An act's atlas packs every authored set that paints one of its planets, set after set in
 `AUTHORED_SETS` order, so the legacy four keep cells 0 to 3 in both acts, P1's gems follow them in
 the foothold.base atlas and P2's own gems in the foothold.heavy atlas, then the gems of P3 to P5.
-Plain Python: the Blender authoring script and the python3 post step both import it.
+An act's atlas is an unbounded list of 16-cell pages (ticket 852): a hero sits on the page its
+mineral skin row records (`atlasPage` in mineralSkins.json), and a hero with none on the first
+page with room, a new page opening when the last is full, as `packHeroPages` in
+src/systems/render/heroAtlas.ts packs them. Plain Python: the Blender authoring script and the
+python3 post step both import it.
 """
 
 import colorsys
@@ -24,11 +28,14 @@ import atlas_layout as layout  # noqa: E402
 MATERIALS_PATH = os.path.join(REPO_ROOT, 'src', 'features', 'materials', 'materials.json')
 THEMES_PATH = os.path.join(REPO_ROOT, 'src', 'features', 'planet-mix', 'oreThemes.json')
 GEM_ROWS_PATH = os.path.join(REPO_ROOT, 'src', 'features', 'ores', 'ores.economy.json')
+SKINS_PATH = os.path.join(REPO_ROOT, 'src', 'features', 'mineral-skins', 'mineralSkins.json')
 CELLS_PATH = os.path.join(HERE, 'hero-cells.json')
 BLENDER_VERSION = '4.2.9 LTS'
 
 # The per-act hero atlas of #451 (TD shape on #450): 1024 px, 256 px cells, 16 a sheet, albedo only.
 ATLAS = {'sidePx': 1024, 'cellPx': 256, 'contentPx': 248, 'gutterPx': 4, 'cellsPerRow': 4}
+# HERO_ATLAS_CELLS in src/constants/scene.ts: the cells of one page (ticket 852).
+CELLS_PER_PAGE = 16
 # Which hero rows of a materials pool an authored set draws: every hero of the pool, the heroes on
 # the pool's gem slots (the `ore.gems` rows of the ores slice, ticket 741), or every other hero.
 EVERY_HERO, GEM_HEROES, NON_GEM_HEROES = 'every', 'gems', 'non-gems'
@@ -58,6 +65,13 @@ def load_materials():
 def load_acts():
     with open(THEMES_PATH, encoding='utf-8') as file:
         return json.load(file)['acts']
+
+
+def load_atlas_pages():
+    """Per species, the atlas page its mineral skin row records (ticket 852); absent for none."""
+    with open(SKINS_PATH, encoding='utf-8') as file:
+        skins = json.load(file)['skins']
+    return {skin['species']: skin['atlasPage'] for skin in skins if 'atlasPage' in skin}
 
 
 def load_gem_slots():
@@ -158,28 +172,57 @@ def hero_entry_of(set_id, hero):
             'cell': 'cells/%s.png' % hero['id'], 'blend': 'blend/hero-%s.blend' % hero['id']}
 
 
-def atlas_entry_of(act, sets, materials, acts, gem_slots):
+def packed_pages(species_ids, page_of):
+    """The act's pages, page 1 first: a recorded hero on its page, the rest in order on the first page
+    with room, a new page opening when every page is full; cells in the act's order within a page."""
+    recorded = [page_of[i] for i in species_ids if i in page_of]
+    pages = [[] for _ in range(max(recorded, default=0))]
+    for species_id in species_ids:
+        if species_id in page_of:
+            pages[page_of[species_id] - 1].append(species_id)
+    for species_id in species_ids:
+        if species_id not in page_of:
+            open_page = next((page for page in pages if len(page) < CELLS_PER_PAGE), None)
+            if open_page is None:
+                open_page = []
+                pages.append(open_page)
+            open_page.append(species_id)
+    return [sorted(page, key=species_ids.index) for page in pages]
+
+
+def atlas_entry_of(act, sets, materials, acts, gem_slots, page_of):
     packed_sets = sets_of_act(act, sets, acts)
-    packed = [hero for set_id in packed_sets for hero in heroes_of_set(set_id, materials, gem_slots)]
+    packed = [hero['id'] for set_id in packed_sets for hero in heroes_of_set(set_id, materials, gem_slots)]
     return {'act': act, 'sets': packed_sets,
-            'cells': [{'index': i, 'speciesId': hero['id'], 'rect': cell_rect_of(i)} for i, hero in enumerate(packed)]}
+            'cells': [{'index': i, 'page': at + 1, 'speciesId': species_id, 'rect': cell_rect_of(i)}
+                      for at, page in enumerate(packed_pages(packed, page_of))
+                      for i, species_id in enumerate(page)]}
+
+
+def cells_of_page(atlas_entry):
+    """The act's cells by page (ticket 852): a list per page, page 1 first."""
+    pages = [[] for _ in range(max((cell['page'] for cell in atlas_entry['cells']), default=0))]
+    for cell in atlas_entry['cells']:
+        pages[cell['page'] - 1].append(cell)
+    return pages
 
 
 def cell_table_of(sets=AUTHORED_SETS, materials=None, acts=None):
     materials = materials or load_materials()
     acts = acts or load_acts()
     gem_slots = load_gem_slots()
+    page_of = load_atlas_pages()
     set_ids = [entry['id'] for entry in sets]
     return {
         '$comment': 'The hero cells of the authored sets %s (#452, tickets 744 and 785): one 256 px albedo cell '
                     'per hero species (`heroes`), and per act the cells its atlas of #451 packs (`atlases`: cell i '
-                    'at column i mod %d, row i div %d, %d px of content inside a %d px gutter), set after set in '
-                    'packing order. Rendered lit on the ore stage with the rock held out, so the alpha is the '
+                    'of its page at column i mod %d, row i div %d, %d px of content inside a %d px gutter), set after '
+                    'set in packing order, each on the page its mineral skin row records (ticket 852). Rendered lit on the ore stage with the rock held out, so the alpha is the '
                     'mask; the shader draws the rarity frame and glow, never the sprite.'
                     % (', '.join(set_ids), ATLAS['cellsPerRow'], ATLAS['cellsPerRow'], ATLAS['contentPx'], ATLAS['gutterPx']),
         'sets': set_ids,
         'atlas': dict(ATLAS),
-        'atlases': [atlas_entry_of(act, sets, materials, acts, gem_slots) for act in acts_of_sets(sets, acts)],
+        'atlases': [atlas_entry_of(act, sets, materials, acts, gem_slots, page_of) for act in acts_of_sets(sets, acts)],
         'heroes': [hero_entry_of(set_id, hero) for set_id in set_ids for hero in heroes_of_set(set_id, materials, gem_slots)],
     }
 

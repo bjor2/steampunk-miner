@@ -51,6 +51,16 @@ describe('gpu capability decision table (TD #470 section 2.3, ticket 477)', () =
     ['no compressed format', { textureFormats: [] }, 'absent'],
     ['only ASTC, which ETC1S cannot reach', { textureFormats: ['astc'] }, 'absent'],
     ['only ETC1, which has no alpha', { textureFormats: ['etc1'] }, 'absent'],
+    [
+      'only PVRTC, which cannot hold the pages as layers (ticket 852)',
+      { textureFormats: ['pvrtc'] },
+      'absent',
+    ],
+    [
+      'PVRTC beside ETC2, which the loader picks first',
+      { textureFormats: ['pvrtc', 'etc2'] },
+      'sampled',
+    ],
   ] as const)(
     'gives the hero atlas the 16th unit with %s: %s (ticket 451)',
     (_, readings, unit) => {

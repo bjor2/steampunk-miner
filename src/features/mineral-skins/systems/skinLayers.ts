@@ -18,8 +18,11 @@ export interface SkinLayer {
 /** One layer id per kind: what a skin row chooses, whoever wears it. */
 export type SkinLayerIds = Readonly<Record<SkinLayerKind, string>>
 
-/** A species' skin row of `mineralSkins.json`: its species id and one layer id per kind. */
-export type SkinRow = { species: string } & SkinLayerIds
+/**
+ * A species' skin row of `mineralSkins.json`: its species id, one layer id per kind and, for a hero
+ * its act's atlas packs, the atlas page (from 1) its sprite sits on (ticket 852, `heroAtlases.ts`).
+ */
+export type SkinRow = { species: string; atlasPage?: number } & SkinLayerIds
 
 /** A planet's signature skin row (ticket 603): the planet whose signature material wears it. */
 export type SignatureSkinRow = { planet: number } & SkinLayerIds

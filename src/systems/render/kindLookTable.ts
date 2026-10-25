@@ -5,9 +5,9 @@
  * only its kind slot; everything it draws comes from here, so a reveal rebuilds no chunk.
  *
  * A slot's entry is (silhouette code, pattern code, colour as 0xRRGGBB, rarity lead + 8 × (cell + 1)
- * for a hero drawn from the resident act's atlas, ticket 451, + 256 × the gem's glint code, ticket
- * 786). A hero whose sprite is not in the resident atlas, or with no atlas at all, keeps the lead
- * alone and draws the shader look. A gem carries the glint of its rank k within its planet
+ * for a hero drawn from the resident act's atlas, ticket 451, its cell act-wide over the pages of
+ * ticket 852, + 8192 × the gem's glint code, ticket 786). A hero whose sprite is not in the
+ * resident atlas, or with no atlas at all, keeps the lead alone and draws the shader look. A gem carries the glint of its rank k within its planet
  * (`gemGlint.ts`), shown from the first frame because it is not rarity (TD ruling 6374381455 on
  * #746), and keyed on k alone, so the field is the same whole number on every planet. A slot that
  * binds no species stays all zeros, which the shader draws as today's family look.
@@ -36,10 +36,11 @@ export const RARITY_LOOK_LEADS = 4
  */
 export const HERO_LOOK_FLAG = 8
 /**
- * The hero share counts cell + 1 below this, room for the atlas's 16 cells and twice as many, so
- * the glint code above it never mixes with a cell.
+ * The hero share counts cell + 1 below this, so the glint code above it never mixes with a cell.
+ * The cell is act-wide (ticket 852: 16 a page, page 1 first), which leaves room for 63 pages, and
+ * the largest glint code over the last cell and mythic still fits a float exactly.
  */
-export const HERO_LOOK_CELL_SPAN = 32
+export const HERO_LOOK_CELL_SPAN = 1024
 /** A gem adds this times its glint code (`gemGlint.ts`, ticket 786) to the fourth float. */
 export const GEM_GLINT_FLAG = HERO_LOOK_FLAG * HERO_LOOK_CELL_SPAN
 export const LOOK_VECTOR = 4
