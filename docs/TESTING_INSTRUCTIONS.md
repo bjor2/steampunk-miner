@@ -178,6 +178,14 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   the flask's cleared firedamp), the kernel seams with probe slices in
   `authority/hazards/hazardOutcomeSeams.test.ts`, and the overlay tags in
   `planet-kit/systems/render/kitOutcomeTags.test.ts`; the lane above replays with the outcomes on.
+  PK7's per-planet identity gate (ticket 826) has its own lane, `planet-kit/identityPace.lane.test.ts`.
+  It plays three seeds to planet 5 twice: skipping every merchant (the bare bot) and with merchants
+  on, where the bot's `kitPolicy.merchant: 'buy_local_kit'` buys each planet's own kit. The lane
+  writes `balance-report/planet-identity.ndjson` and the rewritten `pace-baseline.md`. Its bars and
+  printed rows are unit-specced on built runs in `identityPaceBars.test.ts`, the trace fold in
+  `identityTrace.test.ts`, and the bot's merchant buys in `planet-kit/systems/botKitBuys.test.ts`.
+  The ore-premium backtrack bar (g from 2 to 10) is pure and lives in
+  `planet-kit/systems/premiumBacktrack.test.ts`.
   The deployed pose on the car (ticket 883) is read from the same state by
   `planet-kit/systems/render/kitSocketShows.test.ts` (idle, acting, the tail, the vented flask, the
   digest untouched); the posed parts against the rig's bounds stay in `kitSocketLook.test.ts`.

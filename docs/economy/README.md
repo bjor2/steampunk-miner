@@ -9,8 +9,10 @@ final balance. Nothing here is game code.
 - `economy-constants.json`: the constants from the decision, as decimal strings and integers.
 - `planet-table.md`, `vehicle-table.md`, `price-table.md`, `enemy-table.md`: one row per planet.
 - `tools/gen.py` regenerates the tables from the constants. `tools/sim.py` is the pacing simulation.
-- `pace-baseline.md`: the pacing bot's core minutes on planets 1 to 10 with ore leads (#146), the
-  P3–P10 reference for later tickets.
+- `pace-baseline.md`: the PK7 identity trace (ticket 826). It gives the pacing bot's core minutes
+  on planets 1 to 5, both skipping every merchant and with merchants on, plus drill and tip buys,
+  fuel share, money per minute, and each planet's kit decision. The PK7 lane writes it. It replaced
+  #146's planets 1 to 10 baseline, which is in the file's history.
 - `drill-ladder.md`: the drill-speed ladder (#409), the time a 50-cell planet 1 column takes at
   drill_power 1, 5, 10, 15 and 20, measured by the authority's cut, to tune the drill curve against. It also
   holds the starting rigs' cut-follow speed per stored step 0 to 30 and why it reads flat (#431).

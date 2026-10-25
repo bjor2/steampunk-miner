@@ -431,15 +431,19 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/rarityTripShare.test.ts` | 3 | 3 |
 | `src/features/ores/systems/slotDraws.test.ts` | 4 | 4 |
 
-### `planet-kit`: 34 files, 295 tests
+### `planet-kit`: 39 files, 320 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/planet-kit/cratePace.lane.test.ts` | 2 | 2 |
 | `src/features/planet-kit/cratePaceBars.test.ts` | 3 | 3 |
+| `src/features/planet-kit/identityPace.lane.test.ts` | 2 | 2 |
+| `src/features/planet-kit/identityPaceBars.test.ts` | 10 | 10 |
+| `src/features/planet-kit/identityTrace.test.ts` | 4 | 4 |
 | `src/features/planet-kit/logging.test.ts` | 6 | 6 |
 | `src/features/planet-kit/systems/botCrates.test.ts` | 6 | 6 |
 | `src/features/planet-kit/systems/botFlask.test.ts` | 4 | 4 |
+| `src/features/planet-kit/systems/botKitBuys.test.ts` | 6 | 6 |
 | `src/features/planet-kit/systems/containerPremium.test.ts` | 7 | 6 |
 | `src/features/planet-kit/systems/containerRules.test.ts` | 12 | 12 |
 | `src/features/planet-kit/systems/containerViews.test.ts` | 5 | 5 |
@@ -463,6 +467,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/planet-kit/systems/planetKitPrices.test.ts` | 6 | 6 |
 | `src/features/planet-kit/systems/planetKitRows.test.ts` | 27 | 27 |
 | `src/features/planet-kit/systems/planetKitSales.test.ts` | 7 | 7 |
+| `src/features/planet-kit/systems/premiumBacktrack.test.ts` | 3 | 3 |
 | `src/features/planet-kit/systems/render/kitOutcomeTags.test.ts` | 4 | 4 |
 | `src/features/planet-kit/systems/render/kitSocketLook.test.ts` | 24 | 10 |
 | `src/features/planet-kit/systems/render/kitSocketShows.test.ts` | 7 | 5 |
