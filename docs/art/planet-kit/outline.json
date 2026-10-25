@@ -1,0 +1,102 @@
+{
+  "cellM": 0.004,
+  "windowM": [-1.0, -0.7, 1.2, 1.0],
+  "sockets": {
+    "scree_plough.rest": {
+      "tier-1": {
+        "cells": 1579,
+        "outsideRig": 1064,
+        "behindDrillTip": true
+      },
+      "tier-3": {
+        "cells": 1579,
+        "outsideRig": 30,
+        "behindDrillTip": true
+      }
+    },
+    "scree_plough.acting": {
+      "tier-1": {
+        "cells": 1511,
+        "outsideRig": 1066,
+        "behindDrillTip": true
+      },
+      "tier-3": {
+        "cells": 1511,
+        "outsideRig": 30,
+        "behindDrillTip": true
+      }
+    },
+    "damp_flask.rest": {
+      "tier-1": {
+        "cells": 606,
+        "outsideRig": 142,
+        "behindDrillTip": true
+      },
+      "tier-3": {
+        "cells": 606,
+        "outsideRig": 116,
+        "behindDrillTip": true
+      }
+    },
+    "damp_flask.acting": {
+      "tier-1": {
+        "cells": 630,
+        "outsideRig": 159,
+        "behindDrillTip": true
+      },
+      "tier-3": {
+        "cells": 630,
+        "outsideRig": 126,
+        "behindDrillTip": true
+      }
+    },
+    "shard_tongs.rest": {
+      "tier-1": {
+        "cells": 1151,
+        "outsideRig": 386,
+        "behindDrillTip": true
+      },
+      "tier-3": {
+        "cells": 1151,
+        "outsideRig": 326,
+        "behindDrillTip": true
+      }
+    },
+    "shard_tongs.acting": {
+      "tier-1": {
+        "cells": 1348,
+        "outsideRig": 583,
+        "behindDrillTip": true
+      },
+      "tier-3": {
+        "cells": 1348,
+        "outsideRig": 523,
+        "behindDrillTip": true
+      }
+    },
+    "vent_vane.rest": {
+      "tier-1": {
+        "cells": 584,
+        "outsideRig": 584,
+        "behindDrillTip": true
+      },
+      "tier-3": {
+        "cells": 584,
+        "outsideRig": 562,
+        "behindDrillTip": true
+      }
+    },
+    "vent_vane.acting": {
+      "tier-1": {
+        "cells": 1034,
+        "outsideRig": 1034,
+        "behindDrillTip": true
+      },
+      "tier-3": {
+        "cells": 1034,
+        "outsideRig": 562,
+        "behindDrillTip": true
+      }
+    }
+  }
+}

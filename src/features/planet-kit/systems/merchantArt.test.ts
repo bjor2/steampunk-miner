@@ -83,6 +83,14 @@ describe('merchant art', () => {
     ])
   })
 
+  it('bolts every frontage onto the Sell building at one point of its frame', () => {
+    expect(MERCHANT_ART.host).toBe('sell')
+    expect(MERCHANT_ART.atM).toEqual([1.05, 3])
+    expect(merchantArtProblems({ ...artFile, atM: [1] }, PLANET_KITS.merchants)).toEqual([
+      'merchantArt.json atM must be two metres [x, y]',
+    ])
+  })
+
   it('refuses a table that leaves a merchant without a frontage', () => {
     expect(
       merchantArtProblems(

@@ -2,7 +2,7 @@
   "id": "platform-merchant-2",
   "source": "blender",
   "form": "parts",
-  "status": "placeholder",
+  "status": "final",
   "color": "#8a7aa8",
   "partColors": {
     "merchant-banner": "#8a7aa8"

@@ -14,6 +14,7 @@ import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { planetKitDebugActions } from './debug'
 import { PLANET_KIT_PROJECTIONS, PLANET_KIT_RUN_EVENTS } from './logging'
 import { KIT_SOCKET_PIECE_ID, KitSocketParts } from './scene/KitSocketParts'
+import { MERCHANT_FRONTAGE_PIECE_ID, MerchantFrontage } from './scene/MerchantFrontage'
 import { CONTAINER_RULES } from './systems/containerRules'
 import { CONTAINERS_SECTION } from './systems/containerSection'
 import { MERCHANT_ORE_PREMIUM, MERCHANT_PREMIUM_LIFT } from './systems/merchantPremium'
@@ -43,10 +44,12 @@ export const slice: SliceDefinition = {
     r.bayPanelKind(MERCHANT_PANEL_KIND)
     r.bayPanelRow(MERCHANT_PANEL_ROW)
     r.vehiclePiece({ id: KIT_SOCKET_PIECE_ID, Piece: KitSocketParts })
+    // The merchant's frontage on the Assay & Exchange, where the planet has an authored merchant.
+    r.worldPiece({ id: MERCHANT_FRONTAGE_PIECE_ID, layer: 'platform', Piece: MerchantFrontage })
     // The kit sockets' parts, the merchant frontages and the Cache Crate prop (ticket 825, #214).
     r.artAssets(planetKitArtAssets())
     // steampunkDebug.features['planet-kit'].placeContainer({ tx, ty, ore }), .containers(),
-    // .showKitSockets(), .hideKitSockets(), .kitSockets(), .merchant()
+    // .showKitSockets(), .hideKitSockets(), .kitSockets(), .merchant(), .merchantFrontage()
     r.debugActions(planetKitDebugActions)
   },
 }

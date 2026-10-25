@@ -6,6 +6,7 @@
  * Render-only: nothing here reaches the authority state, a snapshot or a digest.
  */
 import { kebabOf } from '../../../systems/art/artIds'
+import type { Pair } from '../../../systems/art/partsSidecar'
 import type { ArtAsset } from '../../../systems/registries/artAssets'
 import type { PlanetId } from '../../solar-systems'
 import artFile from '../merchantArt.json'
@@ -25,6 +26,8 @@ export interface MerchantFrontage {
 export interface MerchantArt {
   /** The shop building the frontages bolt onto. */
   host: 'sell'
+  /** Where a frontage's origin bolts onto the host, in metres from the host's origin. */
+  atM: Pair
   /** The one part the code can move: the banner on the roof terrace. */
   bannerPartId: string
   frontages: readonly MerchantFrontage[]
@@ -47,6 +50,7 @@ export function merchantArtProblems(file: unknown, merchants: readonly MerchantR
     return ['merchantArt.json needs frontages']
   return [
     ...(file.host === 'sell' ? [] : ['merchantArt.json host must be "sell"']),
+    ...(isPair(file.atM) ? [] : ['merchantArt.json atM must be two metres [x, y]']),
     ...(isText(file.bannerPartId) && KEBAB_ID.test(file.bannerPartId)
       ? []
       : ['merchantArt.json bannerPartId must be a kebab-case part id']),
@@ -77,6 +81,14 @@ export function merchantArtAssets(art: MerchantArt): ArtAsset[] {
     category: FRONTAGE_CATEGORY,
     parts: [art.bannerPartId],
   }))
+}
+
+function isPair(value: unknown): value is Pair {
+  return (
+    Array.isArray(value) &&
+    value.length === 2 &&
+    value.every((side: unknown) => typeof side === 'number' && Number.isFinite(side))
+  )
 }
 
 function frontageProblems(

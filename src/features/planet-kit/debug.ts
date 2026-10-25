@@ -8,7 +8,8 @@
  * `.showKitSockets({ heldFlasks, isActing })` / `.hideKitSockets()` hang the kit tools' parts on
  * the car (by default every flask held and the tools acting) and take them off (presentation only),
  * and `.kitSockets()` lists the sockets with their assets and what they show. `.merchant()` reads
- * the merchant the Sell bay draws on this planet (ticket 821), `merchant: null` where none trades.
+ * the merchant the Sell bay draws on this planet (ticket 821), `merchant: null` where none trades;
+ * `.merchantFrontage()` reads the frontage drawn on this planet's Assay & Exchange, or null.
  */
 import type { DebugAction } from '../../debug/debugActionRegistry'
 import type { DebugResult } from '../../debug/debugScreens'
@@ -19,6 +20,7 @@ import { vehicleOf } from '../../systems/authority/authorityState'
 import { tileOfPose } from '../../systems/vehicle/vehiclePose'
 import type { TilePoint } from '../../systems/world/tileGrid'
 import { readContainerRows } from './store/containerReads'
+import { readMerchantFrontageDrawn } from './store/merchantArtReads'
 import { hideKitSockets, showKitSockets, useKitSocketStore } from './store/kitSocketStore'
 import { readMerchantPanel } from './store/merchantReads'
 import { KIT_SOCKET_ALL_SHOWN, type KitSocketShow } from './systems/render/kitSocketLook'
@@ -105,11 +107,23 @@ function isHeldCount(value: unknown): value is KitSocketShow['heldFlasks'] {
   return Number.isSafeInteger(value) && (value as number) >= 0 && (value as number) <= 3
 }
 
+/** The frontage's asset and the part ids drawn, or null where none is authored. */
+function merchantFrontageReport(): { assetId: string; device: string; partIds: string[] } | null {
+  const drawn = readMerchantFrontageDrawn()
+  if (drawn === null) return null
+  return {
+    assetId: drawn.frontage.assetId,
+    device: drawn.frontage.device,
+    partIds: drawn.quads.map((quad) => quad.partId),
+  }
+}
+
 export const planetKitDebugActions: Readonly<Record<string, DebugAction>> = {
   placeContainer,
   containers: () => ({ ok: true, containers: readContainerRows() }),
   showKitSockets: showKitSocketsAs,
   hideKitSockets: () => okAfter(hideKitSockets),
+  merchantFrontage: () => ({ ok: true, frontage: merchantFrontageReport() }),
   kitSockets: () => ({
     ok: true,
     areShown: useKitSocketStore.getState().areShown,

@@ -862,6 +862,32 @@ kernel's own source before the slices'), under the rig body's cap.
   The part table, the review renders at desktop and phone size and the readability numbers are in
   [docs/art/fuel-tender/](art/fuel-tender/README.md).
 
+## Planet kit: socket parts, merchant frontages and the crate
+
+The art of the P1–P5 planet kits ([#825](https://github.com/bjor2/steampunk-miner/issues/825),
+PK6 of spec #647; the GD lock of 24 Oct), owned by the `planet-kit` slice, which registers the ten
+assets through `r.artAssets` (`systems/planetKitArt.ts`) and draws them: the four kit tools' parts
+on G&V's sockets (#823), one merchant frontage per first-system merchant on the Assay & Exchange,
+and the Cache Crate as a world prop. No hazard art: the lock adds no hazard.
+
+| Asset                           | Source         | What the build draws                                                                                                |
+| ------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `vehicle-item-<kit item>` (4)   | Blender, parts | the tool at its socket, its moving part at the `resting` or `acting` pose of `kitSockets.json` (`KitSocketParts`)   |
+| `platform-merchant-<place>` (5) | Blender, parts | the awning, shingle and banner on the Sell building at `merchantArt.json`'s `atM` (`MerchantFrontage`)              |
+| `prop-cache-crate`              | Blender, parts | the crate at its cell with the owner's `crate-tag`; registered and exported, drawn once the scene-layer line allows |
+
+- Each socket asset is authored in its own frame with its attach point at the origin (K5), so the
+  game places it at the vehicle sidecar's `atM`; a part that moves has its origin at its hinge and
+  its two poses in the table, which #850 drives. Every part keeps inside the rig's bounds at every
+  pose and behind the drawn drill tip (#789), held by `kitSocketLook.test.ts` against the exported
+  vehicle sidecar. A flask part shows from the held count, the shard only while the tongs act.
+- A frontage is two platform parts (#170 amendment): the shell and `merchant-banner`. Its awning
+  and banner take the planet's horizon colour from the registry look row the star map card draws,
+  so the dock and the card agree (`merchantArt.test.ts`).
+- `docs/art/planet-kit/author_planet_kit.py` wrote the first version of every `.blend`; from then on
+  the files are the sources. The part tables, the outline and readability reads and the contact
+  sheets at desktop and 360 px are in [docs/art/planet-kit/](art/planet-kit/README.md).
+
 ## UI chrome sprites
 
 The HUD's gauges, frames and sheet chrome (ticket 683; the brief is

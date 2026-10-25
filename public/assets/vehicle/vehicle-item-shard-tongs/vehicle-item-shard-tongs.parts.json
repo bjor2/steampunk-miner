@@ -1,0 +1,90 @@
+{
+  "assetId": "vehicle-item-shard-tongs",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-shard-tongs/vehicle-item-shard-tongs.blend",
+    "sha256": "db170d834b18789f83327f437cd6e666a40e7413fde8380fe7ddaf4c428b539a",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    256,
+    256
+  ],
+  "maps": {
+    "albedo": "vehicle-item-shard-tongs.albedo.ktx2",
+    "normal": "vehicle-item-shard-tongs.normal.ktx2",
+    "emissive": "vehicle-item-shard-tongs.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "tongs-arm",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        180,
+        67
+      ],
+      "sizeM": [
+        0.3506,
+        0.13
+      ],
+      "pivotM": [
+        0.3156,
+        0.1
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 6
+    },
+    {
+      "id": "tongs-jaw",
+      "tier": 1,
+      "rect": [
+        8,
+        91,
+        56,
+        44
+      ],
+      "sizeM": [
+        0.1077,
+        0.085
+      ],
+      "pivotM": [
+        0.0947,
+        0.072
+      ],
+      "atM": [
+        -0.225,
+        -0.1
+      ],
+      "z": 8
+    },
+    {
+      "id": "tongs-shard",
+      "tier": 1,
+      "rect": [
+        204,
+        8,
+        41,
+        50
+      ],
+      "sizeM": [
+        0.0789,
+        0.097
+      ],
+      "pivotM": [
+        0.0363,
+        0.0485
+      ],
+      "atM": [
+        -0.3,
+        -0.145
+      ],
+      "z": 7
+    }
+  ]
+}

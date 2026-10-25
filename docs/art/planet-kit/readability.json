@@ -1,0 +1,39 @@
+{
+  "phonePxPerM": 30.0,
+  "changedThreshold": 24,
+  "rig": {
+    "tier-1.rest": {
+      "phonePixelsChanged": 114,
+      "rigPhonePixels": 588
+    },
+    "tier-1.acting": {
+      "phonePixelsChanged": 137,
+      "rigPhonePixels": 588
+    },
+    "tier-3.rest": {
+      "phonePixelsChanged": 115,
+      "rigPhonePixels": 745
+    },
+    "tier-3.acting": {
+      "phonePixelsChanged": 129,
+      "rigPhonePixels": 745
+    }
+  },
+  "merchants": {
+    "platform-merchant-1": {
+      "phonePixelsChanged": 2061
+    },
+    "platform-merchant-2": {
+      "phonePixelsChanged": 2143
+    },
+    "platform-merchant-3": {
+      "phonePixelsChanged": 1951
+    },
+    "platform-merchant-4": {
+      "phonePixelsChanged": 2161
+    },
+    "platform-merchant-5": {
+      "phonePixelsChanged": 2092
+    }
+  }
+}

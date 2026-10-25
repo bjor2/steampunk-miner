@@ -34,9 +34,9 @@
   ],
   "rules": [
     {
-      "why": "The planet-kit slice's Cache Crate (ticket 823): the placed container's markers, its list on the base sheet and the pickup its card sends.",
+      "why": "The planet-kit slice's Cache Crate (ticket 823): the placed container's markers, its list on the base sheet and the pickup its card sends. The kit art of ticket 825: the tools on the car's sockets and the merchant frontage on the Assay & Exchange.",
       "paths": ["src/features/planet-kit/**"],
-      "specs": ["e2e/browser/cacheCrate.spec.ts"]
+      "specs": ["e2e/browser/cacheCrate.spec.ts", "e2e/browser/planetKitArt.spec.ts"]
     },
     {
       "why": "The planet-kit slice's merchant on the Sell bay (ticket 821): its name, premium tag and stock on #845's panel slot at 360 px and 1280 px.",

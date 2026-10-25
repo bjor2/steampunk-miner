@@ -2,7 +2,7 @@
   "id": "prop-cache-crate",
   "source": "blender",
   "form": "parts",
-  "status": "placeholder",
+  "status": "final",
   "color": "#8a6a3c",
   "partColors": {
     "crate-tag": "#c9a24b"

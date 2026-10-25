@@ -7,30 +7,30 @@
     "blender": null
   },
   "pxPerMetre": 512,
-  "atlasPx": [256, 256],
+  "atlasPx": [512, 512],
   "maps": {
     "albedo": "prop-cache-crate.albedo.ktx2",
     "normal": "prop-cache-crate.normal.ktx2",
-    "emissive": "prop-cache-crate.emissive.ktx2"
+    "emissive": false
   },
   "parts": [
     {
-      "id": "prop-cache-crate",
-      "tier": 1,
-      "rect": [8, 8, 16, 16],
-      "sizeM": [0.8, 0.7],
-      "pivotM": [0.4, 0.0],
-      "atM": [0, 0],
-      "z": 1
-    },
-    {
       "id": "crate-tag",
       "tier": 1,
-      "rect": [8, 8, 16, 16],
-      "sizeM": [0.3, 0.2],
-      "pivotM": [0.15, 0.1],
-      "atM": [0.2, 0.45],
+      "rect": [8, 362, 72, 67],
+      "sizeM": [0.14, 0.1297],
+      "pivotM": [0.07, 0.11],
+      "atM": [0.2, 0.55],
       "z": 2
+    },
+    {
+      "id": "prop-cache-crate",
+      "tier": 1,
+      "rect": [8, 8, 441, 338],
+      "sizeM": [0.86, 0.66],
+      "pivotM": [0.43, 0.0],
+      "atM": [0.0, 0.0],
+      "z": 1
     }
   ]
 }

@@ -1,0 +1,67 @@
+{
+  "assetId": "vehicle-item-scree-plough",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-scree-plough/vehicle-item-scree-plough.blend",
+    "sha256": "be4411ce4a354a4da9a2ac312ce9a6f2bb542e45c34596c74eb9f604eb7d0770",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    256,
+    128
+  ],
+  "maps": {
+    "albedo": "vehicle-item-scree-plough.albedo.ktx2",
+    "normal": "vehicle-item-scree-plough.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "plough-blade",
+      "tier": 1,
+      "rect": [
+        144,
+        8,
+        64,
+        42
+      ],
+      "sizeM": [
+        0.1236,
+        0.0819
+      ],
+      "pivotM": [
+        0.1126,
+        0.0709
+      ],
+      "atM": [
+        0.105,
+        -0.1
+      ],
+      "z": 10
+    },
+    {
+      "id": "plough-cowl",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        120,
+        64
+      ],
+      "sizeM": [
+        0.233,
+        0.125
+      ],
+      "pivotM": [
+        0.11,
+        0.12
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 9
+    }
+  ]
+}

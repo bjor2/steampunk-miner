@@ -1,0 +1,67 @@
+{
+  "assetId": "prop-cache-crate",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/prop-cache-crate/prop-cache-crate.blend",
+    "sha256": "48af7cf972ee8449987d9e644feb67639d78b2661673c2b26145a45de69ad277",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    512,
+    512
+  ],
+  "maps": {
+    "albedo": "prop-cache-crate.albedo.ktx2",
+    "normal": "prop-cache-crate.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "crate-tag",
+      "tier": 1,
+      "rect": [
+        8,
+        362,
+        72,
+        67
+      ],
+      "sizeM": [
+        0.14,
+        0.1297
+      ],
+      "pivotM": [
+        0.07,
+        0.11
+      ],
+      "atM": [
+        0.2,
+        0.55
+      ],
+      "z": 2
+    },
+    {
+      "id": "prop-cache-crate",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        441,
+        338
+      ],
+      "sizeM": [
+        0.86,
+        0.66
+      ],
+      "pivotM": [
+        0.43,
+        0.0
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 1
+    }
+  ]
+}

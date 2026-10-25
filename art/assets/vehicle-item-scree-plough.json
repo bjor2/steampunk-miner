@@ -2,7 +2,7 @@
   "id": "vehicle-item-scree-plough",
   "source": "blender",
   "form": "parts",
-  "status": "placeholder",
+  "status": "final",
   "color": "#6b5a4a",
   "partColors": {
     "plough-cowl": "#6b5a4a",

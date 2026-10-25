@@ -1,34 +1,50 @@
 {
-  "source": "Ticket 825 (PK6, spec #647): one merchant frontage per authored merchant of planetKits.json, bolted onto the Assay & Exchange (the Sell building, #398) in the building's own frame, so each planet's identity reads at the merchant as the GD lock asks (the HS: one merchant system as a data layer on the #175 shops, no new building and no pad change). The frontage is two platform parts (#170 amendment: an in-place add-on is at most 2): the shell, an awning over the exchange arch with a shingle under it carrying the merchant's device, and a banner on a pole on the assay house's roof terrace, the part the code can move. Awning and banner wear the planet's horizon colour from the same look row the star map card draws (#795/#796, read only), so the dock and the card agree; the device is the merchant's trade. Generated planets (#824) draw no frontage until a template asset exists.",
+  "source": "Ticket 825 (PK6, spec #647): one merchant frontage per authored merchant of planetKits.json, bolted onto the Assay & Exchange (the Sell building, #398) in its own frame, bolted onto the building at atM (metres from the station's origin, the Sell zone's rest point: the awning's left bracket foot on the facade band), so each planet's identity reads at the merchant as the GD lock asks (the HS: one merchant system as a data layer on the #175 shops, no new building and no pad change). The frontage is two platform parts (#170 amendment: an in-place add-on is at most 2): the shell, an awning over the exchange arch with a shingle under it carrying the merchant's device, and a banner on a pole on the assay house's roof terrace, the part the code can move. Awning and banner wear the planet's horizon colour from the same look row the star map card draws (#795/#796, read only), so the dock and the card agree; the device is the merchant's trade. Generated planets (#824) draw no frontage until a template asset exists.",
   "host": "sell",
+  "atM": [1.05, 3.0],
   "bannerPartId": "merchant-banner",
   "frontages": [
     {
-      "planet": { "system": "1", "planet": "1" },
+      "planet": {
+        "system": "1",
+        "planet": "1"
+      },
       "assetId": "platform-merchant-1",
       "device": "crucible",
       "deviceLine": "an assay crucible on its tripod, a honey-amber gem glowing in it"
     },
     {
-      "planet": { "system": "1", "planet": "2" },
+      "planet": {
+        "system": "1",
+        "planet": "2"
+      },
       "assetId": "platform-merchant-2",
       "device": "pick-and-shovel",
       "deviceLine": "a crossed pick and shovel over a heap of scree"
     },
     {
-      "planet": { "system": "1", "planet": "3" },
+      "planet": {
+        "system": "1",
+        "planet": "3"
+      },
       "assetId": "platform-merchant-3",
       "device": "gas-lamp",
       "deviceLine": "a caged gas lamp burning the green firedamp flame"
     },
     {
-      "planet": { "system": "1", "planet": "4" },
+      "planet": {
+        "system": "1",
+        "planet": "4"
+      },
       "assetId": "platform-merchant-4",
       "device": "cut-gem",
       "deviceLine": "a cut rose-quartz gem held in a lapidary's dop over its cutting wheel"
     },
     {
-      "planet": { "system": "1", "planet": "5" },
+      "planet": {
+        "system": "1",
+        "planet": "5"
+      },
       "assetId": "platform-merchant-5",
       "device": "boiler-whistle",
       "deviceLine": "a small riveted boiler with its steam whistle blowing"

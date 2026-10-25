@@ -7,38 +7,38 @@
     "blender": null
   },
   "pxPerMetre": 512,
-  "atlasPx": [256, 256],
+  "atlasPx": [256, 128],
   "maps": {
     "albedo": "vehicle-item-vent-vane.albedo.ktx2",
     "normal": "vehicle-item-vent-vane.normal.ktx2",
-    "emissive": "vehicle-item-vent-vane.emissive.ktx2"
+    "emissive": false
   },
   "parts": [
     {
       "id": "vane-hinge",
       "tier": 1,
-      "rect": [8, 8, 16, 16],
-      "sizeM": [0.2, 0.07],
-      "pivotM": [0.02, 0.05],
-      "atM": [0, 0],
+      "rect": [8, 8, 121, 31],
+      "sizeM": [0.235, 0.06],
+      "pivotM": [0.045, 0.06],
+      "atM": [0.0, 0.0],
       "z": 6
     },
     {
       "id": "vane-leaf",
       "tier": 1,
-      "rect": [8, 8, 16, 16],
-      "sizeM": [0.18, 0.04],
-      "pivotM": [0.01, 0.02],
-      "atM": [0, 0],
+      "rect": [145, 8, 102, 23],
+      "sizeM": [0.198, 0.043],
+      "pivotM": [0.009, 0.034],
+      "atM": [0.0, -0.012],
       "z": 7
     },
     {
       "id": "vane-leaf-2",
       "tier": 1,
-      "rect": [8, 8, 16, 16],
-      "sizeM": [0.18, 0.04],
-      "pivotM": [0.01, 0.02],
-      "atM": [0, 0],
+      "rect": [8, 55, 100, 21],
+      "sizeM": [0.194, 0.041],
+      "pivotM": [0.009, 0.032],
+      "atM": [0.0, -0.012],
       "z": 8
     }
   ]
