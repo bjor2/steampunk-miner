@@ -32,6 +32,11 @@ export const PREMIUM_LEDGER_DEBUG_RULES: {
   },
 }
 
+/** The intent the debug API sends: the ledger replaced with `counts`. */
+export function setPremiumLedgerCommand(counts: ScenarioCounts) {
+  return { type: 'debug.setPremiumLedger' as const, payload: { counts } }
+}
+
 /** Every problem with a scenario's counts against the player's hold; empty when it applies. */
 export function scenarioLedgerProblems(
   state: AuthorityState,

@@ -57,6 +57,9 @@ import { facilityLevelProblems } from '../systems/authority/platformState'
 import type { ArtefactReport } from '../systems/authority/heldArtefact'
 import { setArtefactCommand } from '../systems/artefacts/artefactCommands'
 import { readArtefactReport } from '../store/artefactActions'
+import { readPremiumLedger } from '../store/premiumLedgerDebugActions'
+import type { PremiumLedger } from '../systems/authority/premium/premiumLedger'
+import { setPremiumLedgerCommand } from '../systems/authority/premium/premiumLedgerDebugRules'
 import { setVehicleLoadout } from '../store/loadoutActions'
 import { setVehicleLoadoutCommand } from '../systems/authority/loadoutCommands'
 import { readSnapshot, type SessionSnapshot } from '../systems/authority/sessionSnapshot'
@@ -211,6 +214,11 @@ export interface DebugApi {
   setArtefact(optionId: string): DebugResult
   /** `{ artefactId, breathingRoomCharges, cacheState }` for the local player on this planet. */
   artefact(): DebugResult<ArtefactReport>
+  // premium ledger (ticket 844): the setter is a `debug.*` command, the read is not logged
+  /** The local player's ledger replaced with `counts`, keyed `tier:s:p:speciesId`. */
+  setPremiumLedger(counts: Readonly<Record<string, string>>): DebugResult
+  /** The local player's premium ledger counts, in key order. */
+  premiumLedger(): DebugResult<{ counts: PremiumLedger }>
   // ground (#36): `debug.*` commands; a disc in mm, `amount` 0 to 255 (default all of it)
   /** Lowers density round `(x, y)` mm; credits no ore and never cuts the dock pad. */
   carveCircle(x: number, y: number, radius: number, amount?: number): DebugResult
@@ -427,6 +435,11 @@ export function createDebugApi(): DebugApi {
         game().setArtefact(optionId),
       ),
     artefact: () => ({ ok: true, ...readArtefactReport(game().playerId) }),
+    setPremiumLedger: (counts) =>
+      runUnlessRefused(vehicleDebugProblems(setPremiumLedgerCommand(counts)), () =>
+        game().setPremiumLedger(counts),
+      ),
+    premiumLedger: () => ({ ok: true, counts: readPremiumLedger(game().playerId) }),
     carveCircle: (x, y, radius, amount = SOLID_DENSITY) =>
       runUnlessRefused(vehicleDebugProblems(carveCircleCommand({ x, y, radius, amount })), () =>
         game().carveCircle({ x, y, radius, amount }),

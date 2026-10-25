@@ -86,6 +86,10 @@ import { gunDebugActionsOf, type GunDebugActions } from './gunDebugActions'
 import { chargeDebugActionsOf, type ChargeDebugActions } from './chargeDebugActions'
 import { forgetBlastScorches, recordBlastScorches } from './blastScorchRecord'
 import { heatDebugActionsOf, type HeatDebugActions } from './heatDebugActions'
+import {
+  premiumLedgerDebugActionsOf,
+  type PremiumLedgerDebugActions,
+} from './premiumLedgerDebugActions'
 import { collapseDebugActionsOf, type CollapseDebugActions } from './collapseDebugActions'
 import { groundDebugActionsOf, type GroundDebugActions } from './groundDebugActions'
 import {
@@ -218,7 +222,8 @@ type DebugActions = CombatDebugActions &
   ChargeDebugActions &
   HeatDebugActions &
   CollapseDebugActions &
-  ArtefactActions
+  ArtefactActions &
+  PremiumLedgerDebugActions
 
 export interface GameState
   extends
@@ -425,6 +430,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...heatDebugActionsOf(() => get().playerId),
   ...collapseDebugActionsOf(() => get().playerId),
   ...artefactActionsOf(() => get().playerId),
+  ...premiumLedgerDebugActionsOf(() => get().playerId),
   ...starMapActionsOf(() => get().playerId),
   ...presentationActionsOf(set, get),
   ...hintActionsOf(set, get),
