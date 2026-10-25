@@ -24,6 +24,7 @@ import { KIT_SOCKET_PIECE_ID, KitSocketParts } from './scene/KitSocketParts'
 import { MERCHANT_FRONTAGE_PIECE_ID, MerchantFrontage } from './scene/MerchantFrontage'
 import { PLANET_KIT_BOT_CRATES } from './systems/botCrates'
 import { PLANET_KIT_BOT_FLASK } from './systems/botFlask'
+import { PLANET_KIT_BOT_KIT_BUYS } from './systems/botKitBuys'
 import { CONTAINER_RULES } from './systems/containerRules'
 import { CONTAINERS_SECTION } from './systems/containerSection'
 import { KIT_BUY_RULES } from './systems/kitBuyRules'
@@ -79,6 +80,8 @@ export const slice: SliceDefinition = {
     r.botCrates(PLANET_KIT_BOT_CRATES)
     // The flask a tools-on bot uncorks on entering firedamp, under `kitPolicy.flask` (ticket 881).
     r.botFlask(PLANET_KIT_BOT_FLASK)
+    // Each planet's own kit a merchants-on bot buys, under `kitPolicy.merchant` (ticket 826).
+    r.botKitBuy(PLANET_KIT_BOT_KIT_BUYS)
     r.eventProjections(PLANET_KIT_PROJECTIONS)
     r.runEvents(PLANET_KIT_RUN_EVENTS)
     r.hudPanel({

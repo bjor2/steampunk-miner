@@ -19,6 +19,7 @@
  */
 import { botCrateProvider, type BotCrate, type BotCrateProvider } from '../registries/botCrates'
 import type { FlaskPolicy } from './botFlask'
+import type { MerchantPolicy } from './botKitBuys'
 import { cargoUnitsOf, statsOfVehicle } from '../vehicle/vehicleState'
 import { wouldAccept } from './botDryRun'
 import { canAffordMoveTo } from './botEnergy'
@@ -35,14 +36,16 @@ export type CratePolicy = 'never' | 'drop_on_full'
 /**
  * What the bot does with the planet kits (the TD's Q4 seam on #850): off by default, mirroring
  * `BorePolicy`. T1 (ticket 881) adds `flask` (`botFlask.ts`), absent as `never`; the hazard tools
- * act by context, so a tools-on run only grants them at its start.
+ * act by context, so a tools-on run only grants them at its start. PK7 (ticket 826) adds
+ * `merchant` (`botKitBuys.ts`), absent as `skip`: the merchants-on run buys each planet's own kit.
  */
 export interface KitPolicy {
   crates: CratePolicy
   flask?: FlaskPolicy
+  merchant?: MerchantPolicy
 }
 
-export const DEFAULT_KIT_POLICY: KitPolicy = { crates: 'never', flask: 'never' }
+export const DEFAULT_KIT_POLICY: KitPolicy = { crates: 'never', flask: 'never', merchant: 'skip' }
 
 /** Buys crates at the Sell bay while one is sold here and the wallet pays it. */
 export function restockCrates(session: BotSession, planet: BotPlanet): void {

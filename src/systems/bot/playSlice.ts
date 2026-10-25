@@ -8,7 +8,8 @@
  * it is the goal, the drill digs it fast enough and the casing holds it, else the best ore band the
  * casing grade holds), run it, refine the best of the haul when the platform has the Refinery bay
  * and the bot will dive again (#105), then service and shop; a crate policy restocks Cache Crates
- * at the Sell bay right after the trip (ticket 850, `botCrates.ts`). Charges are bought only on a
+ * at the Sell bay right after the trip (ticket 850, `botCrates.ts`), and a merchant policy buys
+ * the planet's own kit there (ticket 826, `botKitBuys.ts`). Charges are bought only on a
  * planet where the bot met a tile it would blast with none in stock (#129); travel starts afresh.
  * When no band the casing holds pays a trip, as after a rescue that took the last of the wallet
  * with those bands bored out and the next grade unaffordable (#216), the bot retreats to the
@@ -31,6 +32,7 @@ import { deepestHeldBand, holdsCore } from './botCasing'
 import { DEFAULT_BORE_POLICY, mountBoreGunWhenForced, type BorePolicy } from './botBore'
 import { restockSizeOf, type ChargePolicy } from './botCharges'
 import { restockCrates, type KitPolicy } from './botCrates'
+import { buyLocalKit } from './botKitBuys'
 import { DEFAULT_CHAIN_POLICY, type ChainPolicy } from './botChains'
 import type { GunPolicy } from './botGuns'
 import { collectWhenReady, refineWhenWorthIt, type RefineryUse } from './botRefining'
@@ -96,7 +98,10 @@ export interface SliceRunOptions {
    * `nextShotTick` (ticket 347, `balance:bore`).
    */
   borePolicy?: BorePolicy
-  /** Never carry crates (the default), or drop the hold in one whenever it fills (ticket 850). */
+  /**
+   * Never carry crates (the default), or drop the hold in one whenever it fills (ticket 850); skip
+   * the merchants (the default), or buy each planet's own kit (ticket 826).
+   */
   kitPolicy?: KitPolicy
   listener?: BotListener
   /** `used` (the default) from the Refinery bay's planet; `ignored` plays as if it had none. */
@@ -221,6 +226,7 @@ function playDockCycle(session: BotSession, planet: BotPlanet, run: BotRun): boo
   if (goal === null) return towWhenItRefills(session, planet)
   playTrip(session, planet, goal)
   restockCrates(session, planet)
+  buyLocalKit(session, planet)
   collectWhenReady(session)
   if (isRefining(session, run)) refineWhenWorthIt(session, planet)
   serviceAtDock(session)
