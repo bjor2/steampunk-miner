@@ -75,6 +75,21 @@ export function skinTableProblems(raw: unknown, context: SkinGuardContext): stri
   return crossRowProblems(tableOf(file), context)
 }
 
+/**
+ * The species of the materials table no skin row dresses, in table order: what the CI check of
+ * ticket 854 (HS ruling (c), 24 Oct: every material looks different) holds empty. The loader
+ * itself still takes a partial table; the terrain draws a species' catalogue look either way.
+ */
+export function unskinnedSpeciesOf(
+  table: SkinTable = MINERAL_SKINS,
+  materials: MaterialTable = MATERIALS,
+): string[] {
+  const skinned = new Set(table.skins.map((skin) => skin.species))
+  return materials.materials
+    .map((material) => material.id)
+    .filter((species) => !skinned.has(species))
+}
+
 export function loadSkinTable(raw: unknown, context: SkinGuardContext): SkinTable {
   const problems = skinTableProblems(raw, context)
   if (problems.length > 0) throw new Error(`mineralSkins.json is refused:\n${problems.join('\n')}`)

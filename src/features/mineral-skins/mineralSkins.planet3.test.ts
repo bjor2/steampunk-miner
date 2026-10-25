@@ -11,11 +11,12 @@ import { planetSkinProblems, planetSkinsOf, signatureSkinOf } from './systems/mi
 // (green apatite, ribbed shell) and the three rares (native platinum, blue topaz, coiled ammonite).
 // Ticket 600 skins slots 11 to 15, the three epics and two mythics (meteoric iron, star sapphire,
 // opal jaw, orichalcum, heart diamond), and dresses the planet's relic signature, the slotless
-// 16th material. Slots 16 and 17 are #453's two fossil commons, held: no ticket skins them.
+// 16th material. Slots 16 and 17 are #453's two fossil commons (chalk bed, fish bed), skinned by
+// ticket 854.
 
 const PLANET_3 = freshPlanetParamsFor(83921, 3)
 const SKINNED_SLOTS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-const HELD_FOSSIL_SLOTS = [16, 17]
+const FOSSIL_COMMON_SLOTS = [16, 17]
 /** #141 "Signature": the act's signature family at the planet's band-5 tier. */
 const RELIC_SIGNATURE_ON_3 = `relic_t${oreTierOf(3, 5, 0)}`
 
@@ -26,11 +27,12 @@ describe('mineral skins of planet 3', () => {
     expect(planetSkinsOf(PLANET_3)[kindSlot - 1]?.speciesId).toBe(species?.id)
   })
 
-  it.each(HELD_FOSSIL_SLOTS)(
-    'leaves the held fossil common of kind slot %i unskinned',
+  it.each(FOSSIL_COMMON_SLOTS)(
+    "skins #453's fossil common of kind slot %i (ticket 854)",
     (kindSlot) => {
-      expect(planetSpeciesOf(PLANET_3, kindSlot)?.family).toBe('fossil')
-      expect(planetSkinsOf(PLANET_3)[kindSlot - 1]).toBeNull()
+      const species = planetSpeciesOf(PLANET_3, kindSlot)
+      expect(species?.family).toBe('fossil')
+      expect(planetSkinsOf(PLANET_3)[kindSlot - 1]?.speciesId).toBe(species?.id)
     },
   )
 

@@ -1,5 +1,5 @@
 {
-  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5, #593 its slots 6 to 10, #594 its slots 11 and 12 (the legacy pool has 12 species); #598 skins P3's slots 1 to 5, #599 its slots 6 to 10 and #600 its slots 11 to 15 (the foothold-p3 pool; its slots 16 and 17, the two fossil commons of #453, are held); #601 P4's slots 1 to 5, #602 its slots 6 to 10 and #603 its slots 11 to 15 (the foothold-p4 pool; its slots 16 and 17, #453's fossil commons, are held); #604 P5's slots 1 to 5, #605 its slots 6 to 10 and #606 its slots 11 to 15 (the foothold-p5 pool; its slots 16 and 17, #453's fossil commons, are held); #595 P2's slots 1 to 5, #596 its slots 6 to 9 and #597 its slots 10 to 12 (the foothold-p2 pool of #632, on the legacy slots); #710 its slots 13 to 15, the pool's own kinds of ticket 709. #736 dresses the three species P2 swaps in on its slots 6, 7 and 12 under ore rules 9 (Azurite Nodule, Pyrite Sun, Argentite); the retired three keep their skins for the P2 a save holds under older rules. A signature row dresses the signature material of its planet, the slotless 16th material (#453 E1), keyed by the planet: one per planet, apart from every species of the planet's pool, its palette's body inside the hue and luma bands of the family's look (ore-visuals, #151) since it has no hue slot; #600 adds P3's, #603 P4's and #606 P5's. A hero row an act's hero atlas packs also records atlasPage, the page (from 1) of that atlas its sprite sits on (ticket 852, heroAtlases.json): a page never moves once its art ships.",
+  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5, #593 its slots 6 to 10, #594 its slots 11 and 12 (the legacy pool has 12 species); #598 skins P3's slots 1 to 5, #599 its slots 6 to 10 and #600 its slots 11 to 15 (the foothold-p3 pool); #601 P4's slots 1 to 5, #602 its slots 6 to 10 and #603 its slots 11 to 15 (the foothold-p4 pool); #604 P5's slots 1 to 5, #605 its slots 6 to 10 and #606 its slots 11 to 15 (the foothold-p5 pool); #595 P2's slots 1 to 5, #596 its slots 6 to 9 and #597 its slots 10 to 12 (the foothold-p2 pool of #632, on the legacy slots); #710 its slots 13 to 15, the pool's own kinds of ticket 709. #854 skins the two fossil commons #453 appended on slots 16 and 17 of P3, P4 and P5 and all 17 species of the foothold-p6-p7 pool, from layers already drawn, with a palette each (HS ruling (c) of 24 Oct: every material looks different), so every species of materials.json wears a skin, which a spec holds. #736 dresses the three species P2 swaps in on its slots 6, 7 and 12 under ore rules 9 (Azurite Nodule, Pyrite Sun, Argentite); the retired three keep their skins for the P2 a save holds under older rules. A signature row dresses the signature material of its planet, the slotless 16th material (#453 E1), keyed by the planet: one per planet, apart from every species of the planet's pool, its palette's body inside the hue and luma bands of the family's look (ore-visuals, #151) since it has no hue slot; #600 adds P3's, #603 P4's and #606 P5's. A hero row an act's hero atlas packs also records atlasPage, the page (from 1) of that atlas its sprite sits on (ticket 852, heroAtlases.json): a page never moves once its art ships.",
   "layers": {
     "base": [
       {
@@ -815,6 +815,98 @@
       {
         "id": "ruby-crimson",
         "ramp": ["#78204f", "#f0419e", "#f8a0ce"]
+      },
+      {
+        "id": "chalk-bone-white",
+        "ramp": ["#696a63", "#d2d3c6", "#e8e9e2"]
+      },
+      {
+        "id": "fish-shale-olive",
+        "ramp": ["#4a5040", "#94a07f", "#cad0bf"]
+      },
+      {
+        "id": "marl-grey",
+        "ramp": ["#62625b", "#c3c4b6", "#e1e2db"]
+      },
+      {
+        "id": "crinoid-sage",
+        "ramp": ["#52574c", "#a3ae98", "#d1d6cc"]
+      },
+      {
+        "id": "coprolite-olive",
+        "ramp": ["#444a34", "#899567", "#c4cab3"]
+      },
+      {
+        "id": "ash-bone-grey",
+        "ramp": ["#4a3c3a", "#937875", "#c9bcba"]
+      },
+      {
+        "id": "sand-dollar-cream",
+        "ramp": ["#686660", "#d0cdbf", "#e8e6df"]
+      },
+      {
+        "id": "sickle-claw-sage",
+        "ramp": ["#53563a", "#a6ab73", "#d2d5b9"]
+      },
+      {
+        "id": "leviathan-ivory",
+        "ramp": ["#636255", "#c6c4aa", "#e3e2d4"]
+      },
+      {
+        "id": "dune-bone-buff",
+        "ramp": ["#625f54", "#c3bea8", "#e1ded3"]
+      },
+      {
+        "id": "salt-shell-frost",
+        "ramp": ["#606466", "#c0c9cc", "#e0e4e6"]
+      },
+      {
+        "id": "salt-iron-grey",
+        "ramp": ["#565a5c", "#adb4b7", "#d6dadb"]
+      },
+      {
+        "id": "wind-copper-green",
+        "ramp": ["#2c5c50", "#59b8a0", "#acdbd0"]
+      },
+      {
+        "id": "halite-white",
+        "ramp": ["#727374", "#e4e6e7", "#f2f3f3"]
+      },
+      {
+        "id": "desert-rose-sand",
+        "ramp": ["#60504c", "#c19f98", "#e0cfcc"]
+      },
+      {
+        "id": "manganese-black",
+        "ramp": ["#403e4a", "#807b93", "#c0bdc9"]
+      },
+      {
+        "id": "turquoise-sky",
+        "ramp": ["#2a6361", "#53c6c2", "#a9e2e0"]
+      },
+      {
+        "id": "electrum-pale-gold",
+        "ramp": ["#6a683d", "#d3d07a", "#e9e7bc"]
+      },
+      {
+        "id": "moonstone-glow",
+        "ramp": ["#6a6d71", "#d4dae2", "#eaecf0"]
+      },
+      {
+        "id": "thunder-iron-blue",
+        "ramp": ["#505366", "#9fa6cb", "#cfd2e5"]
+      },
+      {
+        "id": "mirage-glass-cyan",
+        "ramp": ["#596c6d", "#b2d7da", "#d8ebec"]
+      },
+      {
+        "id": "windsilver-white",
+        "ramp": ["#717375", "#e2e6ea", "#f0f2f4"]
+      },
+      {
+        "id": "dawn-opal-rose",
+        "ramp": ["#6c516c", "#d7a2d7", "#ebd1eb"]
       }
     ],
     "sheen": [
@@ -1643,6 +1735,167 @@
       "palette": "ruby-crimson",
       "sheen": "ember-facets",
       "atlasPage": 1
+    },
+    {
+      "species": "chalk-bed-amberbone",
+      "base": "ochre-powder",
+      "vein": "nodule-bed",
+      "palette": "chalk-bone-white",
+      "sheen": "bone-dust"
+    },
+    {
+      "species": "fish-bed-amberbone",
+      "base": "slaty-cleavage",
+      "vein": "lobed-segments",
+      "palette": "fish-shale-olive",
+      "sheen": "cleavage-sheen"
+    },
+    {
+      "species": "grey-marl-amberbone",
+      "base": "gravel-bed",
+      "vein": "crumbled-masses",
+      "palette": "marl-grey",
+      "sheen": "powdery"
+    },
+    {
+      "species": "crinoid-stem-amberbone",
+      "base": "scalloped-jet",
+      "vein": "vertebra-column",
+      "palette": "crinoid-sage",
+      "sheen": "dull"
+    },
+    {
+      "species": "coprolite-amberbone",
+      "base": "peat-crumb",
+      "vein": "limonite-clods",
+      "palette": "coprolite-olive",
+      "sheen": "greasy"
+    },
+    {
+      "species": "ash-bed-amberbone",
+      "base": "graphite-smear",
+      "vein": "bullet-darts",
+      "palette": "ash-bone-grey",
+      "sheen": "matte"
+    },
+    {
+      "species": "sand-dollar-amberbone",
+      "base": "phosphate-beds",
+      "vein": "cabochon-domes",
+      "palette": "sand-dollar-cream",
+      "sheen": "sugary"
+    },
+    {
+      "species": "sickle-claw-amberbone",
+      "base": "ripple-shale",
+      "vein": "toothed-jaw",
+      "palette": "sickle-claw-sage",
+      "sheen": "guard-crescents"
+    },
+    {
+      "species": "leviathan-rib-amberbone",
+      "base": "spongy-bone",
+      "vein": "sclerotic-ring",
+      "palette": "leviathan-ivory",
+      "sheen": "satin"
+    },
+    {
+      "species": "dune-scatter-amberbone",
+      "base": "frosted-face",
+      "vein": "split-slabs",
+      "palette": "dune-bone-buff",
+      "sheen": "velvet-frost"
+    },
+    {
+      "species": "salt-shell-amberbone",
+      "base": "bloom-crust",
+      "vein": "ribbed-valves",
+      "palette": "salt-shell-frost",
+      "sheen": "grain-caps"
+    },
+    {
+      "species": "salt-iron-brassvein",
+      "base": "crusted-scale",
+      "vein": "nugget-cluster",
+      "palette": "salt-iron-grey",
+      "sheen": "smudged"
+    },
+    {
+      "species": "wind-copper-brassvein",
+      "base": "oxide-film",
+      "vein": "plate-stack",
+      "palette": "wind-copper-green",
+      "sheen": "tumbled-polish"
+    },
+    {
+      "species": "halite-quartzine",
+      "base": "cubic-cleavage",
+      "vein": "hopper-terraces",
+      "palette": "halite-white",
+      "sheen": "vitreous"
+    },
+    {
+      "species": "desert-rose-quartzine",
+      "base": "sulphur-crumb",
+      "vein": "swallowtail-blades",
+      "palette": "desert-rose-sand",
+      "sheen": "fleck-glints"
+    },
+    {
+      "species": "mesa-manganese-brassvein",
+      "base": "inner-feathers",
+      "vein": "wire-dendrite",
+      "palette": "manganese-black",
+      "sheen": "earthy"
+    },
+    {
+      "species": "turquoise-quartzine",
+      "base": "leopard-nodules",
+      "vein": "olive-drops",
+      "palette": "turquoise-sky",
+      "sheen": "waxy"
+    },
+    {
+      "species": "electrum-brassvein",
+      "base": "watered-damask",
+      "vein": "flake-scatter",
+      "palette": "electrum-pale-gold",
+      "sheen": "brilliant"
+    },
+    {
+      "species": "moonstone-quartzine",
+      "base": "adularia-milk",
+      "vein": "framed-ovals",
+      "palette": "moonstone-glow",
+      "sheen": "moon-sheen"
+    },
+    {
+      "species": "thunder-iron-brassvein",
+      "base": "black-grain",
+      "vein": "star-bursts",
+      "palette": "thunder-iron-blue",
+      "sheen": "lamella-flash"
+    },
+    {
+      "species": "mirage-glass-quartzine",
+      "base": "conchoidal-glass",
+      "vein": "lens-stack",
+      "palette": "mirage-glass-cyan",
+      "sheen": "oil-film"
+    },
+    {
+      "species": "windsilver-brassvein",
+      "base": "molten-pour",
+      "vein": "needle-sheaves",
+      "palette": "windsilver-white",
+      "sheen": "mirror-polish"
+    },
+    {
+      "species": "dawn-opal-quartzine",
+      "base": "opal-potch",
+      "vein": "curled-ribbons",
+      "palette": "dawn-opal-rose",
+      "sheen": "colour-play"
     }
   ],
   "signatures": [

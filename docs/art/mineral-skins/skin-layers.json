@@ -15,7 +15,7 @@
       "id": "crusted-scale",
       "cell": "cells/base/crusted-scale.png",
       "blend": "blend/base-crusted-scale.blend",
-      "wornBy": ["shallow-copper-brassvein"]
+      "wornBy": ["salt-iron-brassvein", "shallow-copper-brassvein"]
     },
     {
       "kind": "base",
@@ -36,7 +36,7 @@
       "id": "conchoidal-glass",
       "cell": "cells/base/conchoidal-glass.png",
       "blend": "blend/base-conchoidal-glass.blend",
-      "wornBy": ["flint-glass-quartzine"]
+      "wornBy": ["flint-glass-quartzine", "mirage-glass-quartzine"]
     },
     {
       "kind": "base",
@@ -141,7 +141,7 @@
       "id": "frosted-face",
       "cell": "cells/base/frosted-face.png",
       "blend": "blend/base-frosted-face.blend",
-      "wornBy": ["rail-quartz-quartzine"]
+      "wornBy": ["dune-scatter-amberbone", "rail-quartz-quartzine"]
     },
     {
       "kind": "base",
@@ -155,7 +155,7 @@
       "id": "oxide-film",
       "cell": "cells/base/oxide-film.png",
       "blend": "blend/base-oxide-film.blend",
-      "wornBy": ["step-bismuth-brassvein"]
+      "wornBy": ["step-bismuth-brassvein", "wind-copper-brassvein"]
     },
     {
       "kind": "base",
@@ -176,7 +176,7 @@
       "id": "opal-potch",
       "cell": "cells/base/opal-potch.png",
       "blend": "blend/base-opal-potch.blend",
-      "wornBy": ["opal-jaw-amberbone"]
+      "wornBy": ["dawn-opal-quartzine", "opal-jaw-amberbone"]
     },
     {
       "kind": "base",
@@ -225,14 +225,14 @@
       "id": "watered-damask",
       "cell": "cells/base/watered-damask.png",
       "blend": "blend/base-watered-damask.blend",
-      "wornBy": ["starsteel-brassvein"]
+      "wornBy": ["electrum-brassvein", "starsteel-brassvein"]
     },
     {
       "kind": "base",
       "id": "inner-feathers",
       "cell": "cells/base/inner-feathers.png",
       "blend": "blend/base-inner-feathers.blend",
-      "wornBy": ["painite-quartzine"]
+      "wornBy": ["mesa-manganese-brassvein", "painite-quartzine"]
     },
     {
       "kind": "base",
@@ -253,7 +253,7 @@
       "id": "black-grain",
       "cell": "cells/base/black-grain.png",
       "blend": "blend/base-black-grain.blend",
-      "wornBy": ["magnetite-brassvein"]
+      "wornBy": ["magnetite-brassvein", "thunder-iron-brassvein"]
     },
     {
       "kind": "base",
@@ -274,42 +274,42 @@
       "id": "leopard-nodules",
       "cell": "cells/base/leopard-nodules.png",
       "blend": "blend/base-leopard-nodules.blend",
-      "wornBy": ["chromite-brassvein"]
+      "wornBy": ["chromite-brassvein", "turquoise-quartzine"]
     },
     {
       "kind": "base",
       "id": "slaty-cleavage",
       "cell": "cells/base/slaty-cleavage.png",
       "blend": "blend/base-slaty-cleavage.blend",
-      "wornBy": ["p2-c1"]
+      "wornBy": ["fish-bed-amberbone", "p2-c1"]
     },
     {
       "kind": "base",
       "id": "ochre-powder",
       "cell": "cells/base/ochre-powder.png",
       "blend": "blend/base-ochre-powder.blend",
-      "wornBy": ["p2-c2"]
+      "wornBy": ["chalk-bed-amberbone", "p2-c2"]
     },
     {
       "kind": "base",
       "id": "gravel-bed",
       "cell": "cells/base/gravel-bed.png",
       "blend": "blend/base-gravel-bed.blend",
-      "wornBy": ["p2-c3"]
+      "wornBy": ["grey-marl-amberbone", "p2-c3"]
     },
     {
       "kind": "base",
       "id": "sulphur-crumb",
       "cell": "cells/base/sulphur-crumb.png",
       "blend": "blend/base-sulphur-crumb.blend",
-      "wornBy": ["p2-c4"]
+      "wornBy": ["desert-rose-quartzine", "p2-c4"]
     },
     {
       "kind": "base",
       "id": "graphite-smear",
       "cell": "cells/base/graphite-smear.png",
       "blend": "blend/base-graphite-smear.blend",
-      "wornBy": ["p2-c5"]
+      "wornBy": ["ash-bed-amberbone", "p2-c5"]
     },
     {
       "kind": "base",
@@ -330,14 +330,14 @@
       "id": "adularia-milk",
       "cell": "cells/base/adularia-milk.png",
       "blend": "blend/base-adularia-milk.blend",
-      "wornBy": ["p2-u3"]
+      "wornBy": ["moonstone-quartzine", "p2-u3"]
     },
     {
       "kind": "base",
       "id": "cubic-cleavage",
       "cell": "cells/base/cubic-cleavage.png",
       "blend": "blend/base-cubic-cleavage.blend",
-      "wornBy": ["p2-u4"]
+      "wornBy": ["halite-quartzine", "p2-u4"]
     },
     {
       "kind": "base",
@@ -365,14 +365,14 @@
       "id": "peat-crumb",
       "cell": "cells/base/peat-crumb.png",
       "blend": "blend/base-peat-crumb.blend",
-      "wornBy": ["bog-iron-brassvein"]
+      "wornBy": ["bog-iron-brassvein", "coprolite-amberbone"]
     },
     {
       "kind": "base",
       "id": "bloom-crust",
       "cell": "cells/base/bloom-crust.png",
       "blend": "blend/base-bloom-crust.blend",
-      "wornBy": ["cobalt-bloom-brassvein"]
+      "wornBy": ["cobalt-bloom-brassvein", "salt-shell-amberbone"]
     },
     {
       "kind": "base",
@@ -407,7 +407,7 @@
       "id": "phosphate-beds",
       "cell": "cells/base/phosphate-beds.png",
       "blend": "blend/base-phosphate-beds.blend",
-      "wornBy": ["shark-tooth-amberbone"]
+      "wornBy": ["sand-dollar-amberbone", "shark-tooth-amberbone"]
     },
     {
       "kind": "base",
@@ -428,7 +428,7 @@
       "id": "spongy-bone",
       "cell": "cells/base/spongy-bone.png",
       "blend": "blend/base-spongy-bone.blend",
-      "wornBy": ["saurian-vertebra-amberbone"]
+      "wornBy": ["leviathan-rib-amberbone", "saurian-vertebra-amberbone"]
     },
     {
       "kind": "base",
@@ -442,7 +442,7 @@
       "id": "ripple-shale",
       "cell": "cells/base/ripple-shale.png",
       "blend": "blend/base-ripple-shale.blend",
-      "wornBy": ["trilobite-amberbone"]
+      "wornBy": ["sickle-claw-amberbone", "trilobite-amberbone"]
     },
     {
       "kind": "base",
@@ -491,7 +491,7 @@
       "id": "molten-pour",
       "cell": "cells/base/molten-pour.png",
       "blend": "blend/base-molten-pour.blend",
-      "wornBy": ["core-gold-brassvein"]
+      "wornBy": ["core-gold-brassvein", "windsilver-brassvein"]
     },
     {
       "kind": "base",
@@ -526,7 +526,7 @@
       "id": "scalloped-jet",
       "cell": "cells/base/scalloped-jet.png",
       "blend": "blend/base-scalloped-jet.blend",
-      "wornBy": ["p2-r5"]
+      "wornBy": ["crinoid-stem-amberbone", "p2-r5"]
     },
     {
       "kind": "base",
@@ -575,28 +575,28 @@
       "id": "nugget-cluster",
       "cell": "cells/vein/nugget-cluster.png",
       "blend": "blend/vein-nugget-cluster.blend",
-      "wornBy": ["ironstone-brassvein"]
+      "wornBy": ["ironstone-brassvein", "salt-iron-brassvein"]
     },
     {
       "kind": "vein",
       "id": "flake-scatter",
       "cell": "cells/vein/flake-scatter.png",
       "blend": "blend/vein-flake-scatter.blend",
-      "wornBy": ["shallow-copper-brassvein"]
+      "wornBy": ["electrum-brassvein", "shallow-copper-brassvein"]
     },
     {
       "kind": "vein",
       "id": "plate-stack",
       "cell": "cells/vein/plate-stack.png",
       "blend": "blend/vein-plate-stack.blend",
-      "wornBy": ["deep-seam-tin-brassvein"]
+      "wornBy": ["deep-seam-tin-brassvein", "wind-copper-brassvein"]
     },
     {
       "kind": "vein",
       "id": "nodule-bed",
       "cell": "cells/vein/nodule-bed.png",
       "blend": "blend/vein-nodule-bed.blend",
-      "wornBy": ["clouded-quartzine"]
+      "wornBy": ["chalk-bed-amberbone", "clouded-quartzine"]
     },
     {
       "kind": "vein",
@@ -638,7 +638,7 @@
       "id": "wire-dendrite",
       "cell": "cells/vein/wire-dendrite.png",
       "blend": "blend/vein-wire-dendrite.blend",
-      "wornBy": ["vein-gold-brassvein"]
+      "wornBy": ["mesa-manganese-brassvein", "vein-gold-brassvein"]
     },
     {
       "kind": "vein",
@@ -666,7 +666,7 @@
       "id": "ribbed-valves",
       "cell": "cells/vein/ribbed-valves.png",
       "blend": "blend/vein-ribbed-valves.blend",
-      "wornBy": ["ribbed-shell-amberbone"]
+      "wornBy": ["ribbed-shell-amberbone", "salt-shell-amberbone"]
     },
     {
       "kind": "vein",
@@ -715,14 +715,14 @@
       "id": "lens-stack",
       "cell": "cells/vein/lens-stack.png",
       "blend": "blend/vein-lens-stack.blend",
-      "wornBy": ["smoke-calcite-quartzine"]
+      "wornBy": ["mirage-glass-quartzine", "smoke-calcite-quartzine"]
     },
     {
       "kind": "vein",
       "id": "hopper-terraces",
       "cell": "cells/vein/hopper-terraces.png",
       "blend": "blend/vein-hopper-terraces.blend",
-      "wornBy": ["step-bismuth-brassvein"]
+      "wornBy": ["halite-quartzine", "step-bismuth-brassvein"]
     },
     {
       "kind": "vein",
@@ -736,14 +736,14 @@
       "id": "cabochon-domes",
       "cell": "cells/vein/cabochon-domes.png",
       "blend": "blend/vein-cabochon-domes.blend",
-      "wornBy": ["star-sapphire-quartzine"]
+      "wornBy": ["sand-dollar-amberbone", "star-sapphire-quartzine"]
     },
     {
       "kind": "vein",
       "id": "toothed-jaw",
       "cell": "cells/vein/toothed-jaw.png",
       "blend": "blend/vein-toothed-jaw.blend",
-      "wornBy": ["opal-jaw-amberbone"]
+      "wornBy": ["opal-jaw-amberbone", "sickle-claw-amberbone"]
     },
     {
       "kind": "vein",
@@ -785,14 +785,14 @@
       "id": "sclerotic-ring",
       "cell": "cells/vein/sclerotic-ring.png",
       "blend": "blend/vein-sclerotic-ring.blend",
-      "wornBy": ["ichthyosaur-eye-amberbone"]
+      "wornBy": ["ichthyosaur-eye-amberbone", "leviathan-rib-amberbone"]
     },
     {
       "kind": "vein",
       "id": "star-bursts",
       "cell": "cells/vein/star-bursts.png",
       "blend": "blend/vein-star-bursts.blend",
-      "wornBy": ["starsteel-brassvein"]
+      "wornBy": ["starsteel-brassvein", "thunder-iron-brassvein"]
     },
     {
       "kind": "vein",
@@ -827,7 +827,7 @@
       "id": "swallowtail-blades",
       "cell": "cells/vein/swallowtail-blades.png",
       "blend": "blend/vein-swallowtail-blades.blend",
-      "wornBy": ["selenite-blade-quartzine"]
+      "wornBy": ["desert-rose-quartzine", "selenite-blade-quartzine"]
     },
     {
       "kind": "vein",
@@ -848,7 +848,7 @@
       "id": "split-slabs",
       "cell": "cells/vein/split-slabs.png",
       "blend": "blend/vein-split-slabs.blend",
-      "wornBy": ["p2-c1"]
+      "wornBy": ["dune-scatter-amberbone", "p2-c1"]
     },
     {
       "kind": "vein",
@@ -869,7 +869,7 @@
       "id": "crumbled-masses",
       "cell": "cells/vein/crumbled-masses.png",
       "blend": "blend/vein-crumbled-masses.blend",
-      "wornBy": ["p2-c4"]
+      "wornBy": ["grey-marl-amberbone", "p2-c4"]
     },
     {
       "kind": "vein",
@@ -918,7 +918,7 @@
       "id": "framed-ovals",
       "cell": "cells/vein/framed-ovals.png",
       "blend": "blend/vein-framed-ovals.blend",
-      "wornBy": ["p2-r2"]
+      "wornBy": ["moonstone-quartzine", "p2-r2"]
     },
     {
       "kind": "vein",
@@ -932,7 +932,7 @@
       "id": "limonite-clods",
       "cell": "cells/vein/limonite-clods.png",
       "blend": "blend/vein-limonite-clods.blend",
-      "wornBy": ["bog-iron-brassvein"]
+      "wornBy": ["bog-iron-brassvein", "coprolite-amberbone"]
     },
     {
       "kind": "vein",
@@ -946,7 +946,7 @@
       "id": "needle-sheaves",
       "cell": "cells/vein/needle-sheaves.png",
       "blend": "blend/vein-needle-sheaves.blend",
-      "wornBy": ["rain-quartz-quartzine"]
+      "wornBy": ["rain-quartz-quartzine", "windsilver-brassvein"]
     },
     {
       "kind": "vein",
@@ -967,7 +967,7 @@
       "id": "olive-drops",
       "cell": "cells/vein/olive-drops.png",
       "blend": "blend/vein-olive-drops.blend",
-      "wornBy": ["peridot-quartzine"]
+      "wornBy": ["peridot-quartzine", "turquoise-quartzine"]
     },
     {
       "kind": "vein",
@@ -995,7 +995,7 @@
       "id": "vertebra-column",
       "cell": "cells/vein/vertebra-column.png",
       "blend": "blend/vein-vertebra-column.blend",
-      "wornBy": ["saurian-vertebra-amberbone"]
+      "wornBy": ["crinoid-stem-amberbone", "saurian-vertebra-amberbone"]
     },
     {
       "kind": "vein",
@@ -1009,7 +1009,7 @@
       "id": "lobed-segments",
       "cell": "cells/vein/lobed-segments.png",
       "blend": "blend/vein-lobed-segments.blend",
-      "wornBy": ["trilobite-amberbone"]
+      "wornBy": ["fish-bed-amberbone", "trilobite-amberbone"]
     },
     {
       "kind": "vein",
@@ -1030,14 +1030,14 @@
       "id": "bullet-darts",
       "cell": "cells/vein/bullet-darts.png",
       "blend": "blend/vein-bullet-darts.blend",
-      "wornBy": ["belemnite-amberbone"]
+      "wornBy": ["ash-bed-amberbone", "belemnite-amberbone"]
     },
     {
       "kind": "vein",
       "id": "curled-ribbons",
       "cell": "cells/vein/curled-ribbons.png",
       "blend": "blend/vein-curled-ribbons.blend",
-      "wornBy": ["firebrass-brassvein"]
+      "wornBy": ["dawn-opal-quartzine", "firebrass-brassvein"]
     },
     {
       "kind": "vein",
@@ -1142,7 +1142,7 @@
       "id": "earthy",
       "cell": "cells/sheen/earthy.png",
       "blend": "blend/sheen-earthy.blend",
-      "wornBy": ["ironstone-brassvein"]
+      "wornBy": ["ironstone-brassvein", "mesa-manganese-brassvein"]
     },
     {
       "kind": "sheen",
@@ -1163,14 +1163,14 @@
       "id": "waxy",
       "cell": "cells/sheen/waxy.png",
       "blend": "blend/sheen-waxy.blend",
-      "wornBy": ["clouded-quartzine"]
+      "wornBy": ["clouded-quartzine", "turquoise-quartzine"]
     },
     {
       "kind": "sheen",
       "id": "vitreous",
       "cell": "cells/sheen/vitreous.png",
       "blend": "blend/sheen-vitreous.blend",
-      "wornBy": ["flint-glass-quartzine"]
+      "wornBy": ["flint-glass-quartzine", "halite-quartzine"]
     },
     {
       "kind": "sheen",
@@ -1205,7 +1205,7 @@
       "id": "brilliant",
       "cell": "cells/sheen/brilliant.png",
       "blend": "blend/sheen-brilliant.blend",
-      "wornBy": ["vein-gold-brassvein"]
+      "wornBy": ["electrum-brassvein", "vein-gold-brassvein"]
     },
     {
       "kind": "sheen",
@@ -1233,7 +1233,7 @@
       "id": "dull",
       "cell": "cells/sheen/dull.png",
       "blend": "blend/sheen-dull.blend",
-      "wornBy": ["ribbed-shell-amberbone"]
+      "wornBy": ["crinoid-stem-amberbone", "ribbed-shell-amberbone"]
     },
     {
       "kind": "sheen",
@@ -1261,14 +1261,14 @@
       "id": "matte",
       "cell": "cells/sheen/matte.png",
       "blend": "blend/sheen-matte.blend",
-      "wornBy": ["pig-iron-brassvein"]
+      "wornBy": ["ash-bed-amberbone", "pig-iron-brassvein"]
     },
     {
       "kind": "sheen",
       "id": "smudged",
       "cell": "cells/sheen/smudged.png",
       "blend": "blend/sheen-smudged.blend",
-      "wornBy": ["soot-zinc-brassvein"]
+      "wornBy": ["salt-iron-brassvein", "soot-zinc-brassvein"]
     },
     {
       "kind": "sheen",
@@ -1282,7 +1282,7 @@
       "id": "satin",
       "cell": "cells/sheen/satin.png",
       "blend": "blend/sheen-satin.blend",
-      "wornBy": ["smoke-calcite-quartzine"]
+      "wornBy": ["leviathan-rib-amberbone", "smoke-calcite-quartzine"]
     },
     {
       "kind": "sheen",
@@ -1296,7 +1296,7 @@
       "id": "lamella-flash",
       "cell": "cells/sheen/lamella-flash.png",
       "blend": "blend/sheen-lamella-flash.blend",
-      "wornBy": ["meteoric-iron-brassvein"]
+      "wornBy": ["meteoric-iron-brassvein", "thunder-iron-brassvein"]
     },
     {
       "kind": "sheen",
@@ -1352,7 +1352,7 @@
       "id": "greasy",
       "cell": "cells/sheen/greasy.png",
       "blend": "blend/sheen-greasy.blend",
-      "wornBy": ["ichthyosaur-eye-amberbone"]
+      "wornBy": ["coprolite-amberbone", "ichthyosaur-eye-amberbone"]
     },
     {
       "kind": "sheen",
@@ -1394,7 +1394,7 @@
       "id": "moon-sheen",
       "cell": "cells/sheen/moon-sheen.png",
       "blend": "blend/sheen-moon-sheen.blend",
-      "wornBy": ["selenite-blade-quartzine"]
+      "wornBy": ["moonstone-quartzine", "selenite-blade-quartzine"]
     },
     {
       "kind": "sheen",
@@ -1415,28 +1415,28 @@
       "id": "cleavage-sheen",
       "cell": "cells/sheen/cleavage-sheen.png",
       "blend": "blend/sheen-cleavage-sheen.blend",
-      "wornBy": ["p2-c1"]
+      "wornBy": ["fish-bed-amberbone", "p2-c1"]
     },
     {
       "kind": "sheen",
       "id": "powdery",
       "cell": "cells/sheen/powdery.png",
       "blend": "blend/sheen-powdery.blend",
-      "wornBy": ["p2-c2"]
+      "wornBy": ["grey-marl-amberbone", "p2-c2"]
     },
     {
       "kind": "sheen",
       "id": "grain-caps",
       "cell": "cells/sheen/grain-caps.png",
       "blend": "blend/sheen-grain-caps.blend",
-      "wornBy": ["p2-c3"]
+      "wornBy": ["p2-c3", "salt-shell-amberbone"]
     },
     {
       "kind": "sheen",
       "id": "sugary",
       "cell": "cells/sheen/sugary.png",
       "blend": "blend/sheen-sugary.blend",
-      "wornBy": ["p2-c4"]
+      "wornBy": ["p2-c4", "sand-dollar-amberbone"]
     },
     {
       "kind": "sheen",
@@ -1450,7 +1450,7 @@
       "id": "fleck-glints",
       "cell": "cells/sheen/fleck-glints.png",
       "blend": "blend/sheen-fleck-glints.blend",
-      "wornBy": ["p2-u1"]
+      "wornBy": ["desert-rose-quartzine", "p2-u1"]
     },
     {
       "kind": "sheen",
@@ -1485,7 +1485,7 @@
       "id": "colour-play",
       "cell": "cells/sheen/colour-play.png",
       "blend": "blend/sheen-colour-play.blend",
-      "wornBy": ["p2-r2"]
+      "wornBy": ["dawn-opal-quartzine", "p2-r2"]
     },
     {
       "kind": "sheen",
@@ -1520,7 +1520,7 @@
       "id": "tumbled-polish",
       "cell": "cells/sheen/tumbled-polish.png",
       "blend": "blend/sheen-tumbled-polish.blend",
-      "wornBy": ["canal-jasper-quartzine"]
+      "wornBy": ["canal-jasper-quartzine", "wind-copper-brassvein"]
     },
     {
       "kind": "sheen",
@@ -1534,7 +1534,7 @@
       "id": "oil-film",
       "cell": "cells/sheen/oil-film.png",
       "blend": "blend/sheen-oil-film.blend",
-      "wornBy": ["peridot-quartzine"]
+      "wornBy": ["mirage-glass-quartzine", "peridot-quartzine"]
     },
     {
       "kind": "sheen",
@@ -1562,7 +1562,7 @@
       "id": "bone-dust",
       "cell": "cells/sheen/bone-dust.png",
       "blend": "blend/sheen-bone-dust.blend",
-      "wornBy": ["saurian-vertebra-amberbone"]
+      "wornBy": ["chalk-bed-amberbone", "saurian-vertebra-amberbone"]
     },
     {
       "kind": "sheen",
@@ -1597,7 +1597,7 @@
       "id": "guard-crescents",
       "cell": "cells/sheen/guard-crescents.png",
       "blend": "blend/sheen-guard-crescents.blend",
-      "wornBy": ["belemnite-amberbone"]
+      "wornBy": ["belemnite-amberbone", "sickle-claw-amberbone"]
     },
     {
       "kind": "sheen",
@@ -1660,14 +1660,14 @@
       "id": "mirror-polish",
       "cell": "cells/sheen/mirror-polish.png",
       "blend": "blend/sheen-mirror-polish.blend",
-      "wornBy": ["p2-r5"]
+      "wornBy": ["p2-r5", "windsilver-brassvein"]
     },
     {
       "kind": "sheen",
       "id": "velvet-frost",
       "cell": "cells/sheen/velvet-frost.png",
       "blend": "blend/sheen-velvet-frost.blend",
-      "wornBy": ["p2-u1b"]
+      "wornBy": ["dune-scatter-amberbone", "p2-u1b"]
     },
     {
       "kind": "sheen",
