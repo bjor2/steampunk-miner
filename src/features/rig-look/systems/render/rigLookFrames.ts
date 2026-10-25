@@ -20,6 +20,8 @@ import {
 /** The asset a step's part comes from when its row names none (the swap's default, ticket 640). */
 export const VEHICLE_LOOK_ASSET_ID = 'vehicle'
 
+const NO_COVERS: readonly string[] = []
+
 /** What a track's slot shows at one look step. */
 export interface RigLookFrame {
   track: string
@@ -32,6 +34,8 @@ export interface RigLookFrame {
   slot: string
   /** The `vehicle` part slot a look part of another asset hides, null for none. */
   replacesSlot: string | null
+  /** The items whose own art the part stands for (ticket 892); none with no part. */
+  covers: readonly string[]
   /** `#rrggbb` of the glow on the track's glow slots, null for the base look. */
   tint: string | null
   /** One glow per glow slot group; zeros on the base look. */
@@ -89,6 +93,7 @@ function baseFrameOf(rows: TrackLookRows): RigLookFrame {
     assetId: null,
     slot: rows.slot,
     replacesSlot: null,
+    covers: NO_COVERS,
     tint: null,
     glows: rows.glowSlots.map(() => 0),
     finish: null,
@@ -104,6 +109,7 @@ function stepFrameOf(rows: TrackLookRows, row: RigLookStepRow, step: number): Ri
     assetId: assetIdOf(row),
     slot: rows.slot,
     replacesSlot: replacesSlotOf(rows, row),
+    covers: coversOf(rows, row),
     tint: row.colour,
     glows: row.glows,
     finish: null,
@@ -131,4 +137,9 @@ function replacesSlotOf(rows: TrackLookRows, row: RigLookStepRow): string | null
   const assetId = assetIdOf(row)
   if (assetId === null || assetId === VEHICLE_LOOK_ASSET_ID) return null
   return rows.replaces ?? null
+}
+
+/** A step with no part swaps nothing in, so it stands for no item's art. */
+function coversOf(rows: TrackLookRows, row: RigLookStepRow): readonly string[] {
+  return row.part === null ? NO_COVERS : (rows.covers ?? NO_COVERS)
 }

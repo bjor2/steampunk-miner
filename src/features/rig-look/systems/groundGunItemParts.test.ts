@@ -121,7 +121,7 @@ describe('rig look: ground-gun item parts (ticket 589)', () => {
 
   it("yields the turret's point to a fitted module, and swaps the look in while none is", () => {
     const look = lookOn('hull.turret')
-    expect(partSwapsOf([look], ['hull.turret'])).toEqual([])
+    expect(partSwapsOf([look], [{ attachId: 'hull.turret', itemIds: [] }])).toEqual([])
     expect(partSwapsOf([look], [])).toHaveLength(1)
   })
 

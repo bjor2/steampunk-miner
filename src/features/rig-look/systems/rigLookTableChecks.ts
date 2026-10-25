@@ -13,7 +13,7 @@
  * purchases apart, with the authored steps on the first of them; and its finish cycle is long
  * enough that no finish and pip count repeat, no two neighbours alike. Every band name (a step's
  * card, a finish's name) is 3 words at most, and a band's glint over its brightest look stays
- * under the track's cap.
+ * under the track's cap. A track's covers (ticket 892) are item ids, each once, on no loop.
  */
 import { isVehiclePartId } from '../../../systems/art/artIds'
 import { isAttachId } from '../../../systems/registries/vehicleAttach'
@@ -28,6 +28,7 @@ import {
   isBandName,
 } from './rigLookBandChecks'
 import type { RigLookGlint } from './render/rigLookGlint'
+import { coverProblemsOf } from './rigLookCoverChecks'
 import { plaqueProblemsOf } from './rigLookPlaque'
 
 export interface RigLookTable {
@@ -74,6 +75,7 @@ export function rigLookTableProblemsOf(
     ...table.tracks.flatMap((rows) => trackProblemsOf(rows, table, knownTracks)),
     ...sharedPointProblemsOf(table.tracks),
     ...sharedHiddenSlotProblemsOf(table.tracks),
+    ...coverProblemsOf(table.tracks),
     ...glowCapProblemsOf(table),
   ]
 }

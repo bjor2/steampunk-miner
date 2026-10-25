@@ -78,6 +78,12 @@ export interface TrackLookRows {
    */
   replaces?: string
   /**
+   * Item ids whose own #166 art the track's look parts stand for (ticket 892, GD lock on #623):
+   * while a step's part shows, those items' mounts draw nothing and their point does not make the
+   * part yield. A track may cover its own item; absent covers none.
+   */
+  covers?: readonly string[]
+  /**
    * The upgrade plaque's fitting fact templates (ticket 585); absent, the plaque keeps its facts.
    */
   plaque?: RigLookPlaque

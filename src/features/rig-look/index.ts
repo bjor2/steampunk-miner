@@ -20,5 +20,8 @@ export {
   rigLookPlaqueFactOf,
   SHIPPED_RIG_LOOKS,
   trackLookFramesOf,
+  type RigLooks,
 } from './systems/rigLooks'
+/** The swaps owned looks ask for, for the rig gear's cover checks (ticket 892). */
+export { partSwapsOf } from './systems/render/rigLookParts'
 export { ownedPurchasesOf, rigLookOfPlayer, rigLookSourceIdOf } from './systems/rigLookSource'

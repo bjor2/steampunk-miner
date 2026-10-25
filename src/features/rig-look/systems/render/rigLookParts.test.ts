@@ -44,6 +44,14 @@ const BOILER = createTrackLookFrames({
   ),
 })
 
+/** A drill-type look on the head standing for the twin bit's own art (ticket 892). */
+const TWIN_BIT = createTrackLookFrames({
+  ...rowsOf('gear.twin_bit', 'drill.head', [null, 'twin-bit-head']),
+  covers: ['gear.twin_bit'],
+})
+
+const TWIN_BIT_ART = { attachId: 'drill.head', itemIds: ['gear.twin_bit'] }
+
 /** The swap source as the scene runs it, over one owned count the spec moves. */
 function boilerSourceAt(owned: { n: number }): PartMotionRequestSource {
   return { id: 'rig-look.spec', requestsNow: () => partSwapsOf([lookFrameAt(BOILER, owned.n)], []) }
@@ -83,7 +91,7 @@ describe('rig look parts', () => {
 
   it('yields a point a fitted module or item draws at, leaving the other tracks swapped', () => {
     const owned = [lookFrameAt(TIP, 25), lookFrameAt(HOLD, 10)]
-    expect(partSwapsOf(owned, ['drill.head'])).toEqual([
+    expect(partSwapsOf(owned, [{ attachId: 'drill.head', itemIds: [] }])).toEqual([
       { kind: 'swap', attach: 'hull.cargo', partIds: ['crate'] },
     ])
   })
@@ -128,5 +136,30 @@ describe('rig look parts', () => {
     expect(swapsOver(createRequestedParts(), oneByOne)).toBe(2)
     const tail = Array.from({ length: 50 }, (_, at) => at + 21)
     expect(swapsOver(createRequestedParts(), [20, ...tail])).toBe(1)
+  })
+
+  it('carries a covering track’s items on its swap, and no covers on any other', () => {
+    expect(partSwapsOf([lookFrameAt(TWIN_BIT, 20), lookFrameAt(HOLD, 10)], [])).toEqual([
+      { kind: 'swap', attach: 'drill.head', partIds: ['twin-bit-head'], covers: ['gear.twin_bit'] },
+      { kind: 'swap', attach: 'hull.cargo', partIds: ['crate'] },
+    ])
+  })
+
+  it('covers nothing on a step whose part is not in yet', () => {
+    expect(lookFrameAt(TWIN_BIT, 10).covers).toEqual([])
+    expect(partSwapsOf([lookFrameAt(TWIN_BIT, 10)], [TWIN_BIT_ART])).toEqual([])
+  })
+
+  it('takes the point held only by the art of the item it covers', () => {
+    expect(partSwapsOf([lookFrameAt(TWIN_BIT, 20)], [TWIN_BIT_ART])).toHaveLength(1)
+  })
+
+  it('still yields to every other item, so a module wins its slot', () => {
+    const tipOverTwinBit = partSwapsOf([lookFrameAt(TIP, 25)], [TWIN_BIT_ART])
+    const twinBitOverModule = partSwapsOf(
+      [lookFrameAt(TWIN_BIT, 20)],
+      [{ attachId: 'drill.head', itemIds: [] }],
+    )
+    expect([tipOverTwinBit, twinBitOverModule]).toEqual([[], []])
   })
 })

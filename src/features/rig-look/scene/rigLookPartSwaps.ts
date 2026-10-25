@@ -3,12 +3,13 @@
  * once per fixed step. It reads the local vehicle's owned levels (the scene draws only that car),
  * and asks which attach points a mounted module or item holds only while an owned look has a part,
  * so a rig with no look parts costs one pass over its tracks and allocates nothing. While one has
- * a part, the taken points are read from `mountedPartsShown()`, which copies its list each step;
+ * a part, what holds each point (and the items drawn there, ticket 892) is read from
+ * `pointHoldersShown()`, which copies its list each step;
  * the drill tip's steps have parts from 70 purchases (ticket 579), the cargo hold's from 23
  * (ticket 581) and the engine's from 2 (ticket 587), the other tracks' rows once their wiring
  * tickets land the art.
  */
-import { mountedPartsShown } from '../../../scene/mountedPartsPresence'
+import { pointHoldersShown } from '../../../scene/mountedPartsPresence'
 import { readAuthorityState } from '../../../store/authorityLink'
 import { useGameStore } from '../../../store/gameStore'
 import type {
@@ -28,7 +29,7 @@ export const RIG_LOOK_PART_SWAPS: PartMotionRequestSource = {
   requestsNow() {
     readOwnedLooks()
     if (!isSwappingParts(owned)) return NO_SWAPS
-    return partSwapsOf(owned, takenPointsNow())
+    return partSwapsOf(owned, pointHoldersShown())
   },
 }
 
@@ -38,8 +39,4 @@ function readOwnedLooks(): void {
   owned.length = 0
   for (const frames of SHIPPED_RIG_LOOKS.tracks)
     owned.push(rigLookOfPlayer(frames, state, playerId))
-}
-
-function takenPointsNow(): string[] {
-  return mountedPartsShown().map((mount) => mount.attachId)
 }
