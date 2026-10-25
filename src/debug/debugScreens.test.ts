@@ -244,7 +244,7 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
     expect(replay.digests.at(-1)?.digest).toBe(takeSessionSnapshot().digest)
   })
 
-  it('registers the 56 event names from before the controls and HUD, plus hint_shown, casing, the four #46 artefact events, collapse, the lining charge, the tunnel wrecker, the guns, the refinery, the lining bill, blasting charges, heat, benchmark results, the memory sample, the loadout, the gate hit, the live blast, save migrations, the charge sizes, the snapshot line, the item purchase, the ore sample, the magnetic hazard, the bore gun, the collapse brace, auto mode, the hazard strip tier, the strut, the drill cut line, the turret burst, the new game, the material pop mode, the scrapped save, the star map fuel, the jump drive, the premium ledger, the hazard contacts and the blast line', () => {
+  it('registers the 56 event names from before the controls and HUD, plus hint_shown, casing, the four #46 artefact events, collapse, the lining charge, the tunnel wrecker, the guns, the refinery, the lining bill, blasting charges, heat, benchmark results, the memory sample, the loadout, the gate hit, the live blast, save migrations, the charge sizes, the snapshot line, the item purchase, the ore sample, the magnetic hazard, the bore gun, the collapse brace, auto mode, the hazard strip tier, the strut, the drill cut line, the turret burst, the new game, the material pop mode, the scrapped save, the star map fuel, the jump drive, the premium ledger, the hazard contacts, the blast line and the collapse roll', () => {
     // #41 added `casing_upgraded`, `casing_placed`, `casing_drilled` and the two grade edges; #46 four
     // artefact events; #43 `collapse_warning`, `collapse_cancelled` and `collapse`; #76 `casing_lined`;
     // #111 `ring_gnawed`, `wrecker_spawned` and `wrecker_fled`; #93 `gun_mounted`, `gun_upgraded`,
@@ -265,7 +265,7 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
     // 704 `save_deleted`; tickets 755 and 756 `fuel_bought` and `fuel_tank_bought`; ticket 759
     // `jump_drive_bought`; ticket 844 `ore_premium_ledger` and `ore_sale_lift`; ticket 848
     // `hazard_refill`, `hazard_bite`, `hazard_shove`, `hazard_drain` and `tool_acting`; ticket 860
-    // `blast`; the controls and the HUD still add none.
+    // `blast`; ticket 861 `blast_collapse_roll`; the controls and the HUD still add none.
     expect(ALL_RUN_EVENT_NAMES).toHaveLength(
       62 +
         4 +
@@ -304,6 +304,7 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
         1 +
         2 +
         5 +
+        1 +
         1,
     )
   })

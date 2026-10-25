@@ -9,6 +9,10 @@
  * `COLLAPSE_FILL_TICKS`, then leaves the list. `debug.forceCollapse` marks a block forced: it runs
  * to its refill whatever its lining and wherever the vehicles are.
  *
+ * A bare blast's roll (D2 #861) adds a block marked `isBlast`: it runs to its refill as a forced
+ * block does, its refill leaves the rig's cell and every cell a vehicle could not drill open, and it
+ * crushes nobody.
+ *
  * A braced block (ticket 331, `collapseBraces`) stays in its warning past its refill tick and
  * never refills; when its brace ends it warns afresh from that tick (`collapseBraceSync.ts`).
  */
@@ -28,6 +32,12 @@ export interface CollapsingBlock {
    * later cannot: the fresh warning starts on the tick the brace was seen to end.
    */
   isBraced?: true
+  /**
+   * Written only on a block a bare blast's roll collapsed (D2 #861), absent otherwise, so a session
+   * that never rolls one keeps its snapshot, save and digest. It holds like a forced block, crushes
+   * no vehicle and leaves the cells `blastCollapseOpenCells.ts` names open.
+   */
+  isBlast?: true
 }
 
 export interface CollapseState {

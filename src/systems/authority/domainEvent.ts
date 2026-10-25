@@ -274,6 +274,18 @@ export interface KernelDomainEventBodies {
   /** The refill starts: the samples it will fill and the vehicles it crushes. */
   CollapseStarted: { block: string; samplesFilled: number; vehiclesHit: number }
   /**
+   * A bare blast's collapse roll on one rim block (D2 #861): the blast's `blastSeq`, the block, its
+   * size's chance and the draw, 0 to 9999 basis points; under the chance it collapses, telegraphed
+   * by the `CollapseWarned` after it.
+   */
+  BlastCollapseRolled: {
+    blastSeq: number
+    block: string
+    collapseBp: number
+    roll: number
+    isCollapsing: boolean
+  }
+  /**
    * The bore gun fired (ticket 313, #309): `aimed` is the bearing the command sent, `bearing` the
    * one bored after the arc clamp, and `rangeCells` the cells the line reaches. Its cells open on
    * the clock, one every few ticks.

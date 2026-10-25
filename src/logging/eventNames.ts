@@ -843,6 +843,21 @@ export const RUN_EVENT_REGISTRY = {
     level: 'core',
     payload: { block: 'text', samplesFilled: 'integer', vehiclesHit: 'integer' },
   },
+  // Ticket 861 (D2): a bare blast's collapse roll on one rim block, a draw of 0 to 9999 basis points
+  // from hash(worldSeed, s, p, block, blastSeq) against its size's `collapseBp`; under it the block
+  // collapses, logged as `collapse_warning` then `collapse` like any other. Sizes of chance 0 roll
+  // nothing, so they log no line.
+  blast_collapse_roll: {
+    group: 'mining',
+    level: 'core',
+    payload: {
+      blastSeq: 'integer',
+      block: 'text',
+      collapseBp: 'integer',
+      roll: 'integer',
+      isCollapsing: 'flag',
+    },
+  },
   // Ticket 313 (#309): the bore gun fired, `aimed` as sent and `bearing` as bored after the arc
   // clamp, its cells opening on the clock; then the bore stopped at its range, budget or tank, or
   // with the clank at a cell the drill cannot dig, the core or lava. Its cells log as

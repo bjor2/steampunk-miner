@@ -14,7 +14,7 @@
  * the ground it reads changed: a new delta of a chunk under the block or its border that holds other
  * density or casing over those samples (`collapseBlockGround`, #120).
  */
-import { blockIdOf, firstSampleOfBlock, type CollapseBlock } from './collapseBlock'
+import { blockIdOf, firstSampleOfBlock, samplesOfBlock, type CollapseBlock } from './collapseBlock'
 import {
   chunksReadByBlock,
   deltasReadByBlock,
@@ -68,6 +68,21 @@ export function linedWallsOfBlock(layers: SampleLayers, block: CollapseBlock): S
   const walls = new Map<string, SamplePoint>()
   visitLinedWallsOfBlock(layers, block, (sx, sy) => walls.set(`${sx},${sy}`, { sx, sy }))
   return [...walls.values()]
+}
+
+/**
+ * Whether the block has carved air and no lined wall borders it: the bare ground a blast's
+ * collapse roll asks about (D2 #861). Lining that holds, or lining too weak (the weak path's), is
+ * never rolled.
+ */
+export function isBareOpenBlock(
+  world: WorldState,
+  params: PlanetParams,
+  block: CollapseBlock,
+): boolean {
+  const layers = openSampleLayers(world, params)
+  const hasCarvedAir = samplesOfBlock(block).some(({ sx, sy }) => isCarvedAirAt(layers, sx, sy))
+  return hasCarvedAir && linedWallsOfBlock(layers, block).length === 0
 }
 
 /**

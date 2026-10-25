@@ -5,6 +5,12 @@
  * telegraph, as the watch starts any other. Lining is never blasted away, so blocks whose lining
  * holds stay quiet as usual, and so do reinforced ones (ticket 365).
  *
+ * A bare blast also rolls (D2 #861): each checked block that is not weak, has carved air and no
+ * lined wall draws its seeded roll (`blastCollapseRoll.ts`) against its size's `collapseBp`, says
+ * so in one `BlastCollapseRolled`, and under the chance starts a blast's telegraph
+ * (`startBlastWarning`): the shared warning and refill, crushing nobody and leaving the rig's cell
+ * and every cell a vehicle could not drill open. Sizes whose chance is 0 roll nothing.
+ *
  * A live blast checks a block once its front is a block past the block's centre, so the block's
  * ground and its border are broken as they will stay, nearest blocks first, at most
  * `BLAST_COLLAPSE_CHECKS_PER_TICK` a tick (the TD caps how many telegraphs start in one tick); the
@@ -12,15 +18,25 @@
  */
 import { COLLAPSE_BLOCK_SAMPLES } from '../../../constants/balance'
 import { BLAST_COLLAPSE_CHECKS_PER_TICK } from '../../../constants/terrainBudget'
+import { collapseBpOf } from '../../economy/chargeSizes'
 import { chargeCentreMm } from '../../vehicle/vehicleCharges'
 import { blockCentreMm, blockIdOf, blocksNear, type CollapseBlock } from '../../world/collapseBlock'
 import type { PlanetParams } from '../../world/planetParams'
+import { isBareOpenBlock } from '../../world/collapseWeakness'
 import { MM_PER_SAMPLE } from '../../world/sampleGrid'
 import type { AuthorityState } from '../authorityState'
 import { entryOfBlock } from '../collapse/collapseState'
-import { startWarning, weaknessOf, type WeakBlock } from '../collapse/collapseWatch'
+import {
+  forcedWeaknessOf,
+  startBlastWarning,
+  startWarning,
+  weaknessOf,
+  type WeakBlock,
+} from '../collapse/collapseWatch'
 import { chainEffects, type RuleEffect } from '../commandRule'
+import type { DomainEventBodies, DomainEventBody } from '../domainEvent'
 import type { BlastEvent } from '../../registries/blastEffects'
+import { collapseRollOf, isRolledToCollapse } from './blastCollapseRoll'
 import { groundRadiusMmOf } from './blastDisc'
 import type { LiveBlast } from './liveBlast'
 
@@ -58,17 +74,15 @@ export function checkCollapseBehindFront(
 ): BlastCollapseCheck {
   const disturbed = disturbedBlocksOf(live.blast, params)
   const due = dueBlocksOf(disturbed, live.collapseChecks, frontMm, isGroundDone)
-  const fresh = freshWeakBlocksAmong(state, params, due)
-  const effect = chainEffects(
-    state,
-    fresh.map((weak) => (current: AuthorityState) => startWarning(current, weak, false)),
-  )
+  const checks = blockChecksAmong(state, params, live.blast, due)
+  const effect = chainEffects(state, checks.map(effectOfCheck))
+  const triggered = checks.filter(isWarningStarted).length
   const checked = {
     ...live,
     collapseChecks: live.collapseChecks + due.length,
-    collapsesTriggered: live.collapsesTriggered + fresh.length,
+    collapsesTriggered: live.collapsesTriggered + triggered,
   }
-  return { effect, live: checked, triggered: fresh.length }
+  return { effect, live: checked, triggered }
 }
 
 function dueBlocksOf(
@@ -112,15 +126,76 @@ function distanceMm(a: { xMm: number; yMm: number }, b: { xMm: number; yMm: numb
   return Math.floor(Math.sqrt(dx * dx + dy * dy))
 }
 
-/** The weak blocks among `blocks` that are not collapsing yet. */
-function freshWeakBlocksAmong(
+/** What checking one disturbed block found: a weak block, or a bare one's roll. */
+type BlockCheck =
+  | { verdict: 'weak'; weak: WeakBlock }
+  | { verdict: 'rolled'; weak: WeakBlock; roll: BlastCollapseRoll }
+
+type BlastCollapseRoll = Omit<DomainEventBodies['BlastCollapseRolled'], 'block'>
+
+/** The checks of the blocks not collapsing yet that are weak or roll, in the order given. */
+function blockChecksAmong(
   state: AuthorityState,
   params: PlanetParams,
+  blast: BlastEvent,
   blocks: readonly CollapseBlock[],
-): WeakBlock[] {
+): BlockCheck[] {
   return blocks.flatMap((block) => {
-    const weakness = weaknessOf(state, params, block)
-    const isCollapsing = entryOfBlock(state.collapse, blockIdOf(block)) !== null
-    return weakness === null || isCollapsing ? [] : [{ block, weakness }]
+    const check = checkOfBlock(state, params, blast, block)
+    return check === null ? [] : [check]
   })
+}
+
+function checkOfBlock(
+  state: AuthorityState,
+  params: PlanetParams,
+  blast: BlastEvent,
+  block: CollapseBlock,
+): BlockCheck | null {
+  if (entryOfBlock(state.collapse, blockIdOf(block)) !== null) return null
+  const weakness = weaknessOf(state, params, block)
+  if (weakness !== null) return { verdict: 'weak', weak: { block, weakness } }
+  return rolledCheckOf(state, params, blast, block)
+}
+
+/** A bare open block's roll against the size's chance; null when the size never collapses. */
+function rolledCheckOf(
+  state: AuthorityState,
+  params: PlanetParams,
+  blast: BlastEvent,
+  block: CollapseBlock,
+): BlockCheck | null {
+  const collapseBp = collapseBpOf(blast.size)
+  if (collapseBp === 0 || !isBareOpenBlock(state.world, params, block)) return null
+  const weakness = forcedWeaknessOf(state, params, block)
+  if (weakness === null) return null
+  const roll = collapseRollOf(params, block, blast.blastSeq)
+  const isCollapsing = isRolledToCollapse(roll, collapseBp)
+  const rolled = { blastSeq: blast.blastSeq, collapseBp, roll, isCollapsing }
+  return { verdict: 'rolled', weak: { block, weakness }, roll: rolled }
+}
+
+function effectOfCheck(check: BlockCheck): (state: AuthorityState) => RuleEffect {
+  if (check.verdict === 'weak') return (state) => startWarning(state, check.weak, false)
+  return (state) => rolledEffectOf(state, check.weak, check.roll)
+}
+
+/** The roll said, then the blast's telegraph when it collapses. */
+function rolledEffectOf(
+  state: AuthorityState,
+  weak: WeakBlock,
+  roll: BlastCollapseRoll,
+): RuleEffect {
+  const rolled: DomainEventBody = {
+    type: 'BlastCollapseRolled',
+    block: blockIdOf(weak.block),
+    ...roll,
+  }
+  if (!roll.isCollapsing) return { state, events: [rolled] }
+  const warned = startBlastWarning(state, weak)
+  return { state: warned.state, events: [rolled, ...warned.events] }
+}
+
+function isWarningStarted(check: BlockCheck): boolean {
+  return check.verdict === 'weak' || check.roll.isCollapsing
 }

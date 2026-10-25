@@ -55,8 +55,8 @@ export interface WeakBlock {
 }
 
 /**
- * A reinforced block never holds; else a forced block always does, any other only while weak with
- * a vehicle within 16 m.
+ * A reinforced block never holds; else a forced block or one a bare blast rolled (D2 #861) always
+ * does, any other only while weak with a vehicle within 16 m.
  */
 export function isCollapseHeld(
   state: AuthorityState,
@@ -65,7 +65,7 @@ export function isCollapseHeld(
 ): boolean {
   const block = blockOfEntry(entry)
   if (isBlockReinforced(state, params, block)) return false
-  if (entry.isForced) return true
+  if (entry.isForced || entry.isBlast === true) return true
   return isNearAnyVehicle(state, block) && weaknessOfBlock(state.world, params, block) !== null
 }
 
@@ -94,6 +94,19 @@ export function startWarning(
 ): RuleEffect {
   const block = blockIdOf(weak.block)
   const entry = { block, startTick: state.tick, isForced }
+  return {
+    state: withCollapse(state, withCollapsingBlock(state.collapse, entry)),
+    events: [{ type: 'CollapseWarned', block, ...weak.weakness }],
+  }
+}
+
+/**
+ * Starts the telegraph of a block a bare blast's roll collapses (D2 #861) at the state's tick: the
+ * same warning and blink as any other, the entry marked `isBlast`.
+ */
+export function startBlastWarning(state: AuthorityState, weak: WeakBlock): RuleEffect {
+  const block = blockIdOf(weak.block)
+  const entry = { block, startTick: state.tick, isForced: false, isBlast: true as const }
   return {
     state: withCollapse(state, withCollapsingBlock(state.collapse, entry)),
     events: [{ type: 'CollapseWarned', block, ...weak.weakness }],

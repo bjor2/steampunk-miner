@@ -10,7 +10,9 @@
  *   list;
  * - first of all, the braces are brought in line (ticket 331): a braced block is skipped and never
  *   begins its refill, and one whose brace ended warns afresh from this tick;
- * - a reinforced cell (ticket 365) is never filled: its samples stay open and its lining stays.
+ * - a reinforced cell (ticket 365) is never filled: its samples stay open and its lining stays;
+ * - a block a bare blast rolled (D2 #861) crushes no vehicle, and its refill also leaves the rigs'
+ *   cells and every cell a vehicle could not drill open (`blastCollapseOpenCells.ts`).
  *
  * Collapse events concern no one player, so they carry only the tick; a crush carries the player
  * whose vehicle it hit. The ground changes as ordinary `GroundChanged`.
@@ -36,7 +38,7 @@ import {
   type CollapsingBlock,
 } from './collapseState'
 import { syncCollapseBracesAt } from './collapseBraceSync'
-import { reinforcedCellsOf } from './collapseReinforcement'
+import { keptOpenCellsOf } from './blastCollapseOpenCells'
 import { cancelCollapse, isCollapseHeld, vehicleBodiesOf, type VehicleBody } from './collapseWatch'
 
 type TickStep = (state: AuthorityState) => TickOutcome
@@ -114,11 +116,9 @@ function crushAndAnnounce(
     params,
     block,
     bodies.map(({ centre }) => centre),
-    reinforcedCellsOf(state),
+    keptOpenCellsOf(state, params, entry),
   )
-  const caught = bodies.filter(
-    ({ playerId }, at) => plan.caught[at] && isCrushable(state.players[playerId].vehicle),
-  )
+  const caught = crushedBodiesOf(state, entry, bodies, plan.caught)
   const announced: DomainEvent = {
     tick,
     type: 'CollapseStarted',
@@ -128,6 +128,19 @@ function crushAndAnnounce(
   }
   const crushed = crushEach(state, caught, bandOfBlock(params, block), tick)
   return { state: crushed.state, events: [announced, ...crushed.events] }
+}
+
+/** The crushable vehicles the refill catches; a bare blast's collapse crushes none (D2 #861). */
+function crushedBodiesOf(
+  state: AuthorityState,
+  entry: CollapsingBlock,
+  bodies: readonly VehicleBody[],
+  isCaught: readonly boolean[],
+): VehicleBody[] {
+  if (entry.isBlast === true) return []
+  return bodies.filter(
+    ({ playerId }, at) => isCaught[at] && isCrushable(state.players[playerId].vehicle),
+  )
 }
 
 function crushEach(
@@ -163,7 +176,7 @@ function refillStep(
     blockOfEntry(entry),
     step,
     bodies,
-    reinforcedCellsOf(state),
+    keptOpenCellsOf(state, params, entry),
   )
   const isLast = step >= COLLAPSE_FILL_TICKS - 1
   const collapse = isLast ? withoutCollapsingBlock(state.collapse, entry.block) : state.collapse

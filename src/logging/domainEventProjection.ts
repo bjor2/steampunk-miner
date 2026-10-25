@@ -104,6 +104,10 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     data: { block, by: by.map((provider) => ({ provider })) },
   }),
   CollapseCancelled: ({ block }) => ({ event: 'collapse_cancelled', data: { block } }),
+  BlastCollapseRolled: ({ blastSeq, block, collapseBp, roll, isCollapsing }) => ({
+    event: 'blast_collapse_roll',
+    data: { blastSeq, block, collapseBp, roll, isCollapsing },
+  }),
   CollapseStarted: ({ block, samplesFilled, vehiclesHit }) => ({
     event: 'collapse',
     data: { block, samplesFilled, vehiclesHit },
