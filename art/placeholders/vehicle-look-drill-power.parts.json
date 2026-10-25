@@ -1,0 +1,126 @@
+{
+  "assetId": "vehicle-look-drill-power",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-look-drill-power/vehicle-look-drill-power.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [128, 2048],
+  "maps": {
+    "albedo": "vehicle-look-drill-power.albedo.ktx2",
+    "normal": "vehicle-look-drill-power.normal.ktx2",
+    "emissive": "vehicle-look-drill-power.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "aether-housing",
+      "tier": 1,
+      "rect": [8, 8, 56, 121],
+      "sizeM": [0.1086, 0.2357],
+      "pivotM": [0.0011, 0.2339],
+      "atM": [0.0, 0.0],
+      "z": 4
+    },
+    {
+      "id": "bolted-housing",
+      "tier": 1,
+      "rect": [8, 145, 56, 121],
+      "sizeM": [0.1085, 0.2356],
+      "pivotM": [0.001, 0.2339],
+      "atM": [0.0, 0.0],
+      "z": 4
+    },
+    {
+      "id": "clamped-housing",
+      "tier": 1,
+      "rect": [8, 967, 56, 104],
+      "sizeM": [0.1085, 0.2026],
+      "pivotM": [0.001, 0.2008],
+      "atM": [0.0, 0.0],
+      "z": 4
+    },
+    {
+      "id": "coiled-housing",
+      "tier": 1,
+      "rect": [8, 282, 56, 121],
+      "sizeM": [0.1085, 0.2356],
+      "pivotM": [0.001, 0.2339],
+      "atM": [0.0, 0.0],
+      "z": 4
+    },
+    {
+      "id": "finned-housing",
+      "tier": 1,
+      "rect": [8, 1087, 52, 104],
+      "sizeM": [0.1005, 0.2026],
+      "pivotM": [0.001, 0.2008],
+      "atM": [0.0, 0.0],
+      "z": 4
+    },
+    {
+      "id": "flywheel-housing",
+      "tier": 1,
+      "rect": [8, 419, 56, 121],
+      "sizeM": [0.1085, 0.2356],
+      "pivotM": [0.001, 0.2339],
+      "atM": [0.0, 0.0],
+      "z": 4
+    },
+    {
+      "id": "gauged-housing",
+      "tier": 1,
+      "rect": [8, 1403, 52, 39],
+      "sizeM": [0.0999, 0.0761],
+      "pivotM": [0.0009, 0.0745],
+      "atM": [0.0, 0.0],
+      "z": 4
+    },
+    {
+      "id": "haloed-housing",
+      "tier": 1,
+      "rect": [8, 556, 56, 121],
+      "sizeM": [0.1086, 0.2357],
+      "pivotM": [0.0011, 0.2339],
+      "atM": [0.0, 0.0],
+      "z": 4
+    },
+    {
+      "id": "lensed-housing",
+      "tier": 1,
+      "rect": [8, 693, 56, 121],
+      "sizeM": [0.1086, 0.2357],
+      "pivotM": [0.0011, 0.2339],
+      "atM": [0.0, 0.0],
+      "z": 4
+    },
+    {
+      "id": "piped-housing",
+      "tier": 1,
+      "rect": [8, 1207, 52, 104],
+      "sizeM": [0.1005, 0.2026],
+      "pivotM": [0.001, 0.2008],
+      "atM": [0.0, 0.0],
+      "z": 4
+    },
+    {
+      "id": "ribbed-housing",
+      "tier": 1,
+      "rect": [8, 830, 56, 121],
+      "sizeM": [0.1085, 0.2356],
+      "pivotM": [0.001, 0.2339],
+      "atM": [0.0, 0.0],
+      "z": 4
+    },
+    {
+      "id": "valved-housing",
+      "tier": 1,
+      "rect": [8, 1327, 52, 60],
+      "sizeM": [0.1, 0.1161],
+      "pivotM": [0.001, 0.1144],
+      "atM": [0.0, 0.0],
+      "z": 4
+    }
+  ]
+}

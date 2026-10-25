@@ -531,12 +531,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/useRefusals.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/useResolution.test.ts` | 12 | 12 |
 
-### `rig-look`: 20 files, 349 tests
+### `rig-look`: 21 files, 383 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/rig-look/rigLookPlanets.lane.test.ts` | 1 | 1 |
 | `src/features/rig-look/systems/cargoHoldLooks.test.ts` | 33 | 11 |
+| `src/features/rig-look/systems/drillPowerLooks.test.ts` | 30 | 15 |
 | `src/features/rig-look/systems/drillTipLooks.test.ts` | 34 | 11 |
 | `src/features/rig-look/systems/engineLooks.test.ts` | 57 | 16 |
 | `src/features/rig-look/systems/groundGunItemParts.test.ts` | 7 | 7 |
@@ -551,7 +552,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/rig-look/systems/rigLookHull.test.ts` | 31 | 11 |
 | `src/features/rig-look/systems/rigLookLines.test.ts` | 12 | 8 |
 | `src/features/rig-look/systems/rigLookPlanets.test.ts` | 4 | 4 |
-| `src/features/rig-look/systems/rigLookPlaque.test.ts` | 28 | 12 |
+| `src/features/rig-look/systems/rigLookPlaque.test.ts` | 32 | 13 |
 | `src/features/rig-look/systems/rigLookReadability.test.ts` | 2 | 2 |
 | `src/features/rig-look/systems/rigLookSource.test.ts` | 13 | 13 |
 | `src/features/rig-look/systems/rigLookTable.test.ts` | 32 | 32 |

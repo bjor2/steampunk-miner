@@ -1,0 +1,101 @@
+{
+  "about": "Ticket 875: silhouette cells of each drill_power look on drill.housing, on a 4 mm grid, outside the rig at rest at tiers 1, 2, 3; written by check_outline.py. `outsideRig` must be all zero. No rig part stands on the slot, so the check is against the whole rig.",
+  "looks": {
+    "gauged-housing": {
+      "cells": 112,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      }
+    },
+    "valved-housing": {
+      "cells": 156,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      }
+    },
+    "piped-housing": {
+      "cells": 308,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      }
+    },
+    "finned-housing": {
+      "cells": 328,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      }
+    },
+    "clamped-housing": {
+      "cells": 358,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      }
+    },
+    "flywheel-housing": {
+      "cells": 427,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      }
+    },
+    "bolted-housing": {
+      "cells": 440,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      }
+    },
+    "ribbed-housing": {
+      "cells": 532,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      }
+    },
+    "coiled-housing": {
+      "cells": 538,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      }
+    },
+    "lensed-housing": {
+      "cells": 538,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      }
+    },
+    "haloed-housing": {
+      "cells": 555,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      }
+    },
+    "aether-housing": {
+      "cells": 555,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      }
+    }
+  }
+}

@@ -70,13 +70,19 @@ const DRILL_POWER_BAND = 6
 /**
  * #554's look with its bit glow on `nose`: the drill tip's crowns stand in the bit's place
  * (ticket 579), so the bit's glow lights them too and the nose stays the brightest part (ticket
- * 590). Colours and glows stay #554's.
+ * 590). Colours and glows stay #554's; the housing parts of ticket 875 join as a third, unlit
+ * group, since they only show from 60 purchases.
  */
-function withNoseSlots(look: DrillLook554, nose: readonly string[]): DrillLook554 {
+function withNoseSlots(
+  look: DrillLook554,
+  nose: readonly string[],
+  housing: readonly string[],
+): DrillLook554 {
   if (look === null) return null
+  const [bit, head] = look.glows
   return {
     ...look,
-    glows: look.glows.map((glow, at) => (at === 0 ? { ...glow, slots: [...nose] } : glow)),
+    glows: [{ ...bit, slots: [...nose] }, head, { ...head, slots: [...housing], glow: 0 }],
   }
 }
 
@@ -93,9 +99,11 @@ describe('rig look on the vehicle', () => {
     )
     const crowns = SHIPPED_RIG_LOOKS.tracks.find((frames) => frames.rows.track === 'drill_tip')!
     const nose = ['drill-bit', ...crowns.rows.steps.flatMap((step) => step.part ?? [])]
+    const housing = SHIPPED_RIG_LOOKS.tracks.find((frames) => frames.rows.track === 'drill_power')!
+      .rows.glowSlots[2]
     const stageOf = (n: number) => Math.min(Math.floor(n / DRILL_POWER_BAND), 9)
     expect(looks).toEqual(
-      looks.map((_, n) => withNoseSlots(DRILL_LOOK_554.looks[stageOf(n)], nose)),
+      looks.map((_, n) => withNoseSlots(DRILL_LOOK_554.looks[stageOf(n)], nose, housing)),
     )
   })
 

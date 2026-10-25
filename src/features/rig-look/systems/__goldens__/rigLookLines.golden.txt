@@ -2,37 +2,73 @@ drill_power
 0: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
 1: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
 5: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
-6: band 1 step 1 tail 0 pips 0 part null finish null tint #c8873a | null
-7: band 1 step 1 tail 0 pips 0 part null finish null tint #c8873a | null
-10: band 1 step 1 tail 0 pips 0 part null finish null tint #c8873a | null
-11: band 1 step 1 tail 0 pips 0 part null finish null tint #c8873a | null
-12: band 2 step 2 tail 0 pips 0 part null finish null tint #e8742a | null
-13: band 2 step 2 tail 0 pips 0 part null finish null tint #e8742a | null
-17: band 2 step 2 tail 0 pips 0 part null finish null tint #e8742a | null
-18: band 3 step 3 tail 0 pips 0 part null finish null tint #ff5a1f | null
-19: band 3 step 3 tail 0 pips 0 part null finish null tint #ff5a1f | null
-23: band 3 step 3 tail 0 pips 0 part null finish null tint #ff5a1f | null
-24: band 4 step 4 tail 0 pips 0 part null finish null tint #ffd27a | null
-25: band 4 step 4 tail 0 pips 0 part null finish null tint #ffd27a | null
-29: band 4 step 4 tail 0 pips 0 part null finish null tint #ffd27a | null
-30: band 5 step 5 tail 0 pips 0 part null finish null tint #5fd6c4 | null
-31: band 5 step 5 tail 0 pips 0 part null finish null tint #5fd6c4 | null
-35: band 5 step 5 tail 0 pips 0 part null finish null tint #5fd6c4 | null
-36: band 6 step 6 tail 0 pips 0 part null finish null tint #b07aff | null
-37: band 6 step 6 tail 0 pips 0 part null finish null tint #b07aff | null
-41: band 6 step 6 tail 0 pips 0 part null finish null tint #b07aff | null
-42: band 7 step 7 tail 0 pips 0 part null finish null tint #ff7ae0 | null
-43: band 7 step 7 tail 0 pips 0 part null finish null tint #ff7ae0 | null
-47: band 7 step 7 tail 0 pips 0 part null finish null tint #ff7ae0 | null
-48: band 8 step 8 tail 0 pips 0 part null finish null tint #f4f4ff | null
-49: band 8 step 8 tail 0 pips 0 part null finish null tint #f4f4ff | null
-53: band 8 step 8 tail 0 pips 0 part null finish null tint #f4f4ff | null
-54: band 9 step 9 tail 0 pips 0 part null finish null tint #ffe14a | null
-55: band 9 step 9 tail 0 pips 0 part null finish null tint #ffe14a | null
-60: band 10 step 9 tail 1 pips 5 part null finish gilt tint #f0c840 | null
-99: band 16 step 9 tail 7 pips 8 part null finish polished-chrome tint #e8eef4 | null
-9999: band 1666 step 9 tail 1657 pips 908 part null finish gilt tint #f0c840 | null
-1000000: band 166666 step 9 tail 166657 pips 90908 part null finish gilt tint #f0c840 | null
+6: band 1 step 1 tail 0 pips 0 part null finish null tint #c8873a | Fitting: Amber glow
+7: band 1 step 1 tail 0 pips 0 part null finish null tint #c8873a | Fitting: Amber glow
+10: band 1 step 1 tail 0 pips 0 part null finish null tint #c8873a | Fitting: Amber glow
+11: band 1 step 1 tail 0 pips 0 part null finish null tint #c8873a | Fitting: Amber glow
+12: band 2 step 2 tail 0 pips 0 part null finish null tint #e8742a | Fitting: Ember glow
+13: band 2 step 2 tail 0 pips 0 part null finish null tint #e8742a | Fitting: Ember glow
+17: band 2 step 2 tail 0 pips 0 part null finish null tint #e8742a | Fitting: Ember glow
+18: band 3 step 3 tail 0 pips 0 part null finish null tint #ff5a1f | Fitting: Flame glow
+19: band 3 step 3 tail 0 pips 0 part null finish null tint #ff5a1f | Fitting: Flame glow
+23: band 3 step 3 tail 0 pips 0 part null finish null tint #ff5a1f | Fitting: Flame glow
+24: band 4 step 4 tail 0 pips 0 part null finish null tint #ffd27a | Fitting: Gold glow
+25: band 4 step 4 tail 0 pips 0 part null finish null tint #ffd27a | Fitting: Gold glow
+29: band 4 step 4 tail 0 pips 0 part null finish null tint #ffd27a | Fitting: Gold glow
+30: band 5 step 5 tail 0 pips 0 part null finish null tint #5fd6c4 | Fitting: Teal glow
+31: band 5 step 5 tail 0 pips 0 part null finish null tint #5fd6c4 | Fitting: Teal glow
+35: band 5 step 5 tail 0 pips 0 part null finish null tint #5fd6c4 | Fitting: Teal glow
+36: band 6 step 6 tail 0 pips 0 part null finish null tint #b07aff | Fitting: Violet glow
+37: band 6 step 6 tail 0 pips 0 part null finish null tint #b07aff | Fitting: Violet glow
+41: band 6 step 6 tail 0 pips 0 part null finish null tint #b07aff | Fitting: Violet glow
+42: band 7 step 7 tail 0 pips 0 part null finish null tint #ff7ae0 | Fitting: Rose glow
+43: band 7 step 7 tail 0 pips 0 part null finish null tint #ff7ae0 | Fitting: Rose glow
+47: band 7 step 7 tail 0 pips 0 part null finish null tint #ff7ae0 | Fitting: Rose glow
+48: band 8 step 8 tail 0 pips 0 part null finish null tint #f4f4ff | Fitting: White glow
+49: band 8 step 8 tail 0 pips 0 part null finish null tint #f4f4ff | Fitting: White glow
+53: band 8 step 8 tail 0 pips 0 part null finish null tint #f4f4ff | Fitting: White glow
+54: band 9 step 9 tail 0 pips 0 part null finish null tint #ffe14a | Fitting: Sun glow
+55: band 9 step 9 tail 0 pips 0 part null finish null tint #ffe14a | Fitting: Sun glow
+59: band 9 step 9 tail 0 pips 0 part null finish null tint #ffe14a | Fitting: Sun glow
+60: band 10 step 10 tail 0 pips 0 part gauged-housing finish null tint #d8b45a | Fitting: Pressure gauge
+61: band 10 step 10 tail 0 pips 0 part gauged-housing finish null tint #d8b45a | Fitting: Pressure gauge
+65: band 10 step 10 tail 0 pips 0 part gauged-housing finish null tint #d8b45a | Fitting: Pressure gauge
+66: band 11 step 11 tail 0 pips 0 part valved-housing finish null tint #b06a3c | Fitting: Relief valve
+67: band 11 step 11 tail 0 pips 0 part valved-housing finish null tint #b06a3c | Fitting: Relief valve
+71: band 11 step 11 tail 0 pips 0 part valved-housing finish null tint #b06a3c | Fitting: Relief valve
+72: band 12 step 12 tail 0 pips 0 part piped-housing finish null tint #c47a46 | Fitting: Steam feed
+73: band 12 step 12 tail 0 pips 0 part piped-housing finish null tint #c47a46 | Fitting: Steam feed
+77: band 12 step 12 tail 0 pips 0 part piped-housing finish null tint #c47a46 | Fitting: Steam feed
+78: band 13 step 13 tail 0 pips 0 part finned-housing finish null tint #4c5258 | Fitting: Cooling fins
+79: band 13 step 13 tail 0 pips 0 part finned-housing finish null tint #4c5258 | Fitting: Cooling fins
+83: band 13 step 13 tail 0 pips 0 part finned-housing finish null tint #4c5258 | Fitting: Cooling fins
+84: band 14 step 14 tail 0 pips 0 part clamped-housing finish null tint #c8ccd0 | Fitting: Clamp band
+85: band 14 step 14 tail 0 pips 0 part clamped-housing finish null tint #c8ccd0 | Fitting: Clamp band
+89: band 14 step 14 tail 0 pips 0 part clamped-housing finish null tint #c8ccd0 | Fitting: Clamp band
+90: band 15 step 15 tail 0 pips 0 part flywheel-housing finish null tint #8a7560 | Fitting: Power flywheel
+91: band 15 step 15 tail 0 pips 0 part flywheel-housing finish null tint #8a7560 | Fitting: Power flywheel
+95: band 15 step 15 tail 0 pips 0 part flywheel-housing finish null tint #8a7560 | Fitting: Power flywheel
+96: band 16 step 16 tail 0 pips 0 part bolted-housing finish null tint #dfe4ea | Fitting: Hex bolts
+97: band 16 step 16 tail 0 pips 0 part bolted-housing finish null tint #dfe4ea | Fitting: Hex bolts
+99: band 16 step 16 tail 0 pips 0 part bolted-housing finish null tint #dfe4ea | Fitting: Hex bolts
+101: band 16 step 16 tail 0 pips 0 part bolted-housing finish null tint #dfe4ea | Fitting: Hex bolts
+102: band 17 step 17 tail 0 pips 0 part ribbed-housing finish null tint #2a2c30 | Fitting: Iron ribs
+103: band 17 step 17 tail 0 pips 0 part ribbed-housing finish null tint #2a2c30 | Fitting: Iron ribs
+107: band 17 step 17 tail 0 pips 0 part ribbed-housing finish null tint #2a2c30 | Fitting: Iron ribs
+108: band 18 step 18 tail 0 pips 0 part coiled-housing finish null tint #d2834e | Fitting: Copper coils
+109: band 18 step 18 tail 0 pips 0 part coiled-housing finish null tint #d2834e | Fitting: Copper coils
+113: band 18 step 18 tail 0 pips 0 part coiled-housing finish null tint #d2834e | Fitting: Copper coils
+114: band 19 step 19 tail 0 pips 0 part lensed-housing finish null tint #4fc9b8 | Fitting: Sight lenses
+115: band 19 step 19 tail 0 pips 0 part lensed-housing finish null tint #4fc9b8 | Fitting: Sight lenses
+119: band 19 step 19 tail 0 pips 0 part lensed-housing finish null tint #4fc9b8 | Fitting: Sight lenses
+120: band 20 step 20 tail 0 pips 0 part haloed-housing finish null tint #7affd8 | Fitting: Flywheel halo
+121: band 20 step 20 tail 0 pips 0 part haloed-housing finish null tint #7affd8 | Fitting: Flywheel halo
+125: band 20 step 20 tail 0 pips 0 part haloed-housing finish null tint #7affd8 | Fitting: Flywheel halo
+126: band 21 step 21 tail 0 pips 0 part aether-housing finish null tint #9ff5e6 | Fitting: Aether housing
+127: band 21 step 21 tail 0 pips 0 part aether-housing finish null tint #9ff5e6 | Fitting: Aether housing
+132: band 22 step 21 tail 1 pips 12 part aether-housing finish gilt tint #f0c840 | Fitting: Gilt · L132
+9999: band 1666 step 21 tail 1645 pips 908 part aether-housing finish gilt tint #f0c840 | Fitting: Gilt · L9,999
+1000000: band 166666 step 21 tail 166645 pips 90908 part aether-housing finish gilt tint #f0c840 | Fitting: Gilt · L1,000,000
 
 drill_tip
 0: band 0 step 0 tail 0 pips 0 part null finish null tint null | null

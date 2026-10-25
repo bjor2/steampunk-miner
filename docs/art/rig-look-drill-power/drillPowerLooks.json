@@ -1,0 +1,23 @@
+{
+  "about": "The drill_power track's rig-look parts (ticket 875, LK12 of the P1-P5 map #647): one asset at the track's attach slot, the drill housing (the GD's drill_power showcase point on #180), one part per look step from the band edge of 60 LK1 (#809) froze for the line to 126, about P40 on the median path. #554's nine glow rows keep the first nine edges (6 to 54) with no part; each step here is the housing with one more part fitted in a socket on the gimbal drive's drum: the steam fittings first (a pressure gauge, a relief valve, the steam feed, cooling fins, a clamp band, a power flywheel), then heavier hardware (hex bolts, iron ribs, copper coils), then the aether glows (sight lenses, a flywheel halo, the aether housing). The names are the data strings of 3 words or fewer the hover line shows; the wiring reads thresholds and names from rigLook.json (#577), not from here. lookBoxM is the box every look fits inside, in the vehicle frame: the drum's face the tier-2 and tier-3 bow armour (z 5) and the headlamp (z 4) leave open, what the readability sheet measures a step over.",
+  "assetId": "vehicle-look-drill-power",
+  "track": "drill_power",
+  "attach": "drill.housing",
+  "z": 4,
+  "replaces": null,
+  "lookBoxM": [0.26, -0.2, 0.37, 0.04],
+  "looks": [
+    { "part": "gauged-housing", "name": "Pressure gauge", "purchases": 60 },
+    { "part": "valved-housing", "name": "Relief valve", "purchases": 66 },
+    { "part": "piped-housing", "name": "Steam feed", "purchases": 72 },
+    { "part": "finned-housing", "name": "Cooling fins", "purchases": 78 },
+    { "part": "clamped-housing", "name": "Clamp band", "purchases": 84 },
+    { "part": "flywheel-housing", "name": "Power flywheel", "purchases": 90 },
+    { "part": "bolted-housing", "name": "Hex bolts", "purchases": 96 },
+    { "part": "ribbed-housing", "name": "Iron ribs", "purchases": 102 },
+    { "part": "coiled-housing", "name": "Copper coils", "purchases": 108 },
+    { "part": "lensed-housing", "name": "Sight lenses", "purchases": 114 },
+    { "part": "haloed-housing", "name": "Flywheel halo", "purchases": 120 },
+    { "part": "aether-housing", "name": "Aether housing", "purchases": 126 }
+  ]
+}

@@ -76,7 +76,8 @@ describe('rig look badges on the rig (ticket 809)', () => {
   })
 
   it('wears the band’s finish on the plate', () => {
-    const [drill] = badgesAt(60, 1, 1)
+    // drill_power's first finish band, past its twenty-one authored steps (ticket 875).
+    const [drill] = badgesAt(132, 1, 1)
     expect(drill).toMatchObject({
       line: 'drill_power',
       finishColour: RIG_LOOK_TABLE.finishes.gilt.colour,

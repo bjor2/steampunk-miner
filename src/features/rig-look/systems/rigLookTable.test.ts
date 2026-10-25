@@ -82,8 +82,10 @@ describe('rig look table', () => {
     expect(rigLookTableProblemsOf(RIG_LOOK_TABLE, UPGRADE_IDS)).toEqual([])
   })
 
-  it("keeps #554's drill_power looks in order, re-keyed onto the bands of 6 (ticket 809)", () => {
-    expect(fromsOf('drill_power')).toEqual([6, 12, 18, 24, 30, 36, 42, 48, 54])
+  it("keeps #554's drill_power looks in order on the bands of 6, the LK12 parts after (ticket 875)", () => {
+    expect(fromsOf('drill_power')!.slice(0, 9)).toEqual([6, 12, 18, 24, 30, 36, 42, 48, 54])
+    expect(fromsOf('drill_power')).toEqual(bandOf('drill_power').edges)
+    expect(fromsOf('drill_power')).toHaveLength(21)
   })
 
   it('puts every authored step on its band edge, the art kept in order', () => {
@@ -131,6 +133,29 @@ describe('rig look table', () => {
   })
 
   it('names each step as Progression listed them', () => {
+    expect(cardsOf('drill_power')).toEqual([
+      'Amber glow',
+      'Ember glow',
+      'Flame glow',
+      'Gold glow',
+      'Teal glow',
+      'Violet glow',
+      'Rose glow',
+      'White glow',
+      'Sun glow',
+      'Pressure gauge',
+      'Relief valve',
+      'Steam feed',
+      'Cooling fins',
+      'Clamp band',
+      'Power flywheel',
+      'Hex bolts',
+      'Iron ribs',
+      'Copper coils',
+      'Sight lenses',
+      'Flywheel halo',
+      'Aether housing',
+    ])
     expect(cardsOf('drill_tip')).toEqual([
       'Steel cone',
       'Fluted bit',
@@ -449,6 +474,20 @@ describe('rig look table', () => {
         'riveted-bin',
         'sealed-bin',
         'tarped-bin',
+      ],
+      'vehicle-look-drill-power': [
+        'aether-housing',
+        'bolted-housing',
+        'clamped-housing',
+        'coiled-housing',
+        'finned-housing',
+        'flywheel-housing',
+        'gauged-housing',
+        'haloed-housing',
+        'lensed-housing',
+        'piped-housing',
+        'ribbed-housing',
+        'valved-housing',
       ],
       'vehicle-look-drill-tip': [
         'aether-cut-crown',

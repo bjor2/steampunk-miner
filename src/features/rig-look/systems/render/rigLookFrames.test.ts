@@ -122,7 +122,10 @@ describe('rig look frames', () => {
 
   it('leaves a vehicle step its own slot: no asset of its own, nothing hidden', () => {
     const shipped = SHIPPED_RIG_LOOKS.tracks[0].rows
-    const steps = shipped.steps.map((step) => ({ ...step, part: 't3-drill-bit' }))
+    const steps = shipped.steps.map(({ asset: _asset, ...step }) => ({
+      ...step,
+      part: 't3-drill-bit',
+    }))
     const frames = createTrackLookFrames(
       { ...shipped, replaces: 'drill-bit', steps },
       RIG_LOOK_TABLE.finishes,

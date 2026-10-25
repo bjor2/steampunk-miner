@@ -27,7 +27,10 @@ describe('drill look on the vehicle', () => {
     session.submit(2, setDrillPower(6))
     const after = drillLookSource().lookOf(session.state(), 'p1', 2)
     expect(before).toBeNull()
-    expect(after?.glows.map((glow) => glow.slots[0])).toEqual(['drill-bit', 'drill-head'])
+    expect(after?.glows.slice(0, 2).map((glow) => glow.slots[0])).toEqual([
+      'drill-bit',
+      'drill-head',
+    ])
     expect(drillLookStageOfPlayer(session.state(), 'p1')).toBe(1)
   })
 

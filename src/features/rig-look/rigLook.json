@@ -55,6 +55,20 @@
       "sealed-bin",
       "tarped-bin"
     ],
+    "vehicle-look-drill-power": [
+      "aether-housing",
+      "bolted-housing",
+      "clamped-housing",
+      "coiled-housing",
+      "finned-housing",
+      "flywheel-housing",
+      "gauged-housing",
+      "haloed-housing",
+      "lensed-housing",
+      "piped-housing",
+      "ribbed-housing",
+      "valved-housing"
+    ],
     "vehicle-look-drill-tip": [
       "aether-cut-crown",
       "aether-vortex-crown",
@@ -207,6 +221,10 @@
     {
       "track": "drill_power",
       "slot": "drill.housing",
+      "plaque": {
+        "step": "Fitting: {bandName}",
+        "tail": "Fitting: {bandName} · L{level}"
+      },
       "glowSlots": [
         [
           "drill-bit",
@@ -231,72 +249,182 @@
           "vortex-crown",
           "aether-vortex-crown"
         ],
-        ["drill-head"]
+        ["drill-head"],
+        [
+          "gauged-housing",
+          "valved-housing",
+          "piped-housing",
+          "finned-housing",
+          "clamped-housing",
+          "flywheel-housing",
+          "bolted-housing",
+          "ribbed-housing",
+          "coiled-housing",
+          "lensed-housing",
+          "haloed-housing",
+          "aether-housing"
+        ]
       ],
       "glowCap": "drillNose",
       "steps": [
         {
           "from": 6,
           "part": null,
-          "card": null,
+          "card": "Amber glow",
           "colour": "#c8873a",
-          "glows": [0.3, 0]
+          "glows": [0.3, 0, 0]
         },
         {
           "from": 12,
           "part": null,
-          "card": null,
+          "card": "Ember glow",
           "colour": "#e8742a",
-          "glows": [0.6, 0]
+          "glows": [0.6, 0, 0]
         },
         {
           "from": 18,
           "part": null,
-          "card": null,
+          "card": "Flame glow",
           "colour": "#ff5a1f",
-          "glows": [0.9, 0.3]
+          "glows": [0.9, 0.3, 0]
         },
         {
           "from": 24,
           "part": null,
-          "card": null,
+          "card": "Gold glow",
           "colour": "#ffd27a",
-          "glows": [1.2, 0.5]
+          "glows": [1.2, 0.5, 0]
         },
         {
           "from": 30,
           "part": null,
-          "card": null,
+          "card": "Teal glow",
           "colour": "#5fd6c4",
-          "glows": [1.4, 0.7]
+          "glows": [1.4, 0.7, 0]
         },
         {
           "from": 36,
           "part": null,
-          "card": null,
+          "card": "Violet glow",
           "colour": "#b07aff",
-          "glows": [1.6, 0.9]
+          "glows": [1.6, 0.9, 0]
         },
         {
           "from": 42,
           "part": null,
-          "card": null,
+          "card": "Rose glow",
           "colour": "#ff7ae0",
-          "glows": [1.8, 1.1]
+          "glows": [1.8, 1.1, 0]
         },
         {
           "from": 48,
           "part": null,
-          "card": null,
+          "card": "White glow",
           "colour": "#f4f4ff",
-          "glows": [2, 1.3]
+          "glows": [2, 1.3, 0]
         },
         {
           "from": 54,
           "part": null,
-          "card": null,
+          "card": "Sun glow",
           "colour": "#ffe14a",
-          "glows": [2.4, 1.6]
+          "glows": [2.4, 1.6, 0]
+        },
+        {
+          "from": 60,
+          "part": "gauged-housing",
+          "asset": "vehicle-look-drill-power",
+          "card": "Pressure gauge",
+          "colour": "#d8b45a",
+          "glows": [2.401, 1.6, 0.6]
+        },
+        {
+          "from": 66,
+          "part": "valved-housing",
+          "asset": "vehicle-look-drill-power",
+          "card": "Relief valve",
+          "colour": "#b06a3c",
+          "glows": [2.402, 1.6, 0.61]
+        },
+        {
+          "from": 72,
+          "part": "piped-housing",
+          "asset": "vehicle-look-drill-power",
+          "card": "Steam feed",
+          "colour": "#c47a46",
+          "glows": [2.403, 1.6, 0.62]
+        },
+        {
+          "from": 78,
+          "part": "finned-housing",
+          "asset": "vehicle-look-drill-power",
+          "card": "Cooling fins",
+          "colour": "#4c5258",
+          "glows": [2.404, 1.6, 0.63]
+        },
+        {
+          "from": 84,
+          "part": "clamped-housing",
+          "asset": "vehicle-look-drill-power",
+          "card": "Clamp band",
+          "colour": "#c8ccd0",
+          "glows": [2.405, 1.6, 0.64]
+        },
+        {
+          "from": 90,
+          "part": "flywheel-housing",
+          "asset": "vehicle-look-drill-power",
+          "card": "Power flywheel",
+          "colour": "#8a7560",
+          "glows": [2.406, 1.6, 0.65]
+        },
+        {
+          "from": 96,
+          "part": "bolted-housing",
+          "asset": "vehicle-look-drill-power",
+          "card": "Hex bolts",
+          "colour": "#dfe4ea",
+          "glows": [2.407, 1.6, 0.66]
+        },
+        {
+          "from": 102,
+          "part": "ribbed-housing",
+          "asset": "vehicle-look-drill-power",
+          "card": "Iron ribs",
+          "colour": "#2a2c30",
+          "glows": [2.408, 1.6, 0.67]
+        },
+        {
+          "from": 108,
+          "part": "coiled-housing",
+          "asset": "vehicle-look-drill-power",
+          "card": "Copper coils",
+          "colour": "#d2834e",
+          "glows": [2.409, 1.6, 0.68]
+        },
+        {
+          "from": 114,
+          "part": "lensed-housing",
+          "asset": "vehicle-look-drill-power",
+          "card": "Sight lenses",
+          "colour": "#4fc9b8",
+          "glows": [2.41, 1.6, 0.7]
+        },
+        {
+          "from": 120,
+          "part": "haloed-housing",
+          "asset": "vehicle-look-drill-power",
+          "card": "Flywheel halo",
+          "colour": "#7affd8",
+          "glows": [2.411, 1.6, 0.72]
+        },
+        {
+          "from": 126,
+          "part": "aether-housing",
+          "asset": "vehicle-look-drill-power",
+          "card": "Aether housing",
+          "colour": "#9ff5e6",
+          "glows": [2.412, 1.6, 0.74]
         }
       ],
       "band": {

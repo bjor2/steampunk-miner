@@ -191,6 +191,7 @@
       "specs": [
         "e2e/browser/rigLook.spec.ts",
         "e2e/browser/rigLookCargoHold.spec.ts",
+        "e2e/browser/rigLookDrillPower.spec.ts",
         "e2e/browser/rigLookDrillTip.spec.ts",
         "e2e/browser/rigLookEngine.spec.ts",
         "e2e/browser/rigLookGroundGunItems.spec.ts",

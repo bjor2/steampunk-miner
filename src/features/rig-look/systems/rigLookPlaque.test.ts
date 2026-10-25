@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { UPGRADE_IDS } from '../../../systems/economy/economyDefinition'
 import { LARGEST_LOOK_PURCHASES } from './render/rigLookIndex'
-import { rigLookPlaqueFactOf, SHIPPED_RIG_LOOKS } from './rigLooks'
-import { levelTextOf } from './rigLookPlaque'
+import { createTrackLookFrames } from './render/rigLookFrames'
+import { rigLookPlaqueFactOf, SHIPPED_RIG_LOOKS, trackLookFramesOf } from './rigLooks'
+import { levelTextOf, plaqueFactOf } from './rigLookPlaque'
 import { RIG_LOOK_TABLE } from './rigLookTable'
 import { rigLookTableProblemsOf, type RigLookTable } from './rigLookTableChecks'
 
@@ -25,10 +26,20 @@ const NAMED_STEPS: readonly (readonly [string, number, string])[] = [
   ['engine', 10, 'Triple flywheel'],
   ['engine', 15, 'Guild turbine'],
   ['boiler', 5, 'Twin-drum boiler'],
+  ['drill_power', 6, 'Amber glow'],
+  ['drill_power', 60, 'Pressure gauge'],
+  ['drill_power', 126, 'Aether housing'],
 ]
 
-/** The tracks whose look rows carry a plaque template. */
-const PLAQUE_TRACKS: readonly string[] = ['drill_tip', 'boiler', 'cargo_hold', 'hull', 'engine']
+/** The tracks whose look rows carry a plaque template: every one since LK12 (ticket 875). */
+const PLAQUE_TRACKS: readonly string[] = [
+  'drill_power',
+  'drill_tip',
+  'boiler',
+  'cargo_hold',
+  'hull',
+  'engine',
+]
 
 /** The widest plaque fact a 360 px plaque wraps onto its own line (Content's 4-word names). */
 const PHONE_FACT_CHARS_MAX = 44
@@ -61,9 +72,10 @@ describe('rig look plaque fact (tickets 585, 809)', () => {
 
   it('shows no level on an authored band, then the finish and the exact level past the art', () => {
     expect(rigLookPlaqueFactOf('hull', 600)).toBe('Fitting: Filigree armour')
-    expect(rigLookPlaqueFactOf('hull', 720)).toBe('Fitting: Gunmetal · L720')
-    expect(rigLookPlaqueFactOf('hull', 721)).toBe('Fitting: Gunmetal · L721')
-    expect(rigLookPlaqueFactOf('hull', 840)).toBe('Fitting: Bright brass · L840')
+    expect(rigLookPlaqueFactOf('hull', 2280)).toBe('Fitting: Skirt bosses')
+    expect(rigLookPlaqueFactOf('hull', 2400)).toBe('Fitting: Gunmetal · L2,400')
+    expect(rigLookPlaqueFactOf('hull', 2401)).toBe('Fitting: Gunmetal · L2,401')
+    expect(rigLookPlaqueFactOf('hull', 2520)).toBe('Fitting: Bright brass · L2,520')
   })
 
   it('shows the exact level through the #681 long mode, grouped, at any count', () => {
@@ -96,12 +108,18 @@ describe('rig look plaque fact (tickets 585, 809)', () => {
     for (const fact of facts) expect(fact.length, fact).toBeLessThanOrEqual(PHONE_FACT_CHARS_MAX)
   })
 
-  it('keeps every track without a plaque template off the plaque', () => {
-    const plain = UPGRADE_IDS.filter((track) => !PLAQUE_TRACKS.includes(track))
-    for (const track of plain) {
-      for (const n of [0, 1, 100, 1_000, 1_000_000])
-        expect(rigLookPlaqueFactOf(track, n)).toBeNull()
-    }
+  it('names a band on every shipped track, since each carries a plaque template', () => {
+    expect(RIG_LOOK_TABLE.tracks.map((rows) => rows.track).sort()).toEqual(
+      [...PLAQUE_TRACKS].sort(),
+    )
+    for (const track of PLAQUE_TRACKS) expect(rigLookPlaqueFactOf(track, 1_000_000)).not.toBeNull()
+  })
+
+  it('keeps a track without a plaque template off the plaque', () => {
+    const frames = trackLookFramesOf(SHIPPED_RIG_LOOKS, 'hull')!
+    const { plaque: _plaque, ...rows } = frames.rows
+    const plain = createTrackLookFrames(rows, SHIPPED_RIG_LOOKS.finishes)
+    for (const n of [0, 1, 100, 1_000, 1_000_000]) expect(plaqueFactOf(plain, n)).toBeNull()
   })
 })
 
@@ -130,11 +148,11 @@ describe('rig look plaque template checks', () => {
 
   it('refuses a template on a track whose steps carry no card', () => {
     const tracks = RIG_LOOK_TABLE.tracks.map((rows) =>
-      rows.track === 'drill_power'
-        ? { ...rows, plaque: { step: '{bandName}', tail: '{bandName} {level}' } }
+      rows.track === 'hull'
+        ? { ...rows, steps: rows.steps.map((step) => ({ ...step, card: null })) }
         : rows,
     )
     const problems = rigLookTableProblemsOf({ ...RIG_LOOK_TABLE, tracks }, UPGRADE_IDS)
-    expect(problems).toContain('drill_power: step from 6: no card for the plaque')
+    expect(problems).toContain('hull: step from 120: no card for the plaque')
   })
 })

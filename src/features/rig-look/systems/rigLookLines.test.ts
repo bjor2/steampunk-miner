@@ -24,8 +24,8 @@ import { RIG_LOOK_TABLE } from './rigLookTable'
 // fuel tank's coal tender and, since D7 (ticket 866), the blasting_charges line's three charge
 // types in the dynamite-visuals slice's look rows. Each has a look row whose bands follow the VS rule from its own ratio,
 // never renders a band invisible, and wears the committed look at the golden counts (0, 1, 10,
-// 99, 9999, 1e6, each authored edge and one either side, the first finish band); a band the art
-// has not drawn yet is a todo until its LK art ticket lands (#785's pattern). Looks are look-only:
+// 99, 9999, 1e6, each authored edge and one either side, the first finish band); since LK12
+// (ticket 875) every band to about P40 of every line is authored, and a spec holds it so. Looks are look-only:
 // a run plays byte-identical with the slice registered or not.
 
 /** The golden counts every line is pinned at (#809). */
@@ -150,10 +150,11 @@ describe('rig look lines (ticket 809)', () => {
   })
 })
 
-describe('rig look bands the art has not drawn yet (ticket 809: LK art tickets)', () => {
-  for (const rows of RIG_LOOK_TABLE.tracks) {
-    for (const edge of rows.band.edges.slice(rows.steps.length)) {
-      it.todo(`draws authored art for ${rows.track}'s band from ${edge} purchases`)
+describe('rig look bands the art has drawn (ticket 809: the LK art tickets, LK6 to LK12)', () => {
+  it('authors a step on every band edge to about P40 of every line, so no band is art-less', () => {
+    for (const rows of RIG_LOOK_TABLE.tracks) {
+      const artless = rows.band.edges.slice(rows.steps.length)
+      expect({ track: rows.track, artless }).toEqual({ track: rows.track, artless: [] })
     }
-  }
+  })
 })
