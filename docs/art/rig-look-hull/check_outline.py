@@ -1,7 +1,7 @@
 """
-The outline check of the hull rig-look parts (ticket 584, #576 rules: a look stays inside the
-rig outline and never changes collision or the hitbox). It rasterises the silhouette in the game's
-front view (X right, Z up) of the rig at rest, at tiers 1 and 3, on a 4 mm grid, and of each look
+The outline check of the hull rig-look parts (tickets 584 and 816, #576 rules: a look stays inside
+the rig outline and never changes collision or the hitbox). It rasterises the silhouette in the
+game's front view (X right, Z up) of the rig at rest, at tiers 1, 2 and 3, on a 4 mm grid, and of each look
 standing on the `hull.plates` slot, and writes outline.json: the cells of each look outside the
 rig's silhouette (must be none) and, for the base look, the cells it adds to the pod fitting it
 reproduces, the rig's own porthole (must be none: below the first step the rig is as it is). It
@@ -11,7 +11,9 @@ exits 1 on either.
 
 Collision needs no check here: the collider is a code constant (`COLLIDER_M` in
 author_casing_driller.py mirrors it) and vehicle.blend is untouched, so nothing a look does can
-reach it.
+reach it. The LK7 skirts (ticket 816) hang under the pod inside its silhouette, so the same rig
+check proves they never read as extra hit area: the collider box is 0.9 m, the skirts' hem 0.24 m
+under the vehicle's origin.
 """
 
 import json
@@ -34,7 +36,7 @@ import render_tech_gear as rig  # noqa: E402
 
 LOOKS_TABLE = os.path.join(HERE, 'hullLooks.json')
 REPORT = os.path.join(HERE, 'outline.json')
-RIG_TIERS = (1, 3)
+RIG_TIERS = (1, 2, 3)
 # The base look reproduces these pod fittings (author_hull_looks.bronze_pod_pieces): the rig's
 # own silhouette inside this window of the tier-1 pod, in the vehicle frame (x0, z0, x1, z1).
 BASE_WINDOW_M = (-0.25, -0.2, 0.25, 0.10)
@@ -42,7 +44,9 @@ BASE_WINDOW_M = (-0.25, -0.2, 0.25, 0.10)
 
 def main():
     table = read_table()
-    report = {look['part']: outline_of(table, look) for look in table['looks']}
+    rigs = {tier: rig_silhouette(tier) for tier in RIG_TIERS}
+    pod = pod_fittings_silhouette()
+    report = {look['part']: outline_of(table, look, rigs, pod) for look in table['looks']}
     with open(REPORT, 'w', encoding='utf8') as file:
         json.dump(report_about(table, report), file, indent=2)
     problems = problems_in(table, report)
@@ -58,12 +62,12 @@ def read_table():
         return json.load(file)
 
 
-def outline_of(table, look):
+def outline_of(table, look, rigs, pod):
     look_mask = look_silhouette(table, look)
-    outside = {('tier-%d' % tier): int((look_mask & ~rig_silhouette(tier)).sum()) for tier in RIG_TIERS}
+    outside = {('tier-%d' % tier): int((look_mask & ~rig_mask).sum()) for tier, rig_mask in rigs.items()}
     entry = {'cells': int(look_mask.sum()), 'outsideRig': outside}
     if look.get('unnamedDefault'):
-        entry['addsToPod'] = int((look_mask & ~pod_fittings_silhouette()).sum())
+        entry['addsToPod'] = int((look_mask & ~pod).sum())
     return entry
 
 
@@ -108,11 +112,11 @@ def problems_in(table, report):
 
 def report_about(table, report):
     return {
-        'about': 'Ticket 584: silhouette cells of each hull look on %s, on a %g mm grid, outside the rig at '
+        'about': 'Tickets 584 and 816: silhouette cells of each hull look on %s, on a %g mm grid, outside the rig at '
                  'rest at tiers %s, and, for the base look, the cells it adds to the tier-1 pod\'s own skin '
                  'inside the window %s (its porthole); written by check_outline.py. '
                  '`outsideRig` must be all zero; the base look\'s `addsToPod` must be zero.'
-                 % (table['attach'], grid.CELL_M * 1000, ' and '.join(str(tier) for tier in RIG_TIERS),
+                 % (table['attach'], grid.CELL_M * 1000, ', '.join(str(tier) for tier in RIG_TIERS),
                     list(BASE_WINDOW_M)),
         'looks': report,
     }

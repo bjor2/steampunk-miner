@@ -7,7 +7,7 @@
     "blender": null
   },
   "pxPerMetre": 512,
-  "atlasPx": [512, 1024],
+  "atlasPx": [512, 4096],
   "maps": {
     "albedo": "vehicle-look-hull.albedo.ktx2",
     "normal": "vehicle-look-hull.normal.ktx2",
@@ -17,16 +17,43 @@
     {
       "id": "banded-iron",
       "tier": 1,
-      "rect": [8, 332, 246, 145],
+      "rect": [8, 3023, 246, 145],
       "sizeM": [0.48, 0.2813],
       "pivotM": [0.24, 0.2715],
       "atM": [0.0, 0.0],
       "z": 5
     },
     {
+      "id": "bossed-skirt-armour",
+      "tier": 1,
+      "rect": [8, 8, 323, 199],
+      "sizeM": [0.63, 0.3878],
+      "pivotM": [0.32, 0.378],
+      "atM": [0.0, 0.0],
+      "z": 5
+    },
+    {
+      "id": "bow-plated-armour",
+      "tier": 1,
+      "rect": [8, 1052, 323, 167],
+      "sizeM": [0.63, 0.3258],
+      "pivotM": [0.32, 0.316],
+      "atM": [0.0, 0.0],
+      "z": 5
+    },
+    {
+      "id": "bow-skirt-armour",
+      "tier": 1,
+      "rect": [8, 223, 323, 198],
+      "sizeM": [0.63, 0.3858],
+      "pivotM": [0.32, 0.376],
+      "atM": [0.0, 0.0],
+      "z": 5
+    },
+    {
       "id": "brass-trimmed-armour",
       "tier": 1,
-      "rect": [8, 8, 246, 146],
+      "rect": [8, 2699, 246, 146],
       "sizeM": [0.48, 0.2841],
       "pivotM": [0.24, 0.2743],
       "atM": [0.0, 0.0],
@@ -35,25 +62,97 @@
     {
       "id": "bronze-pod",
       "tier": 1,
-      "rect": [274, 654, 182, 131],
+      "rect": [274, 3345, 182, 131],
       "sizeM": [0.3541, 0.2556],
       "pivotM": [0.2183, 0.2458],
       "atM": [0.0, 0.0],
       "z": 2
     },
     {
+      "id": "cap-riveted-armour",
+      "tier": 1,
+      "rect": [8, 1235, 323, 167],
+      "sizeM": [0.63, 0.3258],
+      "pivotM": [0.32, 0.316],
+      "atM": [0.0, 0.0],
+      "z": 5
+    },
+    {
+      "id": "corner-plated-armour",
+      "tier": 1,
+      "rect": [8, 1418, 323, 167],
+      "sizeM": [0.63, 0.3258],
+      "pivotM": [0.32, 0.316],
+      "atM": [0.0, 0.0],
+      "z": 5
+    },
+    {
+      "id": "corner-riveted-armour",
+      "tier": 1,
+      "rect": [8, 1601, 323, 167],
+      "sizeM": [0.63, 0.3258],
+      "pivotM": [0.32, 0.316],
+      "atM": [0.0, 0.0],
+      "z": 5
+    },
+    {
       "id": "filigree-armour",
       "tier": 1,
-      "rect": [8, 170, 246, 146],
+      "rect": [8, 2861, 246, 146],
       "sizeM": [0.48, 0.2845],
       "pivotM": [0.24, 0.2747],
       "atM": [0.0, 0.0],
       "z": 5
     },
     {
+      "id": "full-skirt-armour",
+      "tier": 1,
+      "rect": [8, 437, 323, 198],
+      "sizeM": [0.63, 0.3858],
+      "pivotM": [0.32, 0.376],
+      "atM": [0.0, 0.0],
+      "z": 5
+    },
+    {
+      "id": "hatch-bolted-armour",
+      "tier": 1,
+      "rect": [8, 1784, 323, 167],
+      "sizeM": [0.63, 0.3258],
+      "pivotM": [0.32, 0.316],
+      "atM": [0.0, 0.0],
+      "z": 5
+    },
+    {
+      "id": "hatch-ringed-armour",
+      "tier": 1,
+      "rect": [8, 1967, 323, 167],
+      "sizeM": [0.63, 0.3258],
+      "pivotM": [0.32, 0.316],
+      "atM": [0.0, 0.0],
+      "z": 5
+    },
+    {
+      "id": "keel-riveted-armour",
+      "tier": 1,
+      "rect": [8, 2150, 323, 167],
+      "sizeM": [0.63, 0.3258],
+      "pivotM": [0.32, 0.316],
+      "atM": [0.0, 0.0],
+      "z": 5
+    },
+    {
+      "id": "keel-strake-armour",
+      "tier": 1,
+      "rect": [8, 2516, 251, 167],
+      "sizeM": [0.49, 0.3258],
+      "pivotM": [0.245, 0.316],
+      "atM": [0.0, 0.0],
+      "z": 5
+    },
+    {
       "id": "layered-armour",
       "tier": 1,
-      "rect": [8, 493, 246, 145],
+      "rect": [8, 3184, 246, 145],
       "sizeM": [0.48, 0.283],
       "pivotM": [0.24, 0.2732],
       "atM": [0.0, 0.0],
@@ -62,9 +161,36 @@
     {
       "id": "riveted-plate",
       "tier": 1,
-      "rect": [8, 654, 250, 144],
+      "rect": [8, 3345, 250, 144],
       "sizeM": [0.487, 0.2808],
       "pivotM": [0.24, 0.271],
+      "atM": [0.0, 0.0],
+      "z": 5
+    },
+    {
+      "id": "skirt-rail-armour",
+      "tier": 1,
+      "rect": [8, 865, 323, 171],
+      "sizeM": [0.63, 0.3338],
+      "pivotM": [0.32, 0.324],
+      "atM": [0.0, 0.0],
+      "z": 5
+    },
+    {
+      "id": "stern-plated-armour",
+      "tier": 1,
+      "rect": [8, 2333, 290, 167],
+      "sizeM": [0.565, 0.3258],
+      "pivotM": [0.32, 0.316],
+      "atM": [0.0, 0.0],
+      "z": 5
+    },
+    {
+      "id": "stern-skirt-armour",
+      "tier": 1,
+      "rect": [8, 651, 323, 198],
+      "sizeM": [0.63, 0.3858],
+      "pivotM": [0.32, 0.376],
       "atM": [0.0, 0.0],
       "z": 5
     }

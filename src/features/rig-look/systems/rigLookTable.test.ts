@@ -92,7 +92,8 @@ describe('rig look table', () => {
     expect(fromsOf('cargo_hold')).toEqual([11, 22, 33, 44, 55])
     expect(fromsOf('engine')).toEqual([5, 10, 15, 20, 25])
     expect(fromsOf('boiler')).toEqual([5, 10, 15, 20, 25, 30])
-    expect(fromsOf('hull')).toEqual([120, 240, 360, 480, 600])
+    expect(fromsOf('hull')).toEqual(bandOf('hull').edges)
+    expect(fromsOf('hull')).toHaveLength(19)
   })
 
   it("freezes each line's step from its decade and the bot's two-planet buys (VS rule)", () => {
@@ -170,6 +171,27 @@ describe('rig look table', () => {
       'Pipe manifold',
       'Steam drum',
       'Firebox door',
+    ])
+    expect(cardsOf('hull')).toEqual([
+      'Riveted plate',
+      'Banded iron',
+      'Brass-trimmed armour',
+      'Layered armour',
+      'Filigree armour',
+      'Keel strake',
+      'Stern plate',
+      'Bow plate',
+      'Corner plates',
+      'Hatch ring',
+      'Keel rivets',
+      'Cap rivets',
+      'Corner rivets',
+      'Hatch bolts',
+      'Skirt rail',
+      'Stern skirt',
+      'Bow skirt',
+      'Full skirt',
+      'Skirt bosses',
     ])
   })
 
@@ -377,11 +399,25 @@ describe('rig look table', () => {
       ],
       'vehicle-look-hull': [
         'banded-iron',
+        'bossed-skirt-armour',
+        'bow-plated-armour',
+        'bow-skirt-armour',
         'brass-trimmed-armour',
         'bronze-pod',
+        'cap-riveted-armour',
+        'corner-plated-armour',
+        'corner-riveted-armour',
         'filigree-armour',
+        'full-skirt-armour',
+        'hatch-bolted-armour',
+        'hatch-ringed-armour',
+        'keel-riveted-armour',
+        'keel-strake-armour',
         'layered-armour',
         'riveted-plate',
+        'skirt-rail-armour',
+        'stern-plated-armour',
+        'stern-skirt-armour',
       ],
     })
   })

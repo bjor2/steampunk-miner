@@ -195,9 +195,51 @@ hull
 599: band 4 step 4 tail 0 pips 0 part layered-armour finish null tint #a080d0 | Fitting: Layered armour
 600: band 5 step 5 tail 0 pips 0 part filigree-armour finish null tint #f0d8a0 | Fitting: Filigree armour
 601: band 5 step 5 tail 0 pips 0 part filigree-armour finish null tint #f0d8a0 | Fitting: Filigree armour
-720: band 6 step 5 tail 1 pips 3 part filigree-armour finish gunmetal tint #4c5258 | Fitting: Gunmetal · L720
-9999: band 83 step 5 tail 78 pips 47 part filigree-armour finish bright-brass tint #d8b45a | Fitting: Bright brass · L9,999
-1000000: band 8333 step 5 tail 8328 pips 4761 part filigree-armour finish aged-copper tint #b06a3c | Fitting: Aged copper · L1,000,000
+719: band 5 step 5 tail 0 pips 0 part filigree-armour finish null tint #f0d8a0 | Fitting: Filigree armour
+720: band 6 step 6 tail 0 pips 0 part keel-strake-armour finish null tint #6a6f78 | Fitting: Keel strake
+721: band 6 step 6 tail 0 pips 0 part keel-strake-armour finish null tint #6a6f78 | Fitting: Keel strake
+839: band 6 step 6 tail 0 pips 0 part keel-strake-armour finish null tint #6a6f78 | Fitting: Keel strake
+840: band 7 step 7 tail 0 pips 0 part stern-plated-armour finish null tint #7c8692 | Fitting: Stern plate
+841: band 7 step 7 tail 0 pips 0 part stern-plated-armour finish null tint #7c8692 | Fitting: Stern plate
+959: band 7 step 7 tail 0 pips 0 part stern-plated-armour finish null tint #7c8692 | Fitting: Stern plate
+960: band 8 step 8 tail 0 pips 0 part bow-plated-armour finish null tint #8e98a4 | Fitting: Bow plate
+961: band 8 step 8 tail 0 pips 0 part bow-plated-armour finish null tint #8e98a4 | Fitting: Bow plate
+1079: band 8 step 8 tail 0 pips 0 part bow-plated-armour finish null tint #8e98a4 | Fitting: Bow plate
+1080: band 9 step 9 tail 0 pips 0 part corner-plated-armour finish null tint #a8b0ba | Fitting: Corner plates
+1081: band 9 step 9 tail 0 pips 0 part corner-plated-armour finish null tint #a8b0ba | Fitting: Corner plates
+1199: band 9 step 9 tail 0 pips 0 part corner-plated-armour finish null tint #a8b0ba | Fitting: Corner plates
+1200: band 10 step 10 tail 0 pips 0 part hatch-ringed-armour finish null tint #5a5e66 | Fitting: Hatch ring
+1201: band 10 step 10 tail 0 pips 0 part hatch-ringed-armour finish null tint #5a5e66 | Fitting: Hatch ring
+1319: band 10 step 10 tail 0 pips 0 part hatch-ringed-armour finish null tint #5a5e66 | Fitting: Hatch ring
+1320: band 11 step 11 tail 0 pips 0 part keel-riveted-armour finish null tint #c0c6cc | Fitting: Keel rivets
+1321: band 11 step 11 tail 0 pips 0 part keel-riveted-armour finish null tint #c0c6cc | Fitting: Keel rivets
+1439: band 11 step 11 tail 0 pips 0 part keel-riveted-armour finish null tint #c0c6cc | Fitting: Keel rivets
+1440: band 12 step 12 tail 0 pips 0 part cap-riveted-armour finish null tint #d0d4d8 | Fitting: Cap rivets
+1441: band 12 step 12 tail 0 pips 0 part cap-riveted-armour finish null tint #d0d4d8 | Fitting: Cap rivets
+1559: band 12 step 12 tail 0 pips 0 part cap-riveted-armour finish null tint #d0d4d8 | Fitting: Cap rivets
+1560: band 13 step 13 tail 0 pips 0 part corner-riveted-armour finish null tint #b8bcc4 | Fitting: Corner rivets
+1561: band 13 step 13 tail 0 pips 0 part corner-riveted-armour finish null tint #b8bcc4 | Fitting: Corner rivets
+1679: band 13 step 13 tail 0 pips 0 part corner-riveted-armour finish null tint #b8bcc4 | Fitting: Corner rivets
+1680: band 14 step 14 tail 0 pips 0 part hatch-bolted-armour finish null tint #e0e4e8 | Fitting: Hatch bolts
+1681: band 14 step 14 tail 0 pips 0 part hatch-bolted-armour finish null tint #e0e4e8 | Fitting: Hatch bolts
+1799: band 14 step 14 tail 0 pips 0 part hatch-bolted-armour finish null tint #e0e4e8 | Fitting: Hatch bolts
+1800: band 15 step 15 tail 0 pips 0 part skirt-rail-armour finish null tint #d8b45a | Fitting: Skirt rail
+1801: band 15 step 15 tail 0 pips 0 part skirt-rail-armour finish null tint #d8b45a | Fitting: Skirt rail
+1919: band 15 step 15 tail 0 pips 0 part skirt-rail-armour finish null tint #d8b45a | Fitting: Skirt rail
+1920: band 16 step 16 tail 0 pips 0 part stern-skirt-armour finish null tint #6e7a86 | Fitting: Stern skirt
+1921: band 16 step 16 tail 0 pips 0 part stern-skirt-armour finish null tint #6e7a86 | Fitting: Stern skirt
+2039: band 16 step 16 tail 0 pips 0 part stern-skirt-armour finish null tint #6e7a86 | Fitting: Stern skirt
+2040: band 17 step 17 tail 0 pips 0 part bow-skirt-armour finish null tint #7e8a96 | Fitting: Bow skirt
+2041: band 17 step 17 tail 0 pips 0 part bow-skirt-armour finish null tint #7e8a96 | Fitting: Bow skirt
+2159: band 17 step 17 tail 0 pips 0 part bow-skirt-armour finish null tint #7e8a96 | Fitting: Bow skirt
+2160: band 18 step 18 tail 0 pips 0 part full-skirt-armour finish null tint #8e9aa6 | Fitting: Full skirt
+2161: band 18 step 18 tail 0 pips 0 part full-skirt-armour finish null tint #8e9aa6 | Fitting: Full skirt
+2279: band 18 step 18 tail 0 pips 0 part full-skirt-armour finish null tint #8e9aa6 | Fitting: Full skirt
+2280: band 19 step 19 tail 0 pips 0 part bossed-skirt-armour finish null tint #e8c86a | Fitting: Skirt bosses
+2281: band 19 step 19 tail 0 pips 0 part bossed-skirt-armour finish null tint #e8c86a | Fitting: Skirt bosses
+2400: band 20 step 19 tail 1 pips 11 part bossed-skirt-armour finish gunmetal tint #4c5258 | Fitting: Gunmetal · L2,400
+9999: band 83 step 19 tail 64 pips 47 part bossed-skirt-armour finish aged-copper tint #b06a3c | Fitting: Aged copper · L9,999
+1000000: band 8333 step 19 tail 8314 pips 4761 part bossed-skirt-armour finish bright-brass tint #d8b45a | Fitting: Bright brass · L1,000,000
 
 fuel_tank
 1: step 0 tail 0 pips 0 part coal-cart finish null

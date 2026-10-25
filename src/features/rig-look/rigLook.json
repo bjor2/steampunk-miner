@@ -55,11 +55,25 @@
     ],
     "vehicle-look-hull": [
       "banded-iron",
+      "bossed-skirt-armour",
+      "bow-plated-armour",
+      "bow-skirt-armour",
       "brass-trimmed-armour",
       "bronze-pod",
+      "cap-riveted-armour",
+      "corner-plated-armour",
+      "corner-riveted-armour",
       "filigree-armour",
+      "full-skirt-armour",
+      "hatch-bolted-armour",
+      "hatch-ringed-armour",
+      "keel-riveted-armour",
+      "keel-strake-armour",
       "layered-armour",
-      "riveted-plate"
+      "riveted-plate",
+      "skirt-rail-armour",
+      "stern-plated-armour",
+      "stern-skirt-armour"
     ]
   },
   "finishes": {
@@ -697,7 +711,21 @@
           "banded-iron",
           "brass-trimmed-armour",
           "layered-armour",
-          "filigree-armour"
+          "filigree-armour",
+          "keel-strake-armour",
+          "stern-plated-armour",
+          "bow-plated-armour",
+          "corner-plated-armour",
+          "hatch-ringed-armour",
+          "keel-riveted-armour",
+          "cap-riveted-armour",
+          "corner-riveted-armour",
+          "hatch-bolted-armour",
+          "skirt-rail-armour",
+          "stern-skirt-armour",
+          "bow-skirt-armour",
+          "full-skirt-armour",
+          "bossed-skirt-armour"
         ]
       ],
       "glowCap": "rigBody",
@@ -741,6 +769,118 @@
           "card": "Filigree armour",
           "colour": "#f0d8a0",
           "glows": [0.6]
+        },
+        {
+          "from": 720,
+          "part": "keel-strake-armour",
+          "asset": "vehicle-look-hull",
+          "card": "Keel strake",
+          "colour": "#6a6f78",
+          "glows": [0.61]
+        },
+        {
+          "from": 840,
+          "part": "stern-plated-armour",
+          "asset": "vehicle-look-hull",
+          "card": "Stern plate",
+          "colour": "#7c8692",
+          "glows": [0.62]
+        },
+        {
+          "from": 960,
+          "part": "bow-plated-armour",
+          "asset": "vehicle-look-hull",
+          "card": "Bow plate",
+          "colour": "#8e98a4",
+          "glows": [0.63]
+        },
+        {
+          "from": 1080,
+          "part": "corner-plated-armour",
+          "asset": "vehicle-look-hull",
+          "card": "Corner plates",
+          "colour": "#a8b0ba",
+          "glows": [0.64]
+        },
+        {
+          "from": 1200,
+          "part": "hatch-ringed-armour",
+          "asset": "vehicle-look-hull",
+          "card": "Hatch ring",
+          "colour": "#5a5e66",
+          "glows": [0.65]
+        },
+        {
+          "from": 1320,
+          "part": "keel-riveted-armour",
+          "asset": "vehicle-look-hull",
+          "card": "Keel rivets",
+          "colour": "#c0c6cc",
+          "glows": [0.66]
+        },
+        {
+          "from": 1440,
+          "part": "cap-riveted-armour",
+          "asset": "vehicle-look-hull",
+          "card": "Cap rivets",
+          "colour": "#d0d4d8",
+          "glows": [0.67]
+        },
+        {
+          "from": 1560,
+          "part": "corner-riveted-armour",
+          "asset": "vehicle-look-hull",
+          "card": "Corner rivets",
+          "colour": "#b8bcc4",
+          "glows": [0.68]
+        },
+        {
+          "from": 1680,
+          "part": "hatch-bolted-armour",
+          "asset": "vehicle-look-hull",
+          "card": "Hatch bolts",
+          "colour": "#e0e4e8",
+          "glows": [0.69]
+        },
+        {
+          "from": 1800,
+          "part": "skirt-rail-armour",
+          "asset": "vehicle-look-hull",
+          "card": "Skirt rail",
+          "colour": "#d8b45a",
+          "glows": [0.7]
+        },
+        {
+          "from": 1920,
+          "part": "stern-skirt-armour",
+          "asset": "vehicle-look-hull",
+          "card": "Stern skirt",
+          "colour": "#6e7a86",
+          "glows": [0.71]
+        },
+        {
+          "from": 2040,
+          "part": "bow-skirt-armour",
+          "asset": "vehicle-look-hull",
+          "card": "Bow skirt",
+          "colour": "#7e8a96",
+          "glows": [0.72]
+        },
+        {
+          "from": 2160,
+          "part": "full-skirt-armour",
+          "asset": "vehicle-look-hull",
+          "card": "Full skirt",
+          "colour": "#8e9aa6",
+          "glows": [0.73]
+        },
+        {
+          "from": 2280,
+          "part": "bossed-skirt-armour",
+          "asset": "vehicle-look-hull",
+          "card": "Skirt bosses",
+          "colour": "#e8c86a",
+          "glows": [0.74]
         }
       ],
       "band": {

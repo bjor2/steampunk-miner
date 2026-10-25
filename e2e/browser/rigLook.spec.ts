@@ -173,8 +173,9 @@ test.describe('boiler rig look (tickets 583 and 810)', () => {
 })
 
 /**
- * Each hull step on its band edge of 120 (ticket 809) with Progression's name, the purchase
- * before the first, and the first two finish bands above the top step, named with the level.
+ * Each hull step on its band edge of 120 (ticket 809) with its band name (Progression's for
+ * #584's five, the LK7 data strings of ticket 816 for the rest), the purchase before the first,
+ * and the first two finish bands above the top step, named with the level.
  */
 const HULL_COUNTS: readonly { purchases: number; part: string | null; fitting: string | null }[] = [
   { purchases: 119, part: null, fitting: null },
@@ -183,12 +184,26 @@ const HULL_COUNTS: readonly { purchases: number; part: string | null; fitting: s
   { purchases: 360, part: 'brass-trimmed-armour', fitting: 'Fitting: Brass-trimmed armour' },
   { purchases: 480, part: 'layered-armour', fitting: 'Fitting: Layered armour' },
   { purchases: 600, part: 'filigree-armour', fitting: 'Fitting: Filigree armour' },
-  { purchases: 720, part: 'filigree-armour', fitting: 'Fitting: Gunmetal · L720' },
-  { purchases: 840, part: 'filigree-armour', fitting: 'Fitting: Bright brass · L840' },
+  { purchases: 720, part: 'keel-strake-armour', fitting: 'Fitting: Keel strake' },
+  { purchases: 840, part: 'stern-plated-armour', fitting: 'Fitting: Stern plate' },
+  { purchases: 960, part: 'bow-plated-armour', fitting: 'Fitting: Bow plate' },
+  { purchases: 1080, part: 'corner-plated-armour', fitting: 'Fitting: Corner plates' },
+  { purchases: 1200, part: 'hatch-ringed-armour', fitting: 'Fitting: Hatch ring' },
+  { purchases: 1320, part: 'keel-riveted-armour', fitting: 'Fitting: Keel rivets' },
+  { purchases: 1440, part: 'cap-riveted-armour', fitting: 'Fitting: Cap rivets' },
+  { purchases: 1560, part: 'corner-riveted-armour', fitting: 'Fitting: Corner rivets' },
+  { purchases: 1680, part: 'hatch-bolted-armour', fitting: 'Fitting: Hatch bolts' },
+  { purchases: 1800, part: 'skirt-rail-armour', fitting: 'Fitting: Skirt rail' },
+  { purchases: 1920, part: 'stern-skirt-armour', fitting: 'Fitting: Stern skirt' },
+  { purchases: 2040, part: 'bow-skirt-armour', fitting: 'Fitting: Bow skirt' },
+  { purchases: 2160, part: 'full-skirt-armour', fitting: 'Fitting: Full skirt' },
+  { purchases: 2280, part: 'bossed-skirt-armour', fitting: 'Fitting: Skirt bosses' },
+  { purchases: 2400, part: 'bossed-skirt-armour', fitting: 'Fitting: Gunmetal · L2,400' },
+  { purchases: 2520, part: 'bossed-skirt-armour', fitting: 'Fitting: Bright brass · L2,520' },
 ]
 
 /** The levels the card must fit at 360 px (#809's goldens): in full through the #681 long mode. */
-const HULL_LEVELS = [721, 9_999, 1_000_000]
+const HULL_LEVELS = [2_401, 9_999, 1_000_000]
 const HULL_CARD = `[data-testid="${UI_ID_TEMPLATES.workshopUpgradeBuy('hull')}"]`
 const HULL_FITTING = `${HULL_CARD} [data-sheet-card-line]`
 
@@ -212,7 +227,7 @@ async function fittingOverflowOf(page: Page): Promise<number> {
   return Math.max(0, fitting.x + fitting.width - (card.x + card.width))
 }
 
-test.describe('hull rig look (tickets 585, 809)', () => {
+test.describe('hull rig look (tickets 585, 809, 816)', () => {
   for (const viewport of VIEWPORTS) {
     test(`lays each hull armour over the pod and names it on the card, ${viewport.name}`, async ({
       page,
@@ -238,7 +253,7 @@ test.describe('hull rig look (tickets 585, 809)', () => {
       expect(errors).toEqual([])
     })
 
-    test(`fits the hull level at 721, 9999 and 1e6 on the card, ${viewport.name}`, async ({
+    test(`fits the hull level at 2401, 9999 and 1e6 on the card, ${viewport.name}`, async ({
       page,
     }) => {
       await page.setViewportSize(viewport)
