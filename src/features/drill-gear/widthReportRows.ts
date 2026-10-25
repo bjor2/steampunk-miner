@@ -56,12 +56,17 @@ function wideLevelOf(events: readonly RunEvent[]): number {
   return branches[branches.length - 1] === WIDE_BRANCH ? WIDE_WIDTH_LEVELS : 0
 }
 
+/** tech-tree's fork lines (its slice run events, read by name, as no slice imports its logging). */
+const FORK_CHOSEN = 'tech-tree.fork_chosen'
+const FORK_RECHOSEN = 'tech-tree.fork_rechosen'
+
 /** The drill-gear branch a fork line chose or switched to; none for any other line. */
 function laneBranchOf(event: RunEvent): string[] {
+  const name: string = event.event
   const data = event.data as { lane?: string; branch?: string; to?: string }
   if (data.lane !== LANE) return []
-  if (event.event === 'tech-tree.fork_chosen' && data.branch !== undefined) return [data.branch]
-  if (event.event === 'tech-tree.fork_rechosen' && data.to !== undefined) return [data.to]
+  if (name === FORK_CHOSEN && data.branch !== undefined) return [data.branch]
+  if (name === FORK_RECHOSEN && data.to !== undefined) return [data.to]
   return []
 }
 
