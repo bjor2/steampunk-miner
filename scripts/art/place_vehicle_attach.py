@@ -1,6 +1,6 @@
 """
 Places the vehicle's attach points (#162 "vehicle sockets", K5 #188; the five aetheric points of
-ticket 376) as `attach.<id>` empties in
+ticket 376; the three kit points of ticket 881) as `attach.<id>` empties in
 the base vehicle .blend, in an `attach` collection, then saves the file. The export writes them to
 the sidecar's `attach` array. Re-running replaces the empties with the table below.
 
@@ -54,6 +54,14 @@ POINTS = {
     'hull.roof.coils': (-0.18, 0.1, 6),  # the twin coils on the roof plate, before the aft boiler
     'hull.tail': (-0.31, 0.35, 6),  # the escapement cage on the aft stack, beside the echo sounder
     'hull.flank': (0.06, -0.23, 6),  # the condenser tank low on the flank, over the track
+    # The three kit-only points of the planet kit's hazard tools (G&V on #850, ticket 881), used
+    # by planet-kit's kitSockets.json and nothing else, so no tool shares a point with a gear item.
+    # They stand where the tools hung on drill.hood, hull.arm.left and hull.roof.mid until G&V's
+    # Blender pass (#883) moves them to the blade below the collar, the right flank under
+    # hull.arm.right and the roof between hull.roof.fore and hull.roof.mid.
+    'kit.blade': (0.56, 0.16, 9),  # the Scree Plough
+    'kit.grab': (-0.36, -0.12, 6),  # the Shard Tongs
+    'kit.mast': (0.17, 0.4, 6),  # the Vent Vane
 }
 
 

@@ -7,6 +7,7 @@
  *    loadout slot (an extractor, a slotless passive) counts as always equipped.
  */
 import { contentOf } from './content'
+import { SHARED_ATTACH_IDS } from './sharedAttachIds'
 import {
   attachOf,
   isAttachId,
@@ -15,6 +16,8 @@ import {
   type ItemAttach,
 } from './vehicleAttach'
 import { acceptedSlotsOf, LOADOUT_SLOT_IDS, type LoadoutSlotId } from './vehicleLoadout'
+
+export { SHARED_ATTACH_IDS } from './sharedAttachIds'
 
 export interface AttachedItem {
   id: string
@@ -38,13 +41,6 @@ export const VEHICLE_HELD_ATTACH_IDS: readonly AttachId[] = [
   'hull.plates',
   'hull.liner',
 ]
-
-/**
- * Points that hold one cluster asset many items extend: the cab gauge cluster, whose owned gauges
- * are dial variants (TD after the Horizontal Scaler review), and the charge rack, whose consumable
- * crates and flare mortar ride it (TD sockets table; G&V mortar pick, #162).
- */
-export const SHARED_ATTACH_IDS: readonly AttachId[] = ['cab.gauge', 'hull.rear']
 
 /** Why the items break the coverage rule against the sidecar's points; empty when they keep it. */
 export function attachCoverageProblems(

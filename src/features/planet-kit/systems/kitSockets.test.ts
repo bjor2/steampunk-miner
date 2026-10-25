@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { VEHICLE_HELD_ATTACH_IDS } from '../../../systems/registries/attachCoverage'
+import { contentOf } from '../../../systems/registries/content'
 import socketsFile from '../kitSockets.json'
 import {
   KIT_SOCKETS,
@@ -11,12 +12,13 @@ import {
 import { PLANET_KITS } from './planetKitRows'
 
 // The kit items' sockets (G&V on ticket 823): render-only placement inside the locked kit, each
-// with its Blender asset and parts since ticket 825.
+// with its Blender asset and parts since ticket 825, the three tools on kit-only points since
+// ticket 881 (G&V's re-pick on #850).
 
 const SOCKET_OF: Readonly<Record<string, string>> = {
-  scree_plough: 'drill.hood',
-  shard_tongs: 'hull.arm.left',
-  vent_vane: 'hull.roof.mid',
+  scree_plough: 'kit.blade',
+  shard_tongs: 'kit.grab',
+  vent_vane: 'kit.mast',
   damp_flask: 'cab.gauge',
 }
 
@@ -27,12 +29,19 @@ describe('kit sockets (ticket 823)', () => {
     expect(kitSocketsProblems(socketsFile)).toEqual([])
   })
 
-  it('hangs each kit item but the Cache Crate on the socket G&V named', () => {
+  it('hangs each kit item but the Cache Crate on the socket G&V named, the tools on kit points', () => {
     const sockets = Object.fromEntries(KIT_SOCKETS.map((socket) => [socket.itemId, socket.attach]))
     expect(sockets).toEqual(SOCKET_OF)
     const items = PLANET_KITS.items.map((item) => item.id).filter((id) => id !== 'cache_crate')
     expect(Object.keys(sockets).sort()).toEqual(items.sort())
     expect(kitSocketOf(KIT_SOCKETS, 'cache_crate')).toBeNull()
+  })
+
+  it('names each tool’s point on its kit-item entry, so the load refuses one a gear item claims', () => {
+    const attach = Object.fromEntries(
+      contentOf('kit-item').map((entry) => [entry.itemId, entry.attach ?? null]),
+    )
+    expect(attach).toEqual({ ...SOCKET_OF, cache_crate: null })
   })
 
   it('takes no point the vehicle’s own upgrades always hold', () => {

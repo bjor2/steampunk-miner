@@ -33,10 +33,10 @@ function registerBitAndAcceptance(): void {
 }
 
 describe('vehicle loadout registry', () => {
-  it('holds the eight slots of the #162 table and the 32 attach points of K5 and ticket 376', () => {
+  it('holds the eight slots of the #162 table and the 35 attach points of K5, tickets 376 and 881', () => {
     expect(LOADOUT_SLOT_IDS).toHaveLength(8)
-    expect(ATTACH_IDS).toHaveLength(32)
-    expect(new Set(ATTACH_IDS).size).toBe(32)
+    expect(ATTACH_IDS).toHaveLength(35)
+    expect(new Set(ATTACH_IDS).size).toBe(35)
   })
 
   it('has no extractor slot, since extractors are mounted once owned', () => {

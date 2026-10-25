@@ -28,6 +28,7 @@ import { FLASK_FACTOR, FLASK_RULES } from './systems/flaskRules'
 import { KIT_HOLDINGS_SECTION } from './systems/kitHoldingsSection'
 import { KIT_TOOL_CONTEXTS, KIT_TOOL_FACTORS, KIT_TOOL_TRADE_OFFS } from './systems/kitToolRules'
 import { kitItemEntriesOf } from './systems/kitItemContent'
+import { KIT_SOCKETS } from './systems/kitSockets'
 import { MERCHANT_ORE_PREMIUM, MERCHANT_PREMIUM_LIFT } from './systems/merchantPremium'
 import { PLANET_KITS } from './systems/planetKitRows'
 import { MERCHANT_FACILITY } from './systems/sessionMerchant'
@@ -44,7 +45,7 @@ export const slice: SliceDefinition = {
     r.dockFacility(MERCHANT_FACILITY)
     r.orePremium(MERCHANT_ORE_PREMIUM)
     r.oreSaleLift(MERCHANT_PREMIUM_LIFT)
-    r.content('kit-item', kitItemEntriesOf(PLANET_KITS.items))
+    r.content('kit-item', kitItemEntriesOf(PLANET_KITS.items, KIT_SOCKETS))
     r.saveSection(CONTAINERS_SECTION)
     r.saveSection(KIT_HOLDINGS_SECTION)
     r.commandRules(CONTAINER_RULES)

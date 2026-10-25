@@ -1,6 +1,7 @@
 /**
  * The planet-kit art in the preview build (ticket 825), read through `steampunkDebug`, never
- * pixels: with the kit tools shown, the car hangs each socket's asset at G&V's point and reports it
+ * pixels: with the kit tools shown, the car hangs each socket's asset at G&V's point (the tools on
+ * their kit-only points since ticket 881) and reports it
  * under `vehicleParts().mounted`; on Hearthmoor the Assay & Exchange carries the first merchant's
  * frontage with its two parts, at 360 px and 1280 px.
  */
@@ -19,10 +20,10 @@ const VIEWPORTS = [
 ] as const
 
 const SOCKET_ASSETS: Record<string, string> = {
-  'drill.hood': 'vehicle-item-scree-plough',
+  'kit.blade': 'vehicle-item-scree-plough',
   'cab.gauge': 'vehicle-item-damp-flask',
-  'hull.arm.left': 'vehicle-item-shard-tongs',
-  'hull.roof.mid': 'vehicle-item-vent-vane',
+  'kit.grab': 'vehicle-item-shard-tongs',
+  'kit.mast': 'vehicle-item-vent-vane',
 }
 
 async function open(page: Page): Promise<string[]> {

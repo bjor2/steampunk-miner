@@ -1,9 +1,9 @@
 {
-  "source": "G&V on ticket 823 (sockets for the PK4 kit items, the last open part of needs-planner): each kit item that shows on the rig names one vehicle-attach point outside those #809-#816 own and outside MODULE_ATTACH_POINTS. The Cache Crate has none: it is a placed world object drawn at its cell, held crates only a HUD count. Ticket 825 replaced the flat placeholders with Blender art: each socket names its asset (the kernel's slotItemAssetIdOf rule, vehicle-item-<id>), its parts and each part's draw order over the rig's. A part that moves carries a resting and an acting pose (a turn in radians about its pivot, counter-clockwise on screen, and a shift in metres); #850 sets the acting pose while the tool acts. A flask part shows from a held count (G&V: one flask per held flask up to the stack limit of 3); the shard shows only while the tongs act. Every part keeps inside the rig's bounds at every pose and behind the drawn drill tip (#789), which kitSocketLook.test.ts holds against the vehicle sidecar.",
+  "source": "G&V on ticket 823 (sockets for the PK4 kit items, the last open part of needs-planner): each kit item that shows on the rig names one vehicle-attach point outside those #809-#816 own and outside MODULE_ATTACH_POINTS. The Cache Crate has none: it is a placed world object drawn at its cell, held crates only a HUD count. Ticket 825 replaced the flat placeholders with Blender art: each socket names its asset (the kernel's slotItemAssetIdOf rule, vehicle-item-<id>), its parts and each part's draw order over the rig's. A part that moves carries a resting and an acting pose (a turn in radians about its pivot, counter-clockwise on screen, and a shift in metres); #850 sets the acting pose while the tool acts. A flask part shows from a held count (G&V: one flask per held flask up to the stack limit of 3); the shard shows only while the tongs act. Every part keeps inside the rig's bounds at every pose and behind the drawn drill tip (#789), which kitSocketLook.test.ts holds against the vehicle sidecar. Ticket 881 (G&V's re-pick on #850: no sharing) moves the three tools onto the kit-only points kit.blade, kit.grab and kit.mast, which no gear item takes (drill.hood, hull.arm.left and hull.roof.mid hold the containment, acid etcher and aether tether rigs); the flask stays on cab.gauge, the gauge cluster many items extend. The kit points stand where the tools hung until G&V's Blender pass (#883) moves them.",
   "sockets": [
     {
       "itemId": "scree_plough",
-      "attach": "drill.hood",
+      "attach": "kit.blade",
       "assetId": "vehicle-item-scree-plough",
       "shows": "A scree cowl over the drill collar, blades swept back; they flex outward when it shoves rubble.",
       "parts": [
@@ -30,7 +30,7 @@
     },
     {
       "itemId": "shard_tongs",
-      "attach": "hull.arm.left",
+      "attach": "kit.grab",
       "assetId": "vehicle-item-shard-tongs",
       "shows": "A gripper arm mirroring the mobility arm on hull.arm.right; it closes on a lifted spinecrystal, which rides in its jaws.",
       "parts": [
@@ -46,7 +46,7 @@
     },
     {
       "itemId": "vent_vane",
-      "attach": "hull.roof.mid",
+      "attach": "kit.mast",
       "assetId": "vehicle-item-vent-vane",
       "shows": "A folded brass vane on the roof that fans open while it rides a vent blast and folds shut afterwards.",
       "parts": [

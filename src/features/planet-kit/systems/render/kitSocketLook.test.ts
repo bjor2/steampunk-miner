@@ -30,8 +30,8 @@ function partIdsShown(itemId: string, show: KitSocketShow): string[] {
 }
 
 describe('kit socket look', () => {
-  it('hangs the plough’s cowl with its pivot on drill.hood, where the vehicle sidecar puts the point', () => {
-    const point = attachPointOf(VEHICLE, 'drill.hood')!
+  it('hangs the plough’s cowl with its pivot on kit.blade, where the vehicle sidecar puts the point', () => {
+    const point = attachPointOf(VEHICLE, 'kit.blade')!
     const cowl = kitSocketQuadsOf(SHIPPED_ART, socket('scree_plough'), KIT_SOCKET_AT_REST).find(
       (quad) => quad.partId === 'plough-cowl',
     )!

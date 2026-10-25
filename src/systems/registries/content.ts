@@ -9,6 +9,7 @@
  *
  * Other slices register entries of that kind and import its type from the owner's `index.ts`.
  */
+import { crossKindAttachProblemOf } from './contentAttachClaims'
 import { defineRegistry, entriesOf, registrationsOf } from './seal'
 import type { VehicleItem } from './vehicleLoadout'
 
@@ -49,7 +50,11 @@ export interface ContentIconUse {
   iconId: string
 }
 
-export const CONTENT_REGISTRY = defineRegistry<ContentRegistration>('content')
+/** Sealed with one owner kind per attach point (`contentAttachClaims.ts`, ticket 881). */
+export const CONTENT_REGISTRY = defineRegistry<ContentRegistration>(
+  'content',
+  crossKindAttachProblemOf,
+)
 
 export function contentRegistrationOf<K extends ContentKind>(
   kind: K,
