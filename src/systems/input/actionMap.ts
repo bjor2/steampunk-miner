@@ -74,6 +74,9 @@ export const ACTION_IDS = [
   // The drill sockets' gear (#205 GD lock Q1 a): drill-gear's input reactions answer them.
   'use_drill_flank',
   'use_drill_collar',
+  // The planet kit's fired consumable (ticket 881, the TD's seam on #850): planet-kit's input
+  // reaction uncorks a carried Damp Flask; its cell sits in the bar's overflow.
+  'use_kit_tool',
   // The desktop keys of ticket 768 (spec #678, GD lock of 23 Oct): Tab opens and shuts the base
   // sheet, a letter jumps to a place's tab, M is the star map's (#757, wired by #769).
   'toggle_sheet',

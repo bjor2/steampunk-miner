@@ -31,6 +31,7 @@
     "use_slot_5": "slot 5",
     "use_drill_flank": "flank tile",
     "use_drill_collar": "collar tile",
+    "use_kit_tool": "flask tile",
     "toggle_sheet": "Close button",
     "open_outfitter": "Outfitter tab",
     "open_patent_office": "Patent Office tab",

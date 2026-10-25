@@ -245,6 +245,14 @@
       "gamepad": ["PadLT"]
     },
     {
+      "id": "use_kit_tool",
+      "displayName": "Uncork flask",
+      "contexts": ["vehicle"],
+      "kind": "press",
+      "keyboard": ["KeyU"],
+      "gamepad": ["PadLB+PadY"]
+    },
+    {
       "id": "toggle_sheet",
       "displayName": "Sheet on/off",
       "contexts": ["vehicle", "sheet", "pause"],

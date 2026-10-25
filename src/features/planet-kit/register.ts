@@ -23,6 +23,7 @@ import { PLANET_KIT_BOT_CRATES } from './systems/botCrates'
 import { CONTAINER_RULES } from './systems/containerRules'
 import { CONTAINERS_SECTION } from './systems/containerSection'
 import { KIT_BUY_RULES } from './systems/kitBuyRules'
+import { UNCORK_FLASK_REACTION } from './systems/flaskReaction'
 import { FLASK_FACTOR, FLASK_RULES } from './systems/flaskRules'
 import { KIT_HOLDINGS_SECTION } from './systems/kitHoldingsSection'
 import { KIT_TOOL_CONTEXTS, KIT_TOOL_FACTORS, KIT_TOOL_TRADE_OFFS } from './systems/kitToolRules'
@@ -31,6 +32,7 @@ import { MERCHANT_ORE_PREMIUM, MERCHANT_PREMIUM_LIFT } from './systems/merchantP
 import { PLANET_KITS } from './systems/planetKitRows'
 import { MERCHANT_FACILITY } from './systems/sessionMerchant'
 import { CarriedCrates } from './ui/CarriedCrates'
+import { FLASK_TOOL_SLOT } from './ui/flaskToolSlot'
 import { planetKitArtAssets } from './systems/planetKitArt'
 import { CONTAINER_MARKER_PRIORITY, ContainerMarkers } from './ui/ContainerMarkers'
 import { CONTAINERS_TAB } from './ui/ContainersTab'
@@ -54,6 +56,9 @@ export const slice: SliceDefinition = {
     // The Damp Flask, uncorked on purpose: no firedamp drain while it is open (ticket 881).
     r.commandRules(FLASK_RULES)
     r.contactFactor(FLASK_FACTOR)
+    // U, LB+Y or the flask's cell in the bar's overflow uncorks one (ticket 881).
+    r.inputReaction(UNCORK_FLASK_REACTION)
+    r.toolSlot(FLASK_TOOL_SLOT)
     // The crate the pacing bot carries under `kitPolicy.crates: 'drop_on_full'` (ticket 850).
     r.botCrates(PLANET_KIT_BOT_CRATES)
     r.eventProjections(PLANET_KIT_PROJECTIONS)
