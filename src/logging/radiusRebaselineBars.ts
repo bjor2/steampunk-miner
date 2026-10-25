@@ -17,7 +17,8 @@
  *           (ticket 848, the GD lock on #823 Q1: drains at or under 5% of income)
  *   printed the p* and rate of each step, total money per planet, the sold ore step (amber, never
  *           gated: the ore value bar is the generated pool's), drill + tip amber at 7, the
- *           measured minutes for the planet rows and the paceScale the miss asks to retune first
+ *           measured minutes for the planet rows, the paceScale the miss asks to retune first and
+ *           each planet's hazard cost share
  *
  * A miss is a balance finding: that planet's paceScale first, then the shared k (150-200, one
  * value), then a named exception to the GD. Never ore prices, never #551.
@@ -219,7 +220,15 @@ export function printedRadiusRebaselineLinesOf(runs: readonly RadiusRebaselineRu
     ...rows.flatMap(drillTipAmberLines),
     ...rows.map(measuredMinutesLine),
     ...rows.flatMap(retuneLines),
+    ...rows.flatMap(hazardShareLines),
   ]
+}
+
+/** What hazards cost a planet that met any, so a pass shows its margin to the 5% bar. */
+function hazardShareLines({ radius }: PlanetRow): string[] {
+  const share = radius.hazardShareBp
+  if (share === null || share === 0) return []
+  return [`planet ${radius.planet}: hazards cost ${share} bp of the sales to the core`]
 }
 
 function rateStepLines(row: PlanetRow, before: PlanetRow | undefined): string[] {

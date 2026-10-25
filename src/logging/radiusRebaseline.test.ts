@@ -206,6 +206,9 @@ describe('radius re-baseline bars (ticket 644)', () => {
     const problems = gatedRadiusRebaselineProblemsOf(runs)
     expect(problems).toContain('planet 3 hazards cost 600 bp of the sales to the core, bar 500')
     expect(problems.some((line) => line.startsWith('planet 4 hazards'))).toBe(false)
+    expect(printedRadiusRebaselineLinesOf(runs)).toContain(
+      'planet 4: hazards cost 400 bp of the sales to the core',
+    )
   })
 
   it('prints each planet row with its radius and measured minutes', () => {

@@ -6,6 +6,7 @@ import { cmp, sub } from '../../money'
 import type { ContactEffectRow, ContactFactor } from '../../registries/contactEffects'
 import type { HazardPocketsProvider } from '../../registries/hazardPockets'
 import { vehicleMotionAt } from '../../registries/vehicleMotionEffects'
+import { isInputLocked } from '../../vehicle/motionEffects'
 import { FACING } from '../../vehicle/vehiclePose'
 import { energyMaxQuantaOf } from '../../vehicle/vehicleState'
 import { cellDensitySum } from '../../world/cellYield'
@@ -83,7 +84,7 @@ describe('hazard contacts', () => {
     expect(eventsOfType(again, 'CargoAdded')).toEqual([])
   })
 
-  it('shoves the rig up its open shaft along the vent normal as a glide, scalding the hull', () => {
+  it('shoves the rig up its open shaft along the vent normal as a glide, input and drill at rest, scalding the hull', () => {
     const session = sessionInShaft()
     session.submit(START + 99, placeHazardCommand('steamvent', DEEPER.tx, DEEPER.ty))
     const events = mineTile(session, START + 100, DEEPER)
@@ -100,8 +101,9 @@ describe('hazard contacts', () => {
       toTy: BELOW.ty + 3,
       untilTick: tick + 20,
     })
-    const running = vehicleMotionAt(session.state(), 'p1', tick + 5).glide
-    expect(running?.to).toEqual({ x: BELOW.tx + 0.5, y: BELOW.ty + 3.5 })
+    const running = vehicleMotionAt(session.state(), 'p1', tick + 5)
+    expect(running.glide?.to).toEqual({ x: BELOW.tx + 0.5, y: BELOW.ty + 3.5 })
+    expect(isInputLocked(running)).toBe(true)
     expect(vehicleMotionAt(session.state(), 'p1', tick + 20).glide).toBeNull()
   })
 
