@@ -6,4 +6,6 @@ export const PLANET_KIT_TEST_IDS = {
   merchantBuy: 'planet-kit-merchant-buy',
   dropCrate: 'planet-kit-drop-crate',
   carriedCrates: 'planet-kit-carried-crates',
+  /** A hazard tool's outcome tag on the overlay; its `data-outcome` names the verb (ticket 882). */
+  outcomeTag: 'planet-kit-outcome-tag',
 } as const

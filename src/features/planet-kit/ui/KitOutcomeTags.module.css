@@ -1,0 +1,22 @@
+/*
+ * A small tag centred on the cell an outcome acted on: the overlay card's corner sits on the
+ * cell's centre, so the tag offsets itself by half its size. The flask's open zone wears the
+ * gauge's teal, the momentary outcomes brass.
+ */
+.tag {
+  display: inline-block;
+  padding: 1px var(--space-1);
+  border: 1px solid var(--color-brass);
+  border-radius: 4px;
+  background: var(--color-panel);
+  color: var(--color-brass);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+}
+
+.tag[data-outcome='firedamp_cleared'] {
+  border-color: var(--color-teal);
+  color: var(--color-teal);
+}

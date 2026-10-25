@@ -41,6 +41,7 @@ import { MERCHANT_ORE_PREMIUM, MERCHANT_PREMIUM_LIFT } from './systems/merchantP
 import { PLANET_KITS } from './systems/planetKitRows'
 import { MERCHANT_FACILITY } from './systems/sessionMerchant'
 import { CarriedCrates } from './ui/CarriedCrates'
+import { KIT_OUTCOME_TAG_PRIORITY, KitOutcomeTags } from './ui/KitOutcomeTags'
 import { FLASK_TOOL_SLOT } from './ui/flaskToolSlot'
 import { planetKitArtAssets } from './systems/planetKitArt'
 import { CONTAINER_MARKER_PRIORITY, ContainerMarkers } from './ui/ContainerMarkers'
@@ -85,6 +86,12 @@ export const slice: SliceDefinition = {
       slot: 'overlay',
       priority: CONTAINER_MARKER_PRIORITY,
       Panel: ContainerMarkers,
+    })
+    r.hudPanel({
+      id: 'planet-kit.outcome-tags',
+      slot: 'overlay',
+      priority: KIT_OUTCOME_TAG_PRIORITY,
+      Panel: KitOutcomeTags,
     })
     r.hudPanel({ id: 'planet-kit.carried-crates', slot: 'gauges', Panel: CarriedCrates })
     r.sheetTab(CONTAINERS_TAB)
