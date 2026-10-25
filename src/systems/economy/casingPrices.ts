@@ -1,7 +1,7 @@
 /**
  * The casing grade's price (#41 Systems & Economy): the buy that raises grade `G` to `G + 1`
- * costs `ceil(48 * 1.225^(G-1))`, so grades 1->2 .. 4->5 cost 48, 59, 73 and 89 (269 together;
- * #195 gave it drill power's ratio).
+ * costs `ceil(240 * 1.225^(G-1))`, so grades 1->2 .. 4->5 cost 240, 294, 361 and 442 (1337
+ * together; #195 gave it drill power's ratio, #894 raised the base from 48 to 240 and kept it).
  * The base and ratio are `cost.casing.upgrade` in `economy.json`; there is no pace scale in the
  * formula, as the decision writes it.
  *

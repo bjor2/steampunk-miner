@@ -1,7 +1,7 @@
 /**
  * The pacing bot's casing (S11, #65 Systems & Economy note 2; #43 Systems & Economy): it buys
  * casing grades on the curve its route needs, grade `b` before it camps in band `b` and the core's
- * grade (5, #41) before a core trip, so the full-slice gate pays the casing sink (274 over grades 2
+ * grade (5, #41) before a core trip, so the full-slice gate pays the casing sink (1337 over grades 2
  * to 5) where a player would. Its trips stay in the bands its grade holds.
  */
 import { isCasingGradeEnough, requiredCasingGrade } from '../economy/casingGrades'

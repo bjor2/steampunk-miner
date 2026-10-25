@@ -198,7 +198,7 @@ describe('input: no direct mutation (#33 acceptance 3)', () => {
   })
 
   it('buys a casing grade with ui_confirm on the Casing row at the Upgrade bay only', () => {
-    game().giveMoney('200')
+    game().giveMoney('600')
     game().teleportToDock('upgrade')
     game().pressScreenButton('upgradebay-casing-buy')
     game().undock()

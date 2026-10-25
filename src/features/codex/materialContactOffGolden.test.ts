@@ -18,24 +18,25 @@ import { withMaterialContact } from './systems/materialFixtures'
 // 662's 1.2 m bore and its casing trail, rings measured from the hole each tick cut (protocol
 // 118), moved all four again, and only them. Ticket 888 gave planet 80 its generated pool's
 // species, so the record moves money-past-1e40 too: with the switch off it replays to the digests
-// of its stamp-14 planet with no species touched.
+// of its stamp-14 planet with no species touched. Ticket 894's casing prices (protocol 121) moved
+// every pin again.
 
 type MovedDigests = Readonly<Record<string, Readonly<Record<number, string>>>>
 
 /** Protocol 88's digests of the goldens the record moves, by tick (91's for the two digs). */
 const PROTOCOL_88_DIGESTS: MovedDigests = {
-  'casing-lined-band-2': { 2137: 'dad6225409d47136' },
-  'collapse-band-2-grade-1': { 2125: '9c781106c485ea85' },
-  'dig-and-return': { 247: 'c4db3f9c9dcff509', 3600: '180cf9913df8c848', 4000: '7a6bbd2124ee07d1' },
-  'mined-order-mixed': { 307: '89db921635aa40b9' },
-  'money-past-1e40': { 124: '80d0d52ae58e3434', 166: '2fb0ce610afa68d7', 2000: '26a52901206eb78a' },
+  'casing-lined-band-2': { 2137: 'f10d98b8f1cbd07b' },
+  'collapse-band-2-grade-1': { 2125: '4557304bd522c918' },
+  'dig-and-return': { 247: 'df5150891e41f71a', 3600: '85652eb86f98e6ac', 4000: '99a320b209396c35' },
+  'mined-order-mixed': { 307: '7b5b8d6a23d6222c' },
+  'money-past-1e40': { 124: '2db1693d76e14ec9', 166: 'f9a357a85f1f599c', 2000: 'be0ac79106274807' },
 }
 
 /** Protocol 88's charged digests (A6, `drill.exactCarry` on) of the same goldens. */
 const PROTOCOL_88_CHARGED_DIGESTS: MovedDigests = {
   ...PROTOCOL_88_DIGESTS,
-  'casing-lined-band-2': { 2137: '6f16a4e6fdd78057' },
-  'collapse-band-2-grade-1': { 2125: '26d3b8b63020e895' },
+  'casing-lined-band-2': { 2137: 'cfe68776179e5afe' },
+  'collapse-band-2-grade-1': { 2125: 'f211e3c5a65093e8' },
 }
 
 const goldens = committedGoldenRuns().map((golden) => [golden.name, golden] as const)

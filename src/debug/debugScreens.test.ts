@@ -210,12 +210,12 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
 
   it('reads the Casing row and a focused track preview through ui.getUpgradeBayModel', () => {
     const debug = createDebugApi()
-    debug.giveMoney('100')
+    debug.giveMoney('500')
     debug.teleportToDock('upgrade')
     const digest = takeSessionSnapshot().digest
     game().moveFocus(1)
     const model = upgradeBayModel()
-    expect(model.casing).toMatchObject({ grade: 1, gradeText: '1 → 2', cost: { text: '48' } })
+    expect(model.casing).toMatchObject({ grade: 1, gradeText: '1 → 2', cost: { text: '240' } })
     expect(model.preview).toMatchObject({
       highlight: 'drill_tip',
       visualTier: 1,

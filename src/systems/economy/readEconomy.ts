@@ -47,7 +47,7 @@ function readEconomyFields(reader: FieldReader, file: Record<string, unknown>): 
   checkUpgradeSet(reader, upgrades, costCurves)
   const ore = readOre(reader, reader.object('ore', file.ore))
   return {
-    economyVersion: reader.safeInteger('economyVersion', file.economyVersion),
+    economyRulesVersion: reader.safeInteger('economyRulesVersion', file.economyRulesVersion),
     ore,
     planets: readPlanets(reader, reader.object('planets', file.planets)),
     prices: readPrices(reader, reader.object('prices', file.prices)),

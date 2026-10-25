@@ -22,14 +22,14 @@ import { goldenRunProblems, type GoldenRun } from './goldenRun'
 
 type MovedDigests = Readonly<Record<string, Readonly<Record<number, string>>>>
 
-/** Protocol 118's digests at the 0.5 m clearance, by tick, of the goldens the 0.15 m bore moves. */
+/** Protocol 121's digests (#894's casing prices) at the 0.5 m clearance, by tick, of the goldens the 0.15 m bore moves. */
 const WIDE_BORE_DIGESTS: MovedDigests = {
-  'casing-lined-band-2': { 2137: '151428c425a115cf' },
-  'collapse-band-2-grade-1': { 2125: '55ab50a9026a8b7c' },
-  'destroyed-and-towed': { 704: 'b0c160d11e71ac43' },
-  'dig-and-return': { 247: '96e1f52d455e4dae', 3600: '41f11c6db1ef9ba1', 4000: 'ca74782db75f2fa8' },
-  'mined-order-mixed': { 307: '3f0f5d489e5df2f0' },
-  'money-past-1e40': { 124: '51287765f47bbf8a', 166: '3d70299e1d6342cb', 2000: 'c4d130e49009575a' },
+  'casing-lined-band-2': { 2137: 'bbd47e411dc7ecc8' },
+  'collapse-band-2-grade-1': { 2125: 'cee741a48a0c5075' },
+  'destroyed-and-towed': { 704: 'e66dc96093fe4d24' },
+  'dig-and-return': { 247: '4c15a692846812a7', 3600: '3b0028560b157e31', 4000: 'd803ac9fbce777f8' },
+  'mined-order-mixed': { 307: 'f712d702536b3c05' },
+  'money-past-1e40': { 124: 'ed855385b24b44bd', 166: '1e7fdc6599d92bfa', 2000: '12050ad4b4e2620d' },
 }
 
 const goldens = committedGoldenRuns().map((golden) => [golden.name, golden] as const)

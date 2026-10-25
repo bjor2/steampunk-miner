@@ -1,5 +1,5 @@
 {
-  "economyVersion": 3,
+  "economyRulesVersion": 4,
   "ore": {
     "tiersPerPlanet": 3,
     "coreTierBand": 6,
@@ -110,7 +110,7 @@
       "ratio": "1.48"
     },
     { "id": "cost.vehicle.drill_tip", "family": "geometric", "base": "83", "ratio": "1.500625" },
-    { "id": "cost.casing.upgrade", "family": "geometric", "base": "48", "ratio": "1.225" },
+    { "id": "cost.casing.upgrade", "family": "geometric", "base": "240", "ratio": "1.225" },
     { "id": "cost.refinery.slot", "family": "bandOre", "band": 5, "oreUnitsByLevel": ["20", "40"] },
     {
       "id": "cost.charges.rack_slot",
@@ -124,7 +124,7 @@
     "casingGradeStart": 1,
     "casingGradeCoreMin": 5,
     "gnawMaxDrop": 1,
-    "kCasing": "0.002",
+    "kCasing": "0.02",
     "collapseCrush": ["0.080", "0.080", "0.080", "0.080", "0.080", "0.080"],
     "cementGrades": {
       "liningTypes": ["refractory", "insulated", "grounded"],

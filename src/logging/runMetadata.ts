@@ -9,6 +9,7 @@
  */
 import { ENERGY_QUANTA_PER_UNIT } from '../constants/balance'
 import { AUTHORITY_PROTOCOL_VERSION } from '../systems/authority/authorityCommand'
+import { ECONOMY } from '../systems/economy/economy'
 import { GENERATOR_VERSION } from '../systems/generatorVersion'
 import { NUMBER_FORMAT_VERSION } from '../systems/money'
 import type { DevFlags } from '../constants/devFlags'
@@ -30,6 +31,8 @@ export interface RunMetadata {
   numberFormatVersion: number
   generatorVersion: number
   authorityProtocolVersion: number
+  /** The price rows the run bought under (#894), so a replay knows which rows made it. */
+  economyRulesVersion: number
   energyQuantaPerUnit: number
   gameVersion: string
   buildCommit: string
@@ -62,6 +65,7 @@ export type RunFacts = Omit<
   | 'numberFormatVersion'
   | 'generatorVersion'
   | 'authorityProtocolVersion'
+  | 'economyRulesVersion'
   | 'energyQuantaPerUnit'
   | 'patchDockGuaranteed'
 >
@@ -73,6 +77,7 @@ export function createRunMetadata(facts: RunFacts): RunMetadata {
     numberFormatVersion: NUMBER_FORMAT_VERSION,
     generatorVersion: GENERATOR_VERSION,
     authorityProtocolVersion: AUTHORITY_PROTOCOL_VERSION,
+    economyRulesVersion: ECONOMY.economyRulesVersion,
     energyQuantaPerUnit: ENERGY_QUANTA_PER_UNIT,
     patchDockGuaranteed: dockGuaranteeOfSeed(facts.worldSeed),
   }

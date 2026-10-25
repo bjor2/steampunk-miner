@@ -26,7 +26,7 @@ describe('casing grade', () => {
   })
 
   it('ends at grade 5 after four buys, logging each and charging exactly its curve prices', () => {
-    const session = dockedWithMoney('300')
+    const session = dockedWithMoney('1500')
     const fromGrades = [1, 2, 3, 4]
     const prices = fromGrades.map(casingUpgradePrice)
     const events = [2, 3, 4, 5].flatMap((tick) =>
@@ -44,22 +44,22 @@ describe('casing grade', () => {
     )
     expect(session.vehicle().casingGrade).toBe(5)
     expect(session.state().players.p1.wallet).toEqual(
-      sub(fromCanonical('300'), prices.reduce(add, ZERO_MONEY)),
+      sub(fromCanonical('1500'), prices.reduce(add, ZERO_MONEY)),
     )
   })
 
   it('refuses the buy at the Sell bay with wrong_bay, changing nothing', () => {
-    const session = dockedWithMoney('300', 'sell')
+    const session = dockedWithMoney('1500', 'sell')
     const before = session.state().players
     expect(rejectionOf(session.submit(2, buyCasingGradeCommand(CLICK_CHAIN)))).toBe('wrong_bay')
     expect(session.state().players).toEqual(before)
   })
 
   it('refuses a buy the wallet cannot pay with money_short, leaving the grade', () => {
-    const session = dockedWithMoney('47.999')
+    const session = dockedWithMoney('239.999')
     expect(rejectionOf(session.submit(2, buyCasingGradeCommand(CLICK_CHAIN)))).toBe('money_short')
     expect(session.vehicle().casingGrade).toBe(1)
-    expect(toCanonical(session.state().players.p1.wallet)).toBe('4.7999e+1')
+    expect(toCanonical(session.state().players.p1.wallet)).toBe('2.39999e+2')
   })
 
   it('refuses a vehicle that is not docked', () => {

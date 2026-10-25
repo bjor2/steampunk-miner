@@ -439,7 +439,13 @@ export interface HazardArchetype {
 }
 
 export interface Economy {
-  economyVersion: number
+  /**
+   * The economy rules these rows are (TD on #894): it moves with every change of a price row, so
+   * golden runs and run metadata record it and a run replays only under the rows that made it. A
+   * save stores no prices, so a loaded save simply buys at the rows of the build that loads it.
+   * 4 is #894's casing rise (`kCasing` x10, the grade base x5).
+   */
+  economyRulesVersion: number
   ore: {
     tiersPerPlanet: number
     coreTierBand: number
@@ -522,7 +528,9 @@ export interface Economy {
    * at `casingGradeStart` and each grade is bought at the Upgrade bay along `costCurveId`. Grade
    * `G` holds bands `1..G`; the core needs `casingGradeCoreMin`. `collapseCrush` is the hull
    * fraction a collapse takes off a vehicle caught in it (#43), for bands 1 to 5 and then the core.
-   * `kCasing` is the fraction of `V(t(p, b))` one metre of first-placed lining costs (#76).
+   * `kCasing` is the fraction of `V(t(p, b))` one metre of first-placed lining costs (#76): 0.02
+   * since #894 (Bjor's playtest: casing far too cheap), ten times #115's 0.002, as the grade
+   * curve's base went from 48 to 240.
    * `cementGrades` are the hazard linings as casing_cement grades (ticket 366).
    * `gnawMaxDrop` is how many grades a wrecker gnaw takes off a wall's native band grade against
    * collapse, never below grade 1 (Systems ruling (C) on #676, GD lock): one global integer >= 0.

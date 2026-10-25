@@ -19,6 +19,7 @@
  */
 import { AUTHORITY_PROTOCOL_VERSION } from '../systems/authority/authorityCommand'
 import type { DomainEvent } from '../systems/authority/domainEvent'
+import { ECONOMY } from '../systems/economy/economy'
 import { GENERATOR_VERSION } from '../systems/generatorVersion'
 import { NUMBER_FORMAT_VERSION } from '../systems/money'
 import { saveSectionsOf } from '../systems/registries/saveSections'
@@ -33,6 +34,8 @@ export interface GoldenVersions {
   authorityProtocolVersion: number
   logSchemaVersion: number
   numberFormatVersion: number
+  /** The price rows the run was bought under (#894): a price change re-records every golden. */
+  economyRulesVersion: number
   /** Each registered save section's version by id; omitted while none is registered. */
   sliceSections?: Record<string, number>
 }
@@ -44,6 +47,7 @@ const NUMBER_VERSION_NAMES: readonly NumberVersionName[] = [
   'authorityProtocolVersion',
   'logSchemaVersion',
   'numberFormatVersion',
+  'economyRulesVersion',
 ]
 
 export interface GoldenRun extends GoldenVersions {
@@ -69,6 +73,7 @@ export function currentGoldenVersions(): GoldenVersions {
     authorityProtocolVersion: AUTHORITY_PROTOCOL_VERSION,
     logSchemaVersion: LOG_SCHEMA_VERSION,
     numberFormatVersion: NUMBER_FORMAT_VERSION,
+    economyRulesVersion: ECONOMY.economyRulesVersion,
     ...sliceSectionVersions(),
   }
 }

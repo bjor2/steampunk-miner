@@ -575,8 +575,14 @@ import type { JsonCount } from '../wholeCount'
  *    keeps its stamp under `awayOreRules` by `s:p` and lands under it again, and a first arrival
  *    says `PlanetGenerated`. The join snapshot carries both. A run that stays on P1 to P5 of system
  *    1 moves no cell; its digests move only where it travels.
+ * 121: casing costs more (ticket 894, Bjor's playtest, GD lock 25 Oct), economy rules 4: the grade
+ *    curve's base is 240 where it was 48 (`ceil(240 * 1.225^(G-1))`, P1's grades 240, 294, 361 and
+ *    442) and `kCasing` is 0.02 where it was 0.002, so every ring's `CasingLined.price` is ten
+ *    times its old metre rate, rounded once; the shoring shot and the foam cure bill on the same
+ *    rate. No command, event or save field changes; a save stores no prices, so a loaded one buys
+ *    at these rows.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 120
+export const AUTHORITY_PROTOCOL_VERSION = 121
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

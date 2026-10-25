@@ -176,13 +176,13 @@ describe('upgrade bay model', () => {
   })
 
   it('shows the Casing row with grade G -> G+1, the next cost, and a Buy that submits BuyCasingGrade', () => {
-    const casing = upgradeBayOf(atUpgradeBay('100')).casing
+    const casing = upgradeBayOf(atUpgradeBay('500')).casing
     expect(casing).toMatchObject({
       iconId: 'icon-casing',
       grade: 1,
       gradeAfter: 2,
       gradeText: '1 → 2',
-      cost: { text: '48', exact: '4.8e+1' },
+      cost: { text: '240', exact: '2.4e+2' },
       buyState: 'affordable',
     })
     expect(casing.buy).toMatchObject({
@@ -193,7 +193,7 @@ describe('upgrade bay model', () => {
   })
 
   it('reads the next casing price after a buy, and money_short when the wallet is short', () => {
-    const session = atUpgradeBay('100')
+    const session = atUpgradeBay('500')
     session.submit(3, buyCasingGradeCommand(CLICK_CHAIN))
     const casing = upgradeBayOf(session).casing
     const cost = { exact: toCanonical(casingUpgradePrice(2)) }
