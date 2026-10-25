@@ -1023,6 +1023,17 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   749, `boreCellsPerMetreAt` b plus one a level, +6% ore a metre a level). The
   pacing bars themselves (P1-P10 22-30 min, p*, the #551 money rate, the climb share) stay the R3
   lane's.
+- **The casing ring along the cut's aim** (ticket 833): a trail point keeps its cut's aim and its
+  ring lines `r(aim) ± 0.25 m`, `r(aim)` the stamp's own radius. `src/systems/world/casingRingAim.test.ts`
+  holds the band round the stamp's radius at width levels 0, 10 and 1e6 at 0 and 45 degrees and the
+  facings' rings to the byte; `src/systems/authority/casingAlongAim.test.ts` digs 10 m swept legs
+  straight down, at 45 degrees and 5/64 turn off down (both walls lined, run ≤ 1 sample, the 45
+  degree wall past 0.85 m lined), bills a 45 degree leg 10 m ± one ring swept and reported every
+  0.5 m or 1 m, and keeps the aims across a save. The lane `src/physics/casingAlongAim.lane.test.ts`
+  (Tester) digs the same three aims off planet 1's pad at purchases 1, 10 and 20 in the live loop:
+  no unlined run past one cell along either wall, and no aimed leg meets more of its lining than
+  the straight-down leg at its purchase (the dig-pace bar). The straight legs stay
+  `casingPerMetre.lane.test.ts`'s.
 - **Cut-follow at the starting drill** (ticket 430): `src/physics/cutFollowStartingRigs.test.ts`
   plays 8 s legs down, level and up in the live loop with `drill.sweptCut` on, at stored
   drill_power 1 and 2 (tip 0; purchases since ticket 552, 1.50 and 1.86 m/s, the old stored 1 and 20) and #400's two rigs, and holds a down cut to the drill's speed

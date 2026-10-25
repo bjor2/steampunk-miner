@@ -910,6 +910,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/builtFacilities.test.ts` | 6 | 6 |
 | `src/systems/authority/carryRelease.test.ts` | 22 | 13 |
 | `src/systems/authority/carveGeometryKnownRed.test.ts` | 5 | 5 |
+| `src/systems/authority/casingAlongAim.test.ts` | 11 | 6 |
 | `src/systems/authority/casingCadence.test.ts` | 7 | 3 |
 | `src/systems/authority/casingDrill.test.ts` | 5 | 5 |
 | `src/systems/authority/casingGates.test.ts` | 3 | 3 |
@@ -1368,6 +1369,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/physics/carveCompleteRide.test.ts` | 6 | 1 |
+| `src/physics/casingAlongAim.lane.test.ts` | 15 | 2 |
 | `src/physics/casingPerMetre.lane.test.ts` | 8 | 3 |
 | `src/physics/casingRedrill.test.ts` | 24 | 1 |
 | `src/physics/clientFlagFlip.test.ts` | 1 | 1 |
@@ -1869,7 +1871,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/boreWidthStamp.test.ts` | 4 | 4 |
 | `src/systems/vehicle/carryDebt.test.ts` | 8 | 8 |
 | `src/systems/vehicle/carryWalk.test.ts` | 52 | 22 |
-| `src/systems/vehicle/casingTrail.test.ts` | 27 | 19 |
+| `src/systems/vehicle/casingTrail.test.ts` | 29 | 21 |
 | `src/systems/vehicle/casingTrailCadence.lane.test.ts` | 8 | 2 |
 | `src/systems/vehicle/casingTrailReversal.test.ts` | 40 | 6 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
@@ -1881,7 +1883,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/cutStartBreakdown.test.ts` | 6 | 6 |
 | `src/systems/vehicle/downCutRamp.test.ts` | 12 | 12 |
 | `src/systems/vehicle/downCutRampFront.test.ts` | 5 | 5 |
-| `src/systems/vehicle/drillBore.test.ts` | 18 | 15 |
+| `src/systems/vehicle/drillBore.test.ts` | 21 | 18 |
 | `src/systems/vehicle/drillContact.test.ts` | 7 | 7 |
 | `src/systems/vehicle/drillGearCells.test.ts` | 12 | 12 |
 | `src/systems/vehicle/drillQuantum.test.ts` | 6 | 6 |
@@ -2008,6 +2010,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/world/casingBand.test.ts` | 2 | 2 |
 | `src/systems/world/casingBreach.test.ts` | 15 | 15 |
 | `src/systems/world/casingLining.test.ts` | 24 | 24 |
+| `src/systems/world/casingRingAim.test.ts` | 13 | 4 |
 | `src/systems/world/chunkCache.test.ts` | 8 | 6 |
 | `src/systems/world/chunkDelta.test.ts` | 9 | 9 |
 | `src/systems/world/chunkRepair.test.ts` | 4 | 4 |

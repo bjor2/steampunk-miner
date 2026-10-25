@@ -6,12 +6,15 @@
  * body's line, as a cut whose stamp runs beside it leaves one: read only to the ring's reach, that
  * wall's rock never counted, lined or not. The first 2 m and the last 3 m of a leg are left out:
  * the cut starts there, and its last rings wait for the ring lag; a turn's read keeps them
- * (`casingAroundTurn`). Test support only.
+ * (`casingAroundTurn`). A leg cut along an aim off the four facings is read out to the ring's
+ * reach along that aim (ticket 833). Test support only.
  */
 import { MM_PER_METRE } from '../constants/physics'
 import { readPlanetWorld } from '../store/gameStore'
+import { AIM, type Aim } from '../systems/vehicle/aim'
+import { drillStampRadiusMmAlong } from '../systems/vehicle/drillBore'
 import type { Vector2 } from '../systems/vehicle/localFrame'
-import { casingRingAround } from '../systems/world/casingLining'
+import { ringBandRoundCut } from '../systems/world/casingLining'
 import type { PlanetParams } from '../systems/world/planetParams'
 import {
   chunkOfSample,
@@ -43,9 +46,12 @@ const NEIGHBOURS: readonly (readonly [number, number])[] = [
   [0, 1],
 ]
 
-/** The leg's casing as the world stands now, `path` being the body's centre each tick, in metres. */
-export function casingAlongPath(path: readonly Vector2[]): LegCasing {
-  return casingNear(pathWithoutEnds(path))
+/**
+ * The leg's casing as the world stands now, `path` being the body's centre each tick, in metres,
+ * cut along `aim`.
+ */
+export function casingAlongPath(path: readonly Vector2[], aim: Aim = AIM.down): LegCasing {
+  return casingNear(pathWithoutEnds(path), aim)
 }
 
 /**
@@ -59,14 +65,14 @@ export function casingAroundTurn(
 ): LegCasing {
   const before = pathEndOf([...into].reverse(), reachM)
   const after = pathEndOf(outOf, reachM)
-  return casingNear({ points: [...before, ...after], lengthM: 2 * reachM })
+  return casingNear({ points: [...before, ...after], lengthM: 2 * reachM }, AIM.down)
 }
 
-function casingNear(kept: { points: readonly Vector2[]; lengthM: number }): LegCasing {
+function casingNear(kept: { points: readonly Vector2[]; lengthM: number }, aim: Aim): LegCasing {
   const { params, world } = readPlanetWorld()
   if (params === null) throw new Error('the leg was dug on no planet')
   const ground = { world, params }
-  const wall = [...samplesNear(kept.points)].filter((key) => isWallSample(ground, key))
+  const wall = [...samplesNear(kept.points, aim)].filter((key) => isWallSample(ground, key))
   const unlined = new Set(wall.filter((key) => !isLinedSample(ground, key)))
   return {
     lengthM: kept.lengthM,
@@ -105,9 +111,12 @@ function cumulativeLengthsOf(path: readonly Vector2[]): number[] {
   return lengths
 }
 
-/** Every sample within a sample past the ring's outer radius of a point of the path, as keys. */
-function samplesNear(points: readonly Vector2[]): Set<string> {
-  const ring = casingRingAround(0, 0)
+/**
+ * Every sample within a sample past the outer radius of the ring along `aim` of a point of the
+ * path, as keys.
+ */
+function samplesNear(points: readonly Vector2[], aim: Aim): Set<string> {
+  const ring = ringBandRoundCut(drillStampRadiusMmAlong(aim))
   const reachMm = ring.clearMm + ring.widthMm + MM_PER_SAMPLE
   const span = Math.ceil(reachMm / MM_PER_SAMPLE)
   const near = new Set<string>()
