@@ -12,9 +12,15 @@
  * K8 (#218): every size of the dynamite ladder then blows alone at the same site, its radius read
  * from `blastingCharges.sizes`, and its ticks to clear, p95 and max are printed under `sizes` (the
  * perf recorder keeps only the R24 fields, as before).
+ *
+ * D1 (ticket 860, the #840 rows): the largest size, 12, blows once at Blast Radius level 0 and once
+ * at level 1e6, whose ground disc meets planet 1's diameter (far past 64 chunks), its chunks
+ * generated first as the plant's prefetch would; `widened` prints both p95s and their ratio, which
+ * the TD's row holds within 1.10.
  */
 import { loadFeatures } from '../src/features'
 import { BLAST_TILES_PER_TICK } from '../src/constants/terrainBudget'
+import { groundRadiusMmOf } from '../src/systems/authority/charges/blastDisc'
 import { blastChunksOf } from '../src/systems/authority/charges/blastPrefetch'
 import {
   chargeRadiusMm,
@@ -121,6 +127,35 @@ function benchSizeAlone(size: number): number[] {
   return timeTicksUntilSettled(liveBlastSession([blast]), () => undefined)
 }
 
+const WIDEST_SIZE = 12
+const WIDE_LEVEL = 1_000_000
+
+/** The size-12 blast alone at `radiusLevel`, its ground chunks generated first; one run. */
+function benchWidenedBlast(radiusLevel: number): number[] {
+  const blast = blastAt(SOLID_SITE, chargeRadiusMm(WIDEST_SIZE), { size: WIDEST_SIZE, radiusLevel })
+  for (const { cx, cy } of blastChunksOf(SOLID_SITE, groundRadiusMmOf(blast, PARAMS))) {
+    generatedChunkOf(PARAMS, cx, cy)
+  }
+  return timeTicksUntilSettled(liveBlastSession([blast]), () => undefined)
+}
+
+function widenedReport() {
+  const base = benchWidenedBlast(0)
+  const wide = benchWidenedBlast(WIDE_LEVEL)
+  const baseP95 = percentile(base, 0.95)
+  const wideP95 = percentile(wide, 0.95)
+  return {
+    size: WIDEST_SIZE,
+    radiusLevel: WIDE_LEVEL,
+    baseTicks: base.length,
+    wideTicks: wide.length,
+    baseTickP95Ms: round(baseP95),
+    wideTickP95Ms: round(wideP95),
+    wideTickMaxMs: round(Math.max(...wide)),
+    p95Ratio: round(wideP95 / baseP95),
+  }
+}
+
 function sizeReportOf(size: number) {
   const times = repeated(() => benchSizeAlone(size))
   return {
@@ -178,6 +213,7 @@ const report = {
   sharedTickMaxMs: round(Math.max(...shared)),
   budget: BUDGET,
   sizes: chargeSizesUpTo(chargeSizeCount()).map(sizeReportOf),
+  widened: widenedReport(),
 }
 console.log(JSON.stringify(report))
 logBenchmarkSeriesWhenAsked('blast', [
