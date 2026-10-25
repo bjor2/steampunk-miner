@@ -21,6 +21,11 @@ const setUpgrade = (upgradeId: string, level: number) => ({
 const sourceOf = (track: string) =>
   vehicleLookSources().find((source) => source.id === rigLookSourceIdOf(track))!
 
+/** The engine's authored parts in step order: the tracks and wheels of #731, LK3 and LK8. */
+const ENGINE_PARTS = RIG_LOOK_TABLE.tracks
+  .find((rows) => rows.track === 'engine')!
+  .steps.map((step) => step.part)
+
 /** `state` with one player's stored level on a track set, as a replica would hold it. */
 function withLevel(state: AuthorityState, playerId: string, track: string, level: number) {
   const player = state.players[playerId]
@@ -112,7 +117,8 @@ describe('rig look on the vehicle', () => {
   it('steps up when a track is bought past its first step', () => {
     const session = createScriptedSession()
     session.submit(1, setUpgrade('engine', 5))
-    expect(sourceOf('engine').lookOf(session.state(), 'p1', 1)?.glows[0].slots).toEqual([
+    const slots = sourceOf('engine').lookOf(session.state(), 'p1', 1)?.glows[0].slots ?? []
+    expect(slots.slice(0, 6)).toEqual([
       'piston',
       'iron-track',
       'steel-track',
@@ -120,6 +126,8 @@ describe('rig look on the vehicle', () => {
       'flywheel-track',
       'exhaust-track',
     ])
+    // Every authored engine part is lit, so the tail paints the LK8 parts too (ticket 871).
+    expect(slots).toEqual(['piston', ...ENGINE_PARTS])
   })
 
   it("paints each player's rig from their own purchases", () => {

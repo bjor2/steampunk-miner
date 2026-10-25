@@ -67,6 +67,171 @@
         "tier-1": 0,
         "tier-3": 0
       }
+    },
+    "sprocket-track": {
+      "cells": 8685,
+      "outsideRigInWindow": {
+        "tier-1": 2026,
+        "tier-3": 1676
+      },
+      "outsideRigAndWindow": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "idler-track": {
+      "cells": 8698,
+      "outsideRigInWindow": {
+        "tier-1": 2038,
+        "tier-3": 1686
+      },
+      "outsideRigAndWindow": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "coupled-track": {
+      "cells": 9093,
+      "outsideRigInWindow": {
+        "tier-1": 2062,
+        "tier-3": 1686
+      },
+      "outsideRigAndWindow": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "guard-track": {
+      "cells": 9139,
+      "outsideRigInWindow": {
+        "tier-1": 2108,
+        "tier-3": 1732
+      },
+      "outsideRigAndWindow": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "governor-track": {
+      "cells": 9521,
+      "outsideRigInWindow": {
+        "tier-1": 2108,
+        "tier-3": 1732
+      },
+      "outsideRigAndWindow": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "cylinder-track": {
+      "cells": 9878,
+      "outsideRigInWindow": {
+        "tier-1": 2108,
+        "tier-3": 1732
+      },
+      "outsideRigAndWindow": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "piped-track": {
+      "cells": 10162,
+      "outsideRigInWindow": {
+        "tier-1": 2108,
+        "tier-3": 1732
+      },
+      "outsideRigAndWindow": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "locker-track": {
+      "cells": 11082,
+      "outsideRigInWindow": {
+        "tier-1": 2108,
+        "tier-3": 1732
+      },
+      "outsideRigAndWindow": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "lamped-track": {
+      "cells": 11257,
+      "outsideRigInWindow": {
+        "tier-1": 2109,
+        "tier-3": 1733
+      },
+      "outsideRigAndWindow": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "geared-track": {
+      "cells": 11699,
+      "outsideRigInWindow": {
+        "tier-1": 2109,
+        "tier-3": 1733
+      },
+      "outsideRigAndWindow": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "studded-track": {
+      "cells": 11699,
+      "outsideRigInWindow": {
+        "tier-1": 2109,
+        "tier-3": 1733
+      },
+      "outsideRigAndWindow": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "coiled-track": {
+      "cells": 11907,
+      "outsideRigInWindow": {
+        "tier-1": 2109,
+        "tier-3": 1733
+      },
+      "outsideRigAndWindow": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "aether-hub-track": {
+      "cells": 11907,
+      "outsideRigInWindow": {
+        "tier-1": 2109,
+        "tier-3": 1733
+      },
+      "outsideRigAndWindow": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "haloed-track": {
+      "cells": 12087,
+      "outsideRigInWindow": {
+        "tier-1": 2110,
+        "tier-3": 1733
+      },
+      "outsideRigAndWindow": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "aether-track": {
+      "cells": 12089,
+      "outsideRigInWindow": {
+        "tier-1": 2110,
+        "tier-3": 1733
+      },
+      "outsideRigAndWindow": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
     }
   }
 }

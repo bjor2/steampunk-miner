@@ -121,10 +121,54 @@ engine
 24: band 4 step 4 tail 0 pips 0 part flywheel-track finish null tint #9fd0ff | Fitting: Drive flywheel
 25: band 5 step 5 tail 0 pips 0 part exhaust-track finish null tint #ffb070 | Fitting: Twin exhaust stacks
 26: band 5 step 5 tail 0 pips 0 part exhaust-track finish null tint #ffb070 | Fitting: Twin exhaust stacks
-30: band 6 step 5 tail 1 pips 0 part exhaust-track finish bright-brass tint #d8b45a | Fitting: Bright brass · L30
-99: band 19 step 5 tail 14 pips 1 part exhaust-track finish nickel-plate tint #c8ccd0 | Fitting: Nickel plate · L99
-9999: band 1999 step 5 tail 1994 pips 208 part exhaust-track finish nickel-plate tint #c8ccd0 | Fitting: Nickel plate · L9,999
-1000000: band 200000 step 5 tail 199995 pips 20833 part exhaust-track finish gunmetal tint #4c5258 | Fitting: Gunmetal · L1,000,000
+29: band 5 step 5 tail 0 pips 0 part exhaust-track finish null tint #ffb070 | Fitting: Twin exhaust stacks
+30: band 6 step 6 tail 0 pips 0 part sprocket-track finish null tint #e0b060 | Fitting: Drive sprocket
+31: band 6 step 6 tail 0 pips 0 part sprocket-track finish null tint #e0b060 | Fitting: Drive sprocket
+34: band 6 step 6 tail 0 pips 0 part sprocket-track finish null tint #e0b060 | Fitting: Drive sprocket
+35: band 7 step 7 tail 0 pips 0 part idler-track finish null tint #b8c0c8 | Fitting: Idler wheels
+36: band 7 step 7 tail 0 pips 0 part idler-track finish null tint #b8c0c8 | Fitting: Idler wheels
+39: band 7 step 7 tail 0 pips 0 part idler-track finish null tint #b8c0c8 | Fitting: Idler wheels
+40: band 8 step 8 tail 0 pips 0 part coupled-track finish null tint #c9ced4 | Fitting: Coupling rods
+41: band 8 step 8 tail 0 pips 0 part coupled-track finish null tint #c9ced4 | Fitting: Coupling rods
+44: band 8 step 8 tail 0 pips 0 part coupled-track finish null tint #c9ced4 | Fitting: Coupling rods
+45: band 9 step 9 tail 0 pips 0 part guard-track finish null tint #d8dde2 | Fitting: Belt guards
+46: band 9 step 9 tail 0 pips 0 part guard-track finish null tint #d8dde2 | Fitting: Belt guards
+49: band 9 step 9 tail 0 pips 0 part guard-track finish null tint #d8dde2 | Fitting: Belt guards
+50: band 10 step 10 tail 0 pips 0 part governor-track finish null tint #f0c040 | Fitting: Spinning governor
+51: band 10 step 10 tail 0 pips 0 part governor-track finish null tint #f0c040 | Fitting: Spinning governor
+54: band 10 step 10 tail 0 pips 0 part governor-track finish null tint #f0c040 | Fitting: Spinning governor
+55: band 11 step 11 tail 0 pips 0 part cylinder-track finish null tint #e8b870 | Fitting: Twin cylinders
+56: band 11 step 11 tail 0 pips 0 part cylinder-track finish null tint #e8b870 | Fitting: Twin cylinders
+59: band 11 step 11 tail 0 pips 0 part cylinder-track finish null tint #e8b870 | Fitting: Twin cylinders
+60: band 12 step 12 tail 0 pips 0 part piped-track finish null tint #d08a50 | Fitting: Steam lines
+61: band 12 step 12 tail 0 pips 0 part piped-track finish null tint #d08a50 | Fitting: Steam lines
+64: band 12 step 12 tail 0 pips 0 part piped-track finish null tint #d08a50 | Fitting: Steam lines
+65: band 13 step 13 tail 0 pips 0 part locker-track finish null tint #6a7078 | Fitting: Side lockers
+66: band 13 step 13 tail 0 pips 0 part locker-track finish null tint #6a7078 | Fitting: Side lockers
+69: band 13 step 13 tail 0 pips 0 part locker-track finish null tint #6a7078 | Fitting: Side lockers
+70: band 14 step 14 tail 0 pips 0 part lamped-track finish null tint #ffcf70 | Fitting: Running lamps
+71: band 14 step 14 tail 0 pips 0 part lamped-track finish null tint #ffcf70 | Fitting: Running lamps
+74: band 14 step 14 tail 0 pips 0 part lamped-track finish null tint #ffcf70 | Fitting: Running lamps
+75: band 15 step 15 tail 0 pips 0 part geared-track finish null tint #e6c05a | Fitting: Bull gear
+76: band 15 step 15 tail 0 pips 0 part geared-track finish null tint #e6c05a | Fitting: Bull gear
+79: band 15 step 15 tail 0 pips 0 part geared-track finish null tint #e6c05a | Fitting: Bull gear
+80: band 16 step 16 tail 0 pips 0 part studded-track finish null tint #dfe4e8 | Fitting: Belt studs
+81: band 16 step 16 tail 0 pips 0 part studded-track finish null tint #dfe4e8 | Fitting: Belt studs
+84: band 16 step 16 tail 0 pips 0 part studded-track finish null tint #dfe4e8 | Fitting: Belt studs
+85: band 17 step 17 tail 0 pips 0 part coiled-track finish null tint #c87a48 | Fitting: Induction coils
+86: band 17 step 17 tail 0 pips 0 part coiled-track finish null tint #c87a48 | Fitting: Induction coils
+89: band 17 step 17 tail 0 pips 0 part coiled-track finish null tint #c87a48 | Fitting: Induction coils
+90: band 18 step 18 tail 0 pips 0 part aether-hub-track finish null tint #7fe8d8 | Fitting: Aether hubs
+91: band 18 step 18 tail 0 pips 0 part aether-hub-track finish null tint #7fe8d8 | Fitting: Aether hubs
+94: band 18 step 18 tail 0 pips 0 part aether-hub-track finish null tint #7fe8d8 | Fitting: Aether hubs
+95: band 19 step 19 tail 0 pips 0 part haloed-track finish null tint #5fd8ff | Fitting: Wheel halos
+96: band 19 step 19 tail 0 pips 0 part haloed-track finish null tint #5fd8ff | Fitting: Wheel halos
+99: band 19 step 19 tail 0 pips 0 part haloed-track finish null tint #5fd8ff | Fitting: Wheel halos
+100: band 20 step 20 tail 0 pips 0 part aether-track finish null tint #9ff0ff | Fitting: Aether drive
+101: band 20 step 20 tail 0 pips 0 part aether-track finish null tint #9ff0ff | Fitting: Aether drive
+105: band 21 step 20 tail 1 pips 2 part aether-track finish bright-brass tint #d8b45a | Fitting: Bright brass · L105
+9999: band 1999 step 20 tail 1979 pips 208 part aether-track finish case-hardened tint #8a7ab8 | Fitting: Case-hardened · L9,999
+1000000: band 200000 step 20 tail 199980 pips 20833 part aether-track finish rose-bronze tint #c98a7a | Fitting: Rose bronze · L1,000,000
 
 boiler
 0: band 0 step 0 tail 0 pips 0 part null finish null tint null | null

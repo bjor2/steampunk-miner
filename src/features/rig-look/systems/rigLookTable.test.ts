@@ -90,7 +90,8 @@ describe('rig look table', () => {
     expect(fromsOf('drill_tip')).toEqual(bandOf('drill_tip').edges)
     expect(fromsOf('drill_tip')).toHaveLength(20)
     expect(fromsOf('cargo_hold')).toEqual([11, 22, 33, 44, 55])
-    expect(fromsOf('engine')).toEqual([5, 10, 15, 20, 25])
+    expect(fromsOf('engine')).toEqual(bandOf('engine').edges)
+    expect(fromsOf('engine')).toHaveLength(20)
     expect(fromsOf('boiler')).toEqual([5, 10, 15, 20, 25, 30])
     expect(fromsOf('hull')).toEqual(bandOf('hull').edges)
     expect(fromsOf('hull')).toHaveLength(19)
@@ -156,6 +157,21 @@ describe('rig look table', () => {
       'Guild turbine',
       'Drive flywheel',
       'Twin exhaust stacks',
+      'Drive sprocket',
+      'Idler wheels',
+      'Coupling rods',
+      'Belt guards',
+      'Spinning governor',
+      'Twin cylinders',
+      'Steam lines',
+      'Side lockers',
+      'Running lamps',
+      'Bull gear',
+      'Belt studs',
+      'Induction coils',
+      'Aether hubs',
+      'Wheel halos',
+      'Aether drive',
     ])
     expect(cardsOf('cargo_hold')).toEqual([
       'Plank crate',
@@ -390,12 +406,27 @@ describe('rig look table', () => {
         'vortex-crown',
       ],
       'vehicle-look-drive': [
+        'aether-hub-track',
+        'aether-track',
         'bare-hub',
+        'coiled-track',
+        'coupled-track',
+        'cylinder-track',
         'exhaust-track',
         'flywheel-track',
+        'geared-track',
+        'governor-track',
+        'guard-track',
         'guild-track',
+        'haloed-track',
+        'idler-track',
         'iron-track',
+        'lamped-track',
+        'locker-track',
+        'piped-track',
+        'sprocket-track',
         'steel-track',
+        'studded-track',
       ],
       'vehicle-look-hull': [
         'banded-iron',

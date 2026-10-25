@@ -28,9 +28,11 @@ const ASSET_ID = 'vehicle-look-drive'
 const ENGINE = trackLookFramesOf(SHIPPED_RIG_LOOKS, 'engine')!
 
 /**
- * The first band edges of 5 (ticket 809), Progression's names (6300549964), #731's tracks and
- * wheels, which replaced #586's drive units (GD ruling on #726), then the LK3 parts of ticket 811
- * fitted on the guild track in the ticket's order: a flywheel, then twin exhaust stacks.
+ * The band edges of 5 (ticket 809) to about P40: Progression's names (6300549964), #731's tracks
+ * and wheels, which replaced #586's drive units (GD ruling on #726), the LK3 parts of ticket 811
+ * fitted on the guild track in the ticket's order (a flywheel, then twin exhaust stacks), then the
+ * LK8 parts of ticket 871 fitted on the exhaust track: engine fittings, heavier running gear, the
+ * aetheric glows.
  */
 const STEPS = [
   { from: 5, card: 'Single piston', part: 'iron-track' },
@@ -38,9 +40,26 @@ const STEPS = [
   { from: 15, card: 'Guild turbine', part: 'guild-track' },
   { from: 20, card: 'Drive flywheel', part: 'flywheel-track' },
   { from: 25, card: 'Twin exhaust stacks', part: 'exhaust-track' },
+  { from: 30, card: 'Drive sprocket', part: 'sprocket-track' },
+  { from: 35, card: 'Idler wheels', part: 'idler-track' },
+  { from: 40, card: 'Coupling rods', part: 'coupled-track' },
+  { from: 45, card: 'Belt guards', part: 'guard-track' },
+  { from: 50, card: 'Spinning governor', part: 'governor-track' },
+  { from: 55, card: 'Twin cylinders', part: 'cylinder-track' },
+  { from: 60, card: 'Steam lines', part: 'piped-track' },
+  { from: 65, card: 'Side lockers', part: 'locker-track' },
+  { from: 70, card: 'Running lamps', part: 'lamped-track' },
+  { from: 75, card: 'Bull gear', part: 'geared-track' },
+  { from: 80, card: 'Belt studs', part: 'studded-track' },
+  { from: 85, card: 'Induction coils', part: 'coiled-track' },
+  { from: 90, card: 'Aether hubs', part: 'aether-hub-track' },
+  { from: 95, card: 'Wheel halos', part: 'haloed-track' },
+  { from: 100, card: 'Aether drive', part: 'aether-track' },
 ]
-const TOP = 25
-const TOP_PART = 'exhaust-track'
+/** The Systems sizing row on #871: at least 13 steps, so the median bot sees one every 3 planets. */
+const LEAST_STEPS_TO_P40 = 13
+const TOP = 100
+const TOP_PART = 'aether-track'
 const BAND = 5
 const VISUAL_TIERS = [1, 2, 3]
 
@@ -59,12 +78,28 @@ const shownOf = (frame: RigLookFrame): string =>
 const bodyPartIdsAt = (tier: number, looks: ReturnType<typeof partSwapsOf>): string[] =>
   vehicleBodyQuadsOf(SHIPPED_ART, tier, [], looks).map((quad) => quad.partId)
 
-describe('engine look (tickets 587 and 811)', () => {
-  it('reads its five steps from the table, one on each of the first band edges', () => {
+describe('engine look (tickets 587, 811 and 871)', () => {
+  it('reads its twenty steps from the table, one on every band edge to about P40', () => {
     expect(ENGINE.rows.steps.map(({ from, card, part }) => ({ from, card, part }))).toEqual(STEPS)
     expect(ENGINE.rows.steps.every((step) => step.asset === ASSET_ID)).toBe(true)
-    expect(STEPS.length).toBeGreaterThanOrEqual(5)
+    expect(STEPS.length).toBeGreaterThanOrEqual(LEAST_STEPS_TO_P40)
+    expect(STEPS.map((step) => step.from)).toEqual(ENGINE.rows.band.edges)
     STEPS.forEach((step, at) => expect(step.from).toBe((at + 1) * BAND))
+  })
+
+  it('keeps the five steps of #731 and LK3 as the first steps, the LK8 parts after them', () => {
+    expect(STEPS.slice(0, 5).map((step) => step.part)).toEqual([
+      'iron-track',
+      'steel-track',
+      'guild-track',
+      'flywheel-track',
+      'exhaust-track',
+    ])
+    expect(STEPS.slice(5).every((step) => step.from >= 30)).toBe(true)
+  })
+
+  it('names every band with a card of three words or fewer', () => {
+    for (const step of STEPS) expect(step.card.split(' ').length).toBeLessThanOrEqual(3)
   })
 
   it('swaps no part below 5 purchases, so the rig keeps its own rollers and hub cap', () => {
@@ -106,7 +141,7 @@ describe('engine look (tickets 587 and 811)', () => {
     },
   )
 
-  it('keeps the exhaust track past the art and shows a new finish every band', () => {
+  it('keeps the aether track past the art and shows a new finish every band', () => {
     for (let n = TOP; n < TOP + 200 * BAND; n += BAND) {
       expect(engineAt(n + BAND).partId).toBe(TOP_PART)
       expect(shownOf(engineAt(n + BAND))).not.toBe(shownOf(engineAt(n)))
@@ -154,17 +189,14 @@ describe('drive look (ticket 726)', () => {
     [1, '[null,null,null,[0],null,null]'],
     [6, '["iron-track","vehicle-look-drive","#d9a066",[0.3],null,"Fitting: Single piston"]'],
     [7, '["iron-track","vehicle-look-drive","#d9a066",[0.3],null,"Fitting: Single piston"]'],
-    [
-      101,
-      '["exhaust-track","vehicle-look-drive","#4c5258",[0.74],"gunmetal","Fitting: Gunmetal · L101"]',
-    ],
+    [101, '["aether-track","vehicle-look-drive","#9ff0ff",[0.74],null,"Fitting: Aether drive"]'],
     [
       9_999,
-      '["exhaust-track","vehicle-look-drive","#c8ccd0",[0.74],"nickel-plate","Fitting: Nickel plate · L9,999"]',
+      '["aether-track","vehicle-look-drive","#8a7ab8",[0.74],"case-hardened","Fitting: Case-hardened · L9,999"]',
     ],
     [
       1_000_000,
-      '["exhaust-track","vehicle-look-drive","#4c5258",[0.74],"gunmetal","Fitting: Gunmetal · L1,000,000"]',
+      '["aether-track","vehicle-look-drive","#c98a7a",[0.74],"rose-bronze","Fitting: Rose bronze · L1,000,000"]',
     ],
   ]
   /** Planet 1 runs at pace 1, planet 8 at 1.7 (`planets.paceScale`). */
@@ -213,7 +245,7 @@ describe('drive look (ticket 726)', () => {
   it.each([
     ['a bare rig', {}],
     ['a rig on the iron track', { engine: 7 }],
-    ['a rig on the exhaust track tail', { engine: 40, drill_power: 17, drill_tip: 200 }],
+    ['a rig on the aether track tail', { engine: 120, drill_power: 17, drill_tip: 200 }],
   ])(
     'leaves the drive look byte-identical when %s buys drill power or a drill tip',
     (_name, levels) => {
@@ -232,7 +264,9 @@ describe('drive look (ticket 726)', () => {
     ['onto the steel track', 9],
     ['onto the flywheel track', 19],
     ['onto the exhaust track', 24],
-    ['onto its first finish', 29],
+    ['onto the sprocket track', 29],
+    ['onto the aether track', 99],
+    ['onto its first finish', 104],
   ])('changes the drive look when an engine buy steps it %s', (_name, engine) => {
     const session = dockedSessionWith({ engine })
     const before = driveLookBytesOf(session.state())
@@ -265,6 +299,6 @@ describe('drive look (ticket 726)', () => {
       expect(rigLookPlaqueFactOf('engine', step.from)).toBe(`Fitting: ${step.card}`)
       expect(rigLookPlaqueFactOf('engine', step.from - 1) ?? '').not.toContain(step.card)
     }
-    expect(rigLookPlaqueFactOf('engine', TOP + BAND)).toBe('Fitting: Bright brass · L30')
+    expect(rigLookPlaqueFactOf('engine', TOP + BAND)).toBe('Fitting: Bright brass · L105')
   })
 })

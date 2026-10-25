@@ -1,6 +1,7 @@
 /**
  * The engine's rig looks in the browser (ticket 587; tracks and wheels since ticket 726; the LK3
- * flywheel and twin exhaust stacks of ticket 811): from 5 purchases each step of `rigLook.json`
+ * flywheel and twin exhaust stacks of ticket 811; the fifteen LK8 parts of ticket 871 to about
+ * P40): from 5 purchases each step of `rigLook.json`
  * lays its tracks and wheels of `vehicle-look-drive` on `chassis.drive`, the middle roller's hub,
  * over the chassis and hiding no rig part; the tail keeps
  * the top part, a drill purchase never moves it (GD ruling on #726: since #723 the engine is the
@@ -22,7 +23,7 @@ declare global {
 }
 
 const ASSET_ID = 'vehicle-look-drive'
-/** The bare rig, the five steps on the band edges of 5 (ticket 809), then two finish bands. */
+/** The bare rig, the twenty steps on the band edges of 5 (ticket 809) to 100, then two finish bands. */
 const LOOKS = [
   { purchases: 4, part: null, fitting: null },
   { purchases: 5, part: 'iron-track', fitting: 'Fitting: Single piston' },
@@ -30,16 +31,31 @@ const LOOKS = [
   { purchases: 15, part: 'guild-track', fitting: 'Fitting: Guild turbine' },
   { purchases: 20, part: 'flywheel-track', fitting: 'Fitting: Drive flywheel' },
   { purchases: 25, part: 'exhaust-track', fitting: 'Fitting: Twin exhaust stacks' },
-  { purchases: 30, part: 'exhaust-track', fitting: 'Fitting: Bright brass · L30' },
-  { purchases: 35, part: 'exhaust-track', fitting: 'Fitting: Blued steel · L35' },
+  { purchases: 30, part: 'sprocket-track', fitting: 'Fitting: Drive sprocket' },
+  { purchases: 35, part: 'idler-track', fitting: 'Fitting: Idler wheels' },
+  { purchases: 40, part: 'coupled-track', fitting: 'Fitting: Coupling rods' },
+  { purchases: 45, part: 'guard-track', fitting: 'Fitting: Belt guards' },
+  { purchases: 50, part: 'governor-track', fitting: 'Fitting: Spinning governor' },
+  { purchases: 55, part: 'cylinder-track', fitting: 'Fitting: Twin cylinders' },
+  { purchases: 60, part: 'piped-track', fitting: 'Fitting: Steam lines' },
+  { purchases: 65, part: 'locker-track', fitting: 'Fitting: Side lockers' },
+  { purchases: 70, part: 'lamped-track', fitting: 'Fitting: Running lamps' },
+  { purchases: 75, part: 'geared-track', fitting: 'Fitting: Bull gear' },
+  { purchases: 80, part: 'studded-track', fitting: 'Fitting: Belt studs' },
+  { purchases: 85, part: 'coiled-track', fitting: 'Fitting: Induction coils' },
+  { purchases: 90, part: 'aether-hub-track', fitting: 'Fitting: Aether hubs' },
+  { purchases: 95, part: 'haloed-track', fitting: 'Fitting: Wheel halos' },
+  { purchases: 100, part: 'aether-track', fitting: 'Fitting: Aether drive' },
+  { purchases: 105, part: 'aether-track', fitting: 'Fitting: Bright brass · L105' },
+  { purchases: 110, part: 'aether-track', fitting: 'Fitting: Blued steel · L110' },
 ]
 /** The top authored part, which every finish band past the art keeps. */
-const TOP_PART = 'exhaust-track'
+const TOP_PART = 'aether-track'
 /**
  * Levels the card must fit at 360 px past the art, kept to the range the cargo hold's spec owns
  * (ticket 581); the unit spec measures the widest text (rigLookPlaque.test.ts).
  */
-const TAIL_LEVELS = [30, 101, 200]
+const TAIL_LEVELS = [105, 150, 200]
 const CARD = `[data-testid="${UI_ID_TEMPLATES.workshopUpgradeBuy('engine')}"]`
 const FITTING = `${CARD} [data-sheet-card-line]`
 const VIEWPORTS = [
@@ -154,7 +170,7 @@ test.describe('engine look (ticket 587)', () => {
     await setUpgrade(page, 'engine', 4)
     await expectLook(page, null, bare)
     const lowest = await physicsCounts(page)
-    await setUpgrade(page, 'engine', 35)
+    await setUpgrade(page, 'engine', 110)
     await expectLook(page, TOP_PART, bare)
     await expect.poll(() => physicsCounts(page)).toEqual(lowest)
     expect(errors).toEqual([])

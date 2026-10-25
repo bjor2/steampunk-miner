@@ -46,12 +46,27 @@
       "vortex-crown"
     ],
     "vehicle-look-drive": [
+      "aether-hub-track",
+      "aether-track",
       "bare-hub",
+      "coiled-track",
+      "coupled-track",
+      "cylinder-track",
       "exhaust-track",
       "flywheel-track",
+      "geared-track",
+      "governor-track",
+      "guard-track",
       "guild-track",
+      "haloed-track",
+      "idler-track",
       "iron-track",
-      "steel-track"
+      "lamped-track",
+      "locker-track",
+      "piped-track",
+      "sprocket-track",
+      "steel-track",
+      "studded-track"
     ],
     "vehicle-look-hull": [
       "banded-iron",
@@ -267,7 +282,7 @@
       "replaces": "drill-bit",
       "plaque": {
         "step": "Fitting: {bandName}",
-        "tail": "Fitting: {bandName} \u00b7 L{level}"
+        "tail": "Fitting: {bandName} · L{level}"
       },
       "glowSlots": [
         [
@@ -473,10 +488,32 @@
       "slot": "chassis.drive",
       "plaque": {
         "step": "Fitting: {bandName}",
-        "tail": "Fitting: {bandName} \u00b7 L{level}"
+        "tail": "Fitting: {bandName} · L{level}"
       },
       "glowSlots": [
-        ["piston", "iron-track", "steel-track", "guild-track", "flywheel-track", "exhaust-track"]
+        [
+          "piston",
+          "iron-track",
+          "steel-track",
+          "guild-track",
+          "flywheel-track",
+          "exhaust-track",
+          "sprocket-track",
+          "idler-track",
+          "coupled-track",
+          "guard-track",
+          "governor-track",
+          "cylinder-track",
+          "piped-track",
+          "locker-track",
+          "lamped-track",
+          "geared-track",
+          "studded-track",
+          "coiled-track",
+          "aether-hub-track",
+          "haloed-track",
+          "aether-track"
+        ]
       ],
       "glowCap": "rigBody",
       "steps": [
@@ -519,6 +556,126 @@
           "card": "Twin exhaust stacks",
           "colour": "#ffb070",
           "glows": [0.74]
+        },
+        {
+          "from": 30,
+          "part": "sprocket-track",
+          "asset": "vehicle-look-drive",
+          "card": "Drive sprocket",
+          "colour": "#e0b060",
+          "glows": [0.74]
+        },
+        {
+          "from": 35,
+          "part": "idler-track",
+          "asset": "vehicle-look-drive",
+          "card": "Idler wheels",
+          "colour": "#b8c0c8",
+          "glows": [0.74]
+        },
+        {
+          "from": 40,
+          "part": "coupled-track",
+          "asset": "vehicle-look-drive",
+          "card": "Coupling rods",
+          "colour": "#c9ced4",
+          "glows": [0.74]
+        },
+        {
+          "from": 45,
+          "part": "guard-track",
+          "asset": "vehicle-look-drive",
+          "card": "Belt guards",
+          "colour": "#d8dde2",
+          "glows": [0.74]
+        },
+        {
+          "from": 50,
+          "part": "governor-track",
+          "asset": "vehicle-look-drive",
+          "card": "Spinning governor",
+          "colour": "#f0c040",
+          "glows": [0.74]
+        },
+        {
+          "from": 55,
+          "part": "cylinder-track",
+          "asset": "vehicle-look-drive",
+          "card": "Twin cylinders",
+          "colour": "#e8b870",
+          "glows": [0.74]
+        },
+        {
+          "from": 60,
+          "part": "piped-track",
+          "asset": "vehicle-look-drive",
+          "card": "Steam lines",
+          "colour": "#d08a50",
+          "glows": [0.74]
+        },
+        {
+          "from": 65,
+          "part": "locker-track",
+          "asset": "vehicle-look-drive",
+          "card": "Side lockers",
+          "colour": "#6a7078",
+          "glows": [0.74]
+        },
+        {
+          "from": 70,
+          "part": "lamped-track",
+          "asset": "vehicle-look-drive",
+          "card": "Running lamps",
+          "colour": "#ffcf70",
+          "glows": [0.74]
+        },
+        {
+          "from": 75,
+          "part": "geared-track",
+          "asset": "vehicle-look-drive",
+          "card": "Bull gear",
+          "colour": "#e6c05a",
+          "glows": [0.74]
+        },
+        {
+          "from": 80,
+          "part": "studded-track",
+          "asset": "vehicle-look-drive",
+          "card": "Belt studs",
+          "colour": "#dfe4e8",
+          "glows": [0.74]
+        },
+        {
+          "from": 85,
+          "part": "coiled-track",
+          "asset": "vehicle-look-drive",
+          "card": "Induction coils",
+          "colour": "#c87a48",
+          "glows": [0.74]
+        },
+        {
+          "from": 90,
+          "part": "aether-hub-track",
+          "asset": "vehicle-look-drive",
+          "card": "Aether hubs",
+          "colour": "#7fe8d8",
+          "glows": [0.74]
+        },
+        {
+          "from": 95,
+          "part": "haloed-track",
+          "asset": "vehicle-look-drive",
+          "card": "Wheel halos",
+          "colour": "#5fd8ff",
+          "glows": [0.74]
+        },
+        {
+          "from": 100,
+          "part": "aether-track",
+          "asset": "vehicle-look-drive",
+          "card": "Aether drive",
+          "colour": "#9ff0ff",
+          "glows": [0.74]
         }
       ],
       "band": {
@@ -546,7 +703,7 @@
       "replaces": "boiler",
       "plaque": {
         "step": "Fitting: {bandName}",
-        "tail": "Fitting: {bandName} \u00b7 L{level}"
+        "tail": "Fitting: {bandName} · L{level}"
       },
       "glowSlots": [
         [
@@ -635,7 +792,7 @@
       "replaces": "hopper",
       "plaque": {
         "step": "Fitting: {bandName}",
-        "tail": "Fitting: {bandName} \u00b7 L{level}"
+        "tail": "Fitting: {bandName} · L{level}"
       },
       "glowSlots": [
         ["hopper", "plank-crate", "ore-hopper", "riveted-bin", "racked-bin", "pannier-bin"]
@@ -699,7 +856,7 @@
       "slot": "hull.plates",
       "plaque": {
         "step": "Fitting: {bandName}",
-        "tail": "Fitting: {bandName} \u00b7 L{level}"
+        "tail": "Fitting: {bandName} · L{level}"
       },
       "glowSlots": [
         [
