@@ -230,6 +230,90 @@ Against #812's acceptance, with the numbers the scripts wrote after `author_carg
 - **Checked by eye** on `tier-1.png` and the hold crops: the rack reads as a rack bolted under the
   hold, the panniers as bags hung in it, not as a wagon.
 
+## Checks (25 Oct 2026, LK9)
+
+Against #872's acceptance, with the numbers the scripts wrote after
+`author_cargo_hold_p40_steps.py`:
+
+- **Step count and edges** (`cargoHoldLooks.json`, `rigLook.json`): twenty-one authored steps on
+  every LK1 edge of 11 from 11 to 231, about P40 on the median path; more than the 13 Systems'
+  sizing row asks for, so the median bot never goes more than 3 planets without a band step
+  through P40 by construction. The five steps of #580 and LK4 stay the first steps; the sixteen
+  LK9 parts follow, each an added part in a socket, none a recolour. The band rule, the edges and
+  the finish cycle are LK1's as they were, so the economy and the thresholds do not move; above
+  231 the finish tail keeps the aether hold. The PK7 trace (#826) is not on main yet, so the
+  thresholds are LK1's frozen edges, and the cadence lane (`rigLookPlanets.lane.test.ts`) is
+  where the 3-planet rule is measured.
+- **Inside the rig outline, drill tip and collider unchanged** (`outline.json`): on a 4 mm grid
+  every LK9 look has **0** silhouette cells outside the rig at tier 1 and at tier 3 (1,687 to
+  1,755 cells each, all over the hatch or the pod's flank; the base look still changes the rig's
+  outline by 0). The parts live on `hull.cargo` only, so the drawn drill tip is untouched (#789),
+  and the collider is the code constant (`COLLIDER_M`, 0.9 m) no art feeds; `vehicle.blend` is
+  untouched. A first cut had one cell out from the lock bar on: 10-facet rings clamped the whole
+  part's bevel and squared the lid's right corner off, so every ring now has 16 facets.
+- **Readable at 360 px and 1280+** (`tier-<n>.phone.png`, `tier-<n>.ingame.png`,
+  `readability.json`): the pixels of the look box each step changes against the step before it, a
+  channel moving more than 24 of 255, untinted renders. At the closest zoom (8 m, 45 px/m on a
+  360 px phone, where `rigLookSweep.spec.ts` judges one visible step as 16 pixels), and at the
+  default 12 m zoom (30 px/m), tier 1 / tier 3:
+
+  | Step (from)          | Closest zoom, tier 1 | Tier 3 | Default zoom, tier 1 | Tier 3 |
+  | -------------------- | -------------------: | -----: | -------------------: | -----: |
+  | Cargo nets (66)      |                   21 |     21 |                    8 |      8 |
+  | Oiled tarp (77)      |                    9 |      8 |                    0 |      0 |
+  | Lock bar (88)        |                    9 |      9 |                    8 |      7 |
+  | Brass bumper (99)    |                   11 |     11 |                    3 |      3 |
+  | Cargo lantern (110)  |                    2 |      2 |                    1 |      1 |
+  | Lid clamps (121)     |                    0 |      0 |                    0 |      0 |
+  | Lock plate (132)     |                    4 |      4 |                    1 |      1 |
+  | Load gauge (143)     |                    2 |      2 |                    1 |      1 |
+  | Lid handrail (154)   |                    7 |      7 |                    5 |      5 |
+  | Pannier plates (165) |                   16 |     14 |                    4 |      4 |
+  | Copper lines (176)   |                    4 |      4 |                    0 |      0 |
+  | Hoist tackle (187)   |                    0 |      0 |                    0 |      0 |
+  | Aether seals (198)   |                    1 |      2 |                    0 |      0 |
+  | Stasis field (209)   |                   10 |     10 |                    1 |      1 |
+  | Aether halos (220)   |                   14 |     14 |                    5 |      6 |
+  | Aether hold (231)    |                    7 |      5 |                    0 |      0 |
+
+  The nets and the pannier plates clear the line by geometry alone, against the first five steps'
+  24 to 32; the tarp, the lock bar, the bumper, the handrail, the stasis field, the halos and the
+  aether hold sit at 5 to 14. The hold is the smallest socket on the rig: its look box is 10 by 11
+  phone pixels at 45 px/m, and the bin's face, where the lantern, clamps, lock plate, gauge, copper
+  lines, hoist and seals are fitted, is 170 by 72 mm, so those parts (8 to 36 mm pieces, under a
+  pixel each at 45 px/m) move 0 to 4 phone pixels; the lantern's 26 mm lens and body sit over the
+  tan panniers and the olive tarp at a close luminance, so it moves 2. In the game every band also
+  wears its own tint and glow from `rigLook.json` on the whole look, which the sweep's crop diff
+  sees and these renders leave out; whether that carries the small steps on a phone is the Tester's
+  sweep and G&V's call (**finding for G&V**, as LK6 to LK8 found for their rivets, face parts and
+  studs). Should it not, the hold's own socket has no room for larger fittings (see "Known limits"),
+  and the recourse is the band tints and glows in `rigLook.json`, data. At 90 px/m
+  (`tier-<n>.ingame.png`, a 1280 px desktop) and on `tier-1.png` every step reads on the rig: the
+  nets as dark lattices over the panniers, the tarp as an olive hood, the lock bar as a bright bar
+  with its padlock, the bumper as a brass tube along the racks' foot, the lantern as an amber dot
+  at the right end, the clamps and lock plate as dark fittings on the bin's face, the gauge as a
+  second dial beside the sight glass, the handrail along the lid, the plates as bright belly
+  plates, the copper line along the deck, the hoist as a block under the deck, then the teal
+  seals, strips, halos and bands.
+
+- **Glow under the `rigBody` cap** (`glow.png`, `readability.json`): the lantern's lens and the
+  aether parts glow at 0.3 (LK8's value), under the sight glass's 0.4. By emission alone the
+  drill nose stays the brightest part: 246 to 247 against the look box's 173 to 183 (the halos
+  183, the aether hold 182; the pannier bin alone was 178), and the rest of the rig's 253 is the
+  headlamp lens, as before. Lit, the look box's brightest pixel is 164 to 201 at tier 1 under the
+  pannier bin's 195 at most by 6 (the halos and the aether hold at 201, the lit nose 203) and 165
+  to 203 at tier 3 against the nose's 255. The step glows in `rigLook.json` are 0.74 on every LK9
+  step, the brightest LK4 left under the `rigBody` cap of 1 with the glint's 0.25
+  (`rigLookTableChecks` refuses more).
+- **Band names:** sixteen data strings of 2 words in `rigLook.json` (`card`) and
+  `cargoHoldLooks.json`; the table checks refuse longer ones. Progression and G&V may rename them
+  in those two files.
+- **Look-only:** no kernel, state, save or digest change; `cargoHoldLooks.test.ts` pins the state
+  digest byte-identical at the lowest and the highest look, and `rigLookLines.test.ts` plays a
+  dock run buying across every edge with the slice registered and looked at, or not, to the same
+  digest. The byte-identical NDJSON replay with looks on and off on the running game is the
+  Tester's (`rigLookPlanets.lane.test.ts`, `rigLookCargoHold.spec.ts`).
+
 ## Known limits
 
 - The hold is a small part of the rig: at a 360 px phone it is six pixels across and three tall,

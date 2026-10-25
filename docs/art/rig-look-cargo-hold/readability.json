@@ -1,5 +1,5 @@
 {
-  "about": "Tickets 580 and 812: at a 360 px wide phone (30 px/m over the 12 m zoom, and 45 px/m over the closest 8 m zoom the sweep spec judges at), the pixels of the hold's look box (lookBoxM [0.125, 0.0, 0.345, 0.21]: the hatch, the flank under it and the stay) that change between each look on hull.cargo and the next (a channel moving more than 24 of 255), and the brightest pixel (Rec. 709 luminance, 0-255) of the drill nose against the look box and the rest of the rig for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_cargo_hold_looks.py. The nose must stay the brightest glow.",
+  "about": "Tickets 580, 812 and 872: at a 360 px wide phone (30 px/m over the 12 m zoom, and 45 px/m over the closest 8 m zoom the sweep spec judges at), the pixels of the hold's look box (lookBoxM [0.125, 0.0, 0.345, 0.21]: the hatch, the flank under it and the stay) that change between each look on hull.cargo and the next (a channel moving more than 24 of 255), and the brightest pixel (Rec. 709 luminance, 0-255) of the drill nose against the look box and the rest of the rig for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_cargo_hold_looks.py. The nose must stay the brightest glow.",
   "lit": {
     "tier-1": {
       "phonePxPerM": 30.0,
@@ -23,6 +23,70 @@
         "racked-bin -> pannier-bin": {
           "changed": 11,
           "of": 56
+        },
+        "pannier-bin -> netted-bin": {
+          "changed": 8,
+          "of": 56
+        },
+        "netted-bin -> tarped-bin": {
+          "changed": 0,
+          "of": 56
+        },
+        "tarped-bin -> barred-bin": {
+          "changed": 8,
+          "of": 56
+        },
+        "barred-bin -> bumpered-bin": {
+          "changed": 3,
+          "of": 56
+        },
+        "bumpered-bin -> lamped-bin": {
+          "changed": 1,
+          "of": 56
+        },
+        "lamped-bin -> clamped-bin": {
+          "changed": 0,
+          "of": 56
+        },
+        "clamped-bin -> locked-bin": {
+          "changed": 1,
+          "of": 56
+        },
+        "locked-bin -> gauged-bin": {
+          "changed": 1,
+          "of": 56
+        },
+        "gauged-bin -> railed-bin": {
+          "changed": 5,
+          "of": 56
+        },
+        "railed-bin -> plated-bin": {
+          "changed": 4,
+          "of": 56
+        },
+        "plated-bin -> piped-bin": {
+          "changed": 0,
+          "of": 56
+        },
+        "piped-bin -> hoisted-bin": {
+          "changed": 0,
+          "of": 56
+        },
+        "hoisted-bin -> sealed-bin": {
+          "changed": 0,
+          "of": 56
+        },
+        "sealed-bin -> field-bin": {
+          "changed": 1,
+          "of": 56
+        },
+        "field-bin -> haloed-bin": {
+          "changed": 5,
+          "of": 56
+        },
+        "haloed-bin -> aether-bin": {
+          "changed": 0,
+          "of": 56
         }
       },
       "closestZoomPxPerM": 45.0,
@@ -45,6 +109,70 @@
         },
         "racked-bin -> pannier-bin": {
           "changed": 27,
+          "of": 110
+        },
+        "pannier-bin -> netted-bin": {
+          "changed": 21,
+          "of": 110
+        },
+        "netted-bin -> tarped-bin": {
+          "changed": 9,
+          "of": 110
+        },
+        "tarped-bin -> barred-bin": {
+          "changed": 9,
+          "of": 110
+        },
+        "barred-bin -> bumpered-bin": {
+          "changed": 11,
+          "of": 110
+        },
+        "bumpered-bin -> lamped-bin": {
+          "changed": 2,
+          "of": 110
+        },
+        "lamped-bin -> clamped-bin": {
+          "changed": 0,
+          "of": 110
+        },
+        "clamped-bin -> locked-bin": {
+          "changed": 4,
+          "of": 110
+        },
+        "locked-bin -> gauged-bin": {
+          "changed": 2,
+          "of": 110
+        },
+        "gauged-bin -> railed-bin": {
+          "changed": 7,
+          "of": 110
+        },
+        "railed-bin -> plated-bin": {
+          "changed": 16,
+          "of": 110
+        },
+        "plated-bin -> piped-bin": {
+          "changed": 4,
+          "of": 110
+        },
+        "piped-bin -> hoisted-bin": {
+          "changed": 0,
+          "of": 110
+        },
+        "hoisted-bin -> sealed-bin": {
+          "changed": 1,
+          "of": 110
+        },
+        "sealed-bin -> field-bin": {
+          "changed": 10,
+          "of": 110
+        },
+        "field-bin -> haloed-bin": {
+          "changed": 14,
+          "of": 110
+        },
+        "haloed-bin -> aether-bin": {
+          "changed": 7,
           "of": 110
         }
       },
@@ -78,6 +206,86 @@
           "nose": 203,
           "look": 195,
           "restOfRig": 255
+        },
+        "netted-bin": {
+          "nose": 203,
+          "look": 193,
+          "restOfRig": 255
+        },
+        "tarped-bin": {
+          "nose": 203,
+          "look": 190,
+          "restOfRig": 255
+        },
+        "barred-bin": {
+          "nose": 203,
+          "look": 190,
+          "restOfRig": 255
+        },
+        "bumpered-bin": {
+          "nose": 203,
+          "look": 190,
+          "restOfRig": 255
+        },
+        "lamped-bin": {
+          "nose": 203,
+          "look": 192,
+          "restOfRig": 255
+        },
+        "clamped-bin": {
+          "nose": 203,
+          "look": 183,
+          "restOfRig": 255
+        },
+        "locked-bin": {
+          "nose": 203,
+          "look": 180,
+          "restOfRig": 255
+        },
+        "gauged-bin": {
+          "nose": 203,
+          "look": 167,
+          "restOfRig": 255
+        },
+        "railed-bin": {
+          "nose": 203,
+          "look": 164,
+          "restOfRig": 255
+        },
+        "plated-bin": {
+          "nose": 203,
+          "look": 169,
+          "restOfRig": 255
+        },
+        "piped-bin": {
+          "nose": 203,
+          "look": 169,
+          "restOfRig": 255
+        },
+        "hoisted-bin": {
+          "nose": 203,
+          "look": 169,
+          "restOfRig": 255
+        },
+        "sealed-bin": {
+          "nose": 203,
+          "look": 176,
+          "restOfRig": 255
+        },
+        "field-bin": {
+          "nose": 203,
+          "look": 190,
+          "restOfRig": 255
+        },
+        "haloed-bin": {
+          "nose": 203,
+          "look": 201,
+          "restOfRig": 255
+        },
+        "aether-bin": {
+          "nose": 203,
+          "look": 201,
+          "restOfRig": 255
         }
       }
     },
@@ -103,6 +311,70 @@
         "racked-bin -> pannier-bin": {
           "changed": 11,
           "of": 56
+        },
+        "pannier-bin -> netted-bin": {
+          "changed": 8,
+          "of": 56
+        },
+        "netted-bin -> tarped-bin": {
+          "changed": 0,
+          "of": 56
+        },
+        "tarped-bin -> barred-bin": {
+          "changed": 7,
+          "of": 56
+        },
+        "barred-bin -> bumpered-bin": {
+          "changed": 3,
+          "of": 56
+        },
+        "bumpered-bin -> lamped-bin": {
+          "changed": 1,
+          "of": 56
+        },
+        "lamped-bin -> clamped-bin": {
+          "changed": 0,
+          "of": 56
+        },
+        "clamped-bin -> locked-bin": {
+          "changed": 1,
+          "of": 56
+        },
+        "locked-bin -> gauged-bin": {
+          "changed": 1,
+          "of": 56
+        },
+        "gauged-bin -> railed-bin": {
+          "changed": 5,
+          "of": 56
+        },
+        "railed-bin -> plated-bin": {
+          "changed": 4,
+          "of": 56
+        },
+        "plated-bin -> piped-bin": {
+          "changed": 0,
+          "of": 56
+        },
+        "piped-bin -> hoisted-bin": {
+          "changed": 0,
+          "of": 56
+        },
+        "hoisted-bin -> sealed-bin": {
+          "changed": 0,
+          "of": 56
+        },
+        "sealed-bin -> field-bin": {
+          "changed": 1,
+          "of": 56
+        },
+        "field-bin -> haloed-bin": {
+          "changed": 6,
+          "of": 56
+        },
+        "haloed-bin -> aether-bin": {
+          "changed": 0,
+          "of": 56
         }
       },
       "closestZoomPxPerM": 45.0,
@@ -125,6 +397,70 @@
         },
         "racked-bin -> pannier-bin": {
           "changed": 26,
+          "of": 110
+        },
+        "pannier-bin -> netted-bin": {
+          "changed": 21,
+          "of": 110
+        },
+        "netted-bin -> tarped-bin": {
+          "changed": 8,
+          "of": 110
+        },
+        "tarped-bin -> barred-bin": {
+          "changed": 9,
+          "of": 110
+        },
+        "barred-bin -> bumpered-bin": {
+          "changed": 11,
+          "of": 110
+        },
+        "bumpered-bin -> lamped-bin": {
+          "changed": 2,
+          "of": 110
+        },
+        "lamped-bin -> clamped-bin": {
+          "changed": 0,
+          "of": 110
+        },
+        "clamped-bin -> locked-bin": {
+          "changed": 4,
+          "of": 110
+        },
+        "locked-bin -> gauged-bin": {
+          "changed": 2,
+          "of": 110
+        },
+        "gauged-bin -> railed-bin": {
+          "changed": 7,
+          "of": 110
+        },
+        "railed-bin -> plated-bin": {
+          "changed": 14,
+          "of": 110
+        },
+        "plated-bin -> piped-bin": {
+          "changed": 4,
+          "of": 110
+        },
+        "piped-bin -> hoisted-bin": {
+          "changed": 0,
+          "of": 110
+        },
+        "hoisted-bin -> sealed-bin": {
+          "changed": 2,
+          "of": 110
+        },
+        "sealed-bin -> field-bin": {
+          "changed": 10,
+          "of": 110
+        },
+        "field-bin -> haloed-bin": {
+          "changed": 14,
+          "of": 110
+        },
+        "haloed-bin -> aether-bin": {
+          "changed": 5,
           "of": 110
         }
       },
@@ -157,6 +493,86 @@
         "pannier-bin": {
           "nose": 255,
           "look": 195,
+          "restOfRig": 226
+        },
+        "netted-bin": {
+          "nose": 255,
+          "look": 193,
+          "restOfRig": 226
+        },
+        "tarped-bin": {
+          "nose": 255,
+          "look": 190,
+          "restOfRig": 226
+        },
+        "barred-bin": {
+          "nose": 255,
+          "look": 190,
+          "restOfRig": 226
+        },
+        "bumpered-bin": {
+          "nose": 255,
+          "look": 190,
+          "restOfRig": 226
+        },
+        "lamped-bin": {
+          "nose": 255,
+          "look": 192,
+          "restOfRig": 226
+        },
+        "clamped-bin": {
+          "nose": 255,
+          "look": 182,
+          "restOfRig": 226
+        },
+        "locked-bin": {
+          "nose": 255,
+          "look": 180,
+          "restOfRig": 226
+        },
+        "gauged-bin": {
+          "nose": 255,
+          "look": 166,
+          "restOfRig": 226
+        },
+        "railed-bin": {
+          "nose": 255,
+          "look": 165,
+          "restOfRig": 226
+        },
+        "plated-bin": {
+          "nose": 255,
+          "look": 170,
+          "restOfRig": 226
+        },
+        "piped-bin": {
+          "nose": 255,
+          "look": 169,
+          "restOfRig": 226
+        },
+        "hoisted-bin": {
+          "nose": 255,
+          "look": 169,
+          "restOfRig": 226
+        },
+        "sealed-bin": {
+          "nose": 255,
+          "look": 176,
+          "restOfRig": 226
+        },
+        "field-bin": {
+          "nose": 255,
+          "look": 191,
+          "restOfRig": 226
+        },
+        "haloed-bin": {
+          "nose": 255,
+          "look": 203,
+          "restOfRig": 226
+        },
+        "aether-bin": {
+          "nose": 255,
+          "look": 203,
           "restOfRig": 226
         }
       }
@@ -191,6 +607,86 @@
     "pannier-bin": {
       "nose": 247,
       "look": 178,
+      "restOfRig": 253
+    },
+    "netted-bin": {
+      "nose": 247,
+      "look": 178,
+      "restOfRig": 253
+    },
+    "tarped-bin": {
+      "nose": 247,
+      "look": 180,
+      "restOfRig": 253
+    },
+    "barred-bin": {
+      "nose": 247,
+      "look": 177,
+      "restOfRig": 253
+    },
+    "bumpered-bin": {
+      "nose": 247,
+      "look": 179,
+      "restOfRig": 253
+    },
+    "lamped-bin": {
+      "nose": 247,
+      "look": 176,
+      "restOfRig": 253
+    },
+    "clamped-bin": {
+      "nose": 247,
+      "look": 176,
+      "restOfRig": 253
+    },
+    "locked-bin": {
+      "nose": 247,
+      "look": 175,
+      "restOfRig": 253
+    },
+    "gauged-bin": {
+      "nose": 247,
+      "look": 175,
+      "restOfRig": 253
+    },
+    "railed-bin": {
+      "nose": 247,
+      "look": 176,
+      "restOfRig": 253
+    },
+    "plated-bin": {
+      "nose": 247,
+      "look": 176,
+      "restOfRig": 253
+    },
+    "piped-bin": {
+      "nose": 247,
+      "look": 177,
+      "restOfRig": 253
+    },
+    "hoisted-bin": {
+      "nose": 247,
+      "look": 177,
+      "restOfRig": 253
+    },
+    "sealed-bin": {
+      "nose": 247,
+      "look": 175,
+      "restOfRig": 253
+    },
+    "field-bin": {
+      "nose": 247,
+      "look": 173,
+      "restOfRig": 253
+    },
+    "haloed-bin": {
+      "nose": 247,
+      "look": 183,
+      "restOfRig": 253
+    },
+    "aether-bin": {
+      "nose": 246,
+      "look": 182,
       "restOfRig": 253
     }
   }
