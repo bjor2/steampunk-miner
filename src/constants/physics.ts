@@ -152,3 +152,31 @@ export const STRUT_PLANK_LENGTH = 2
 
 /** The plank's thickness, m: more than `GROUND_PROBE_DEPTH`, so a rig resting on it is grounded. */
 export const STRUT_PLANK_THICKNESS = 1 / 4
+
+/**
+ * How long the collider takes to grow one width level (GD lock on #662 Part B, ticket 750): a
+ * level's metre of side, half of it each way across, grown in half a second of fixed steps, so
+ * a Mark bought on open ground reads as the rig unfolding rather than a pop. My pick, by hand in
+ * no feel test yet; the mid-shaft spec bounds the whole cut-out.
+ */
+export const BODY_GROWTH_SECONDS_PER_LEVEL = 1 / 2
+
+/**
+ * How long a growth with ground in its way probes every step before it backs off to one probe a
+ * period this long (ticket 750, the TD's "applies when clear" wait with a limit): the rig never
+ * waits on its growth to move, so the limit only bounds the probing, and a growth whose room is
+ * cut starts within it.
+ */
+export const BODY_GROWTH_WAIT_LIMIT_TICKS = 60
+
+/**
+ * The growth's room probes lie this far apart, mm: half a density sample, so no solid sample's
+ * blended contour fits between two of them (the sweep's quarter metre is one sample).
+ */
+export const BODY_GROWTH_PROBE_STEP_MM = 125
+
+/**
+ * The growth's probes start this far above the wheels, mm: a resting body sinks a few mm into its
+ * floor (`drillStamp.ts` allows 20 for the same), and that floor is the body's own support.
+ */
+export const BODY_GROWTH_FLOOR_ALLOWANCE_MM = 20
