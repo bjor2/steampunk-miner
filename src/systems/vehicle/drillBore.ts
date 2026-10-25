@@ -24,7 +24,12 @@
  *   ring's outer radius: a ring is laid once the stamp's centre is that far past its axis point, so
  *   on a straight cut no later stamp reaches it.
  */
-import { BODY_HALF_SIZE_MM, CASING_LINING_WIDTH_MM, DRILL_BORE_ROWS } from '../../constants/balance'
+import {
+  BARE_BORE_CELLS_PER_METRE,
+  BODY_HALF_SIZE_MM,
+  CASING_LINING_WIDTH_MM,
+  DRILL_BORE_ROWS,
+} from '../../constants/balance'
 import { AIM_STEPS_PER_TURN, MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
 import { MM_PER_SAMPLE } from '../world/sampleGrid'
 import { aimDirectionOf, type Aim } from './aim'
@@ -58,11 +63,13 @@ export function boreRadiusMmAlongAt(aim: Aim, widthLevel: number): number {
 }
 
 /**
- * The cells a metre of straight bore opens at `widthLevel`: the whole metres its width spans, as
- * #316's width bench counts them (2 for the bare 1.2 m bore, one more a level).
+ * The cells a metre of straight bore opens at `widthLevel`, as #316's width bench counts a level
+ * cut: the bare bore's `BARE_BORE_CELLS_PER_METRE` (1 on the 1.2 m bore, ticket 663) and a row more
+ * for each whole metre the body grows up from its bottom (one a level).
  */
 export function boreCellsPerMetreAt(widthLevel: number): number {
-  return Math.ceil(boreWidthMmAt(widthLevel) / MM_PER_METRE)
+  const grownMm = widthLevel * DRILL_BORE_ROWS.bodyWidthPerLevelMm
+  return BARE_BORE_CELLS_PER_METRE + Math.floor(grownMm / MM_PER_METRE)
 }
 
 /** The stamp's radius along one of the four facings: half the body plus the clearance. */

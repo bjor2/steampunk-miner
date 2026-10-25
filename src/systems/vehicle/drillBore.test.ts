@@ -96,10 +96,10 @@ describe('drill bore', () => {
 describe('drill bore width levels (ticket 749)', () => {
   // Goldens at width levels 0, 1, 10 and 1e6 (VS on #662 Part B): body, R and cells a metre.
   it.each([
-    { level: 0, bodyMm: 900, radiusMm: 600, cellsPerMetre: 2 },
-    { level: 1, bodyMm: 1_900, radiusMm: 1_100, cellsPerMetre: 3 },
-    { level: 10, bodyMm: 10_900, radiusMm: 5_600, cellsPerMetre: 12 },
-    { level: 1e6, bodyMm: 1_000_000_900, radiusMm: 500_000_600, cellsPerMetre: 1_000_002 },
+    { level: 0, bodyMm: 900, radiusMm: 600, cellsPerMetre: 1 },
+    { level: 1, bodyMm: 1_900, radiusMm: 1_100, cellsPerMetre: 2 },
+    { level: 10, bodyMm: 10_900, radiusMm: 5_600, cellsPerMetre: 11 },
+    { level: 1e6, bodyMm: 1_000_000_900, radiusMm: 500_000_600, cellsPerMetre: 1_000_001 },
   ])(
     'grows the body to $bodyMm mm, the stamp to $radiusMm mm and the cut to $cellsPerMetre cells a metre at level $level',
     ({ level, bodyMm, radiusMm, cellsPerMetre }) => {

@@ -11,7 +11,6 @@
  * bench's `BARE_BORE_CELLS_PER_METRE`, 1 on the 1.2 m bore since ticket 663), and each such width
  * cell pays the kernel's `sideOreShareBp` of its ore, so the ore a metre grows by `level * share / b`.
  */
-import { BARE_BORE_CELLS_PER_METRE } from '../../../constants/balance'
 import { MM_PER_METRE } from '../../../constants/physics'
 import { formatAmount } from '../../../systems/displayAmount'
 import { ECONOMY } from '../../../systems/economy/economy'
@@ -42,7 +41,7 @@ export function sideOreSharePercent(): Money {
 /** How much more ore a metre the bore takes at `widthLevel`, as a percent. */
 export function oreGainPercentOf(widthLevel: number): Money {
   const gainBp = widthCellsPerMetreOf(widthLevel) * ECONOMY.drillGearCaps.sideOreShareBp
-  return div(percentOf(gainBp), fromSafeInteger(BARE_BORE_CELLS_PER_METRE))
+  return div(percentOf(gainBp), fromSafeInteger(boreCellsPerMetreAt(BARE_WIDTH_LEVEL)))
 }
 
 /** The width cells a metre of bore opens past the bare bore's at `widthLevel`. */

@@ -960,7 +960,8 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   way at both bores and finds the same tiles and ore, which is why no paceScale row moved: the
   bot never cut the disc. `src/systems/authority/sideCellsPerMetre.test.ts` (the #316 bench) and
   the drill-gear `boreWidthCopy.test.ts` read the bench's base `BARE_BORE_CELLS_PER_METRE` (1);
-  the cards print the real bore from the bore row (1.2 m plus a metre a side cell a flank). The
+  the cards print the real bore from the bore row (1.2 m and a metre a width level since ticket
+  749, `boreCellsPerMetreAt` b plus one a level, +6% ore a metre a level). The
   pacing bars themselves (P1-P10 22-30 min, p*, the #551 money rate, the climb share) stay the R3
   lane's.
 - **Cut-follow at the starting drill** (ticket 430): `src/physics/cutFollowStartingRigs.test.ts`
