@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25T01:47:39+02:00",
+  "updated_at": "2026-10-25T02:16:32+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -71,7 +71,7 @@
       "size": 6,
       "used": 2,
       "free": 4,
-      "claims_last_hour": 1,
+      "claims_last_hour": 0,
       "name": "Claude Max 1"
     },
     {
@@ -369,6 +369,36 @@
     "parallel": 1,
     "list": [
       {
+        "number": 856,
+        "key": "647-8A",
+        "map": 647,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "blocked",
+        "tickets": [
+          821,
+          826,
+          850
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
+        "number": 855,
+        "key": "647-7Q",
+        "map": 647,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "ready",
+        "tickets": [
+          852,
+          853,
+          854
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
         "number": 851,
         "key": "647-7S",
         "map": 647,
@@ -388,7 +418,7 @@
       },
       {
         "number": 846,
-        "key": "647-7H",
+        "key": "647-7A",
         "map": 647,
         "lane": "remote",
         "mode": "solo",
@@ -396,24 +426,9 @@
         "tickets": [
           630,
           631,
+          633,
           634,
           635,
-          845
-        ],
-        "done": [
-          845
-        ],
-        "live": 0
-      },
-      {
-        "number": 841,
-        "key": "647-7A",
-        "map": 647,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "paused",
-        "tickets": [
-          633,
           565
         ],
         "done": [],
@@ -421,17 +436,14 @@
       },
       {
         "number": 827,
-        "key": "647-7Q",
+        "key": "647-7P",
         "map": 647,
         "lane": "remote",
         "mode": "solo",
         "state": "paused",
         "tickets": [
-          821,
           824,
-          825,
-          826,
-          850
+          825
         ],
         "done": [],
         "live": 0
@@ -475,7 +487,7 @@
       },
       {
         "number": 751,
-        "key": "647-7P",
+        "key": "647-7H",
         "map": 647,
         "lane": "remote",
         "mode": "solo",
