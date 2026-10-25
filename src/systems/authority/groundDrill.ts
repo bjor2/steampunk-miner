@@ -48,7 +48,7 @@ import type { SideLatch } from '../vehicle/facedSide'
 import type { VehiclePose } from '../vehicle/vehiclePose'
 import { hasCargoRoom, withOreUnit, type VehicleState } from '../vehicle/vehicleState'
 import type { Carve, CarveWindow, CellDrillTicks, CellsBesideCut } from '../world/groundEdit'
-import type { StampPoint } from '../world/stampShape'
+import type { DiscStamp, StampPoint } from '../world/stampShape'
 import type { YieldedCell } from '../world/cellYield'
 import { bandOfTile } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
@@ -58,6 +58,7 @@ import type { TilePoint } from '../world/tileGrid'
 import { CELL_KIND, kindOfCell } from '../world/worldCell'
 import { materialCellAt, type WorldState } from '../world/worldState'
 import { vehicleOf, withVehicle, type AuthorityState } from './authorityState'
+import { boreStampOf } from './boreStamp'
 import { chainEffects, unchanged, type RuleEffect } from './commandRule'
 import { harvestCoreTile } from './coreHarvest'
 import type { DomainEventBody } from './domainEvent'
@@ -241,8 +242,9 @@ export interface ReportedDrill {
 }
 
 /**
- * The reported drill: the stamp at the pose, aimed by its facing (#40), as the capsule from its
- * tail when the bite runs on (ticket 537), and any drill gear, which may read the reported drive
+ * The reported drill: the stamp at the pose, aimed by its facing (#40) and grown to the player's
+ * bore (ticket 749), as the capsule from its tail when the bite runs on (ticket 537), and any drill
+ * gear, which may read the reported drive
  * (ticket 279), counted and charged on `clock`: whole ticks as every drill was, or the law work it
  * removed (ticket 535), on sub-steps for the capsule.
  */
@@ -256,9 +258,10 @@ export function drillAtPose(
   clock: DrillClock = WHOLE_TICK_CLOCK,
 ): RuleEffect {
   const { pose, drive, isLifting, tail, cellsBeside } = reported
+  const atBore = (stamp: DiscStamp) => boreStampOf(state, playerId, stamp, pose)
   const bits = {
-    cut: { pose, disc: stampSweptFrom(reportCutStampOf(pose, isLifting), tail), drive },
-    gear: { pose, disc: stampSweptFrom(drillStampOf(pose, isLifting), tail), drive },
+    cut: { pose, disc: stampSweptFrom(atBore(reportCutStampOf(pose, isLifting)), tail), drive },
+    gear: { pose, disc: stampSweptFrom(atBore(drillStampOf(pose, isLifting)), tail), drive },
   }
   const carve: CarveIn = (request) =>
     carveRunOnWithGear(state, params, playerId, bits, request, cellsBeside)
@@ -525,19 +528,31 @@ interface CarveCollection {
 }
 
 function collectYieldedCells(state: AuthorityState, collection: CarveCollection): RuleEffect {
-  const shareOf = oreSharesOf(collection.carved.gearCells)
+  const shareOf = oreSharesOf(collection.carved.gearCells, collection.carved.widthCells)
+  const isWidthCell = isTileListedIn(collection.carved.widthCells)
   return chainEffects(
     state,
     collection.carved.yielded.map((yielded) => (current: AuthorityState) => {
       const collected = collectUngatedTile(current, collection, yielded, shareOf)
-      const destroyed: DomainEventBody = {
-        type: 'TileDestroyed',
-        ...yielded.tile,
-        kind: kindNameOf(yielded.cell),
-      }
+      const destroyed = tileDestroyedOf(yielded, isWidthCell(yielded.tile))
       return { state: collected.state, events: [destroyed, ...collected.events] }
     }),
   )
+}
+
+/** An opened cell's `TileDestroyed`, marked when it is one of the rig's width cells (ticket 749). */
+function tileDestroyedOf(yielded: YieldedCell, isWidthCell: boolean): DomainEventBody {
+  const destroyed = {
+    type: 'TileDestroyed' as const,
+    ...yielded.tile,
+    kind: kindNameOf(yielded.cell),
+  }
+  return isWidthCell ? { ...destroyed, isWidthCell: true } : destroyed
+}
+
+function isTileListedIn(tiles: readonly TilePoint[]): (tile: TilePoint) => boolean {
+  const keys = new Set(tiles.map(({ tx, ty }) => `${tx},${ty}`))
+  return ({ tx, ty }) => keys.has(`${tx},${ty}`)
 }
 
 /** A cell a gate says is lost is destroyed, pays nothing and says why; every other is collected. */

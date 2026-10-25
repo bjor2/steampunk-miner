@@ -133,6 +133,25 @@ describe('drill_cut span line (ticket 420)', () => {
     expect(session.lines.flatMap(runEventProblems)).toEqual([])
   })
 
+  it('counts the width cells a wider rig broke past the bare bore, and leaves them out with none (ticket 749)', () => {
+    const wide = sessionOf()
+    const widthCell = {
+      type: 'TileDestroyed',
+      tx: 5,
+      ty: 269,
+      kind: 'ore',
+      isWidthCell: true,
+    } as const
+    send(wide, 40, DRILL_STEP, [...drilledBodies(3), widthCell])
+    wide.runLog.flushDrillSpans()
+    expect(drillCutsOf(wide)[0].data).toMatchObject({ cells: 4, widthCells: 1 })
+    expect(wide.lines.flatMap(runEventProblems)).toEqual([])
+    const bare = sessionOf()
+    send(bare, 40, DRILL_STEP, drilledBodies(3))
+    bare.runLog.flushDrillSpans()
+    expect('widthCells' in drillCutsOf(bare)[0].data).toBe(false)
+  })
+
   it('folds consecutive drill commands into one span and counts them', () => {
     const session = sessionOf()
     for (let index = 0; index < 4; index++) {

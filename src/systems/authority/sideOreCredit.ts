@@ -6,6 +6,9 @@
  * to a whole unit pays one, its own ore, in the cut's walk order (`yieldedInWalkOrder`). No float,
  * no random draw: the same cut credits the same cells on every machine.
  *
+ * The rig's width cells (ticket 749, the GD lock on #662 Part B Q3) pay the same side share: the
+ * cells its wider stamp opened that the bare 1.2 m bore never reaches.
+ *
  * The cut itself, its energy and its heat stay per cell as before; only the yield reads the share.
  * A cell a gate loses never reaches here, so it is never credited. Core cells harvest whole.
  */
@@ -28,9 +31,18 @@ export interface OreShareCredit {
 /** Every tile a whole share; a carve with no gear. */
 export const WHOLE_ORE_SHARES: OreShareOf = () => BASIS_POINTS
 
-/** The ore share of each tile the carve opened, by what its gear listed the tile as. */
-export function oreSharesOf(gearCells: readonly GearCellShare[]): OreShareOf {
-  const kinds = new Map(gearCells.map(({ tx, ty, kind }) => [keyOf({ tx, ty }), kind]))
+/**
+ * The ore share of each tile the carve opened, by what its gear listed the tile as; a width cell
+ * (ticket 749: opened past the bare 1.2 m bore by the rig's wider stamp) is a side cell.
+ */
+export function oreSharesOf(
+  gearCells: readonly GearCellShare[],
+  widthCells: readonly TilePoint[] = [],
+): OreShareOf {
+  const kinds = new Map<string, GearCellShare['kind']>(
+    widthCells.map((tile) => [keyOf(tile), 'side']),
+  )
+  gearCells.forEach(({ tx, ty, kind }) => kinds.set(keyOf({ tx, ty }), kind))
   return (tile) => sideOreShareOf(kindOf(kinds, tile), ECONOMY.drillGearCaps)
 }
 

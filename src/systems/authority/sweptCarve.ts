@@ -202,6 +202,7 @@ function emptyCarveOf(world: WorldState, carrySubSteps: number): SweptCarve {
     gearTicksUsed: 0,
     lawWorkBp: 0,
     gearCells: [],
+    widthCells: [],
     aheadLatch: null,
     sideLatch: null,
     reachedStep: -1,

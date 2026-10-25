@@ -61,4 +61,15 @@ describe('side ore credit', () => {
     expect(shareOf({ tx: 0, ty: -1 })).toBe(10000)
     expect(shareOf({ tx: 0, ty: 0 })).toBe(10000)
   })
+
+  it('reads a width cell past the bare bore at the side share, and a gear cell as its gear lists it (ticket 749)', () => {
+    const gear: GearCellShare[] = [{ tx: 3, ty: 0, shareBp: 10000, kind: 'ahead' }]
+    const shareOf = oreSharesOf(gear, [
+      { tx: 2, ty: 0 },
+      { tx: 3, ty: 0 },
+    ])
+    expect(shareOf({ tx: 2, ty: 0 })).toBe(600)
+    expect(shareOf({ tx: 3, ty: 0 })).toBe(10000)
+    expect(shareOf({ tx: 0, ty: 0 })).toBe(10000)
+  })
 })

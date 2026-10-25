@@ -52,6 +52,7 @@ import {
 } from '../systems/registries/discovery'
 import { DOCK_FACILITY_REGISTRY } from '../systems/registries/dockFacilities'
 import { DOCK_SERVICE_REGISTRY } from '../systems/registries/dockServices'
+import { BORE_WIDTH_REGISTRY } from '../systems/registries/boreWidth'
 import { DRILL_GEAR_REGISTRY } from '../systems/registries/drillGear'
 import { INPUT_REACTION_REGISTRY } from '../systems/registries/inputReactions'
 import { ENEMY_DETECTION_MODIFIER_REGISTRY } from '../systems/registries/enemyDetectionModifiers'
@@ -162,6 +163,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     dockFacility: (facility) => add(DOCK_FACILITY_REGISTRY, facility),
     artefactOption: (option) => add(ARTEFACT_OPTION_REGISTRY, option),
     drillGear: (source) => add(DRILL_GEAR_REGISTRY, source),
+    boreWidth: (source) => add(BORE_WIDTH_REGISTRY, source),
     itemHook: (hook) => add(ITEM_HOOK_REGISTRY, hook),
     liveBeacon: (provider) => add(LIVE_BEACON_REGISTRY, provider),
     hullDamageIntercept: (intercept) => add(HULL_DAMAGE_INTERCEPT_REGISTRY, intercept),

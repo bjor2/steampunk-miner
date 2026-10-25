@@ -33,6 +33,7 @@ import type {
 } from '../systems/registries/discovery'
 import type { DockFacility } from '../systems/registries/dockFacilities'
 import type { DockService } from '../systems/registries/dockServices'
+import type { BoreWidthSource } from '../systems/registries/boreWidth'
 import type { DrillGearSource } from '../systems/registries/drillGear'
 import type { ItemHook } from '../systems/registries/itemHooks'
 import type { LiveBeaconProvider } from '../systems/registries/liveBeacon'
@@ -175,6 +176,11 @@ export interface SliceRegistrar {
    * side cell costs at least the drill's own energy for it (ticket 234).
    */
   drillGear(source: DrillGearSource): void
+  /**
+   * Width levels the player's rig owns now (ticket 749): every source's are added into the one
+   * width the stamp reads (0.9 m body and 1 m more a level, the stamp at the same clearance).
+   */
+  boreWidth(source: BoreWidthSource): void
   /**
    * A combo's or twist's answer at a lane item's decision point (ticket 323): never a dig hook, a
    * reach of at most 12 cells, and an id that names no unlock row.

@@ -67,6 +67,8 @@ export interface DrillSpan {
   spans: number
   lastSeq: number | undefined
   cells: number
+  /** Its width cells (ticket 749): broken past the bare 1.2 m bore by the rig's wider stamp. */
+  widthCells: number
   first: Cell | null
   last: Cell | null
   ticks: number
@@ -93,6 +95,7 @@ export function openDrillSpan(first: SpanEvent, opening: SpanReading | null): Dr
     spans: 0,
     lastSeq: undefined,
     cells: 0,
+    widthCells: 0,
     first: null,
     last: null,
     ticks: 0,
@@ -165,6 +168,7 @@ function foldBrokenCell(span: DrillSpan, { event, stamp, band }: SpanEvent<'Tile
     span.band = band
   }
   span.cells += 1
+  if (event.isWidthCell === true) span.widthCells += 1
   span.last = cell
 }
 
@@ -192,6 +196,7 @@ export function drillCutDataOf(span: DrillSpan, stop: DrillSpanStop): RunEventDa
   return {
     spans: span.spans,
     cells: span.cells,
+    ...widthCellsFieldOf(span),
     ...cellFieldsOf(span),
     ticks: span.ticks,
     units: span.units,
@@ -200,6 +205,11 @@ export function drillCutDataOf(span: DrillSpan, stop: DrillSpanStop): RunEventDa
     ...netChangeOf(span.opening, span.closing),
     stop,
   }
+}
+
+/** Only a span that broke width cells says so, so a bare rig's line reads as before. */
+function widthCellsFieldOf({ widthCells }: DrillSpan): { widthCells?: number } {
+  return widthCells === 0 ? {} : { widthCells }
 }
 
 function cellFieldsOf({ first, last }: DrillSpan): { first?: Cell; last?: Cell } {

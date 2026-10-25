@@ -3,6 +3,9 @@
  *
  * - **Travelling** (the cut gate shut): a cutting step's bound ahead of the pose
  *   (`travelStampAheadMmAt`), as the body may cover more than the drill's step.
+ * Either stamp is grown to the player's bore (ticket 749, `boreStamp.ts`); its centre stays the
+ * bare body's, so the front and the rear it is held to are where they were.
+ *
  * - **Cutting** (the gate open): at the front of this tick's step (`sweptStampAheadMmOf`), the step
  *   the drill law gives (`frontStepMmAt`), or on the first cutting tick after travel the body's own
  *   speed when that is more (`landingFrontStepMmOf`). A continuing cut's stamp never stands behind
@@ -26,6 +29,7 @@ import type { VehiclePose } from '../vehicle/vehiclePose'
 import { MM_PER_SAMPLE } from '../world/sampleGrid'
 import type { DiscStamp, StampPoint } from '../world/stampShape'
 import { vehicleOf, type AuthorityState } from './authorityState'
+import { boreStampOf } from './boreStamp'
 import { frontStepMmAt, type CutFollowStep } from './cutFollowRead'
 import { cutGateLeftAt, stepBoundsAt, travelStampAheadMmAt } from './stepBoundRead'
 
@@ -59,7 +63,8 @@ export function sweptStampAt(
   if (!isCutGateOpen(gate)) return placedTravellingAt(pose, isLifting, state, playerId)
   const stepMm = cutFrontStepMmAt(state, playerId, step)
   const aheadMm = sweptStampAheadMmOf(stepMm, aimOfPose(pose))
-  const placed = placedAt(pose, cuttingDrillStampOf(pose, isLifting, aheadMm), aheadMm)
+  const cutting = boreStampOf(state, playerId, cuttingDrillStampOf(pose, isLifting, aheadMm), pose)
+  const placed = placedAt(pose, cutting, aheadMm)
   const cursor = continuedCursorOf(state, playerId, pose)
   if (cursor === null) return placed
   const stamp = withinCursorReach(placed.stamp, { cursor, pose, stepMm })
@@ -73,7 +78,8 @@ function placedTravellingAt(
   playerId: string,
 ): PlacedStamp {
   const aheadMm = travelStampAheadMmAt(state, playerId)
-  return placedAt(pose, sweptDrillStampOf(pose, isLifting, aheadMm), aheadMm)
+  const travelling = boreStampOf(state, playerId, sweptDrillStampOf(pose, isLifting, aheadMm), pose)
+  return placedAt(pose, travelling, aheadMm)
 }
 
 function placedAt(pose: VehiclePose, stamp: DiscStamp, aheadMm: number): PlacedStamp {

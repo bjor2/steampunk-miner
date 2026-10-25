@@ -198,6 +198,11 @@ export interface KernelDomainEventBodies {
     ty: number
     kind: 'ground' | 'ore' | 'core'
     cause?: 'blast' | 'bore'
+    /**
+     * A cell the rig's wider stamp opened past the bare 1.2 m bore (ticket 749): it paid the side
+     * ore share. Left out on every other cell, so a bare rig's events read as before.
+     */
+    isWidthCell?: true
   }
   /**
    * A slice's gate check stopped the drill at an ore cell (feature-slices.md 3.6, K2): `refused`

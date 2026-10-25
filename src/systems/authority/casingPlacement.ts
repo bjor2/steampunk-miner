@@ -8,7 +8,8 @@
  * ring. Never refused: a grade too low for the band still lines. A ring that lines native rock for
  * the first time, or relays lining of another type, is then charged in its type (#76, #113,
  * `chargeFirstLining`); the debug `lineCasing` lays a standard ring free, as debug commands never
- * count as play.
+ * count as play. A wider rig's rings are laid round its own bore and fall due its own lag behind
+ * the stamp (ticket 749), so the wall its wider stamp cut is the wall they line.
  */
 import {
   followCasingTrail,
@@ -18,6 +19,8 @@ import {
   type RingPoint,
   type TrailStep,
 } from '../vehicle/casingTrail'
+import { widthLevelOf } from '../registries/boreWidth'
+import { boreRadiusMmAt, casingRingLagMmAt } from '../vehicle/drillBore'
 import { drillStampOf } from '../vehicle/drillStamp'
 import { liningTypeIndexOf } from '../vehicle/liningType'
 import { isVehicleActive, type VehicleState } from '../vehicle/vehicleState'
@@ -84,7 +87,8 @@ export function layCasingAlongCut(
   const params = planetParamsOf(state.planet)
   const vehicle = vehicleOf(state, playerId)
   if (params === null || !isVehicleActive(vehicle)) return unchanged(state)
-  const step = followCasingTrailAlongCut(vehicle.casingTrail, axis, isCutting)
+  const bore = boreOfPlayer(state, playerId)
+  const step = followCasingTrailAlongCut(vehicle.casingTrail, axis, isCutting, bore.ringLagMm)
   return layTrailStep(state, playerId, params, step, sweepOfCut(axis))
 }
 
@@ -108,7 +112,7 @@ function layCasingAlongTrail(
   motion: DrillMotion,
 ): RuleEffect {
   const params = planetParamsOf(state.planet)
-  const step = trailStepOf(vehicleOf(state, playerId), motion)
+  const step = trailStepOf(vehicleOf(state, playerId), motion, boreOfPlayer(state, playerId))
   if (params === null || step === null) return unchanged(state)
   return layTrailStep(state, playerId, params, step, NO_RING_SWEEP)
 }
@@ -148,11 +152,26 @@ interface LaidLining {
   liningType: string
 }
 
-function trailStepOf(vehicle: VehicleState, motion: DrillMotion): TrailStep | null {
+function trailStepOf(
+  vehicle: VehicleState,
+  motion: DrillMotion,
+  bore: PlayerBore,
+): TrailStep | null {
   if (!isVehicleActive(vehicle) || vehicle.pose === null) return null
   const stamp = drillStampOf(vehicle.pose, motion.isLifting)
   const centre = { xMm: stamp.xMm, yMm: stamp.yMm }
-  return followCasingTrail(vehicle.casingTrail, centre, motion.isCutting)
+  return followCasingTrail(vehicle.casingTrail, centre, motion.isCutting, bore.ringLagMm)
+}
+
+/** The player's bore as the casing reads it (ticket 749): its radius and the ring lag round it. */
+interface PlayerBore {
+  radiusMm: number
+  ringLagMm: number
+}
+
+function boreOfPlayer(state: AuthorityState, playerId: string): PlayerBore {
+  const level = widthLevelOf(state, playerId)
+  return { radiusMm: boreRadiusMmAt(level), ringLagMm: casingRingLagMmAt(level) }
 }
 
 function layRings(
@@ -183,11 +202,12 @@ function layPaidCasingRing(
   { point, stretchFrom, sweep }: DueRing,
   lining: LaidLining,
 ): RuleEffect {
+  const { radiusMm } = boreOfPlayer(state, playerId)
   const samples = casableRingSamplesOf(
     state,
     playerId,
     params,
-    casingRingAlong(point.xMm, point.yMm, stretchFrom, sweep),
+    casingRingAlong(point.xMm, point.yMm, stretchFrom, sweep, radiusMm),
   )
   const ring = lineCasingRing(
     state,

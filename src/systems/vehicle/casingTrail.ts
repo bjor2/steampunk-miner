@@ -70,14 +70,18 @@ export interface TrailStep {
 
 export const EMPTY_CASING_TRAIL: CasingTrail = { lastAxisPoint: null, unlined: [] }
 
-/** The trail after the stamp's centre reached `stampCentre`; `isCutting` records a new point. */
+/**
+ * The trail after the stamp's centre reached `stampCentre`; `isCutting` records a new point. A
+ * point falls due `ringLagMm` behind the stamp: the bare bore's lag, or a wider rig's (ticket 749).
+ */
 export function followCasingTrail(
   trail: CasingTrail,
   stampCentre: RingPoint,
   isCutting: boolean,
+  ringLagMm: number = casingRingLagMm(),
 ): TrailStep {
   const recorded = isCutting ? recordAxisPoint(trail, stampCentre) : trail
-  return splitDuePoints(recorded, stampCentre)
+  return splitDuePoints(recorded, stampCentre, ringLagMm)
 }
 
 /**
@@ -95,9 +99,10 @@ export function followCasingTrailAlongCut(
   trail: CasingTrail,
   axis: CutAxis,
   isCutting: boolean,
+  ringLagMm: number = casingRingLagMm(),
 ): TrailStep {
   const recorded = isCutting ? recordAxisPointsAlong(trail, axis) : trail
-  return splitDuePoints(recorded, axis.stampReach)
+  return splitDuePoints(recorded, axis.stampReach, ringLagMm)
 }
 
 /** One point per whole spacing from the last point toward the cut's end; a new cut starts as before. */
@@ -178,8 +183,8 @@ function stretchSince(last: RingPoint | null, stampCentre: RingPoint): number {
 }
 
 /** Only points past the lag fall due; past `MAX_CASING_TRAIL_POINTS` the newest left are dropped. */
-function splitDuePoints(trail: CasingTrail, stampCentre: RingPoint): TrailStep {
-  const isDue = (point: AxisPoint) => isPastLag(point, stampCentre)
+function splitDuePoints(trail: CasingTrail, stampCentre: RingPoint, ringLagMm: number): TrailStep {
+  const isDue = (point: AxisPoint) => squaredDistance(point, stampCentre) >= squared(ringLagMm)
   const waiting = trail.unlined.filter((point) => !isDue(point))
   const dueIndices = trail.unlined.flatMap((point, index) => (isDue(point) ? [index] : []))
   return {
@@ -228,10 +233,6 @@ function trailHeadingAt(
 
 function differenceOf(to: RingPoint, from: RingPoint): RingPoint {
   return { xMm: to.xMm - from.xMm, yMm: to.yMm - from.yMm }
-}
-
-function isPastLag(point: RingPoint, stampCentre: RingPoint): boolean {
-  return squaredDistance(point, stampCentre) >= squared(casingRingLagMm())
 }
 
 function squaredDistance(a: RingPoint, b: RingPoint): number {

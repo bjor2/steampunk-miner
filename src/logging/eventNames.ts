@@ -663,6 +663,9 @@ export const RUN_EVENT_REGISTRY = {
     payload: {
       spans: 'integer',
       cells: 'integer',
+      // The span's cells broken past the bare 1.2 m bore by a wider rig (ticket 749): the width's
+      // extra cells, so a report reads them a metre. Optional, so a bare rig's line reads as before.
+      widthCells: { optional: 'integer' },
       first: { optional: { tuple: ['integer', 'integer'] } },
       last: { optional: { tuple: ['integer', 'integer'] } },
       ticks: 'integer',

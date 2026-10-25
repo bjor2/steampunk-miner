@@ -82,13 +82,18 @@ type RingStep = 'line' | 'retype' | 'reline' | 'skip'
  * 0.25 m <= d < stampR + 0.25 m`, from the bore wall's full-weight edge (`stampShape.ts`) to the
  * rock just outside it. The TD's release check on #662 found the ring that started at `stampR`
  * left the rock behind a wall sample cut just under the iso unlined (24 samples on L20's down leg);
- * starting a sample inside, as #36's ring did round its own bore, lines it.
+ * starting a sample inside, as #36's ring did round its own bore, lines it. A wider rig's ring is
+ * read round its own bore's radius (ticket 749), so it lines the wall its stamp cut.
  */
-export function casingRingAround(xMm: number, yMm: number): CasingRing {
+export function casingRingAround(
+  xMm: number,
+  yMm: number,
+  boreRadiusMm: number = drillStampRadiusMm(),
+): CasingRing {
   return {
     xMm,
     yMm,
-    clearMm: drillStampRadiusMm() - CASING_LINING_WIDTH_MM,
+    clearMm: boreRadiusMm - CASING_LINING_WIDTH_MM,
     widthMm: 2 * CASING_LINING_WIDTH_MM,
   }
 }
@@ -107,8 +112,9 @@ export function casingRingAlong(
   yMm: number,
   stretchFromMm: MmPoint,
   sweepMm: MmPoint,
+  boreRadiusMm: number = drillStampRadiusMm(),
 ): CasingRing {
-  return { ...casingRingAround(xMm, yMm), stretchFromMm, sweepMm }
+  return { ...casingRingAround(xMm, yMm, boreRadiusMm), stretchFromMm, sweepMm }
 }
 
 /** Lines one ring at the player's `grade`, in the lining type `typeIndex` (the standard one by default). */

@@ -58,6 +58,8 @@ import {
   type AheadLatchRules,
   type DrillBit,
 } from '../vehicle/aheadBearingLatch'
+import { aimOfPose } from '../vehicle/aim'
+import { cellsBeyondBareBore } from '../vehicle/boreWidthStamp'
 import { cellStampOf, drillGearCellsAt } from '../vehicle/drillGearCells'
 import { driveOfFacing } from '../vehicle/driveSigns'
 import { latchFacedSide, type SideLatch } from '../vehicle/facedSide'
@@ -102,6 +104,11 @@ export interface DrillCarve extends Carve {
   lawWorkBp: number
   /** The drill gear's cells this cut reached, each with its energy share (ticket 335). */
   gearCells: readonly GearCellShare[]
+  /**
+   * The cells the bit opened that the bare 1.2 m bore would not have reached, its gear's aside
+   * (ticket 749, `vehicle/boreWidthStamp.ts`): the width's cells, which pay the side ore share.
+   */
+  widthCells: readonly TilePoint[]
   /** The ahead bearing this cut latched, or null when no gear is aimed by the drive. */
   aheadLatch: AheadLatch | null
   /** The faced side this cut latched, or null when no side ask is aimed by the drive. */
@@ -132,6 +139,7 @@ export function withoutGear(carve: Carve): DrillCarve {
     gearTicksUsed: 0,
     lawWorkBp: carve.lawWork * BASIS_POINTS,
     gearCells: [],
+    widthCells: [],
     aheadLatch: null,
     sideLatch: null,
   }
@@ -224,8 +232,24 @@ export function carveStampWithRead(
   cut: StampCut,
 ): DrillCarve {
   const stamp = { disc: bit.disc, ...cut }
-  if (read === null) return withoutGear(carveBareDisc(params, stamp, request))
-  return carveBitAndGear(read, request, discWithCellsOf(params, stamp, request))
+  const carved =
+    read === null
+      ? withoutGear(carveBareDisc(params, stamp, request))
+      : carveBitAndGear(read, request, discWithCellsOf(params, stamp, request))
+  return withWidthCells(carved, bit)
+}
+
+/** The carve with the cells its bit opened past the bare bore, none of them a gear cell. */
+function withWidthCells(carved: DrillCarve, bit: DrillBit): DrillCarve {
+  const gearKeys = new Set(carved.gearCells.map(tileKeyOf))
+  const opened = carved.yielded
+    .map(({ tile }) => tile)
+    .filter((tile) => !gearKeys.has(tileKeyOf(tile)))
+  return { ...carved, widthCells: cellsBeyondBareBore(bit.disc, aimOfPose(bit.pose), opened) }
+}
+
+function tileKeyOf({ tx, ty }: TilePoint): string {
+  return `${tx},${ty}`
 }
 
 /** The bit's stamp, how the carve walks it, and when the cells beside it are cut. */
@@ -419,6 +443,7 @@ function carveBitAndGear(
     gearTicksUsed: Math.max(0, ...carved.cellTicksUsed),
     lawWorkBp: lawWorkBpOf(carved, shares),
     gearCells,
+    widthCells: [],
     ...latches,
   }
 }
