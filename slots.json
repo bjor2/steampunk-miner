@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25T07:14:36+01:00",
+  "updated_at": "2026-10-25T07:45:00+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -71,7 +71,7 @@
       "size": 6,
       "used": 2,
       "free": 4,
-      "claims_last_hour": 1,
+      "claims_last_hour": 0,
       "name": "Claude Max 1"
     },
     {
@@ -368,22 +368,6 @@
     "mode": "on",
     "parallel": 1,
     "list": [
-      {
-        "number": 877,
-        "key": "647-7Z",
-        "map": 647,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "ready",
-        "tickets": [
-          871,
-          872,
-          873,
-          874
-        ],
-        "done": [],
-        "live": 0
-      },
       {
         "number": 876,
         "key": "647-7Z",
