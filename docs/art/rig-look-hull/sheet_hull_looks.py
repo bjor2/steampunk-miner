@@ -1,14 +1,16 @@
 """
-The review sheets cut from render_hull_looks.py's renders (ticket 584): the six looks alone, the
-rig at tiers 1 and 3 bare and with each look on the slot, each row resampled to a 1080p screen's
-90 px/m at the default 12 m zoom (#39) and to a 360 px wide phone's 30 px/m over the same zoom
-(the width the #576 ladder is judged at), the phone copy enlarged 8x with no smoothing so each
-phone pixel shows. It also measures what the eye is asked to judge and writes readability.json:
-how many phone pixels of the hull plating's footprint change between each look and the one
-before it (and between the bare rig and the base look, which should be none), and the brightest
-pixel of the drill nose against the brightest of the footprint for each look, lit and by glow
-alone (the emission-only render, what the glow cap of #576 is about). Needs Pillow and numpy;
-run after the Blender render, which leaves its raw PNGs in build/ (removed here):
+The review sheets cut from render_hull_looks.py's renders (tickets 584 and 816): the twenty looks
+alone, the rig at tiers 1 and 3 bare and with each look on the slot, seven a row, each resampled
+to a 1080p screen's 90 px/m at the default 12 m zoom (#39) and to a 360 px wide phone's 30 px/m
+over the same zoom (the width the #576 ladder is judged at), the phone copy enlarged 8x with no
+smoothing so each phone pixel shows. It also measures what the eye is asked to judge and writes
+readability.json: how many phone pixels of the hull footprint (the plating, the caps and the
+skirt) change between each look and the one before it (and between the bare rig and the base
+look, which should be none), at the default zoom and at the closest, where the rig-look sweep
+spec judges a step, and the brightest pixel of the drill nose against the brightest of the
+footprint for each look, lit and by glow alone (the emission-only render, what the glow cap of
+#576 is about). Needs Pillow and numpy; run after the Blender render, which leaves its raw PNGs
+in build/ (removed here):
 
     python3 docs/art/rig-look-hull/sheet_hull_looks.py
 """
@@ -35,14 +37,18 @@ INGAME_PX_PER_M = 90
 PHONE_WIDTH_PX = 360
 ZOOM_M = 12
 PHONE_PX_PER_M = PHONE_WIDTH_PX / ZOOM_M
+# The closest zoom (VIEW_SHORT_AXIS_MIN_M, 8 m), where the rig-look sweep spec judges one visible
+# step (ticket 809: at least 16 pixels moved by 24 of 255).
+CLOSEST_ZOOM_M = 8
+PHONE_CLOSEST_PX_PER_M = PHONE_WIDTH_PX / CLOSEST_ZOOM_M
 PHONE_ENLARGE = 8
 # render_casing_driller.FRAME: (centre x, centre z), width, height in metres.
 RIG_FRAME = ((0.05, 0.05), 2.1, 1.75)
 RIG_TIERS = (1, 3)
 GLOW_TIER = 1
 BARE = 'rig'
-# Tiles per row of a sheet: the bare rig and the six looks make two rows.
-SHEET_COLUMNS = 4
+# Tiles per row of a sheet: the bare rig and the twenty looks make three rows (ticket 816).
+SHEET_COLUMNS = 7
 # A phone pixel counts as changed when a channel moves by more than this (of 255).
 CHANGED_THRESHOLD = 24
 
@@ -128,14 +134,24 @@ def write_report(table, looks):
 
 
 def measured(tier, looks, hull, nose):
-    phone = {part: resampled(flattened('tier-%d.%s' % (tier, part)), PHONE_PX_PER_M) for part in [BARE] + looks}
-    steps = list(zip([BARE] + looks, looks))
+    """Each step against the look before it, at the phone's px/m over the default zoom and over
+    the closest zoom the sweep spec judges at (ticket 816: every step reads at 360 px)."""
+    rendered = {part: flattened('tier-%d.%s' % (tier, part)) for part in [BARE] + looks}
+    phone = {part: resampled(image, PHONE_PX_PER_M) for part, image in rendered.items()}
+    closest = {part: resampled(image, PHONE_CLOSEST_PX_PER_M) for part, image in rendered.items()}
     return {
         'phonePxPerM': PHONE_PX_PER_M,
-        'hullFootprintPx': {'%s -> %s' % (before, after): changed_pixels(phone[before], phone[after], hull)
-                            for before, after in steps},
+        'hullFootprintPx': stepped_pixels(phone, looks, hull),
+        'closestZoomPxPerM': PHONE_CLOSEST_PX_PER_M,
+        'closestZoomHullFootprintPx': stepped_pixels(closest, looks, hull),
         'brightest': {part: brightest_of_image(image, hull, nose) for part, image in phone.items()},
     }
+
+
+def stepped_pixels(images, looks, hull):
+    """The hull-footprint pixels each look changes against the look before it."""
+    return {'%s -> %s' % (before, after): changed_pixels(images[before], images[after], hull)
+            for before, after in zip([BARE] + looks, looks)}
 
 
 def brightest_of(name, hull, nose):
@@ -191,13 +207,15 @@ def part_bounds(part):
 
 def report_about(table, lit, glow):
     return {
-        'about': 'Ticket 584: at a 360 px wide phone (%g px/m over the 12 m zoom), the pixels of the hull '
-                 'plating\'s footprint %s that change from each look to the next (a channel moving more than '
+        'about': 'Tickets 584 and 816: at a 360 px wide phone (%g px/m over the 12 m zoom, and %g px/m over the '
+                 'closest %g m zoom the sweep spec judges at), the pixels of the hull footprint %s (the plating, '
+                 'the caps and the skirt) that change from each look to the next (a channel moving more than '
                  '%d of 255; the bare rig to the base look should change none), and the brightest pixel '
                  '(Rec. 709 luminance, 0-255) of the drill nose against the footprint for each look, the nose '
                  'lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-%d '
                  'emission-only render at 512 px/m; written by sheet_hull_looks.py. The nose must stay the '
-                 'brightest glow.' % (PHONE_PX_PER_M, table['footprintM'], CHANGED_THRESHOLD, GLOW_TIER),
+                 'brightest glow.' % (PHONE_PX_PER_M, PHONE_CLOSEST_PX_PER_M, CLOSEST_ZOOM_M, table['footprintM'],
+                                      CHANGED_THRESHOLD, GLOW_TIER),
         'lit': lit,
         'glow': glow,
     }

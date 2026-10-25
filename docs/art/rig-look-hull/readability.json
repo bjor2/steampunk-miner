@@ -1,32 +1,171 @@
 {
-  "about": "Ticket 584: at a 360 px wide phone (30 px/m over the 12 m zoom), the pixels of the hull plating's footprint [-0.24, -0.13, 0.24, 0.15] that change from each look to the next (a channel moving more than 24 of 255; the bare rig to the base look should change none), and the brightest pixel (Rec. 709 luminance, 0-255) of the drill nose against the footprint for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_hull_looks.py. The nose must stay the brightest glow.",
+  "about": "Tickets 584 and 816: at a 360 px wide phone (30 px/m over the 12 m zoom, and 45 px/m over the closest 8 m zoom the sweep spec judges at), the pixels of the hull footprint [-0.33, -0.24, 0.33, 0.15] (the plating, the caps and the skirt) that change from each look to the next (a channel moving more than 24 of 255; the bare rig to the base look should change none), and the brightest pixel (Rec. 709 luminance, 0-255) of the drill nose against the footprint for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_hull_looks.py. The nose must stay the brightest glow.",
   "lit": {
     "tier-1": {
       "phonePxPerM": 30.0,
       "hullFootprintPx": {
         "rig -> bronze-pod": {
           "changed": 1,
-          "of": 144
+          "of": 240
         },
         "bronze-pod -> riveted-plate": {
           "changed": 69,
-          "of": 144
+          "of": 240
         },
         "riveted-plate -> banded-iron": {
           "changed": 59,
-          "of": 144
+          "of": 240
         },
         "banded-iron -> brass-trimmed-armour": {
           "changed": 77,
-          "of": 144
+          "of": 240
         },
         "brass-trimmed-armour -> layered-armour": {
           "changed": 84,
-          "of": 144
+          "of": 240
         },
         "layered-armour -> filigree-armour": {
           "changed": 57,
-          "of": 144
+          "of": 240
+        },
+        "filigree-armour -> keel-strake-armour": {
+          "changed": 5,
+          "of": 240
+        },
+        "keel-strake-armour -> stern-plated-armour": {
+          "changed": 13,
+          "of": 240
+        },
+        "stern-plated-armour -> bow-plated-armour": {
+          "changed": 11,
+          "of": 240
+        },
+        "bow-plated-armour -> corner-plated-armour": {
+          "changed": 15,
+          "of": 240
+        },
+        "corner-plated-armour -> hatch-ringed-armour": {
+          "changed": 19,
+          "of": 240
+        },
+        "hatch-ringed-armour -> keel-riveted-armour": {
+          "changed": 5,
+          "of": 240
+        },
+        "keel-riveted-armour -> cap-riveted-armour": {
+          "changed": 5,
+          "of": 240
+        },
+        "cap-riveted-armour -> corner-riveted-armour": {
+          "changed": 10,
+          "of": 240
+        },
+        "corner-riveted-armour -> hatch-bolted-armour": {
+          "changed": 4,
+          "of": 240
+        },
+        "hatch-bolted-armour -> skirt-rail-armour": {
+          "changed": 20,
+          "of": 240
+        },
+        "skirt-rail-armour -> stern-skirt-armour": {
+          "changed": 8,
+          "of": 240
+        },
+        "stern-skirt-armour -> bow-skirt-armour": {
+          "changed": 9,
+          "of": 240
+        },
+        "bow-skirt-armour -> full-skirt-armour": {
+          "changed": 10,
+          "of": 240
+        },
+        "full-skirt-armour -> bossed-skirt-armour": {
+          "changed": 18,
+          "of": 240
+        }
+      },
+      "closestZoomPxPerM": 45.0,
+      "closestZoomHullFootprintPx": {
+        "rig -> bronze-pod": {
+          "changed": 3,
+          "of": 589
+        },
+        "bronze-pod -> riveted-plate": {
+          "changed": 165,
+          "of": 589
+        },
+        "riveted-plate -> banded-iron": {
+          "changed": 163,
+          "of": 589
+        },
+        "banded-iron -> brass-trimmed-armour": {
+          "changed": 199,
+          "of": 589
+        },
+        "brass-trimmed-armour -> layered-armour": {
+          "changed": 182,
+          "of": 589
+        },
+        "layered-armour -> filigree-armour": {
+          "changed": 138,
+          "of": 589
+        },
+        "filigree-armour -> keel-strake-armour": {
+          "changed": 25,
+          "of": 589
+        },
+        "keel-strake-armour -> stern-plated-armour": {
+          "changed": 28,
+          "of": 589
+        },
+        "stern-plated-armour -> bow-plated-armour": {
+          "changed": 25,
+          "of": 589
+        },
+        "bow-plated-armour -> corner-plated-armour": {
+          "changed": 51,
+          "of": 589
+        },
+        "corner-plated-armour -> hatch-ringed-armour": {
+          "changed": 37,
+          "of": 589
+        },
+        "hatch-ringed-armour -> keel-riveted-armour": {
+          "changed": 29,
+          "of": 589
+        },
+        "keel-riveted-armour -> cap-riveted-armour": {
+          "changed": 16,
+          "of": 589
+        },
+        "cap-riveted-armour -> corner-riveted-armour": {
+          "changed": 20,
+          "of": 589
+        },
+        "corner-riveted-armour -> hatch-bolted-armour": {
+          "changed": 14,
+          "of": 589
+        },
+        "hatch-bolted-armour -> skirt-rail-armour": {
+          "changed": 51,
+          "of": 589
+        },
+        "skirt-rail-armour -> stern-skirt-armour": {
+          "changed": 21,
+          "of": 589
+        },
+        "stern-skirt-armour -> bow-skirt-armour": {
+          "changed": 19,
+          "of": 589
+        },
+        "bow-skirt-armour -> full-skirt-armour": {
+          "changed": 20,
+          "of": 589
+        },
+        "full-skirt-armour -> bossed-skirt-armour": {
+          "changed": 44,
+          "of": 589
         }
       },
       "brightest": {
@@ -40,11 +179,11 @@
         },
         "riveted-plate": {
           "nose": 203,
-          "hull": 181
+          "hull": 196
         },
         "banded-iron": {
           "nose": 203,
-          "hull": 191
+          "hull": 197
         },
         "brass-trimmed-armour": {
           "nose": 203,
@@ -52,11 +191,67 @@
         },
         "layered-armour": {
           "nose": 203,
-          "hull": 180
+          "hull": 196
         },
         "filigree-armour": {
           "nose": 203,
+          "hull": 196
+        },
+        "keel-strake-armour": {
+          "nose": 203,
+          "hull": 196
+        },
+        "stern-plated-armour": {
+          "nose": 203,
           "hull": 182
+        },
+        "bow-plated-armour": {
+          "nose": 203,
+          "hull": 212
+        },
+        "corner-plated-armour": {
+          "nose": 203,
+          "hull": 211
+        },
+        "hatch-ringed-armour": {
+          "nose": 203,
+          "hull": 211
+        },
+        "keel-riveted-armour": {
+          "nose": 203,
+          "hull": 211
+        },
+        "cap-riveted-armour": {
+          "nose": 203,
+          "hull": 209
+        },
+        "corner-riveted-armour": {
+          "nose": 203,
+          "hull": 209
+        },
+        "hatch-bolted-armour": {
+          "nose": 203,
+          "hull": 209
+        },
+        "skirt-rail-armour": {
+          "nose": 203,
+          "hull": 209
+        },
+        "stern-skirt-armour": {
+          "nose": 203,
+          "hull": 208
+        },
+        "bow-skirt-armour": {
+          "nose": 203,
+          "hull": 208
+        },
+        "full-skirt-armour": {
+          "nose": 203,
+          "hull": 208
+        },
+        "bossed-skirt-armour": {
+          "nose": 203,
+          "hull": 207
         }
       }
     },
@@ -65,27 +260,166 @@
       "hullFootprintPx": {
         "rig -> bronze-pod": {
           "changed": 1,
-          "of": 144
+          "of": 240
         },
         "bronze-pod -> riveted-plate": {
           "changed": 70,
-          "of": 144
+          "of": 240
         },
         "riveted-plate -> banded-iron": {
           "changed": 58,
-          "of": 144
+          "of": 240
         },
         "banded-iron -> brass-trimmed-armour": {
           "changed": 76,
-          "of": 144
+          "of": 240
         },
         "brass-trimmed-armour -> layered-armour": {
           "changed": 84,
-          "of": 144
+          "of": 240
         },
         "layered-armour -> filigree-armour": {
-          "changed": 59,
-          "of": 144
+          "changed": 58,
+          "of": 240
+        },
+        "filigree-armour -> keel-strake-armour": {
+          "changed": 11,
+          "of": 240
+        },
+        "keel-strake-armour -> stern-plated-armour": {
+          "changed": 13,
+          "of": 240
+        },
+        "stern-plated-armour -> bow-plated-armour": {
+          "changed": 10,
+          "of": 240
+        },
+        "bow-plated-armour -> corner-plated-armour": {
+          "changed": 16,
+          "of": 240
+        },
+        "corner-plated-armour -> hatch-ringed-armour": {
+          "changed": 18,
+          "of": 240
+        },
+        "hatch-ringed-armour -> keel-riveted-armour": {
+          "changed": 6,
+          "of": 240
+        },
+        "keel-riveted-armour -> cap-riveted-armour": {
+          "changed": 5,
+          "of": 240
+        },
+        "cap-riveted-armour -> corner-riveted-armour": {
+          "changed": 10,
+          "of": 240
+        },
+        "corner-riveted-armour -> hatch-bolted-armour": {
+          "changed": 3,
+          "of": 240
+        },
+        "hatch-bolted-armour -> skirt-rail-armour": {
+          "changed": 17,
+          "of": 240
+        },
+        "skirt-rail-armour -> stern-skirt-armour": {
+          "changed": 8,
+          "of": 240
+        },
+        "stern-skirt-armour -> bow-skirt-armour": {
+          "changed": 7,
+          "of": 240
+        },
+        "bow-skirt-armour -> full-skirt-armour": {
+          "changed": 7,
+          "of": 240
+        },
+        "full-skirt-armour -> bossed-skirt-armour": {
+          "changed": 18,
+          "of": 240
+        }
+      },
+      "closestZoomPxPerM": 45.0,
+      "closestZoomHullFootprintPx": {
+        "rig -> bronze-pod": {
+          "changed": 5,
+          "of": 589
+        },
+        "bronze-pod -> riveted-plate": {
+          "changed": 166,
+          "of": 589
+        },
+        "riveted-plate -> banded-iron": {
+          "changed": 163,
+          "of": 589
+        },
+        "banded-iron -> brass-trimmed-armour": {
+          "changed": 196,
+          "of": 589
+        },
+        "brass-trimmed-armour -> layered-armour": {
+          "changed": 180,
+          "of": 589
+        },
+        "layered-armour -> filigree-armour": {
+          "changed": 138,
+          "of": 589
+        },
+        "filigree-armour -> keel-strake-armour": {
+          "changed": 23,
+          "of": 589
+        },
+        "keel-strake-armour -> stern-plated-armour": {
+          "changed": 31,
+          "of": 589
+        },
+        "stern-plated-armour -> bow-plated-armour": {
+          "changed": 24,
+          "of": 589
+        },
+        "bow-plated-armour -> corner-plated-armour": {
+          "changed": 46,
+          "of": 589
+        },
+        "corner-plated-armour -> hatch-ringed-armour": {
+          "changed": 38,
+          "of": 589
+        },
+        "hatch-ringed-armour -> keel-riveted-armour": {
+          "changed": 29,
+          "of": 589
+        },
+        "keel-riveted-armour -> cap-riveted-armour": {
+          "changed": 15,
+          "of": 589
+        },
+        "cap-riveted-armour -> corner-riveted-armour": {
+          "changed": 21,
+          "of": 589
+        },
+        "corner-riveted-armour -> hatch-bolted-armour": {
+          "changed": 14,
+          "of": 589
+        },
+        "hatch-bolted-armour -> skirt-rail-armour": {
+          "changed": 47,
+          "of": 589
+        },
+        "skirt-rail-armour -> stern-skirt-armour": {
+          "changed": 27,
+          "of": 589
+        },
+        "stern-skirt-armour -> bow-skirt-armour": {
+          "changed": 25,
+          "of": 589
+        },
+        "bow-skirt-armour -> full-skirt-armour": {
+          "changed": 27,
+          "of": 589
+        },
+        "full-skirt-armour -> bossed-skirt-armour": {
+          "changed": 44,
+          "of": 589
         }
       },
       "brightest": {
@@ -99,7 +433,7 @@
         },
         "riveted-plate": {
           "nose": 253,
-          "hull": 191
+          "hull": 194
         },
         "banded-iron": {
           "nose": 253,
@@ -115,7 +449,63 @@
         },
         "filigree-armour": {
           "nose": 253,
+          "hull": 194
+        },
+        "keel-strake-armour": {
+          "nose": 253,
+          "hull": 194
+        },
+        "stern-plated-armour": {
+          "nose": 253,
           "hull": 190
+        },
+        "bow-plated-armour": {
+          "nose": 253,
+          "hull": 212
+        },
+        "corner-plated-armour": {
+          "nose": 253,
+          "hull": 212
+        },
+        "hatch-ringed-armour": {
+          "nose": 253,
+          "hull": 212
+        },
+        "keel-riveted-armour": {
+          "nose": 253,
+          "hull": 212
+        },
+        "cap-riveted-armour": {
+          "nose": 253,
+          "hull": 209
+        },
+        "corner-riveted-armour": {
+          "nose": 253,
+          "hull": 209
+        },
+        "hatch-bolted-armour": {
+          "nose": 253,
+          "hull": 209
+        },
+        "skirt-rail-armour": {
+          "nose": 253,
+          "hull": 209
+        },
+        "stern-skirt-armour": {
+          "nose": 253,
+          "hull": 208
+        },
+        "bow-skirt-armour": {
+          "nose": 253,
+          "hull": 208
+        },
+        "full-skirt-armour": {
+          "nose": 253,
+          "hull": 208
+        },
+        "bossed-skirt-armour": {
+          "nose": 253,
+          "hull": 208
         }
       }
     }
@@ -123,31 +513,87 @@
   "glow": {
     "rig": {
       "nose": 247,
-      "hull": 15
+      "hull": 31
     },
     "bronze-pod": {
       "nose": 247,
-      "hull": 15
+      "hull": 31
     },
     "riveted-plate": {
       "nose": 247,
-      "hull": 15
+      "hull": 31
     },
     "banded-iron": {
       "nose": 247,
-      "hull": 15
+      "hull": 32
     },
     "brass-trimmed-armour": {
       "nose": 247,
-      "hull": 15
+      "hull": 32
     },
     "layered-armour": {
       "nose": 247,
-      "hull": 15
+      "hull": 36
     },
     "filigree-armour": {
       "nose": 247,
       "hull": 163
+    },
+    "keel-strake-armour": {
+      "nose": 247,
+      "hull": 163
+    },
+    "stern-plated-armour": {
+      "nose": 247,
+      "hull": 164
+    },
+    "bow-plated-armour": {
+      "nose": 247,
+      "hull": 163
+    },
+    "corner-plated-armour": {
+      "nose": 247,
+      "hull": 165
+    },
+    "hatch-ringed-armour": {
+      "nose": 247,
+      "hull": 161
+    },
+    "keel-riveted-armour": {
+      "nose": 247,
+      "hull": 162
+    },
+    "cap-riveted-armour": {
+      "nose": 247,
+      "hull": 162
+    },
+    "corner-riveted-armour": {
+      "nose": 247,
+      "hull": 162
+    },
+    "hatch-bolted-armour": {
+      "nose": 247,
+      "hull": 160
+    },
+    "skirt-rail-armour": {
+      "nose": 247,
+      "hull": 162
+    },
+    "stern-skirt-armour": {
+      "nose": 247,
+      "hull": 158
+    },
+    "bow-skirt-armour": {
+      "nose": 247,
+      "hull": 158
+    },
+    "full-skirt-armour": {
+      "nose": 247,
+      "hull": 158
+    },
+    "bossed-skirt-armour": {
+      "nose": 247,
+      "hull": 164
     }
   }
 }

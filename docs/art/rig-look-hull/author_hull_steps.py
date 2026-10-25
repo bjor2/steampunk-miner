@@ -28,19 +28,21 @@ the hips and the thrusters' swivel mounts, as the tier-3 rig's own belly skirt d
 (author_casing_driller.skirt_pieces, `t3-armour-plate-3`): 0.3 m either side of the slot and
 no lower than 0.166 m under the pod's axis, which is inside the pod's silhouette out to the
 caps and well inside the 0.9 m collider box (VEHICLE_COLLIDER_SIZE), so a skirt never reads as
-hit area. The skirts stand with their faces 0.21 m nearer the camera than the pod's axis, in
-front of the hips the legs hang from, so the review composites show them as the game draws
-them: the look's sprite (draw order 5) over the chassis (2) and the thrusters (4). Rivets and
-bolts are 7.5 to 10 mm domes in a metal that contrasts with the plate they sit on (bright steel
-on dark iron, dark iron on pale steel), in double or ringed rows, so a rivet step moves a 360 px
-phone's pixels along a whole edge rather than one dot. No glow is added: the filigree's gems
-stay the hull's one emission, under a fifth of the drill nose's.
+hit area. The skirts stand with their faces 0.215 m nearer the camera than the pod's axis, in
+front of the hips and thigh rams of the legs, so the review composites show them as the game draws
+them: the look's sprite (draw order 5) over the chassis (2) and the thrusters (4). Every plate
+is a metal that contrasts with what it lies on (dark iron on the bronze stern and the dark
+keel strip, pale steel on the grey bow cap, over the dark filigree bays and over the dark keel
+bar), and rivets and bolts are 10 to 11 mm domes in a metal that contrasts with their plate
+(bright steel on dark iron, dark iron on pale steel), in double or ringed rows, so a rivet
+step moves a 360 px phone's pixels along a whole edge rather than one dot. No glow is added:
+the filigree's gems stay the hull's one emission, under a fifth of the drill nose's.
 
 | Part                     | Step | Adds                                                                     |
 | ------------------------ | ---- | ------------------------------------------------------------------------ |
 | `keel-strake-armour`     | 720  | a dark-iron keel strake along the plating's bottom edge, brass-lipped    |
-| `stern-plated-armour`    | 840  | a brass-rimmed dark-iron plate on the stern cap, three facets            |
-| `bow-plated-armour`      | 960  | the same on the bow cap                                                  |
+| `stern-plated-armour`    | 840  | a brass-rimmed dark-iron plate on the bronze stern cap, three facets     |
+| `bow-plated-armour`      | 960  | a brass-rimmed pale steel plate on the grey bow cap, three facets        |
 | `corner-plated-armour`   | 1080 | pale steel doubling plates with dark chamfers over the four corner bays  |
 | `hatch-ringed-armour`    | 1200 | a heavy dark-iron ring round the porthole, brass hinge knuckles, a latch |
 | `keel-riveted-armour`    | 1320 | two staggered rows of bright steel rivets along the keel strake          |
@@ -48,7 +50,7 @@ stay the hull's one emission, under a fifth of the drill nose's.
 | `corner-riveted-armour`  | 1560 | a ring of dark-iron rivets round each corner plate                       |
 | `hatch-bolted-armour`    | 1680 | twelve bright steel bolts round the hatch ring                           |
 | `skirt-rail-armour`      | 1800 | a brass skirt rail under the keel strake on five brass hangers           |
-| `stern-skirt-armour`     | 1920 | three dark steel skirt plates hung from the rail at the stern            |
+| `stern-skirt-armour`     | 1920 | three pale steel skirt plates hung from the rail at the stern            |
 | `bow-skirt-armour`       | 2040 | three more at the bow                                                    |
 | `full-skirt-armour`      | 2160 | the three middle plates, closing the skirt                               |
 | `bossed-skirt-armour`    | 2280 | a brass boss on every skirt plate and a brass trim bar along its hem     |
@@ -89,6 +91,7 @@ STRAKE_LIP_W = 0.008
 # the stack's foot (x -0.326) and the piston (x 0.313). At x +-0.32 the cap's silhouette still
 # reaches 0.168 m off the axis, so the rows' 0.145 m top stays inside it.
 CAP_COLUMNS = ((-0.32, -0.247), (0.247, 0.31))
+CAP_PLATE_MATERIALS = ('dark-iron', 'steel')
 CAP_ROWS = ((-0.062, 0.02), (0.02, 0.10), (0.10, 0.145))
 CAP_TRIM_W = 0.010
 # The corner plates over the plating's four corner bays, inset from the bay, standing over the
@@ -113,20 +116,21 @@ LATCH_DX = 0.076
 # plate, twelve bolts round the hatch ring.
 KEEL_RIVET_ROWS = ((-0.071, -0.225), (-0.089, -0.2025))
 KEEL_RIVET_STEP = 0.045
-KEEL_RIVET_R = 0.0085
-CAP_RIVET_INSET = 0.014
-CAP_RIVET_STEP = 0.038
-CAP_RIVET_R = 0.009
-CORNER_RIVET_INSET = 0.013
-CORNER_RIVET_STEP = 0.030
-CORNER_RIVET_R = 0.0075
+KEEL_RIVET_R = 0.010
+CAP_RIVET_INSET = 0.016
+CAP_RIVET_STEP = 0.034
+CAP_RIVET_R = 0.011
+CORNER_RIVET_INSET = 0.015
+CORNER_RIVET_STEP = 0.024
+CORNER_RIVET_R = 0.010
 HATCH_BOLTS = 12
-HATCH_BOLT_R = 0.0075
+HATCH_BOLT_R = 0.010
 # The skirt: a brass rail on five hangers under the keel strake, nine plates hung from it, a
-# boss on each and a trim bar along the hem. Flat, facing the camera, their faces at SKIRT_Y
-# (the hips' faces are at -0.186), inside the pod's silhouette: at x +-0.30 the stern and bow
-# caps reach 0.1755 m under the axis, the hem stops at 0.168.
-SKIRT_Y = -0.205
+# boss on each and a trim bar along the hem. Flat, facing the camera, their faces at SKIRT_Y,
+# ahead of everything the legs put in front of the pod (the hips' faces are at -0.186, the
+# thigh rams' at -0.20), inside the pod's silhouette: at x +-0.30 the stern and bow caps reach
+# 0.1755 m under the axis, the hem stops at 0.168.
+SKIRT_Y = -0.215
 RAIL_X = (-0.30, 0.30)
 RAIL_DZ = (-0.114, -0.100)
 RAIL_T = 0.012
@@ -219,17 +223,18 @@ def keel_strake_pieces():
 
 
 def stern_plate_pieces():
-    return cap_plate_pieces(CAP_COLUMNS[0])
+    return cap_plate_pieces(CAP_COLUMNS[0], CAP_PLATE_MATERIALS[0])
 
 
 def bow_plate_pieces():
-    return cap_plate_pieces(CAP_COLUMNS[1])
+    return cap_plate_pieces(CAP_COLUMNS[1], CAP_PLATE_MATERIALS[1])
 
 
-def cap_plate_pieces(column):
-    """Three dark-iron facets down a cap, the plating's rows, under one brass rim."""
+def cap_plate_pieces(column, material):
+    """Three facets down a cap, the plating's rows, under one brass rim: dark iron on the bronze
+    stern, pale steel on the grey bow, so each reads against its cap."""
     x0, x1 = column
-    pieces = [base.facet('dark-iron', x0, x1, dz0, dz1, base.GAP) for dz0, dz1 in CAP_ROWS]
+    pieces = [base.facet(material, x0, x1, dz0, dz1, base.GAP) for dz0, dz1 in CAP_ROWS]
     bay = (x0, x1, CAP_ROWS[0][0], CAP_ROWS[-1][1])
     return pieces + base.rim_strips('brass', bay, CAP_TRIM_W, base.GAP + base.PLATE_T)
 
@@ -331,12 +336,13 @@ def middle_skirt_pieces():
 
 
 def skirt_plate_pieces(indices):
-    """Dark steel plates hung from the rail, a dark-iron lip along each one's hem."""
+    """Pale steel plates hung from the rail over the dark keel bar, a dark-iron lip along each
+    one's hem."""
     dz0, dz1 = SKIRT_PLATE_DZ
     pieces = []
     for index in indices:
         x, width = skirt_plate_span(index)
-        pieces.append(skirt_box('hull-steel', (width, SKIRT_PLATE_T, dz1 - dz0), x, (dz0 + dz1) / 2, 0.0))
+        pieces.append(skirt_box('steel', (width, SKIRT_PLATE_T, dz1 - dz0), x, (dz0 + dz1) / 2, 0.0))
         pieces.append(skirt_box('dark-iron', (width, SKIRT_PLATE_T, SKIRT_LIP_DZ), x, dz0 + SKIRT_LIP_DZ / 2, -0.002))
     return pieces
 

@@ -661,21 +661,30 @@ review renders, at desktop and at a 360 px phone's size, are in
 
 The art half of the hull line of the rig look ladder
 ([#576](https://github.com/bjor2/steampunk-miner/issues/576), built by
-[#584](https://github.com/bjor2/steampunk-miner/issues/584)): a Blender source for the five look
-steps of the `hull` track, `art/blender/vehicle-look-hull/`, with the base look beside them. Each
-part is authored with the track's attach slot, `hull.plates`, at the origin, on the deck line
+[#584](https://github.com/bjor2/steampunk-miner/issues/584), authored to about P40 by
+[#816](https://github.com/bjor2/steampunk-miner/issues/816)): a Blender source for the nineteen
+look steps of the `hull` track, `art/blender/vehicle-look-hull/`, with the base look beside them.
+Each part is authored with the track's attach slot, `hull.plates`, at the origin, on the deck line
 0.21 m above the pod's axis, and is plating over the pod's camera-side skin: three rows of facets
 tangent to its cross-section, a hatch opening round the porthole, two brass lifting eyes at the
 slot. No rig part sits on the slot, so a look lies over the pod rather than replacing a part;
-`bronze-pod` is the pod's own bands and porthole piece for piece, the five armours the steps at
-20, 80, 140, 260 and 440 purchases. The rig-look seam
+`bronze-pod` is the pod's own porthole piece for piece, the five #584 armours the steps on the
+first band edges LK1 ([#809](https://github.com/bjor2/steampunk-miner/issues/809)) froze for the
+line (120, 240, 360, 480 and 600 purchases), and the fourteen LK7 parts the edges 720 to 2280:
+each is the filigree armour with one more part fitted in a socket, in the ticket's order, the
+plates (a keel strake, stern and bow cap plates, corner plates, a hatch ring), then the rivets on
+them (keel, cap and corner rivets, hatch bolts), then the armour skirts (a brass rail, the stern,
+bow and middle skirt plates, bosses and a hem). The skirts hang under the keel strake over the
+keel bar and the hips, as the tier-3 rig's own skirt does, inside the pod's silhouette and far
+inside the 0.9 m collider box. The rig-look seam
 ([#640](https://github.com/bjor2/steampunk-miner/issues/640)) registers it through `r.artAssets`
-from `rigLook.json`'s `lookAssets` and exports it to `public/assets/vehicle/`; with no `replaces`
-on the track, the look lies over the pod and hides nothing. The wiring (#585) fills the steps'
-parts and runs the tail above the top step. `docs/art/rig-look-hull/author_hull_looks.py` wrote the first version
-of the `.blend`; from then on it is the source. The part table, the outline check and the review
-renders, at desktop and at a 360 px phone's size, are in
-[docs/art/rig-look-hull/](art/rig-look-hull/README.md).
+from `rigLook.json`'s `lookAssets` and exports it to `public/assets/vehicle/` (20 parts,
+512x4096); with no `replaces` on the track, the look lies over the pod and hides nothing. The
+wiring (#585) fills the steps' parts and runs the finish tail above the top step.
+`docs/art/rig-look-hull/author_hull_looks.py` wrote the first version of the `.blend`;
+`author_hull_steps.py` fitted the LK7 parts into it (re-runnable); from then on the file is the
+source. The part table, the outline check and the review renders, at desktop and at a 360 px
+phone's size, are in [docs/art/rig-look-hull/](art/rig-look-hull/README.md).
 
 ## Rig-look parts: the cargo hold
 

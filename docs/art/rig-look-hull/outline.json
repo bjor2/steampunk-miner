@@ -99,7 +99,7 @@
       }
     },
     "cap-riveted-armour": {
-      "cells": 9357,
+      "cells": 9383,
       "outsideRig": {
         "tier-1": 0,
         "tier-2": 0,
@@ -107,7 +107,7 @@
       }
     },
     "corner-riveted-armour": {
-      "cells": 9357,
+      "cells": 9383,
       "outsideRig": {
         "tier-1": 0,
         "tier-2": 0,
@@ -115,7 +115,7 @@
       }
     },
     "hatch-bolted-armour": {
-      "cells": 9391,
+      "cells": 9443,
       "outsideRig": {
         "tier-1": 0,
         "tier-2": 0,
@@ -123,7 +123,7 @@
       }
     },
     "skirt-rail-armour": {
-      "cells": 9729,
+      "cells": 9781,
       "outsideRig": {
         "tier-1": 0,
         "tier-2": 0,
@@ -131,7 +131,7 @@
       }
     },
     "stern-skirt-armour": {
-      "cells": 10281,
+      "cells": 10333,
       "outsideRig": {
         "tier-1": 0,
         "tier-2": 0,
@@ -139,7 +139,7 @@
       }
     },
     "bow-skirt-armour": {
-      "cells": 10833,
+      "cells": 10885,
       "outsideRig": {
         "tier-1": 0,
         "tier-2": 0,
@@ -147,7 +147,7 @@
       }
     },
     "full-skirt-armour": {
-      "cells": 11385,
+      "cells": 11437,
       "outsideRig": {
         "tier-1": 0,
         "tier-2": 0,
@@ -155,7 +155,7 @@
       }
     },
     "bossed-skirt-armour": {
-      "cells": 11409,
+      "cells": 11461,
       "outsideRig": {
         "tier-1": 0,
         "tier-2": 0,

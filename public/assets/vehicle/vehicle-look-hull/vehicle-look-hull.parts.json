@@ -3,7 +3,7 @@
   "schema": 1,
   "source": {
     "blend": "art/blender/vehicle-look-hull/vehicle-look-hull.blend",
-    "sha256": "6965fadc68bd17a189812e007609637d99d5bc7b0d6a7c95c2fc09656e4dc3f6",
+    "sha256": "134223ab6f4784e78e5e2f3e2841c3b95c29401bb4c4c51930ddfe4745861d55",
     "blender": "4.2.9 LTS"
   },
   "pxPerMetre": 512,
@@ -166,7 +166,7 @@
       ],
       "sizeM": [
         0.63,
-        0.3258
+        0.3259
       ],
       "pivotM": [
         0.32,
@@ -212,7 +212,7 @@
       ],
       "sizeM": [
         0.63,
-        0.3258
+        0.3259
       ],
       "pivotM": [
         0.32,
@@ -281,7 +281,7 @@
       ],
       "sizeM": [
         0.63,
-        0.3258
+        0.3259
       ],
       "pivotM": [
         0.32,
@@ -327,7 +327,7 @@
       ],
       "sizeM": [
         0.63,
-        0.3258
+        0.3259
       ],
       "pivotM": [
         0.32,
