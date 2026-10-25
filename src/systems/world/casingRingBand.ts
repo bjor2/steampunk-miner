@@ -7,7 +7,9 @@
  * body's line on the stamp's side (the 3° slant at planet 1's pad, #879). A ring with no sweep is
  * its stretch alone, and a stretch of no length is the circle. The shape stops square at its
  * stretch's start: what lies behind is the stretch before's, its own ring's to line and bill
- * (#76, #115).
+ * (#76, #115). Ahead of its point the band reaches no further along the stretch than the
+ * stretch's own band does, so the sweep's lead down the cut never lines the ground the drill is
+ * about to cut.
  */
 
 /** A point in mm. */
@@ -40,7 +42,7 @@ type RingShape = readonly [MmPoint, MmPoint, MmPoint, MmPoint]
 export function isInRingBand(ring: CasingRing, xMm: number, yMm: number): boolean {
   const shape = ringShapeOf(ring)
   const point = { xMm, yMm }
-  if (isBehindStretch(shape, point)) return false
+  if (isBehindStretch(shape, point) || isPastRingReach(shape, point, outerOf(ring))) return false
   if (isInsideShape(shape, point)) return false
   return (
     isFartherThanAll(shape, point, ring.clearMm) && isNearerThanAny(shape, point, outerOf(ring))
@@ -69,13 +71,31 @@ function outerOf(ring: CasingRing): number {
 
 function ringShapeOf(ring: CasingRing): RingShape {
   const from = ring.stretchFromMm ?? { xMm: ring.xMm, yMm: ring.yMm }
-  const sweep = ring.sweepMm ?? NO_RING_SWEEP
+  const sweep = hasLength(from, ring) ? (ring.sweepMm ?? NO_RING_SWEEP) : NO_RING_SWEEP
   return [
     from,
     { xMm: ring.xMm, yMm: ring.yMm },
     { xMm: ring.xMm + sweep.xMm, yMm: ring.yMm + sweep.yMm },
     { xMm: from.xMm + sweep.xMm, yMm: from.yMm + sweep.yMm },
   ]
+}
+
+function hasLength(from: MmPoint, to: MmPoint): boolean {
+  return from.xMm !== to.xMm || from.yMm !== to.yMm
+}
+
+/**
+ * Further along the stretch than `reachMm` past the ring's point: ahead of where the stretch's own
+ * band reaches (Q1's ring). The sweep's lead down the cut is ground its stamp has cut, but ahead
+ * of that reach it is the face the drill turns into as the leg ends, which lined there would meet
+ * the drill with its own lining inside the ring lag (#560; a 48 m/s rig's lift out of its level
+ * leg crawled at its thrust through the lined end of the tunnel).
+ */
+function isPastRingReach([from, to]: RingShape, point: MmPoint, reachMm: number): boolean {
+  const ax = to.xMm - from.xMm
+  const ay = to.yMm - from.yMm
+  const past = (point.xMm - to.xMm) * ax + (point.yMm - to.yMm) * ay
+  return past > 0 && past * past >= reachMm * reachMm * (ax * ax + ay * ay)
 }
 
 /** Behind the square cut across the stretch at its start; a stretch of no length has no behind. */

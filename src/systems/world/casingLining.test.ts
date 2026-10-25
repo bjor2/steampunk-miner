@@ -408,7 +408,7 @@ describe('casing lining: a trail ring along its stretch of axis (the TD’s Q1 r
   })
 })
 
-describe('casing lining: a trail ring swept by its cut (the GD\u2019s (e) ruling on #662)', () => {
+describe('casing lining: a trail ring swept by its cut (the GD’s (e) ruling on #662)', () => {
   /**
    * The body falls straight down this line while its stamp, 0.8 m ahead down the planet's radial,
    * runs 45 mm east of it: the slant at planet 1's pad (#879), purchase 20's worst. The east
@@ -490,7 +490,7 @@ describe('casing lining: a trail ring swept by its cut (the GD\u2019s (e) ruling
     return createHash('sha256').update(text, 'utf8').digest('hex')
   }
 
-  it('lines the wall rock the slanted stamp cut past the body\u2019s line, which its stretch alone leaves', () => {
+  it('lines the wall rock the slanted stamp cut past the body’s line, which its stretch alone leaves', () => {
     const shaft = slantedShaft()
     const wall = eastWallRockOf(shaft)
     const swept = linedDown(shaft, SWEEP)
@@ -500,7 +500,7 @@ describe('casing lining: a trail ring swept by its cut (the GD\u2019s (e) ruling
     expect(wall.some(({ sx, sy }) => casingAt(unswept, sx, sy) === 0)).toBe(true)
   })
 
-  it('still lines nothing behind its stretch\u2019s start, which the stretch before\u2019s ring bills', () => {
+  it('still lines nothing behind its stretch’s start, which the stretch before’s ring bills', () => {
     const shaft = slantedShaft()
     const from = { xMm: BODY_X, yMm: 284_500 }
     const lined = lineRing(shaft, params, casingRingAlong(BODY_X, 284_000, from, SWEEP), 2)
@@ -508,7 +508,16 @@ describe('casing lining: a trail ring swept by its cut (the GD\u2019s (e) ruling
     expect(lined.linedSamples.every(({ sy }) => sy * MM_PER_SAMPLE < 284_500)).toBe(true)
   })
 
-  it('is the TD\u2019s Q1 stretch band, sample for sample, when its cut swept nothing', () => {
+  it('lines no further ahead of its point than its stretch’s own band, the ground its drill turns into', () => {
+    const shaft = slantedShaft()
+    const from = { xMm: BODY_X, yMm: 284_500 }
+    const lined = lineRing(shaft, params, casingRingAlong(BODY_X, 284_000, from, SWEEP), 2)
+    const reach = drillStampRadiusMm() + 250
+    expect(lined.placed).toBeGreaterThan(0)
+    expect(lined.linedSamples.every(({ sy }) => sy * MM_PER_SAMPLE > 284_000 - reach)).toBe(true)
+  })
+
+  it('is the TD’s Q1 stretch band, sample for sample, when its cut swept nothing', () => {
     // Pinned on 248d631f7, the stretch band as Q1 built it before any sweep (once #879 lands).
     expect(digestOf(stretchRings())).toBe(
       'e901ea6c61155d26e8f9733fc2a1a1daf1a2d57d410e2eac380930b95b0edb0c',
