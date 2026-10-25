@@ -531,7 +531,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/useRefusals.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/useResolution.test.ts` | 12 | 12 |
 
-### `rig-look`: 21 files, 383 tests
+### `rig-look`: 22 files, 393 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -544,10 +544,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/rig-look/systems/render/rigLookBands.test.ts` | 10 | 10 |
 | `src/features/rig-look/systems/render/rigLookFrames.test.ts` | 10 | 10 |
 | `src/features/rig-look/systems/render/rigLookIndex.test.ts` | 8 | 8 |
-| `src/features/rig-look/systems/render/rigLookParts.test.ts` | 9 | 9 |
+| `src/features/rig-look/systems/render/rigLookParts.test.ts` | 13 | 13 |
 | `src/features/rig-look/systems/rigLookArt.test.ts` | 6 | 4 |
 | `src/features/rig-look/systems/rigLookBadges.test.ts` | 12 | 8 |
 | `src/features/rig-look/systems/rigLookBoiler.test.ts` | 34 | 10 |
+| `src/features/rig-look/systems/rigLookCoverChecks.test.ts` | 6 | 6 |
 | `src/features/rig-look/systems/rigLookGlint.test.ts` | 6 | 6 |
 | `src/features/rig-look/systems/rigLookHull.test.ts` | 31 | 11 |
 | `src/features/rig-look/systems/rigLookLines.test.ts` | 12 | 8 |
@@ -661,7 +662,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/solar-systems/systems/systemRoster.golden.test.ts` | 2 | 2 |
 | `src/features/solar-systems/systems/systemRoster.test.ts` | 11 | 11 |
 
-### `tech-tree`: 61 files, 432 tests
+### `tech-tree`: 62 files, 447 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -712,6 +713,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/render/milestoneLook.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/render/powerUpFx.test.ts` | 9 | 9 |
 | `src/features/tech-tree/systems/render/powerUpFxFeed.test.ts` | 13 | 13 |
+| `src/features/tech-tree/systems/render/rigCovers.test.ts` | 15 | 11 |
 | `src/features/tech-tree/systems/render/rigGear.test.ts` | 13 | 13 |
 | `src/features/tech-tree/systems/render/techGear.test.ts` | 14 | 14 |
 | `src/features/tech-tree/systems/render/techGearQuads.test.ts` | 9 | 9 |
@@ -1510,7 +1512,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/renderQuality.test.ts` | 9 | 9 |
 | `src/systems/render/renderRate.test.ts` | 6 | 6 |
 | `src/systems/render/renderScale.test.ts` | 19 | 19 |
-| `src/systems/render/requestedParts.test.ts` | 6 | 6 |
+| `src/systems/render/requestedParts.test.ts` | 10 | 10 |
 | `src/systems/render/sampleClock.test.ts` | 3 | 3 |
 | `src/systems/render/sceneLights.test.ts` | 6 | 6 |
 | `src/systems/render/screenProjection.test.ts` | 5 | 5 |
@@ -1523,6 +1525,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/sprayPool.test.ts` | 15 | 15 |
 | `src/systems/render/stagedTurn.test.ts` | 2 | 2 |
 | `src/systems/render/stationIdleMotion.test.ts` | 9 | 9 |
+| `src/systems/render/swapCovers.test.ts` | 7 | 7 |
 | `src/systems/render/vehicleLook.test.ts` | 10 | 8 |
 | `src/systems/render/vehicleLookFold.test.ts` | 9 | 9 |
 | `src/systems/render/vehiclePreviewLook.test.ts` | 5 | 5 |
