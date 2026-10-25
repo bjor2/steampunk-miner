@@ -144,33 +144,33 @@ LOCKER_RIVET_DXS = (-0.036, 0.036)
 LOCKER_RIVET_DZS = (-0.03, 0.03)
 # The running lamps over the lockers, inboard of the stack bonnets and under the steam lines.
 LAMP_XS = (-0.2, 0.2)
-LAMP = (0.02, 0.03, 0.31)
-LAMP_LENS = (0.014, 0.01)
+LAMP = (0.026, 0.03, 0.305)
+LAMP_LENS = (0.019, 0.01)
 # The bull gear round the turbine: a brass ring outside the vanes (0.056) and sixteen teeth inside
 # the belt's inner edge.
 GEAR_RIM = (0.068, 0.007)
 GEAR_TEETH = (16, 0.079, (0.012, 0.01, 0.012))
 GEAR_Y = base.FRONT_Y - 0.008
-# The belt studs: a bright steel dome on every cleat's face round the loop, inside the window's
-# edges (x +-0.44, z -0.12).
-STUD_R = 0.006
-STUD_Y = -0.25
+# The belt studs: a bright steel dome on every cleat's face round the loop, its crown at the
+# roller's own radius (0.1195), inside the window's edges (x +-0.44, z -0.12).
+STUD_R = 0.0075
+STUD_Y = -0.252
 # The induction coils round each stack's shaft, over the tier-3 skirt line (0.175) and under the
 # stack's lower band (0.245).
 COIL = (0.03, 0.006)
 COIL_ZS = (0.19, 0.205, 0.22)
 # The aether hubs: a glowing lens on the three axles and the two idlers.
-HUB_LENS = (0.011, 0.006)
-IDLER_LENS = (0.006, 0.006)
+HUB_LENS = (0.015, 0.006)
+IDLER_LENS = (0.009, 0.006)
 # The wheel halos: inside the sprocket's and flywheel's rims, and round the turbine's vanes inside
 # its boss (0.034).
 WHEEL_HALO = (0.05, 0.004)
 TURBINE_HALO = (0.031, 0.0025)
 HALO_Y = base.FRONT_Y - 0.026
 # The aether drive: glow strips along the side rod, the guards and round the cylinders' ends.
-ROD_STRIP = 0.005
-GUARD_STRIP = (0.12, 0.004, 0.006)
-CYLINDER_RING = (0.021, 0.003)
+ROD_STRIP = 0.008
+GUARD_STRIP = (0.12, 0.004, 0.012)
+CYLINDER_RING = (0.021, 0.005)
 # The vehicle-scale 4 mm bevel of the first six parts.
 BEVEL_M = base.BEVEL_M
 

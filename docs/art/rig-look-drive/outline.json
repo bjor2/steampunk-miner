@@ -157,10 +157,10 @@
       }
     },
     "lamped-track": {
-      "cells": 11257,
+      "cells": 11342,
       "outsideRigInWindow": {
-        "tier-1": 2109,
-        "tier-3": 1733
+        "tier-1": 2108,
+        "tier-3": 1732
       },
       "outsideRigAndWindow": {
         "tier-1": 0,
@@ -168,10 +168,10 @@
       }
     },
     "geared-track": {
-      "cells": 11699,
+      "cells": 11784,
       "outsideRigInWindow": {
-        "tier-1": 2109,
-        "tier-3": 1733
+        "tier-1": 2108,
+        "tier-3": 1732
       },
       "outsideRigAndWindow": {
         "tier-1": 0,
@@ -179,10 +179,10 @@
       }
     },
     "studded-track": {
-      "cells": 11699,
+      "cells": 11802,
       "outsideRigInWindow": {
-        "tier-1": 2109,
-        "tier-3": 1733
+        "tier-1": 2110,
+        "tier-3": 1732
       },
       "outsideRigAndWindow": {
         "tier-1": 0,
@@ -190,10 +190,10 @@
       }
     },
     "coiled-track": {
-      "cells": 11907,
+      "cells": 12010,
       "outsideRigInWindow": {
-        "tier-1": 2109,
-        "tier-3": 1733
+        "tier-1": 2110,
+        "tier-3": 1732
       },
       "outsideRigAndWindow": {
         "tier-1": 0,
@@ -201,10 +201,10 @@
       }
     },
     "aether-hub-track": {
-      "cells": 11907,
+      "cells": 12010,
       "outsideRigInWindow": {
-        "tier-1": 2109,
-        "tier-3": 1733
+        "tier-1": 2110,
+        "tier-3": 1732
       },
       "outsideRigAndWindow": {
         "tier-1": 0,
@@ -212,9 +212,9 @@
       }
     },
     "haloed-track": {
-      "cells": 12087,
+      "cells": 12209,
       "outsideRigInWindow": {
-        "tier-1": 2110,
+        "tier-1": 2112,
         "tier-3": 1733
       },
       "outsideRigAndWindow": {
@@ -223,9 +223,9 @@
       }
     },
     "aether-track": {
-      "cells": 12089,
+      "cells": 12211,
       "outsideRigInWindow": {
-        "tier-1": 2110,
+        "tier-1": 2112,
         "tier-3": 1733
       },
       "outsideRigAndWindow": {
