@@ -865,6 +865,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/casingRules.test.ts` | 6 | 6 |
 | `src/systems/authority/casingSupport.test.ts` | 4 | 4 |
 | `src/systems/authority/cellDigEnergy.test.ts` | 4 | 4 |
+| `src/systems/authority/charges/blastCollapseRoll.test.ts` | 5 | 5 |
 | `src/systems/authority/charges/blastDisc.test.ts` | 8 | 8 |
 | `src/systems/authority/charges/blastFront.test.ts` | 10 | 10 |
 | `src/systems/authority/charges/blastPrefetch.test.ts` | 2 | 2 |
@@ -872,6 +873,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/charges/chargeBlast.test.ts` | 17 | 17 |
 | `src/systems/authority/charges/chargeBlastEffects.test.ts` | 3 | 3 |
 | `src/systems/authority/charges/chargeBlastGates.test.ts` | 6 | 6 |
+| `src/systems/authority/charges/chargeCollapseRoll.test.ts` | 12 | 12 |
 | `src/systems/authority/charges/chargeDisc.test.ts` | 9 | 9 |
 | `src/systems/authority/charges/chargeLiveBlast.test.ts` | 12 | 12 |
 | `src/systems/authority/charges/chargeShop.test.ts` | 10 | 10 |
@@ -1103,7 +1105,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/casingCementGrades.test.ts` | 7 | 7 |
 | `src/systems/economy/casingGrades.test.ts` | 10 | 10 |
 | `src/systems/economy/casingPrices.test.ts` | 8 | 8 |
-| `src/systems/economy/chargeSizes.test.ts` | 29 | 29 |
+| `src/systems/economy/chargeSizes.test.ts` | 31 | 31 |
 | `src/systems/economy/collapseCrush.test.ts` | 2 | 2 |
 | `src/systems/economy/costCurveLookup.test.ts` | 3 | 3 |
 | `src/systems/economy/depthDensityCurve.test.ts` | 7 | 7 |
