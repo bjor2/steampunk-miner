@@ -10,6 +10,7 @@ describe('hazard contact rows', () => {
       id: 'ores.rockfall',
       kind: 'rockfall',
       effect: 'refill',
+      diveHullCapBp: 2500,
       factorBp: 10000,
       refillShareBp: 10000,
       hullShareBp: 300,

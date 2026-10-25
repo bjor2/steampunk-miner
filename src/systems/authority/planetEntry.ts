@@ -1,7 +1,7 @@
 /**
  * Moving the session onto another planet (decisions #10 and #4): another planet is another world.
- * Its deltas start empty, its core progress, enemies, collapses, lava, bores, struts and grounded
- * lines start fresh, and every vehicle stands on its dock site, its drill's gated bite over (ticket
+ * Its deltas start empty, its core progress, enemies, collapses, lava, bores, struts, grounded
+ * lines and placed hazards start fresh, and every vehicle stands on its dock site, its drill's gated bite over (ticket
  * 519), its report cut's carry dropped (ticket 535) and its hazard tally and shove with them (ticket
  * 848). An item on auto stays on, its preview dropped (ticket 317). The vehicles keep their
  * levels, energy, hull and cargo; the platform keeps its look, and its core bay becomes the new
@@ -34,6 +34,7 @@ import { NO_BORES, withBores } from './bore/boreState'
 import { NO_STRUTS, withStruts } from './bore/strutState'
 import { NO_GROUNDED_LINES, withGroundedLines } from './magnetic/groundedLines'
 import { withoutDiveHazards } from './hazards/hazardDive'
+import { withoutPlacedHazards } from './hazards/placedHazards'
 import { playerOnNewPlanet } from './autoMode/autoModeState'
 import { combatOnNewPlanet } from './combat/enemyRoster'
 import type { DomainEventBodies } from './domainEvent'
@@ -64,7 +65,9 @@ export function withSessionOnPlanet(state: AuthorityState, to: SessionPlanet): A
     ]),
   )
   return {
-    ...withGroundedLines(withStruts(withBores(state, NO_BORES), NO_STRUTS), NO_GROUNDED_LINES),
+    ...withoutPlacedHazards(
+      withGroundedLines(withStruts(withBores(state, NO_BORES), NO_STRUTS), NO_GROUNDED_LINES),
+    ),
     ...coreBaysOnLanding(state, planet),
     planet,
     world: EMPTY_WORLD,

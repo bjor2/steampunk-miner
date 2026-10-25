@@ -15,7 +15,8 @@
  * drill's cut, and past and beside the scripted cell too, so the bot cuts with the player's gear
  * (`drillGearCut.ts`, ticket 392); with none registered the cut is the disc or the cell alone. On a magnetic
  * planet an electrified cell takes its shock's ticks longer, and shocks the vehicle as it breaks
- * (`magnetic/electrifiedShock.ts`, spec #258).
+ * (`magnetic/electrifiedShock.ts`, spec #258). A cell of a hazard kind with a contact-effect row
+ * plays its effect on the rig as it breaks (`hazards/hazardContacts.ts`, ticket 848).
  *
  * The swept cut (`drillStep`, ticket 330, `sweptDrill.ts`) goes through the same path one tick at a
  * time, counting drill time in sub-steps (`SUB_STEP_CLOCK`) and charging each cell it breaks its own
@@ -75,6 +76,7 @@ import { creditOreShare, oreSharesOf, type OreShareOf } from './sideOreCredit'
 import { minedOreOf, type MinedOre } from './minedOre'
 import { countPremiumUnit } from './premium/premiumLedgerState'
 import { oreCellHardness, scratchFloorOfCell } from './signatureCells'
+import { meetHazardContacts } from './hazards/hazardContacts'
 import { wakeLavaBeside } from './lava/lavaRules'
 import {
   shockElectrifiedCells,
@@ -409,6 +411,7 @@ function chargeAndCollect(
   const collected = chainEffects(charged, [
     (current) => collectYieldedCells(current, { playerId, params, gates, carved }),
     (current) => shockElectrifiedCells(current, playerId, params, carved.yielded),
+    (current) => meetHazardContacts(current, playerId, params, carved.yielded),
   ])
   return {
     state: wakeLavaBeside(collected.state, params, carved.yielded, state.tick),

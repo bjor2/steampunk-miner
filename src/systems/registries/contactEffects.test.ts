@@ -18,6 +18,7 @@ const BITE: ContactEffectRow = {
   kind: 'spinecrystal',
   effect: 'bite',
   factorBp: 10000,
+  diveHullCapBp: 2500,
   hullShareBp: 200,
 }
 const PLAYER = 'p1'

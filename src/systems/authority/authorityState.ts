@@ -16,6 +16,7 @@ import { NO_TERRAIN_EDITS, type QueuedTerrainEdit } from './terrain/terrainEdits
 import type { PendingBore } from './bore/boreState'
 import type { StandingStruts } from './bore/strutState'
 import type { GroundedLine } from './magnetic/groundedLines'
+import type { PlacedHazards } from './hazards/placedHazards'
 import type { AutoMode } from './autoMode/autoModeState'
 import { NO_COLLAPSE, type CollapseState } from './collapse/collapseState'
 import { NO_LOOSE_LAVA, type LavaState } from './lava/lavaState'
@@ -82,6 +83,11 @@ export interface AuthorityState {
    * are none, so a session that never grounds digests as before.
    */
   groundedLines?: readonly GroundedLine[]
+  /**
+   * Hazards a scenario placed, by cell (ticket 848, `debug.placeHazard`); absent while none is, so
+   * a session that never placed one digests as before. Emptied on every planet.
+   */
+  placedHazards?: PlacedHazards
   /** Set by the first accepted `debug.*` command and never reset (#11 section 4). */
   debugApplied: boolean
   /**

@@ -34,7 +34,9 @@ export const slice: SliceDefinition = {
     r.generationHook(oreLeadHook)
     r.planetRow(PLANET_ROW_PROVIDER)
     r.hazardPockets(HAZARD_POCKETS_PROVIDER)
-    hazardContactRowsOf(ORE_ROWS.planets.hazards).forEach((row) => r.contactEffect(row))
+    hazardContactRowsOf(ORE_ROWS.planets.hazards, ORE_ROWS.planets.hazardCaps).forEach((row) =>
+      r.contactEffect(row),
+    )
     r.planetCardLine(HAZARD_CARD_SOURCE)
     r.discoveryAliases(kernelOreAliases())
     r.orePickup(RARITY_PICKUP_PROVIDER)

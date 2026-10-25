@@ -7,7 +7,8 @@
  *   rings behind the drill every 0.5 m it cut (#41, #56); it also telegraphs a casing grade too low
  *   for the band (#41), and logs the guns' hits since the last report (#107), then settles the heat gauge
  *   on a heat planet and burns a vehicle touching lava (#113). A report that drives the vehicle
- *   into a magnetic field says so (spec #258, ticket 290). While a slice provides turret shapes,
+ *   into a magnetic field says so (spec #258, ticket 290). A rig that stood in a cut drain pocket
+ *   since its last charged command loses that time's drain first (ticket 848, `hazardDrain.ts`). While a slice provides turret shapes,
  *   a report notes whether the rig moved or drilled, for the sentry cam (ticket 382). A stranded
  *   or destroyed vehicle still reports its pose (gravity and hits apply) but its action ticks are
  *   ignored.
@@ -16,7 +17,8 @@
  *   (#115), so a scripted dig pays the lining a player's dig pays. Its `ticks` name the window
  *   it may cut in, counted on the swept cut's sub-steps in the rig's drill quantum, and it is
  *   charged and heated on the law work it removed (ticket 559), so a cell can clear in part of a
- *   tick and several `drillTile`s at one tick each pay only their own cell.
+ *   tick and several `drillTile`s at one tick each pay only their own cell. It settles a drain
+ *   pocket's drain as a report does (ticket 848).
  * - `requestRescue`: calls the tow for a stranded or destroyed vehicle.
  *
  * With the dev flag `drill.sweptCut` on, `drillStep` (`drillStepRules.ts`, ticket 330) cuts every
@@ -57,6 +59,7 @@ import {
 import { layCasingAfterScriptedDrill, layCasingAtPose, layDueCasingAtPose } from './casingPlacement'
 import { followCasingSupport } from './casingSupport'
 import { flushGunHits } from './combat/gunHits'
+import { drainInHazardPocket } from './hazards/hazardDrain'
 import { noteReportForCombat } from './combat/poseReportCombat'
 import { drillCell } from './groundDrill'
 import { touchLavaAtPose } from './lava/lavaRules'
@@ -123,6 +126,13 @@ export const VEHICLE_COMMAND_RULES: {
         (current) => followCasingSupport(current, command.playerId),
         (current) => noteReportForCombat(current, command.playerId, command.tick),
         (current) => flushGunHits(current, command.playerId),
+        (current) =>
+          drainInHazardPocket(
+            current,
+            command.playerId,
+            vehicleOf(state, command.playerId),
+            command.tick,
+          ),
         (current) => chargeReportedActions(current, command, vehicleOf(state, command.playerId)),
         (current) => layReportedCasing(current, command),
         (current) => followReportedHeat(current, command, vehicleOf(state, command.playerId)),
@@ -146,6 +156,13 @@ export const VEHICLE_COMMAND_RULES: {
         (current) => drillScriptedTile(current, command),
         (current) => unchanged(noteRigCut(current, command.playerId, command.tick)),
         (current) => followCarriedHeat(current, command.playerId, command.tick, false),
+        (current) =>
+          drainInHazardPocket(
+            current,
+            command.playerId,
+            vehicleOf(state, command.playerId),
+            command.tick,
+          ),
         (current) => markCharged(current, command.playerId, command.tick),
         (current) => layCasingAfterScriptedDrill(current, command.playerId, command.payload.ticks),
         (current) => followEnergyChange(current, command.playerId, command.tick),

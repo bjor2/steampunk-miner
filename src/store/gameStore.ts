@@ -90,6 +90,7 @@ import {
   premiumLedgerDebugActionsOf,
   type PremiumLedgerDebugActions,
 } from './premiumLedgerDebugActions'
+import { hazardDebugActionsOf, type HazardDebugActions } from './hazardDebugActions'
 import { collapseDebugActionsOf, type CollapseDebugActions } from './collapseDebugActions'
 import { groundDebugActionsOf, type GroundDebugActions } from './groundDebugActions'
 import {
@@ -223,7 +224,8 @@ type DebugActions = CombatDebugActions &
   HeatDebugActions &
   CollapseDebugActions &
   ArtefactActions &
-  PremiumLedgerDebugActions
+  PremiumLedgerDebugActions &
+  HazardDebugActions
 
 export interface GameState
   extends
@@ -431,6 +433,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...collapseDebugActionsOf(() => get().playerId),
   ...artefactActionsOf(() => get().playerId),
   ...premiumLedgerDebugActionsOf(() => get().playerId),
+  ...hazardDebugActionsOf(() => get().playerId),
   ...starMapActionsOf(() => get().playerId),
   ...presentationActionsOf(set, get),
   ...hintActionsOf(set, get),

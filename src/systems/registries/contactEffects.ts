@@ -14,7 +14,7 @@
  *   `shoveTiles` along its normal over `ticks`.
  *
  * Hull shares are basis points of the planet's on-curve hull, the hull law at g, from the arc the
- * cell lies in. **Factors.** A row's `factorBp` scales every number of its effect, and a tool or
+ * cell lies in, and a dive's contacts never take more than the row's `diveHullCapBp` in all. **Factors.** A row's `factorBp` scales every number of its effect, and a tool or
  * consumable answers a factor hook for a kind (`contactFactors`), the smallest answer applying on
  * top, never stacked. A factor of 0 plays nothing and says nothing, so a replay with every factor
  * at 0 is byte-identical to one with no rows at all.
@@ -32,6 +32,8 @@ interface ContactRowFields {
   kind: string
   /** The scale on every number of the effect, 0 to 10000 bp. */
   factorBp: number
+  /** The most on-curve hull, in bp, hazard contacts take from one dive in all, this one's too. */
+  diveHullCapBp: number
 }
 
 export type ContactEffectRow = ContactRowFields &

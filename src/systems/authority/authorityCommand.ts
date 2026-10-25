@@ -693,6 +693,11 @@ export interface KernelCommandPayloads {
    * count, or a tier counting more units than the hold holds; an empty map empties the ledger.
    */
   'debug.setPremiumLedger': { counts: Readonly<Record<string, string>> }
+  /**
+   * Places a hazard of `kind` in the cell `tx, ty` for a scenario (ticket 848): read before the
+   * planet's own pockets. Refused, never trimmed, for a kind no contact-effect row plays.
+   */
+  'debug.placeHazard': { kind: string; tx: number; ty: number }
 }
 
 /**

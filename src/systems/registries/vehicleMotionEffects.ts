@@ -7,7 +7,8 @@
  * nothing registered the answer is `PLAIN_MOTION` and the vehicle drives as it did.
  *
  * The kernel adds its own beside them (ticket 848): an acting tool's trade-off on the engine's
- * lift or drive (`toolTradeOffs.ts`). With no tool acting it adds nothing.
+ * lift or drive (`toolTradeOffs.ts`) and a steam vent's shove while it runs, a glide
+ * (`authority/hazards/hazardShove.ts`). With no tool acting and no shove it adds nothing.
  */
 import { vehicleOf, type AuthorityState } from '../authority/authorityState'
 import { ECONOMY } from '../economy/economy'
@@ -16,6 +17,7 @@ import {
   type VehicleMotion,
   type VehicleMotionEffect,
 } from '../vehicle/motionEffects'
+import type { VehicleState } from '../vehicle/vehicleState'
 import { defineRegistry, entriesOf } from './seal'
 import { tradeOffMotionEffectsOf } from './toolTradeOffs'
 
@@ -37,7 +39,10 @@ export function vehicleMotionAt(
   playerId: string,
   tick: number,
 ): VehicleMotion {
-  const effects = [...sliceEffectsOn(state, playerId, tick), ...kernelEffectsOn(state, playerId)]
+  const effects = [
+    ...sliceEffectsOn(state, playerId, tick),
+    ...kernelEffectsOn(state, playerId, tick),
+  ]
   return foldMotionEffects(effects, tick, ECONOMY.itemEffectCaps.motionBoostCapBp)
 }
 
@@ -51,7 +56,18 @@ function sliceEffectsOn(
     .filter((effect): effect is VehicleMotionEffect => effect !== null)
 }
 
-function kernelEffectsOn(state: AuthorityState, playerId: string): VehicleMotionEffect[] {
+function kernelEffectsOn(
+  state: AuthorityState,
+  playerId: string,
+  tick: number,
+): VehicleMotionEffect[] {
   if (!Object.hasOwn(state.players, playerId)) return []
-  return tradeOffMotionEffectsOf(vehicleOf(state, playerId))
+  const vehicle = vehicleOf(state, playerId)
+  return [...tradeOffMotionEffectsOf(vehicle), ...runningShoveOf(vehicle, tick)]
+}
+
+/** A vent's shove while it runs, as the glide it is; nothing once it ended. */
+function runningShoveOf(vehicle: VehicleState, tick: number): VehicleMotionEffect[] {
+  const shove = vehicle.hazardShove
+  return shove === undefined || tick >= shove.untilTick ? [] : [{ glide: shove }]
 }

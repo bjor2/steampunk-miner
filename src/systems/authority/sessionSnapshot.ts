@@ -37,6 +37,7 @@ import {
   portableGroundedLinesProblems,
   type GroundedLine,
 } from './magnetic/groundedLines'
+import { placedHazardsFieldOf, portablePlacedHazardsProblems } from './hazards/placedHazards'
 import {
   portableAutoModesOf,
   portableAutoModesProblems,
@@ -149,6 +150,8 @@ export interface PortableState {
   struts?: Record<string, BoreStrut>
   /** The grounded bore lines (ticket 378); omitted while there are none. */
   groundedLines?: GroundedLine[]
+  /** The hazards a scenario placed (ticket 848); omitted while there are none. */
+  placedHazards?: Record<string, string>
   debugApplied: boolean
   /** The dev flags off their defaults (ticket 547); omitted while none is. */
   devFlagDelta?: DevFlagDelta
@@ -210,6 +213,7 @@ function portableStateOf(state: AuthorityState): PortableState {
     ...portableBoresField(state.bores),
     ...portableStrutsField(state.struts),
     ...portableGroundedLinesField(state.groundedLines),
+    ...placedHazardsFieldOf(state.placedHazards),
     debugApplied: state.debugApplied,
     ...devFlagFieldsOf(state),
     ...portableSectionsOf(state.slices, 'session'),
@@ -278,6 +282,7 @@ function authorityStateOf(portable: PortableState): AuthorityState {
     ...portableBoresField(portable.bores),
     ...portableStrutsField(portable.struts),
     ...portableGroundedLinesField(portable.groundedLines),
+    ...placedHazardsFieldOf(portable.placedHazards),
     debugApplied: portable.debugApplied,
     ...devFlagFieldsOf(portable),
     ...sectionsOfPortable(portable.slices, 'session'),
@@ -330,6 +335,7 @@ function portableStateProblems(state: unknown, tick: unknown): string[] {
     ...portableBoresProblems(state.bores, 'snapshot.state.bores'),
     ...portableStrutsProblems(state.struts, 'snapshot.state.struts'),
     ...portableGroundedLinesProblems(state.groundedLines, 'snapshot.state.groundedLines'),
+    ...portablePlacedHazardsProblems(state.placedHazards, 'snapshot.state.placedHazards'),
     ...(typeof state.debugApplied === 'boolean'
       ? []
       : ['snapshot.state.debugApplied must be a boolean']),

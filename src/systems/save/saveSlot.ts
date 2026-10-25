@@ -38,6 +38,7 @@
 import type { AuthorityState } from '../authority/authorityState'
 import { isJsonObject, isWholeNumber } from '../authority/payloadFields'
 import { planetParamsOf } from '../authority/planetOfState'
+import { placedHazardsFieldOf } from '../authority/hazards/placedHazards'
 import {
   boreFieldsOf,
   oreRulesFieldOf,
@@ -112,6 +113,8 @@ export interface SaveWorldSection extends WorldSectionPlanet {
   struts?: PortableState['struts']
   /** The grounded bore lines (ticket 378); omitted while there are none. */
   groundedLines?: PortableState['groundedLines']
+  /** The hazards a scenario placed (ticket 848); omitted while there are none. */
+  placedHazards?: PortableState['placedHazards']
   debugApplied: boolean
   /** The dev flags off their defaults, so the world runs as it ran (ticket 547); omitted while none is. */
   devFlagDelta?: PortableState['devFlagDelta']
@@ -198,6 +201,7 @@ function worldSectionOf(state: PortableState, saveEpoch: number): SaveWorldSecti
     liveBlasts: state.liveBlasts,
     terrainEdits: state.terrainEdits,
     ...boreFieldsOf(state),
+    ...placedHazardsFieldOf(state.placedHazards),
     debugApplied: state.debugApplied,
     ...devFlagFieldsOf(state),
     ...(state.slices === undefined ? {} : { slices: state.slices }),
@@ -270,6 +274,7 @@ export function snapshotOfSaveSlot(file: SaveSections): SessionSnapshot {
       liveBlasts: world.liveBlasts,
       terrainEdits: world.terrainEdits,
       ...boreFieldsOf(world),
+      ...placedHazardsFieldOf(world.placedHazards),
       debugApplied: world.debugApplied,
       ...devFlagFieldsOf(world),
       ...(world.slices === undefined ? {} : { slices: world.slices }),

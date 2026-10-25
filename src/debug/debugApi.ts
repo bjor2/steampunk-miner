@@ -60,6 +60,7 @@ import { readArtefactReport } from '../store/artefactActions'
 import { readPremiumLedger } from '../store/premiumLedgerDebugActions'
 import type { PremiumLedger } from '../systems/authority/premium/premiumLedger'
 import { setPremiumLedgerCommand } from '../systems/authority/premium/premiumLedgerDebugRules'
+import { placeHazardCommand } from '../systems/authority/hazards/hazardDebugRules'
 import { setVehicleLoadout } from '../store/loadoutActions'
 import { setVehicleLoadoutCommand } from '../systems/authority/loadoutCommands'
 import { readSnapshot, type SessionSnapshot } from '../systems/authority/sessionSnapshot'
@@ -219,6 +220,9 @@ export interface DebugApi {
   setPremiumLedger(counts: Readonly<Record<string, string>>): DebugResult
   /** The local player's premium ledger counts, in key order. */
   premiumLedger(): DebugResult<{ counts: PremiumLedger }>
+  // hazards (ticket 848): a `debug.*` command; `kind` a hazard kind with a contact-effect row
+  /** A hazard of `kind` (`rockfall`, `firedamp`, `spinecrystal`, `steamvent`) in cell `tx, ty`. */
+  placeHazard(kind: string, tx: number, ty: number): DebugResult
   // ground (#36): `debug.*` commands; a disc in mm, `amount` 0 to 255 (default all of it)
   /** Lowers density round `(x, y)` mm; credits no ore and never cuts the dock pad. */
   carveCircle(x: number, y: number, radius: number, amount?: number): DebugResult
@@ -440,6 +444,10 @@ export function createDebugApi(): DebugApi {
         game().setPremiumLedger(counts),
       ),
     premiumLedger: () => ({ ok: true, counts: readPremiumLedger(game().playerId) }),
+    placeHazard: (kind, tx, ty) =>
+      runUnlessRefused(vehicleDebugProblems(placeHazardCommand(kind, tx, ty)), () =>
+        game().placeHazard(kind, tx, ty),
+      ),
     carveCircle: (x, y, radius, amount = SOLID_DENSITY) =>
       runUnlessRefused(vehicleDebugProblems(carveCircleCommand({ x, y, radius, amount })), () =>
         game().carveCircle({ x, y, radius, amount }),
