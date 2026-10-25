@@ -45,7 +45,7 @@ describe('save migration: snapshot 25 -> 26, the drill aim (ticket 791)', () => 
     }
   })
 
-  it('loads a snapshot 25 save through its step and the premium ledger step, state and digest as saved', () => {
+  it('loads a snapshot 25 save through its step, the premium ledger step and the blast record step, state and digest as saved', () => {
     const state = reportedFacing(FACING.down)
     const file = saveSlotOf({ ...takeSnapshot(state), snapshotVersion: 25 }, 1)
     const reading = readMigratedSaveSlot(file)
@@ -54,6 +54,7 @@ describe('save migration: snapshot 25 -> 26, the drill aim (ticket 791)', () => 
       { version: 'snapshotVersion', from: 25, to: 26 },
       { version: 'snapshotVersion', from: 26, to: 27 },
       { version: 'snapshotVersion', from: 27, to: 28 },
+      { version: 'snapshotVersion', from: 28, to: 29 },
     ])
     expect(reading.state).toEqual(state)
     expect(stateDigest(reading.state)).toBe(stateDigest(state))

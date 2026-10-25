@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest'
+import { baseTilesSqOf } from '../../../../systems/authority/charges/blastDisc'
 import { ticksToClear } from '../../../../systems/authority/charges/blastFront'
 import { previewBlastFrames, solidRockSlicesOf } from './blastPreview'
 
 describe('blast preview', () => {
   it('slices an R24 blast as K6 clears it in solid rock: 29 rings, growing out to the radius', () => {
     const slices = solidRockSlicesOf(24000)
-    expect(slices).toHaveLength(ticksToClear(24000))
+    expect(slices).toHaveLength(ticksToClear(baseTilesSqOf(24000)))
     expect(slices).toHaveLength(29)
     expect(slices[0][0]).toBe(0)
     expect(slices.at(-1)?.[1]).toBeLessThanOrEqual(24000)

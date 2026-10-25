@@ -201,5 +201,14 @@ function tileInBand(params: PlanetParams, band: number): TilePoint {
 }
 
 function blastOf(tile: TilePoint, size: number): BlastEvent {
-  return { ...tile, radiusMm: 0, size, playerId: 'p1', source: 'charge', tick: 0 }
+  return {
+    ...tile,
+    radiusMm: 0,
+    size,
+    radiusLevel: 0,
+    blastSeq: 0,
+    playerId: 'p1',
+    source: 'charge',
+    tick: 0,
+  }
 }

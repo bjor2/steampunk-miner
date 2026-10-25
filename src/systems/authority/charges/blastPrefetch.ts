@@ -14,6 +14,7 @@ import { chunkKey, chunkOfTile, type TilePoint } from '../../world/tileGrid'
 import { generatedChunkOf, isGeneratedChunkHeld } from '../../world/worldState'
 import type { AuthorityState } from '../authorityState'
 import { planetParamsOf } from '../planetOfState'
+import { groundRadiusMmOf, UNOWNED_RADIUS_LEVEL } from './blastDisc'
 import { liveChargesOf } from './chargeRules'
 
 export interface ChunkPoint {
@@ -39,9 +40,15 @@ export function prefetchPlantedBlastChunks(state: AuthorityState, ticks: number)
 /** The planted charges' blast chunks not generated yet, in charge then row order. */
 export function chunksAwaitingPrefetch(state: AuthorityState, params: PlanetParams): ChunkPoint[] {
   const chunks = liveChargesOf(state).flatMap((charge) =>
-    blastChunksOf(charge, chargeRadiusMm(charge.size)),
+    blastChunksOf(charge, plantedGroundReachMmOf(charge.size, params)),
   )
   return uniqueChunks(chunks).filter(({ cx, cy }) => !isGeneratedChunkHeld(params, cx, cy))
+}
+
+/** The ground a planted charge will clear: its rung at the planter's level (`blastDisc.ts`). */
+function plantedGroundReachMmOf(size: number, params: PlanetParams): number {
+  const disc = { radiusMm: chargeRadiusMm(size), radiusLevel: UNOWNED_RADIUS_LEVEL }
+  return groundRadiusMmOf(disc, params)
 }
 
 /** Every chunk a blast of this radius and its collapse rim read, bottom row first. */

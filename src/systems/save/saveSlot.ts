@@ -8,7 +8,7 @@
  *   world    the planet as seed + params + the deltas of the chunks play changed, packed into one
  *            table (`packedChunks.ts`, #401 VS2), the platform, the core, combat, the blocks
  *            warning or refilling (#43), loose lava (#113), live blasts and queued power-up terrain
- *            edits (K6 #189), and the bore gun's pending shots, standing struts and grounded lines
+ *            edits (K6 #189), the blast counter once a charge has blown (ticket 860), and the bore gun's pending shots, standing struts and grounded lines
  *            while there are any (tickets 313, 379, 378; carried since ticket 405, so a save taken
  *            mid-bore restores)
  *   profile  per player the wallet, the last seq and the vehicle (integer levels, never stats):
@@ -39,6 +39,7 @@ import type { AuthorityState } from '../authority/authorityState'
 import { isJsonObject, isWholeNumber } from '../authority/payloadFields'
 import { planetParamsOf } from '../authority/planetOfState'
 import { placedHazardsFieldOf } from '../authority/hazards/placedHazards'
+import { blastSeqFieldOf } from '../authority/charges/blastSeq'
 import {
   boreFieldsOf,
   oreRulesFieldOf,
@@ -106,6 +107,8 @@ export interface SaveWorldSection extends WorldSectionPlanet {
   collapse: PortableState['collapse']
   lava: PortableState['lava']
   liveBlasts: PortableState['liveBlasts']
+  /** The session's blast counter (ticket 860); omitted before the first blast. */
+  blastSeq?: PortableState['blastSeq']
   terrainEdits: PortableState['terrainEdits']
   /** The bore gun's pending shots (ticket 313); omitted while there are none. */
   bores?: PortableState['bores']
@@ -199,6 +202,7 @@ function worldSectionOf(state: PortableState, saveEpoch: number): SaveWorldSecti
     collapse: state.collapse,
     lava: state.lava,
     liveBlasts: state.liveBlasts,
+    ...blastSeqFieldOf(state),
     terrainEdits: state.terrainEdits,
     ...boreFieldsOf(state),
     ...placedHazardsFieldOf(state.placedHazards),
@@ -272,6 +276,7 @@ export function snapshotOfSaveSlot(file: SaveSections): SessionSnapshot {
       collapse: world.collapse,
       lava: world.lava,
       liveBlasts: world.liveBlasts,
+      ...blastSeqFieldOf(world),
       terrainEdits: world.terrainEdits,
       ...boreFieldsOf(world),
       ...placedHazardsFieldOf(world.placedHazards),

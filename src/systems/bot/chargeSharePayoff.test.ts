@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { baseTilesSqOf } from '../authority/charges/blastDisc'
 import { inRadiusCount } from '../authority/charges/blastFront'
 import { chargePrice, chargeRadiusMm, minChargeFor } from '../economy/chargeSizes'
 import { oreTier } from '../economy/oreEconomy'
@@ -78,7 +79,7 @@ describe('charge payoff under the share model (ticket 247, Systems on K8 #218)',
   it('frees the gated share of the radius and divides by one charge of the size', () => {
     const entries = bandOf(22, 5, { plusOne: true, plusTwo: false })
     const row = chargeSharePayoffOf(22, 5, entries, 5)
-    const radiusCells = inRadiusCount(chargeRadiusMm(5))
+    const radiusCells = inRadiusCount(baseTilesSqOf(chargeRadiusMm(5)))
     expect(toCanonical(row.gatedCells)).toBe(
       toCanonical(div(fromSafeInteger(radiusCells * 700), fromSafeInteger(10000))),
     )

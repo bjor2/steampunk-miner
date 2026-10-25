@@ -20,6 +20,7 @@ import {
   portableLiveBlastsProblems,
   type LiveBlast,
 } from './charges/liveBlast'
+import { blastSeqFieldOf, portableBlastSeqProblems } from './charges/blastSeq'
 import {
   portableTerrainEditsOf,
   portableTerrainEditsProblems,
@@ -88,6 +89,9 @@ import {
 } from './vehicleSnapshot'
 
 /**
+ * 29: the blast's disc record (ticket 860): each live blast's `blast` holds the planter's
+ * `radiusLevel` and its `blastSeq`, and the session counts its blasts under `blastSeq`, absent
+ * before the first (older saves number their live blasts in order, `saveMigrations.ts`);
  * 28: the bignum hold (ticket 849): a hold's units per tier, a Refinery batch's units and a Cache
  * Crate's cargo are written as a safe integer, or as canonical decimal text past 2^53 (older saves
  * hold safe integers only, which read as they are, `saveMigrations.ts`);
@@ -122,7 +126,7 @@ import {
  * vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
  * progress (#24); 3 the platform (#23).
  */
-export const SNAPSHOT_VERSION = 28
+export const SNAPSHOT_VERSION = 29
 
 export interface SessionSnapshot {
   snapshotVersion: number
@@ -149,6 +153,8 @@ export interface PortableState {
   collapse: CollapseState
   lava: LavaState
   liveBlasts: LiveBlast[]
+  /** The session's blast counter (ticket 860); omitted before the first blast. */
+  blastSeq?: number
   terrainEdits: QueuedTerrainEdit[]
   /** The bore gun's pending shots (ticket 313); omitted while there are none. */
   bores?: PendingBore[]
@@ -215,6 +221,7 @@ function portableStateOf(state: AuthorityState): PortableState {
     collapse: portableCollapseOf(state.collapse),
     lava: portableLavaOf(state.lava),
     liveBlasts: portableLiveBlastsOf(state.liveBlasts),
+    ...blastSeqFieldOf(state),
     terrainEdits: portableTerrainEditsOf(state.terrainEdits),
     ...portableBoresField(state.bores),
     ...portableStrutsField(state.struts),
@@ -284,6 +291,7 @@ function authorityStateOf(portable: PortableState): AuthorityState {
     collapse: portableCollapseOf(portable.collapse),
     lava: portableLavaOf(portable.lava),
     liveBlasts: portableLiveBlastsOf(portable.liveBlasts),
+    ...blastSeqFieldOf(portable),
     terrainEdits: portableTerrainEditsOf(portable.terrainEdits),
     ...portableBoresField(portable.bores),
     ...portableStrutsField(portable.struts),
@@ -337,6 +345,7 @@ function portableStateProblems(state: unknown, tick: unknown): string[] {
     ...portableCollapseProblems(state.collapse, 'snapshot.state.collapse'),
     ...portableLavaProblems(state.lava, 'snapshot.state.lava'),
     ...portableLiveBlastsProblems(state.liveBlasts, 'snapshot.state.liveBlasts'),
+    ...portableBlastSeqProblems(state.blastSeq, 'snapshot.state.blastSeq'),
     ...portableTerrainEditsProblems(state.terrainEdits, 'snapshot.state.terrainEdits'),
     ...portableBoresProblems(state.bores, 'snapshot.state.bores'),
     ...portableStrutsProblems(state.struts, 'snapshot.state.struts'),

@@ -5,13 +5,14 @@
  * as it draws a real blast, so a browser spec measures the R24 front against its budget.
  */
 import { BLAST_TILES_PER_TICK } from '../../../../constants/terrainBudget'
+import { baseTilesSqOf } from '../../../../systems/authority/charges/blastDisc'
 import { blastFrontOf, frontRadiusMm } from '../../../../systems/authority/charges/blastFront'
 import type { DomainEvent } from '../../../../systems/authority/domainEvent'
 import type { TilePoint } from '../../../../systems/world/tileGrid'
 
 /** Each slice's ring from its first tile to its last, in mm from the charge tile's centre. */
 export function solidRockSlicesOf(radiusMm: number): [number, number][] {
-  const front = blastFrontOf(radiusMm)
+  const front = blastFrontOf(baseTilesSqOf(radiusMm))
   const slices: [number, number][] = []
   for (let first = 0; first < front.length; first += BLAST_TILES_PER_TICK) {
     const last = Math.min(front.length, first + BLAST_TILES_PER_TICK) - 1

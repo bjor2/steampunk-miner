@@ -72,7 +72,16 @@ function minerOnForkPlanet(branch: Branch | null) {
 }
 
 function blastAt(tile: TilePoint, radiusMm = 1500): BlastEvent {
-  return { ...tile, radiusMm, size: 1, playerId: 'p1', source: 'charge', tick: 5 }
+  return {
+    ...tile,
+    radiusMm,
+    size: 1,
+    radiusLevel: 0,
+    blastSeq: 0,
+    playerId: 'p1',
+    source: 'charge',
+    tick: 5,
+  }
 }
 
 function distanceSqMm(a: TilePoint, b: TilePoint): number {

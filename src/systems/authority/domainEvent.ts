@@ -569,8 +569,9 @@ export interface KernelDomainEventBodies {
   }
   /**
    * The charge at `tx, ty` blew (#109): its hits land now, its ground breaks as a live blast that
-   * `BlastResolved` sums up (K6 #189). `size` is its rung on the dynamite ladder and `radiusMm`
-   * its blast's radius, both copied from the `BlastEvent` (K3 #186, #213). The radius is a render
+   * `BlastResolved` sums up (K6 #189). `size` is its rung on the dynamite ladder (K3 #186, #213)
+   * and `radiusMm` the reach of the ground its blast clears (D1 #860: the rung's own radius at
+   * Blast Radius level 0, wider with a level). The radius is a render
    * hint for the flash, shake and thump; balance keys off `size`, never the radius. `by` says
    * whether its fuse ran out or the plunger fired it (#153 amendment 2; the plunger is #149's).
    */
@@ -580,6 +581,25 @@ export interface KernelDomainEventBodies {
     size: number
     radiusMm?: number
     by: DetonationTrigger
+  }
+  /**
+   * The detonated charge's blast as its disc record (D1 #860, the GD's 04:50 amendment): its rung
+   * `size` and `chargeType`, the planter's Blast Radius level read now, the two squared radii in
+   * half-tiles scaled by the track's divisor as decimal integer text (`baseR2` the danger zone,
+   * `groundR2` the ground it clears before the planet's edge), the session's `blastSeq`, and whether
+   * the host laid casing round its crater (D3's Blast Casing; none before it). Said beside
+   * `ChargeDetonated`.
+   */
+  BlastStarted: {
+    tx: number
+    ty: number
+    size: number
+    chargeType: number
+    radiusLevel: number
+    baseR2: string
+    groundR2: string
+    blastSeq: number
+    casingLaid: boolean
   }
   /** A live charge lost unfired (#153): the planter docked or was wrecked, or it timed out. */
   ChargeDisarmed: { tx: number; ty: number; size: number; reason: DisarmReason }

@@ -370,6 +370,20 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     detonateTick === null
       ? { event: 'remote_charge_planted', data: { tx, ty, size, carried } }
       : { event: 'charge_planted', data: { tx, ty, size, detonateTick, carried } },
+  BlastStarted: ({
+    tx,
+    ty,
+    size,
+    chargeType,
+    radiusLevel,
+    baseR2,
+    groundR2,
+    blastSeq,
+    casingLaid,
+  }) => ({
+    event: 'blast',
+    data: { tx, ty, size, chargeType, radiusLevel, baseR2, groundR2, blastSeq, casingLaid },
+  }),
   ChargeDisarmed: ({ tx, ty, size, reason }) => ({
     event: 'charge_disarmed',
     data: { tx, ty, size, reason },

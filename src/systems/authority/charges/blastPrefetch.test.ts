@@ -9,6 +9,7 @@ import { MM_PER_SAMPLE } from '../../world/sampleGrid'
 import { chunkKey, chunkOfTile } from '../../world/tileGrid'
 import { planetParamsOf } from '../planetOfState'
 import { createScriptedSession } from '../scriptedSession'
+import { baseTilesSqOf } from './blastDisc'
 import { blastFrontOf } from './blastFront'
 import { blastChunksOf, chunksAwaitingPrefetch } from './blastPrefetch'
 import { plantOnWall, prepareBlaster } from './chargeFixtures'
@@ -35,7 +36,7 @@ describe('blast prefetch', () => {
 
   it('covers every chunk an R24 blast breaks and every chunk its rim checks read', () => {
     const covered = new Set(blastChunksOf(SOLID_SITE, R24_MM).map(({ cx, cy }) => chunkKey(cx, cy)))
-    const broken = blastFrontOf(R24_MM).map(({ dx, dy }) =>
+    const broken = blastFrontOf(baseTilesSqOf(R24_MM)).map(({ dx, dy }) =>
       chunkKey(chunkOfTile(SOLID_SITE.tx + dx), chunkOfTile(SOLID_SITE.ty + dy)),
     )
     const rimBlocks = blocksNear(

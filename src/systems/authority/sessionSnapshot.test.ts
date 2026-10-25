@@ -43,7 +43,7 @@ describe('session snapshot', () => {
   it('carries the state digest and the versions it was taken under', () => {
     const snapshot = takeSnapshot(richState())
     expect(snapshot).toMatchObject({
-      snapshotVersion: 28,
+      snapshotVersion: 29,
       generatorVersion: 17,
       tick: 600,
       digest: stateDigest(richState()),
@@ -72,7 +72,7 @@ describe('session snapshot', () => {
       state: { tick: 600, planet: { index: -1, seed: 1 }, players: { p1: { wallet: 5 } } },
     }
     expect(readSnapshot(broken).problems).toEqual([
-      'snapshot.snapshotVersion is 0, this build reads 28',
+      'snapshot.snapshotVersion is 0, this build reads 29',
       'snapshot.state.planet must hold a whole index and a safe-integer seed',
       'snapshot.state.players.p1 must hold a money wallet and a whole lastSeq',
       'snapshot.state.world must be an object',
@@ -125,7 +125,7 @@ describe('session snapshot: casing (#41)', () => {
   it('refuses a snapshot taken before breached casing, at version 9, with the version message', () => {
     const snapshot = { ...throughJson(takeSnapshot(linedState())), snapshotVersion: 9 }
     expect(readSnapshot(snapshot).problems).toEqual([
-      'snapshot.snapshotVersion is 9, this build reads 28',
+      'snapshot.snapshotVersion is 9, this build reads 29',
     ])
   })
 
@@ -255,7 +255,7 @@ describe('session snapshot: blasting charges (#109)', () => {
   it('refuses a rack holding a size off the ladder (#218)', () => {
     const snapshot = throughJson(takeSnapshot(richState()))
     const vehicle = snapshot.state.players.p1.vehicle
-    const charges = { ...vehicle.charges, carriedBySize: { '11': 1 } }
+    const charges = { ...vehicle.charges, carriedBySize: { '13': 1 } }
     const broken = {
       ...snapshot,
       state: {

@@ -8,15 +8,24 @@ import { chainEffects, type RuleEffect } from '../authority/commandRule'
 import type { PlanetParams } from '../world/planetParams'
 import { defineRegistry, entriesOf } from './seal'
 
+/**
+ * A blast as its disc record (D1 #860: {centre, i, L, blastSeq}) and who set it off. Its ground
+ * reach is derived from `radiusMm` and `radiusLevel` (`charges/blastDisc.ts`), never stored.
+ */
 export interface BlastEvent {
   tx: number
   ty: number
+  /** The rung's own radius L_i in whole mm, whole half-tiles: the danger zone, no level grows it. */
   radiusMm: number
   /**
    * The rung on the dynamite ladder (#153, numbers on #143), 1 to 12; `radiusMm` is that rung's
    * radius. The shipped charge is size 1.
    */
   size: number
+  /** The planter's Blast Radius level read at detonation (D9 #869 sells it; 0 until then). */
+  radiusLevel: number
+  /** The session's blast counter at detonation: a persisted id no reload rerolls (VS on #860). */
+  blastSeq: number
   playerId: string
   /** What blew: `charge` for the shipped blasting charges. */
   source: string

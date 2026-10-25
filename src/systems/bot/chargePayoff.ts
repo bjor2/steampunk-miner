@@ -17,6 +17,7 @@
  * build: #148 gates the bot's median `gate_cleared {kind: dynamite}` payoff. Nothing here reaches
  * the authority. Money stays Money (#196).
  */
+import { baseTilesSqOf } from '../authority/charges/blastDisc'
 import { inRadiusCount } from '../authority/charges/blastFront'
 import { chargePrice, chargeRadiusMm, minChargeFor } from '../economy/chargeSizes'
 import { oreSalePrice, oreTier } from '../economy/oreEconomy'
@@ -62,7 +63,7 @@ export function chargePayoffsOf(worldSeed: number): ChargePayoff[] {
 
 export function chargePayoffOf(params: PlanetParams, band: number, lead: number): ChargePayoff {
   const size = minChargeFor({ lead, band }, params.planetIndex)
-  const radiusCells = inRadiusCount(chargeRadiusMm(size))
+  const radiusCells = inRadiusCount(baseTilesSqOf(chargeRadiusMm(size)))
   const cellsFreed = Math.min(params.patchMeanCells[band - 1], radiusCells)
   const leadValue = oreSalePrice(oreTier(params.planetIndex, band) + lead)
   const valueFreed = mul(fromSafeInteger(cellsFreed), leadValue)

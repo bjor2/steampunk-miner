@@ -729,7 +729,7 @@ export const RUN_EVENT_REGISTRY = {
   // to the hold, the sale value of the blasted ore that never reached it, the rim blocks checked,
   // the warnings they started, and the ticks it was live.
   // K8 (#218): every charge has a size, optional so a line from before the sizes still reads (it
-  // was size 1); a remote one (sizes 7 to 10) has no fuse, waits for the plunger (#149) and logs
+  // was size 1); a remote one (sizes 7 to 12) has no fuse, waits for the plunger (#149) and logs
   // `remote_charge_planted`. `by` says what fired a charge (a line without it was its fuse), and a
   // live one lost unfired (dock, wreck, or 3600 ticks) logs `charge_disarmed`.
   charge_planted: {
@@ -761,6 +761,25 @@ export const RUN_EVENT_REGISTRY = {
       size: { optional: 'integer' },
       radiusMm: { optional: 'integer' },
       by: { optional: { oneOf: ['fuse', 'plunger'] } },
+    },
+  },
+  // Ticket 860 (D1): the detonated charge's blast as its disc record, beside `charge_detonated`:
+  // its rung and type, the planter's Blast Radius level `radiusLevel`, the danger zone's and the
+  // ground's squared radii (half-tiles scaled by the track's divisor, integer text: the ground one
+  // grows without bound with the level), the session's `blastSeq` and whether casing was laid.
+  blast: {
+    group: 'mining',
+    level: 'core',
+    payload: {
+      tx: 'integer',
+      ty: 'integer',
+      size: 'integer',
+      chargeType: 'integer',
+      radiusLevel: 'integer',
+      baseR2: 'text',
+      groundR2: 'text',
+      blastSeq: 'integer',
+      casingLaid: 'flag',
     },
   },
   charge_disarmed: {

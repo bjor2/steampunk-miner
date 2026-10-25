@@ -14,6 +14,7 @@
  * Domain (#247 scope): planets 7 to 40 and 50, only bands with dynamite-gated lead cells, sizes up
  * to the band and open on the planet. Reported, gating nothing: #148 gates the bot's medians.
  */
+import { baseTilesSqOf } from '../authority/charges/blastDisc'
 import { inRadiusCount } from '../authority/charges/blastFront'
 import { bandOreWorth } from '../economy/bandOreCost'
 import { chargePrice, chargeRadiusMm, chargeSizesUpTo, largestSizeOn } from '../economy/chargeSizes'
@@ -83,7 +84,7 @@ export function chargeSharePayoffOf(
   entries: readonly GatedMixEntry[],
   size: number,
 ): ChargeSharePayoff {
-  const radiusCells = fromSafeInteger(inRadiusCount(chargeRadiusMm(size)))
+  const radiusCells = fromSafeInteger(inRadiusCount(baseTilesSqOf(chargeRadiusMm(size))))
   const freed = entries.filter((entry) => isFreedBy(entry, size))
   const share = cappedValueShareOf(leadValueShareOf(planetIndex, band, freed, entries))
   const valueFreed = mul(mul(radiusCells, share.share), bandCellWorthOf(planetIndex, band, entries))

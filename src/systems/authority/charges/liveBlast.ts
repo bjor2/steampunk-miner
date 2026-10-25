@@ -9,6 +9,7 @@
 import type { BlastEvent } from '../../registries/blastEffects'
 import type { AuthorityState } from '../authorityState'
 import { isJsonObject, isWholeNumber } from '../payloadFields'
+import { isHalfTileRadius } from './blastDisc'
 
 export interface LiveBlast {
   /** The blast as the slices' gates and effects are told it, at its detonation tick. */
@@ -77,13 +78,16 @@ function isLiveBlast(live: unknown): live is LiveBlast {
   )
 }
 
+/** A blast's disc record (ticket 860): a rung radius of whole half-tiles, a level and a number. */
 function isBlastEvent(blast: unknown): boolean {
   return (
     isJsonObject(blast) &&
     Number.isSafeInteger(blast.tx) &&
     Number.isSafeInteger(blast.ty) &&
-    isWholeNumber(blast.radiusMm) &&
+    isHalfTileRadius(blast.radiusMm) &&
     isWholeNumber(blast.size) &&
+    isWholeNumber(blast.radiusLevel) &&
+    isWholeNumber(blast.blastSeq) &&
     typeof blast.playerId === 'string' &&
     typeof blast.source === 'string' &&
     isWholeNumber(blast.tick)

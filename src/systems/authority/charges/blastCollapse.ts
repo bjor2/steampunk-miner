@@ -1,7 +1,7 @@
 /**
  * A blast is a disturbance for the collapse rules (spec #109 "Collapse risk", #43; #153: the
  * disturbance check runs on the crater rim): every collapse block whose centre lies within one
- * block of the blast's radius is checked once, and each weak one not already collapsing starts its
+ * block of the blast's ground reach (its widened disc, D1 #860) is checked once, and each weak one not already collapsing starts its
  * telegraph, as the watch starts any other. Lining is never blasted away, so blocks whose lining
  * holds stay quiet as usual, and so do reinforced ones (ticket 365).
  *
@@ -21,6 +21,7 @@ import { entryOfBlock } from '../collapse/collapseState'
 import { startWarning, weaknessOf, type WeakBlock } from '../collapse/collapseWatch'
 import { chainEffects, type RuleEffect } from '../commandRule'
 import type { BlastEvent } from '../../registries/blastEffects'
+import { groundRadiusMmOf } from './blastDisc'
 import type { LiveBlast } from './liveBlast'
 
 const BLOCK_SIDE_MM = COLLAPSE_BLOCK_SAMPLES * MM_PER_SAMPLE
@@ -43,8 +44,8 @@ const disturbedByBlast = new Map<string, readonly DisturbedBlock[]>()
 const REMEMBERED_BLASTS = 8
 
 /** Every block the blast disturbs, checked or not. */
-export function collapseBlocksOf(blast: BlastEvent): number {
-  return disturbedBlocksOf(blast).length
+export function collapseBlocksOf(blast: BlastEvent, params: PlanetParams): number {
+  return disturbedBlocksOf(blast, params).length
 }
 
 /** Checks the blocks the front has passed (all of them once `isGroundDone`), up to the cap. */
@@ -55,7 +56,8 @@ export function checkCollapseBehindFront(
   frontMm: number,
   isGroundDone: boolean,
 ): BlastCollapseCheck {
-  const due = dueBlocksOf(disturbedBlocksOf(live.blast), live.collapseChecks, frontMm, isGroundDone)
+  const disturbed = disturbedBlocksOf(live.blast, params)
+  const due = dueBlocksOf(disturbed, live.collapseChecks, frontMm, isGroundDone)
   const fresh = freshWeakBlocksAmong(state, params, due)
   const effect = chainEffects(
     state,
@@ -84,20 +86,22 @@ function dueBlocksOf(
   return due
 }
 
-function disturbedBlocksOf(blast: BlastEvent): readonly DisturbedBlock[] {
-  const key = `${blast.tx},${blast.ty},${blast.radiusMm}`
+/** The rim is the ground disc's (D1 #860): a widened blast disturbs the blocks round its reach. */
+function disturbedBlocksOf(blast: BlastEvent, params: PlanetParams): readonly DisturbedBlock[] {
+  const reachMm = groundRadiusMmOf(blast, params)
+  const key = `${blast.tx},${blast.ty},${reachMm}`
   const known = disturbedByBlast.get(key)
   if (known !== undefined) return known
-  const disturbed = disturbedBlocksAround(blast)
+  const disturbed = disturbedBlocksAround(blast, reachMm)
   if (disturbedByBlast.size === REMEMBERED_BLASTS) disturbedByBlast.clear()
   disturbedByBlast.set(key, disturbed)
   return disturbed
 }
 
 /** Nearest first; `blocksNear` sorts by block id, and the stable sort keeps that on ties. */
-function disturbedBlocksAround(blast: BlastEvent): DisturbedBlock[] {
+function disturbedBlocksAround(blast: BlastEvent, reachMm: number): DisturbedBlock[] {
   const centre = chargeCentreMm(blast)
-  return blocksNear(centre, blast.radiusMm + BLOCK_SIDE_MM)
+  return blocksNear(centre, reachMm + BLOCK_SIDE_MM)
     .map((block) => ({ block, passMm: distanceMm(centre, blockCentreMm(block)) + BLOCK_SIDE_MM }))
     .sort((a, b) => a.passMm - b.passMm)
 }

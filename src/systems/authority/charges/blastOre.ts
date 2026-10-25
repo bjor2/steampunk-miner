@@ -22,6 +22,7 @@ import { chargeReachTiles, isInChargeRadius } from '../../economy/chargeSizes'
 import { oreSalePrice } from '../../economy/oreEconomy'
 import { add, cmp, div, fromSafeInteger, mul, ZERO_MONEY, type Money } from '../../money'
 import { MM_PER_METRE } from '../../../constants/physics'
+import { BLAST_VISITS_PER_TICK } from '../../../constants/terrainBudget'
 import { blastGround, type GroundBlast, type IsBlastBreakable } from '../../world/blastGround'
 import type { YieldedCell } from '../../world/cellYield'
 import type { PlanetParams } from '../../world/planetParams'
@@ -33,7 +34,8 @@ import type { DomainEventBody } from '../domainEvent'
 import { groundChangedEventsOf } from '../groundChangedEvents'
 import { collectOreUnit, hardnessOfTile, kindNameOf } from '../groundDrill'
 import { minedOreOf, type MinedOre } from '../minedOre'
-import { blastFrontOf } from './blastFront'
+import { groundTilesSqOf } from './blastDisc'
+import { frontWalkFrom, parkFrontWalk } from './blastFront'
 import {
   blastGatesOf,
   blastOreFateOf,
@@ -53,6 +55,14 @@ export interface BrokenSlice {
   /** Front tiles the slice looked at, cleared or passed over. */
   tilesVisited: number
   tilesCleared: number
+  /** The squared tile distances of the first and last tiles it looked at; null when none. */
+  ring: FrontRing | null
+}
+
+/** The ring of the front a slice covered, as squared tile distances from the charge tile. */
+export interface FrontRing {
+  innerSq: number
+  outerSq: number
 }
 
 /**
@@ -76,8 +86,10 @@ export function breakBlastSlice(
   maxCleared: number,
 ): BrokenSlice {
   const gateOf = blastGatesOf(state, params, live.blast)
-  const tiles = frontTilesFrom(live)
-  const ground = blastGround(state.world, params, tiles, isBreakableOn(params, gateOf), maxCleared)
+  const walked: WalkedRing = { ring: null }
+  const tiles = frontTilesFrom(live, params, walked)
+  const limits = { maxCleared, maxVisited: BLAST_VISITS_PER_TICK }
+  const ground = blastGround(state.world, params, tiles, isBreakableOn(params, gateOf), limits)
   const ores = blastedOreOf(params, ground.yielded, gateOf)
   const tiers = slicedTiersOf(ores.shared, live, ditherOf(state, live))
   const world = { ...state, world: ground.world }
@@ -87,6 +99,7 @@ export function breakBlastSlice(
     live: liveAfterSlice(live, ground, tiers, ores),
     tilesVisited: ground.tilesVisited,
     tilesCleared: ground.tilesCleared,
+    ring: walked.ring,
   }
 }
 
@@ -131,12 +144,33 @@ export function blastTilesAround(charge: TilePoint, size: number): TilePoint[] {
   return tiles
 }
 
-/** The live blast's front from its cursor on, as world tiles. */
-function* frontTilesFrom(live: LiveBlast): Generator<TilePoint> {
-  const front = blastFrontOf(live.blast.radiusMm)
-  for (let at = live.cursor; at < front.length; at++) {
-    yield { tx: live.blast.tx + front[at].dx, ty: live.blast.ty + front[at].dy }
+/** The ring a walk has covered so far. */
+interface WalkedRing {
+  ring: FrontRing | null
+}
+
+/**
+ * The live blast's front from its cursor on, as world tiles: its ground disc (D1 #860), walked
+ * as far as the slice looks and parked there for the next slice.
+ */
+function* frontTilesFrom(
+  live: LiveBlast,
+  params: PlanetParams,
+  walked: WalkedRing,
+): Generator<TilePoint> {
+  const walk = frontWalkFrom(groundTilesSqOf(live.blast, params), live.cursor)
+  try {
+    for (let tile = walk.next(); tile !== null; tile = walk.next()) {
+      walked.ring = ringReaching(walked.ring, tile.distanceSq)
+      yield { tx: live.blast.tx + tile.dx, ty: live.blast.ty + tile.dy }
+    }
+  } finally {
+    parkFrontWalk(walk)
   }
+}
+
+function ringReaching(ring: FrontRing | null, distanceSq: number): FrontRing {
+  return { innerSq: ring?.innerSq ?? distanceSq, outerSq: distanceSq }
 }
 
 /** A gated cell breaks as its gate says; any other as before, under the planet's hardness cap. */

@@ -14,6 +14,7 @@
  * one tile further, past the plunger's interlock, #153), wait out the fuse, drive back. A report
  * and a guard, never a rule; nothing here reaches the authority. Money stays Money (#196).
  */
+import { baseTilesSqOf } from '../authority/charges/blastDisc'
 import { inRadiusCount } from '../authority/charges/blastFront'
 import {
   chargePrice,
@@ -110,7 +111,7 @@ function tradesOnPlanet(params: PlanetParams, size: number): ChargeSizeTrade[] {
 
 /** The kept share of the ore money in the blast's radius, less one charge of the size. */
 function blastNetMoney(params: PlanetParams, size: number, oreMoneyPerTile: Money): Money {
-  const tiles = fromSafeInteger(inRadiusCount(chargeRadiusMm(size)))
+  const tiles = fromSafeInteger(inRadiusCount(baseTilesSqOf(chargeRadiusMm(size))))
   const kept = mul(mul(tiles, oreMoneyPerTile), keptFractionOf(size))
   return sub(kept, chargePrice(size, ONE_CHARGE, params.planetIndex))
 }

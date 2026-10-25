@@ -15,9 +15,10 @@ import { stampedFor, type TickOutcome } from '../combat/combatTick'
 import type { RuleEffect } from '../commandRule'
 import type { DomainEventBody } from '../domainEvent'
 import { planetParamsOf } from '../planetOfState'
-import { blastFrontOf, frontRadiusMm } from './blastFront'
+import { groundTilesSqOf } from './blastDisc'
+import { frontDistanceSqAt, frontRadiusMm, inRadiusCount } from './blastFront'
 import { checkCollapseBehindFront, collapseBlocksOf } from './blastCollapse'
-import { breakBlastSlice, oreUnitsKeptOf, oreValueLostOf } from './blastOre'
+import { breakBlastSlice, oreUnitsKeptOf, oreValueLostOf, type FrontRing } from './blastOre'
 import type { LiveBlast } from './liveBlast'
 
 /** The pass so far: the outcome, the tiles left this tick, and the blasts still live. */
@@ -54,8 +55,8 @@ function advanceLiveBlast(
   tick: number,
 ): SlicePass {
   const sliced = sliceGroundOf(pass.outcome.state, params, live, pass.tilesLeft)
-  const checked = checkRimOf(sliced.effect.state, params, sliced.live)
-  const isResolved = isBlastResolved(checked.live)
+  const checked = checkRimOf(sliced.effect.state, params, sliced.live, sliced.ring)
+  const isResolved = isBlastResolved(checked.live, params)
   const resolution = isResolved ? [resolvedEventOf(checked.effect.state, checked.live, tick)] : []
   const effect = {
     state: checked.effect.state,
@@ -78,46 +79,59 @@ function sliceGroundOf(
   params: PlanetParams,
   live: LiveBlast,
   tilesLeft: number,
-): { effect: RuleEffect; live: LiveBlast; tilesCleared: number } {
-  if (tilesLeft === 0 || isGroundDone(live)) {
-    return { effect: { state, events: [] }, live, tilesCleared: 0 }
+): { effect: RuleEffect; live: LiveBlast; tilesCleared: number; ring: FrontRing | null } {
+  if (tilesLeft === 0 || isGroundDone(live, params)) {
+    return { effect: { state, events: [] }, live, tilesCleared: 0, ring: null }
   }
   const slice = breakBlastSlice(state, params, live, tilesLeft)
-  const front = frontEventOf(live, slice.tilesVisited)
+  const front = frontEventOf(live, slice.ring as FrontRing)
   return {
     effect: { state: slice.effect.state, events: [front, ...slice.effect.events] },
     live: slice.live,
     tilesCleared: slice.tilesCleared,
+    ring: slice.ring,
   }
 }
 
-function checkRimOf(state: AuthorityState, params: PlanetParams, live: LiveBlast) {
-  return checkCollapseBehindFront(state, params, live, frontMmOf(live), isGroundDone(live))
+/** The rim behind the front: this tick's slice says how far it reached, else the cursor does. */
+function checkRimOf(
+  state: AuthorityState,
+  params: PlanetParams,
+  live: LiveBlast,
+  ring: FrontRing | null,
+) {
+  const reachedSq = ring?.outerSq ?? reachedSqOf(live, params)
+  const isDone = isGroundDone(live, params)
+  return checkCollapseBehindFront(state, params, live, frontRadiusMm(reachedSq), isDone)
 }
 
-function isGroundDone(live: LiveBlast): boolean {
-  return live.cursor === blastFrontOf(live.blast.radiusMm).length
+/** The blast's ground disc's reach, `dx² + dy²` at most (D1 #860). */
+function groundReachOf(live: LiveBlast, params: PlanetParams): number {
+  return groundTilesSqOf(live.blast, params)
 }
 
-function isBlastResolved(live: LiveBlast): boolean {
-  return isGroundDone(live) && live.collapseChecks === collapseBlocksOf(live.blast)
+function isGroundDone(live: LiveBlast, params: PlanetParams): boolean {
+  return live.cursor === inRadiusCount(groundReachOf(live, params))
+}
+
+function isBlastResolved(live: LiveBlast, params: PlanetParams): boolean {
+  return isGroundDone(live, params) && live.collapseChecks === collapseBlocksOf(live.blast, params)
 }
 
 /** How far the front has reached: the last tile it looked at, or the charge tile before any. */
-function frontMmOf(live: LiveBlast): number {
+function reachedSqOf(live: LiveBlast, params: PlanetParams): number {
   if (live.cursor === 0) return 0
-  return frontRadiusMm(blastFrontOf(live.blast.radiusMm)[live.cursor - 1].distanceSq)
+  return frontDistanceSqAt(groundReachOf(live, params), live.cursor - 1)
 }
 
 /** The ring the slice covered, from the first tile it looked at to the last. */
-function frontEventOf(live: LiveBlast, tilesVisited: number): DomainEventBody {
-  const front = blastFrontOf(live.blast.radiusMm)
+function frontEventOf(live: LiveBlast, ring: FrontRing): DomainEventBody {
   return {
     type: 'BlastFront',
     tx: live.blast.tx,
     ty: live.blast.ty,
-    rInnerMm: frontRadiusMm(front[live.cursor].distanceSq),
-    rOuterMm: frontRadiusMm(front[live.cursor + tilesVisited - 1].distanceSq),
+    rInnerMm: frontRadiusMm(ring.innerSq),
+    rOuterMm: frontRadiusMm(ring.outerSq),
   }
 }
 

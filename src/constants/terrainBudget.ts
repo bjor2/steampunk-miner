@@ -15,6 +15,13 @@
  * most 32 density cells or 64 swaps (the #162 section-3 caps: p50 1.04 ms and 0.19 ms measured).
  */
 export const BLAST_TILES_PER_TICK = 64
+/**
+ * The tiles one live blast's slice may look at in a tick, cleared or passed over (D1 #860, the #840
+ * rows): a disc a Blast Radius level widens can reach far past the planet, and its air must not be
+ * walked in one tick. 128 slices' worth: above every level-0 disc (4,293 tiles at size 12), so the
+ * shipped ladder never meets it.
+ */
+export const BLAST_VISITS_PER_TICK = 8192
 export const TERRAIN_EDIT_UNITS_PER_TICK = 64
 export const DENSITY_CELL_UNITS = 2
 export const SWAP_CELL_UNITS = 1

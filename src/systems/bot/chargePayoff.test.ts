@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { baseTilesSqOf } from '../authority/charges/blastDisc'
 import { inRadiusCount } from '../authority/charges/blastFront'
 import { chargePrice, chargeRadiusMm } from '../economy/chargeSizes'
 import { oreSalePrice, oreTier } from '../economy/oreEconomy'
@@ -36,7 +37,7 @@ describe('charge payoff guard (#143 guard 2, GD lock on K8 #218)', () => {
     const band5 = chargePayoffOf(params, 5, 2)
     expect(band5.cellsFreed).toBe(params.patchMeanCells[4])
     const small = chargePayoffOf({ ...params, patchMeanCells: [999, 999, 999, 999, 999] }, 3, 1)
-    expect(small.cellsFreed).toBe(inRadiusCount(chargeRadiusMm(small.size)))
+    expect(small.cellsFreed).toBe(inRadiusCount(baseTilesSqOf(chargeRadiusMm(small.size))))
   })
 
   it('sells the freed cells at the lead tier and charges one minCharge at its price', () => {

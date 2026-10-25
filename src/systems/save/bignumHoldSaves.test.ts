@@ -35,7 +35,10 @@ describe('save migration: snapshot 27 -> 28, the bignum hold (ticket 849)', () =
     expect(JSON.stringify(file)).toContain(`"ore":{"1":${cargoCapacity(361)}}`)
     const reading = readMigratedSaveSlot(file)
     if (!('state' in reading)) throw new Error(reading.problems.join('; '))
-    expect(reading.migrations).toEqual([{ version: 'snapshotVersion', from: 27, to: 28 }])
+    expect(reading.migrations).toEqual([
+      { version: 'snapshotVersion', from: 27, to: 28 },
+      { version: 'snapshotVersion', from: 28, to: 29 },
+    ])
     expect(reading.state).toEqual(state)
     expect(stateDigest(reading.state)).toBe(stateDigest(state))
   })

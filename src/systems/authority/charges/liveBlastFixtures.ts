@@ -28,12 +28,14 @@ export const R24_MM = 24 * MM_PER_METRE
 export function blastAt(
   site: TilePoint,
   radiusMm: number,
-  options: { tick?: number; playerId?: string; size?: number } = {},
+  options: { tick?: number; playerId?: string; size?: number; radiusLevel?: number } = {},
 ): BlastEvent {
   return {
     ...site,
     radiusMm,
     size: options.size ?? 1,
+    radiusLevel: options.radiusLevel ?? 0,
+    blastSeq: 0,
     playerId: options.playerId ?? 'p1',
     source: 'charge',
     tick: options.tick ?? BLAST_TICK,

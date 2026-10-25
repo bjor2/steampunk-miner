@@ -7,6 +7,8 @@
  * waits there instead of routing round. With no gate registered nothing is asked.
  */
 import { gateOfTile, type GateAsker } from '../authority/cellGates'
+import { UNOWNED_RADIUS_LEVEL } from '../authority/charges/blastDisc'
+import { blastSeqOf } from '../authority/charges/blastSeq'
 import { chargeRadiusMm, chargeSizeCount, isRemoteSize } from '../economy/chargeSizes'
 import { hasGateChecks, isStandingVerdict, type GateVerdict } from '../registries/gateChecks'
 import type { BlastEvent } from '../registries/blastEffects'
@@ -71,6 +73,8 @@ function blastOf(session: BotSession, tile: TilePoint, size: number): BlastEvent
     ...tile,
     radiusMm: chargeRadiusMm(size),
     size,
+    radiusLevel: UNOWNED_RADIUS_LEVEL,
+    blastSeq: blastSeqOf(session.state()),
     playerId: session.playerId,
     source: 'charge',
     tick: session.tick(),

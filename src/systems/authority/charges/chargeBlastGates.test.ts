@@ -91,6 +91,8 @@ describe('charge blast gates', () => {
       ...SITE.wall,
       radiusMm: chargeRadiusMm(1),
       size: 1,
+      radiusLevel: 0,
+      blastSeq: 0,
       playerId: 'p1',
       source: 'charge',
       tick: BLAST_TICK,

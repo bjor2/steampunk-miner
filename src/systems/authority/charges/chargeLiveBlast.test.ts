@@ -15,6 +15,7 @@ import { resourceTierOf } from '../minedOre'
 import { continueScriptedSession, coreTiles, PARAMS, WORLD_SEED } from '../scriptedSession'
 import { readSnapshot, takeSnapshot } from '../sessionSnapshot'
 import { stateDigest } from '../stateDigest'
+import { baseTilesSqOf } from './blastDisc'
 import { blastFrontOf, inRadiusCount } from './blastFront'
 import { ofType } from './chargeFixtures'
 import { BLAST_TICK, blastAt, liveBlastSession, R24_MM, SOLID_SITE } from './liveBlastFixtures'
@@ -23,7 +24,10 @@ import { BLAST_TICK, blastAt, liveBlastSession, R24_MM, SOLID_SITE } from './liv
 const SETTLED_TICK = BLAST_TICK + 60
 
 function frontTilesOf(site: TilePoint, radiusMm: number): TilePoint[] {
-  return blastFrontOf(radiusMm).map(({ dx, dy }) => ({ tx: site.tx + dx, ty: site.ty + dy }))
+  return blastFrontOf(baseTilesSqOf(radiusMm)).map(({ dx, dy }) => ({
+    tx: site.tx + dx,
+    ty: site.ty + dy,
+  }))
 }
 
 function densityOfTile(session: ReturnType<typeof liveBlastSession>, tile: TilePoint): number {
@@ -41,12 +45,12 @@ describe('live blast', () => {
       const radiusMm = radius * MM_PER_METRE
       const session = liveBlastSession([blastAt(SOLID_SITE, radiusMm)])
       session.advanceTo(SETTLED_TICK)
-      const slices = Math.ceil(inRadiusCount(radiusMm) / 64)
+      const slices = Math.ceil(inRadiusCount(baseTilesSqOf(radiusMm)) / 64)
       expect(sliceTicksOf(session)).toEqual(
         Array.from({ length: slices }, (_, k) => BLAST_TICK + k),
       )
       const [resolved] = ofType(session.events(), 'BlastResolved')
-      expect(resolved.tilesCleared).toBe(inRadiusCount(radiusMm))
+      expect(resolved.tilesCleared).toBe(inRadiusCount(baseTilesSqOf(radiusMm)))
     }
   })
 
@@ -228,7 +232,7 @@ describe('live blast: gated cells (#153 amendment)', () => {
     expect(ore.length).toBeGreaterThan(64)
     expect(ore.filter((tile) => densityOfTile(session, tile) === 0)).toEqual([])
     const [resolved] = ofType(session.events(), 'BlastResolved')
-    expect(resolved.tilesCleared).toBe(inRadiusCount(R24_MM) - ore.length)
+    expect(resolved.tilesCleared).toBe(inRadiusCount(baseTilesSqOf(R24_MM)) - ore.length)
     expect(sliceTicksOf(session)).toHaveLength(Math.ceil(resolved.tilesCleared / 64))
   })
 

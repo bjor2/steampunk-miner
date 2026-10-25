@@ -69,6 +69,8 @@ const AIM_STEP = { version: 'snapshotVersion', from: 25, to: 26 }
 const PREMIUM_STEP = { version: 'snapshotVersion', from: 26, to: 27 }
 /** Ticket 849: every fixture was written before the bignum hold. */
 const BIGNUM_HOLD_STEP = { version: 'snapshotVersion', from: 27, to: 28 }
+/** Ticket 860: every fixture was written before the blast's disc record. */
+const BLAST_RECORD_STEP = { version: 'snapshotVersion', from: 28, to: 29 }
 /** #401: every fixture was written in the one-slot layout, format 1. */
 const SLOT_FORMAT_STEP = { version: 'formatVersion', from: 1, to: 2 }
 const PACKED_CHUNKS_STEP = { version: 'formatVersion', from: 2, to: 3 }
@@ -114,7 +116,7 @@ describe('save migration chain', () => {
     ])
   })
 
-  it('loads a pre-#175 save through the snapshot 18 -> 19, 19 -> 20, 20 -> 21, 21 -> 22, 22 -> 23, 23 -> 24, 24 -> 25, 25 -> 26, 26 -> 27 and 27 -> 28 steps, then the generator 5 -> 6, 6 -> 7, 7 -> 8, 8 -> 9, 9 -> 10, 10 -> 11, 11 -> 12, 12 -> 13, 13 -> 14, 14 -> 15, 15 -> 16 and 16 -> 17 steps', () => {
+  it('loads a pre-#175 save through the snapshot 18 -> 19, 19 -> 20, 20 -> 21, 21 -> 22, 22 -> 23, 23 -> 24, 24 -> 25, 25 -> 26, 26 -> 27, 27 -> 28 and 28 -> 29 steps, then the generator 5 -> 6, 6 -> 7, 7 -> 8, 8 -> 9, 9 -> 10, 10 -> 11, 11 -> 12, 12 -> 13, 13 -> 14, 14 -> 15, 15 -> 16 and 16 -> 17 steps', () => {
     const reading = withRegistrations([], () => restored(PLANET_1_SAVE))
     expect(reading.migrations).toEqual([
       SNAPSHOT_STEP,
@@ -127,6 +129,7 @@ describe('save migration chain', () => {
       AIM_STEP,
       PREMIUM_STEP,
       BIGNUM_HOLD_STEP,
+      BLAST_RECORD_STEP,
       GENERATOR_STEP,
       ORE_LEAD_STEP,
       ORE_MIX_STEP,
@@ -161,6 +164,7 @@ describe('save migration chain', () => {
       AIM_STEP,
       PREMIUM_STEP,
       BIGNUM_HOLD_STEP,
+      BLAST_RECORD_STEP,
       GENERATOR_STEP,
       ORE_LEAD_STEP,
       ORE_MIX_STEP,
@@ -371,7 +375,7 @@ describe('save migration chain', () => {
 describe('save migration chain: levels to steps (#181)', () => {
   const saved = PLANET_5_SAVE.profile.players.p1
 
-  it('loads a pre-#181 save through the snapshot 18 -> 19, 19 -> 20, 20 -> 21, 21 -> 22, 22 -> 23, 23 -> 24, 24 -> 25, 25 -> 26, 26 -> 27 and 27 -> 28 steps, then the generator 6 -> 7, 7 -> 8, 8 -> 9, 9 -> 10, 10 -> 11, 11 -> 12, 12 -> 13, 13 -> 14, 14 -> 15, 15 -> 16 and 16 -> 17 steps', () => {
+  it('loads a pre-#181 save through the snapshot 18 -> 19, 19 -> 20, 20 -> 21, 21 -> 22, 22 -> 23, 23 -> 24, 24 -> 25, 25 -> 26, 26 -> 27, 27 -> 28 and 28 -> 29 steps, then the generator 6 -> 7, 7 -> 8, 8 -> 9, 9 -> 10, 10 -> 11, 11 -> 12, 12 -> 13, 13 -> 14, 14 -> 15, 15 -> 16 and 16 -> 17 steps', () => {
     expect(versionStepsOf(restored(PLANET_5_SAVE))).toEqual([
       SNAPSHOT_STEP,
       CHARGE_RACK_STEP,
@@ -383,6 +387,7 @@ describe('save migration chain: levels to steps (#181)', () => {
       AIM_STEP,
       PREMIUM_STEP,
       BIGNUM_HOLD_STEP,
+      BLAST_RECORD_STEP,
       ORE_LEAD_STEP,
       ORE_MIX_STEP,
       ORE_RULES_STEP,

@@ -66,6 +66,11 @@ export interface AuthorityState {
   lava: LavaState
   /** Blasts still opening their crater, oldest first (K6 #189); emptied on every planet. */
   liveBlasts: readonly LiveBlast[]
+  /**
+   * The blasts the session has set off, the next one's `blastSeq` (D1 #860, `charges/blastSeq.ts`);
+   * absent before the first, so a session that never blasts digests as before. Kept across planets.
+   */
+  blastSeq?: number
   /** Power-up terrain edits waiting for their share of a tick (K6 #189); emptied on every planet. */
   terrainEdits: readonly QueuedTerrainEdit[]
   /**

@@ -48,6 +48,11 @@
  * hold, of a Refinery batch and of a Cache Crate as a safe integer, which is this build's spelling
  * of a count below 2^53. So the old digest is checked and the state is kept as saved; a build from
  * before the bignum hold refuses a save that holds a count past 2^53 it could not read.
+ * Snapshot 28 -> 29 (ticket 860, the blast's disc record): a live blast saved mid-crater gains the
+ * Blast Radius level every planter then owned, 0, and its `blastSeq` in the order it went live, and
+ * the session's counter starts past them (`numberedBlasts.ts`), so the crater a reload finishes is
+ * the one it would have been. The rack is kept as saved: the 12-row ladder keeps sizes 1 to 10
+ * as they were, so every owned charge is the same row.
  *
  * Generator 5 -> 6 (#175): the pad grew to -8..+12 under the two shop buildings, so the chunk edits
  * of every chunk the old or new pad and its cleared air touch are dropped and regenerate under the
@@ -162,6 +167,7 @@ import {
 import { UNTIMED_AUTOSAVE } from './saveSlotIndex'
 import { unlocksToSave } from './savedUnlocks'
 import { withCarriedCursors } from './carriedCursors'
+import { withNumberedBlasts } from './numberedBlasts'
 import { withSizedChargeRacks } from './sizedChargeRacks'
 
 /** The header version a step moves on. */
@@ -210,6 +216,7 @@ const SAVE_MIGRATION_STEPS: readonly SaveMigrationStep[] = [
   { version: 'snapshotVersion', from: 25, to: 26, migrate: keepFacingsAsAims },
   { version: 'snapshotVersion', from: 26, to: 27, migrate: keepHoldsWithoutPremium },
   { version: 'snapshotVersion', from: 27, to: 28, migrate: keepSafeHoldCounts },
+  { version: 'snapshotVersion', from: 28, to: 29, migrate: numberLiveBlasts },
   { version: 'generatorVersion', from: 5, to: 6, migrate: regeneratePadArea },
   { version: 'generatorVersion', from: 6, to: 7, migrate: keepEditsUnderOreLeads },
   { version: 'generatorVersion', from: 7, to: 8, migrate: keepEditsUnderOreMix },
@@ -355,6 +362,11 @@ function keepHoldsWithoutPremium(file: MigratingFile): MigratingFile | null {
 /** Snapshot 27 -> 28: a safe-integer count is a count's spelling below 2^53, so the state is kept. */
 function keepSafeHoldCounts(file: MigratingFile): MigratingFile | null {
   return reshapedFile(file, 28, (state) => state)
+}
+
+/** Snapshot 28 -> 29: each live blast its level 0 and its number, the counter past them. */
+function numberLiveBlasts(file: MigratingFile): MigratingFile | null {
+  return reshapedFile(file, 29, withNumberedBlasts)
 }
 
 /** Generator 5 -> 6: the state is read as saved (the digest must hold), then moved off the pad. */
