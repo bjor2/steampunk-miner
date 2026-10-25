@@ -46,6 +46,7 @@ describe('save migration: snapshot 23 -> 24, the jump drive (ticket 759)', () =>
       { version: 'snapshotVersion', from: 23, to: 24 },
       { version: 'snapshotVersion', from: 24, to: 25 },
       { version: 'snapshotVersion', from: 25, to: 26 },
+      { version: 'snapshotVersion', from: 26, to: 27 },
     ])
     expect(reading.state).toEqual(state)
     expect(stateDigest(reading.state)).toBe(stateDigest(state))

@@ -50,6 +50,8 @@ import type { ItemDescriberProvider } from '../systems/registries/itemDescriber'
 import type { ItemDescriptionEntry } from '../systems/registries/itemDescriptionEntries'
 import type { OreLookProvider } from '../systems/registries/oreLook'
 import type { OrePickupProvider } from '../systems/registries/orePickup'
+import type { OrePremiumProvider } from '../systems/registries/orePremium'
+import type { OreSaleLiftSource } from '../systems/registries/oreSaleLifts'
 import type { CellGateLookProvider } from '../systems/registries/cellGateLook'
 import type { KindLookProvider } from '../systems/registries/kindLook'
 import type { MagneticGroundProvider } from '../systems/registries/magneticGround'
@@ -174,6 +176,10 @@ export interface SliceRegistrar {
   oreLook(provider: OreLookProvider): void
   /** One provider across all slices: the tier an ore unit is kept at in the hold (ticket 509). */
   orePickup(provider: OrePickupProvider): void
+  /** One provider across all slices: the premium species a stored unit counts as (ticket 844). */
+  orePremium(provider: OrePremiumProvider): void
+  /** One row of the ore sale lift list (ticket 844): a lift on units sold, never stacked. */
+  oreSaleLift(source: OreSaleLiftSource): void
   /** One provider across all slices: the gate each cell shows in the ground (ticket 298). */
   cellGateLook(provider: CellGateLookProvider): void
   /** One provider across all slices: how a planet's material kinds look in the ground (ticket 450). */

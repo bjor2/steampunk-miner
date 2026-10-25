@@ -10,6 +10,7 @@ import type { EquipRefusal, LoadoutSlotId } from '../registries/vehicleLoadout'
 import type { BayId } from '../world/dockBays'
 import type { CommandStamp, CommandType } from './authorityCommand'
 import type { PlatformVisualState } from './platformState'
+import type { PremiumLedgerChange, PremiumLedgerReason } from './premium/premiumLedgerReasons'
 
 /**
  * Why a command changed nothing (#11 amendment 2: `command_rejected {type, reason}`), one key per
@@ -478,6 +479,23 @@ export interface KernelDomainEventBodies {
   ArtefactChosen: { optionId: string }
   /** `assay_beacon` priced one sold tier at the mid-band unit price (#46). */
   ArtefactAssayApplied: { tier: number; band: number; unitPrice: string }
+  /**
+   * One premium ledger count changed (ticket 844): `units` (canonical decimal text) of the species
+   * mined on `origin` (`s:p`), kept at hold tier `tier`.
+   */
+  OrePremiumLedgerChanged: {
+    change: PremiumLedgerChange
+    reason: PremiumLedgerReason
+    tier: number
+    origin: string
+    speciesId: string
+    units: string
+  }
+  /**
+   * Premium units of one species sold at their origin's merchant (ticket 844): the lift that won,
+   * `source` its id and `lift` its ratio `num/den`, never two lifts stacked.
+   */
+  OreSaleLifted: { tier: number; speciesId: string; units: string; source: string; lift: string }
   /**
    * The Refinery bay (#105): a batch queued into `slot` (`units` after the clamp to the hold and
    * half its capacity, `requestedUnits` as asked), ready on the clock for its owner, and collected

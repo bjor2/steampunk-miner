@@ -678,6 +678,12 @@ export interface KernelCommandPayloads {
    * and the session keeps only the ones off their shipped defaults. Flags, never numbers.
    */
   'debug.setFlags': { delta: Readonly<Record<string, boolean>> }
+  /**
+   * Replaces the player's premium ledger (ticket 844): each key `tier:s:p:speciesId` counts its
+   * value's units, canonical decimal text from 1. Refused, never trimmed, for a malformed key or
+   * count, or a tier counting more units than the hold holds; an empty map empties the ledger.
+   */
+  'debug.setPremiumLedger': { counts: Readonly<Record<string, string>> }
 }
 
 /**

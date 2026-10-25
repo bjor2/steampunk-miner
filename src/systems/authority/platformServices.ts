@@ -14,27 +14,18 @@
  *
  * A charge the wallet cannot pay is refused with `money_short`, never trimmed to what it can pay.
  * A player holding `assay_beacon` (#46) sells the planet's shallow-band ore at the mid-band unit
- * price, and each lifted tier says so in `artefact_assay_applied`.
+ * price, and each lifted tier says so in `artefact_assay_applied`. Every price goes through the sell
+ * kernel's one lift provider (`oreSaleLift.ts`, ticket 844): the premium ledger's units sold at the
+ * merchant of the planet they were mined on take the largest lift a premium row pays, never two
+ * lifts stacked, say so in `ore_sale_lift`, and leave the ledger with the tiers sold.
  *
  * A recharge, alone or in the quick action, ends with the slices' dock services (#217): free
  * refills on the same bill, which they never change.
  */
 import { ENERGY_QUANTA_PER_UNIT } from '../../constants/balance'
-import { ARTEFACT_ID } from '../artefacts/artefactOptions'
-import { assayedSalePrice, bandOfTierOnPlanet, isAssayLifted } from '../economy/assayPricing'
-import { oreSalePrice } from '../economy/oreEconomy'
+import { bandOfTierOnPlanet } from '../economy/assayPricing'
 import { rechargePrice, repairPrice } from '../economy/planetCharges'
-import {
-  add,
-  cmp,
-  div,
-  fromSafeInteger,
-  mul,
-  sub,
-  toCanonical,
-  ZERO_MONEY,
-  type Money,
-} from '../money'
+import { add, cmp, div, fromSafeInteger, sub, toCanonical, ZERO_MONEY, type Money } from '../money'
 import {
   energyMaxQuantaOf,
   statsOfVehicle,
@@ -54,6 +45,13 @@ import {
 import { atBayRejection, atShopRejection } from './dockRules'
 import type { DomainEventBody, SaleMode, SoldItem } from './domainEvent'
 import { liningPaidOutOf, payLiningBillOutOf } from './liningBill'
+import {
+  isAssayLiftedFor,
+  plainUnitPriceOf,
+  saleLiftedEventsOfItems,
+  saleValueOfItems,
+} from './oreSaleLift'
+import { debitPremiumTiers } from './premium/premiumLedgerState'
 import { collectWhenReady, readyRefinedValueOf } from './refinery/refineryCollection'
 import { applyDockServicesOnRecharge } from '../registries/dockServices'
 import { coinsShownOf, nextStepPriceOf } from './sellCoins'
@@ -148,16 +146,12 @@ export function quickServiceCharges(quote: ServiceQuote): Money {
   return add(quote.repairCost, quote.rechargeCost)
 }
 
-/** What one unit of a tier sells for to this player here: `floorMilli(V(t))`, or assayed (#46). */
+/**
+ * What one unit of a tier sells for to this player here: `floorMilli(V(t))` at the largest lift
+ * on every unit, such as assayed (#46); a premium unit at its origin may pay more (ticket 844).
+ */
 export function sellBayUnitPrice(state: AuthorityState, playerId: string, tier: number): Money {
-  if (!isAssayLiftedFor(state, playerId, tier)) return oreSalePrice(tier)
-  return assayedSalePrice(state.planet.index, tier)
-}
-
-/** Whether `assay_beacon` lifts this tier's price for this player on this planet. */
-export function isAssayLiftedFor(state: AuthorityState, playerId: string, tier: number): boolean {
-  const held = state.players[playerId].artefact
-  return held?.id === ARTEFACT_ID.assayBeacon && isAssayLifted(state.planet.index, tier)
+  return plainUnitPriceOf(state, playerId, tier)
 }
 
 /** `0.5 * V3 * hullLost / hullMax`, rounded up to 0.001 (#6, #20). */
@@ -221,11 +215,7 @@ function soldItemsOf(cargo: Cargo, selection: OreSelection): SoldItem[] {
 
 /** Each unit at its rounded unit price, so the total is an exact sum (#20 rounding rule). */
 function saleValueOf(state: AuthorityState, playerId: string, items: readonly SoldItem[]): Money {
-  return items.reduce(
-    (total, item) =>
-      add(total, mul(sellBayUnitPrice(state, playerId, item.tier), fromSafeInteger(item.amount))),
-    ZERO_MONEY,
-  )
+  return saleValueOfItems(state, playerId, items)
 }
 
 /** One `artefact_assay_applied` per lifted tier of the sale. */
@@ -249,6 +239,7 @@ function sellOre(state: AuthorityState, playerId: string, selection: OreSelectio
   const value = saleValueOf(state, playerId, items)
   return chainEffects(state, [
     (current) => payForOre(current, playerId, items, selection),
+    (current) => debitPremiumTiers(current, playerId, soldTiersOf(items), 'sold'),
     (current) => payLiningBillOutOf(current, playerId, value),
   ])
 }
@@ -269,6 +260,7 @@ function payForOre(
     state: withWallet(sold, playerId, add(wallet, value)),
     events: [
       ...assayEventsOf(state, playerId, items),
+      ...saleLiftedEventsOfItems(state, playerId, items),
       {
         type: 'ResourceSold',
         items,
@@ -278,6 +270,10 @@ function payForOre(
       },
     ],
   }
+}
+
+function soldTiersOf(items: readonly SoldItem[]): number[] {
+  return items.map((item) => item.tier)
 }
 
 function withoutOre(cargo: Cargo, items: readonly SoldItem[]): Cargo {

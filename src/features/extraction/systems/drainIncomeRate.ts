@@ -93,6 +93,7 @@ function richestCellsOf(planet: number, band: number, count: number) {
     oreId: `kernel.metal.t${tier}`,
     depthTiles: 3,
     chunk: '0,0',
+    kindSlot: 0,
   }
   return Array.from({ length: count }, (_, tx) => ({ tile: { tx, ty: 0 }, ore }))
 }

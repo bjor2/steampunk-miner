@@ -73,6 +73,7 @@ import { groundChangedEventsOf } from './groundChangedEvents'
 import { heatThrottledDrill } from './heatRules'
 import { creditOreShare, oreSharesOf, type OreShareOf } from './sideOreCredit'
 import { minedOreOf, type MinedOre } from './minedOre'
+import { countPremiumUnit } from './premium/premiumLedgerState'
 import { oreCellHardness, scratchFloorOfCell } from './signatureCells'
 import { wakeLavaBeside } from './lava/lavaRules'
 import {
@@ -573,14 +574,16 @@ function collectTile(
 /**
  * One ore unit into the hold at the tier the ore pickup seam keeps it at (#232, ticket 509: its own
  * sale tier, or its band's when the rarity trip clamp holds it), named with its tier, ore id, depth
- * and chunk (#122); with a full hold it is lost, never refused (#7), and never asks the seam.
+ * and chunk (#122); with a full hold it is lost, never refused (#7), and never asks the seam. A
+ * stored unit of a planet's premium species is counted in the player's premium ledger (ticket 844).
  */
 export function collectOreUnit(state: AuthorityState, playerId: string, ore: MinedOre): RuleEffect {
   if (!hasCargoRoom(vehicleOf(state, playerId))) {
     return { state, events: [{ type: 'StorageFull', lostUnits: 1 }] }
   }
   const picked = pickedUpUnitOf(state, playerId, pickupFindOf(state, ore))
-  return storeOreUnit(picked, playerId, ore)
+  const stored = storeOreUnit(picked, playerId, ore)
+  return countPremiumUnit(stored, playerId, ore, picked.saleTier)
 }
 
 function pickupFindOf(
@@ -592,10 +595,13 @@ function pickupFindOf(
   return { planetIndex, band, tierAboveBand, saleTier, ...(gem === true ? { gem } : {}) }
 }
 
-/** The unit into the hold at the picked tier; `band`, `saleTier` and `gem` stay off `CargoAdded`. */
+/**
+ * The unit into the hold at the picked tier; `band`, `saleTier`, `gem` and `kindSlot` stay off
+ * `CargoAdded`.
+ */
 function storeOreUnit(picked: PickedUp, playerId: string, ore: MinedOre): RuleEffect {
   const vehicle = vehicleOf(picked.state, playerId)
-  const { saleTier: _ownSaleTier, band: _band, gem: _gem, ...named } = ore
+  const { saleTier: _ownSaleTier, band: _band, gem: _gem, kindSlot: _kindSlot, ...named } = ore
   return {
     state: withVehicle(picked.state, playerId, {
       ...vehicle,

@@ -381,7 +381,8 @@ function isPortableLining(lining: unknown): boolean {
   )
 }
 
-function isPortableCargo(cargo: unknown): cargo is Cargo {
+/** Whether a saved hold holds whole units per tier and whole core fragments. */
+export function isPortableCargo(cargo: unknown): cargo is Cargo {
   return (
     isJsonObject(cargo) &&
     isWholeNumber(cargo.coreFragments) &&

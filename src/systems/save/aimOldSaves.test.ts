@@ -45,12 +45,15 @@ describe('save migration: snapshot 25 -> 26, the drill aim (ticket 791)', () => 
     }
   })
 
-  it('loads a snapshot 25 save through the one step with its state and digest as saved', () => {
+  it('loads a snapshot 25 save through its step and the premium ledger step, state and digest as saved', () => {
     const state = reportedFacing(FACING.down)
     const file = saveSlotOf({ ...takeSnapshot(state), snapshotVersion: 25 }, 1)
     const reading = readMigratedSaveSlot(file)
     if (!('state' in reading)) throw new Error(reading.problems.join('; '))
-    expect(reading.migrations).toEqual([{ version: 'snapshotVersion', from: 25, to: 26 }])
+    expect(reading.migrations).toEqual([
+      { version: 'snapshotVersion', from: 25, to: 26 },
+      { version: 'snapshotVersion', from: 26, to: 27 },
+    ])
     expect(reading.state).toEqual(state)
     expect(stateDigest(reading.state)).toBe(stateDigest(state))
   })

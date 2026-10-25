@@ -22,6 +22,10 @@ import {
   MATERIAL_POP_MODE_SOURCES,
 } from '../systems/materialPop/materialPopMode'
 import { SAVE_FAILURE_CAUSES } from '../systems/save/saveWriteFailure'
+import {
+  PREMIUM_LEDGER_CHANGES,
+  PREMIUM_LEDGER_REASONS,
+} from '../systems/authority/premium/premiumLedgerReasons'
 import { sliceRunEventOf } from './registries/runEvents'
 
 export type RunEventLevel = 'core' | 'detail' | 'perf'
@@ -442,6 +446,27 @@ export const RUN_EVENT_REGISTRY = {
     group: 'platform',
     level: 'detail',
     payload: { tier: 'integer', band: 'integer', unitPrice: 'money' },
+  },
+  // Ticket 844 (the TD ruling on #821): one premium ledger count changed, with how and why; `units`
+  // is a bigint count as decimal text and `origin` the mining planet's `s:p`.
+  ore_premium_ledger: {
+    group: 'platform',
+    level: 'core',
+    payload: {
+      change: { oneOf: PREMIUM_LEDGER_CHANGES },
+      reason: { oneOf: PREMIUM_LEDGER_REASONS },
+      tier: 'integer',
+      origin: 'text',
+      speciesId: 'text',
+      units: 'text',
+    },
+  },
+  // Ticket 844: premium units sold at their origin's merchant at the largest lift, `lift` its
+  // `num/den` and `source` the lift source's id.
+  ore_sale_lift: {
+    group: 'platform',
+    level: 'core',
+    payload: { tier: 'integer', speciesId: 'text', units: 'text', source: 'text', lift: 'text' },
   },
   // #123: a debug run also keeps the save as `file` (a path in the run folder, logging strategy
   // section 1); a played run writes no file and leaves the field out.

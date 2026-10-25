@@ -29,6 +29,7 @@ function oreOfTier(saleTier: number): MinedOre {
     oreId: `kernel.metal.t${saleTier}`,
     depthTiles: 3,
     chunk: '0,0',
+    kindSlot: 0,
   }
 }
 

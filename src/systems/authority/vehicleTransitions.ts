@@ -36,6 +36,7 @@ import { bankCoreFragments } from './coreBay'
 import type { Attacker, DomainEvent, DomainEventBody, RescueCause } from './domainEvent'
 import { endShockDiveOnDock } from './magnetic/shockDive'
 import { dockSiteOfPlanet } from './planetOfState'
+import { debitWholeLedger } from './premium/premiumLedgerState'
 import { endGatedBite } from './reportedGateBite'
 
 /** What follows any change to a vehicle's energy: the low-energy lines, then a possible strand. */
@@ -68,9 +69,10 @@ export function destroyIfHullGone(
 }
 
 /**
- * The tow (#7, #8): fee paid, cargo ore lost, hull full, at least 25% energy, back on the dock,
- * the carried core fragments delivered to the bay (#8 Game Director's rule, #10), the report
- * cut's carry dropped with the trip (ticket 535), and the trip over for combat (#9).
+ * The tow (#7, #8): fee paid, cargo ore lost with its premium ledger counts (ticket 844), hull
+ * full, at least 25% energy, back on the dock, the carried core fragments delivered to the bay (#8
+ * Game Director's rule, #10), the report cut's carry dropped with the trip (ticket 535), and the
+ * trip over for combat (#9).
  */
 export function towVehicle(
   state: AuthorityState,
@@ -81,6 +83,7 @@ export function towVehicle(
   return chainEffects(state, [
     (current) => payRescueFee(current, playerId, cause),
     (current) => bringVehicleToDock(current, playerId),
+    (current) => debitWholeLedger(current, playerId, 'lost'),
     (current) => changeMode(current, playerId, 'docked', 'rescue', tick),
     (current) => bankCoreFragments(current, playerId, 'rescue', tick),
     (current) => endTrip(current, playerId),

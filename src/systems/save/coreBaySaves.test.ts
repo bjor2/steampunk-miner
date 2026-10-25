@@ -55,7 +55,7 @@ describe('save migration: snapshot 24 -> 25, the core bay of each planet (ticket
     expect('awayCoreBays' in back.platform).toBe(false)
   })
 
-  it('loads a snapshot 24 save through its step and the aim step with its state and digest as saved', () => {
+  it('loads a snapshot 24 save through its step and the later steps with its state and digest as saved', () => {
     const state = createScriptedSession().state()
     const file = saveSlotOf({ ...takeSnapshot(state), snapshotVersion: 24 }, 1)
     const reading = readMigratedSaveSlot(file)
@@ -63,6 +63,7 @@ describe('save migration: snapshot 24 -> 25, the core bay of each planet (ticket
     expect(reading.migrations).toEqual([
       { version: 'snapshotVersion', from: 24, to: 25 },
       { version: 'snapshotVersion', from: 25, to: 26 },
+      { version: 'snapshotVersion', from: 26, to: 27 },
     ])
     expect(reading.state).toEqual(state)
     expect(stateDigest(reading.state)).toBe(stateDigest(state))

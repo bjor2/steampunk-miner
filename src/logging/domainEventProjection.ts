@@ -306,6 +306,14 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'artefact_assay_applied',
     data: { tier, band, unitPrice },
   }),
+  OrePremiumLedgerChanged: ({ change, reason, tier, origin, speciesId, units }) => ({
+    event: 'ore_premium_ledger',
+    data: { change, reason, tier, origin, speciesId, units },
+  }),
+  OreSaleLifted: ({ tier, speciesId, units, source, lift }) => ({
+    event: 'ore_sale_lift',
+    data: { tier, speciesId, units, source, lift },
+  }),
   RefineQueued: ({ slot, tier, units, requestedUnits }) => ({
     event: 'refine_queued',
     data: { slot, tier, units, requestedUnits },

@@ -65,7 +65,14 @@ import {
   type PortableSections,
 } from './sliceSectionSnapshot'
 import { stateDigest } from './stateDigest'
+import type { PremiumCount } from './premium/premiumLedger'
 import {
+  portablePremiumLedgerField,
+  portablePremiumLedgerProblems,
+} from './premium/premiumLedgerPortable'
+import { EMPTY_CARGO } from '../vehicle/vehicleState'
+import {
+  isPortableCargo,
   portableVehicleOf,
   portableVehicleProblems,
   portableWorldOf,
@@ -77,6 +84,8 @@ import {
 } from './vehicleSnapshot'
 
 /**
+ * 27: the premium ledger (ticket 844): each player's counts of premium units under
+ * `premiumLedger`, absent while empty (older saves count none, the absent key, `saveMigrations.ts`);
  * 26: the drill's aim (ticket 791): a vehicle's pose and its swept cut's cursor hold `aim` off the
  * four facings (older saves hold none, each pose aiming at its facing, `saveMigrations.ts`);
  * 25: the core bay of each planet (ticket 790): the bays of the planets the session has left, by
@@ -106,7 +115,7 @@ import {
  * vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
  * progress (#24); 3 the platform (#23).
  */
-export const SNAPSHOT_VERSION = 26
+export const SNAPSHOT_VERSION = 27
 
 export interface SessionSnapshot {
   snapshotVersion: number
@@ -156,6 +165,8 @@ export interface PortablePlayer {
   artefact: HeldArtefact | null
   /** The items on auto (ticket 317); omitted while none is. */
   autoModes?: AutoMode[]
+  /** The premium ledger's counts (ticket 844); omitted while it is empty. */
+  premiumLedger?: PremiumCount[]
   /** The player sections; omitted while none is registered. */
   slices?: PortableSections
 }
@@ -183,6 +194,7 @@ function portableStateOf(state: AuthorityState): PortableState {
           vehicle: portableVehicleOf(player.vehicle),
           artefact: player.artefact === null ? null : { ...player.artefact },
           ...portableAutoModesField(player.autoModes),
+          ...portablePremiumLedgerField(player.premiumLedger),
           ...portableSectionsOf(player.slices, 'player'),
         },
       ]),
@@ -279,6 +291,7 @@ function playerStateOf(player: PortablePlayer): PlayerState {
     vehicle: vehicleOfPortable(player.vehicle),
     artefact: player.artefact === null ? null : { ...player.artefact },
     ...portableAutoModesField(player.autoModes),
+    ...portablePremiumLedgerField(player.premiumLedger),
     ...sectionsOfPortable(player.slices, 'player'),
   }
 }
@@ -394,8 +407,16 @@ function portablePlayerProblems(id: string, player: unknown): string[] {
     ...portableVehicleProblems(player.vehicle, `${path}.vehicle`),
     ...heldArtefactProblems(player.artefact, `${path}.artefact`),
     ...portableAutoModesProblems(player.autoModes, `${path}.autoModes`),
+    ...premiumLedgerProblemsOf(player, `${path}.premiumLedger`),
     ...portableSectionsProblems(player.slices, 'player', path),
   ]
+}
+
+/** The ledger read against the saved hold, or an empty one where the vehicle check refused it. */
+function premiumLedgerProblemsOf(player: Record<string, unknown>, path: string): string[] {
+  const cargo = isJsonObject(player.vehicle) ? player.vehicle.cargo : undefined
+  const hold = isPortableCargo(cargo) ? cargo : EMPTY_CARGO
+  return portablePremiumLedgerProblems(player.premiumLedger, hold, path)
 }
 
 function isPortablePlayer(player: unknown): player is Record<string, unknown> {

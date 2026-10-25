@@ -9,8 +9,9 @@
  * - `BuyRefinerySlot` raises the slots by one along `cost.refinery.slot` (20 then 40 band-5 ore
  *   units at this planet), up to `slotsMax`.
  *
- * Before the platform has the bay (planet 3) both are refused with `refinery_locked`. Nothing here
- * pays out: refined batches are collected at the Sell bay (`refineryCollection.ts`).
+ * A batch debits the premium ledger by its units, in key order within the tier (ticket 844): a
+ * refined unit is never sold as a premium unit. Before the platform has the bay (planet 3) both
+ * are refused with `refinery_locked`. Nothing here pays out: refined batches are collected at the Sell bay (`refineryCollection.ts`).
  */
 import { coreMaterialTier } from '../../economy/oreEconomy'
 import { refineBatchCap, refinerySlotPrice, refinerySlotsMax } from '../../economy/refineryEconomy'
@@ -18,6 +19,7 @@ import { sub, toCanonical, ZERO_MONEY, type Money } from '../../money'
 import { statsOfVehicle, type Cargo } from '../../vehicle/vehicleState'
 import { vehicleOf, withVehicle, withWallet, type AuthorityState } from '../authorityState'
 import {
+  chainEffects,
   firstRejection,
   rejectionOf,
   type CommandRule,
@@ -26,6 +28,7 @@ import {
 } from '../commandRule'
 import { atBayRejection, missingBayRejection } from '../dockRules'
 import { moneyShortRejection } from '../platformServices'
+import { debitPremiumUnits } from '../premium/premiumLedgerState'
 import { freeSlotIndex, refineTicks, type RefineryBatch } from './refineryBatch'
 
 export const REFINERY_RULES: {
@@ -104,6 +107,7 @@ function nextSlotPriceOf(state: AuthorityState): Money {
   return nextRefinerySlotPrice(state) ?? ZERO_MONEY
 }
 
+/** The batch into its slot, then the ore's premium ledger counts debited (ticket 844). */
 function queueBatch(
   state: AuthorityState,
   playerId: string,
@@ -111,8 +115,27 @@ function queueBatch(
   tier: number,
   requestedUnits: number,
 ): RuleEffect {
-  const vehicle = vehicleOf(state, playerId)
   const units = clampedUnits(state, playerId, tier, requestedUnits)
+  return chainEffects(state, [
+    (current) => loadBatch(current, playerId, tick, { tier, units, requestedUnits }),
+    (current) => debitPremiumUnits(current, playerId, tier, BigInt(units), 'refined'),
+  ])
+}
+
+/** A queued batch: the tier, the units after the clamp, and the units asked for. */
+interface BatchRequest {
+  tier: number
+  units: number
+  requestedUnits: number
+}
+
+function loadBatch(
+  state: AuthorityState,
+  playerId: string,
+  tick: number,
+  { tier, units, requestedUnits }: BatchRequest,
+): RuleEffect {
+  const vehicle = vehicleOf(state, playerId)
   const slot = freeSlotIndex(state.platform.refinerySlots) as number
   const batch = newBatch(state, playerId, tick, tier, units)
   const unloaded = withVehicle(state, playerId, {

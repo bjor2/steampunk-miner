@@ -25,6 +25,7 @@ import type { DevFlagDelta } from './devFlagState'
 import type { HeldArtefact } from './heldArtefact'
 import { NEW_PLATFORM, type PlatformState } from './platformState'
 import { dockSiteOfPlanet, enteredPlanetOf, type SessionPlanet } from './planetOfState'
+import type { PremiumLedger } from './premium/premiumLedger'
 
 export interface PlayerState {
   wallet: Money
@@ -38,6 +39,11 @@ export interface PlayerState {
    * (ticket 317); absent while none is on, so a save that never used auto digests as before.
    */
   autoModes?: readonly AutoMode[]
+  /**
+   * How many of the hold's units are a planet's premium species, by where they were mined (ticket
+   * 844, `premium/premiumLedger.ts`); absent while empty, so a run that counts none digests as before.
+   */
+  premiumLedger?: PremiumLedger
   /** The slices' player sections away from their initial value (feature-slices.md 3.13). */
   slices?: SliceSections
 }

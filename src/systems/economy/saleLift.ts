@@ -15,7 +15,8 @@ export interface SaleLift {
 }
 
 /** The plain price: every unit sells at least at V(t). */
-export const NO_LIFT: SaleLift = { num: 1n, den: 1n }
+// Written as BigInt(1): the economy source scan admits only the literals 0 and 1 here.
+export const NO_LIFT: SaleLift = { num: BigInt(1), den: BigInt(1) }
 
 /** Whether `lift` pays more than `than`. */
 export function isLiftAbove(lift: SaleLift, than: SaleLift): boolean {

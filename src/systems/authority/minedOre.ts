@@ -9,7 +9,8 @@
  *
  * `saleTier` is the tier the unit is kept and sold at (#232): a signature's is one up. It stays off
  * `CargoAdded`, whose `resourceTier` is the cell's own. So does `band`, the band of the cell's tile,
- * which the ore pickup seam reads (ticket 509). A gem kind's unit is kept at the gem's own tier
+ * which the ore pickup seam reads (ticket 509), and `kindSlot`, which the ore premium seam reads
+ * (ticket 844). A gem kind's unit is kept at the gem's own tier
  * (ticket 713), read from the cell's kind slot by `oreTypeOfCell`.
  */
 import { oreTier } from '../economy/oreEconomy'
@@ -45,6 +46,8 @@ export interface MinedOre extends OreCargoTags {
   depthTiles: number
   /** `cx,cy` of the chunk the cell lay in (`chunkKey`). */
   chunk: string
+  /** The cell's stored kind slot (0 for none), which the ore premium seam reads (ticket 844). */
+  kindSlot: number
 }
 
 export function minedOreOf(params: PlanetParams, tile: TilePoint, cell: number): MinedOre {
@@ -58,6 +61,7 @@ export function minedOreOf(params: PlanetParams, tile: TilePoint, cell: number):
     ...oreCargoTagsOf(ore),
     depthTiles: depthTilesAt(params, tile.tx, tile.ty),
     chunk: chunkKey(chunkOfTile(tile.tx), chunkOfTile(tile.ty)),
+    kindSlot: kindSlotOfCell(cell),
   }
 }
 

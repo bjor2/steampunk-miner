@@ -82,6 +82,8 @@ import { LIVE_BEACON_REGISTRY } from '../systems/registries/liveBeacon'
 import { ITEM_DESCRIPTION_ENTRY_REGISTRY } from '../systems/registries/itemDescriptionEntries'
 import { ORE_LOOK_REGISTRY } from '../systems/registries/oreLook'
 import { ORE_PICKUP_REGISTRY } from '../systems/registries/orePickup'
+import { ORE_PREMIUM_REGISTRY } from '../systems/registries/orePremium'
+import { ORE_SALE_LIFT_REGISTRY } from '../systems/registries/oreSaleLifts'
 import { ORE_DRILL_CLASS_REGISTRY } from '../systems/registries/oreDrillClasses'
 import {
   ORE_GEM_REGISTRY,
@@ -162,6 +164,8 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     generationHook: (hook) => add(GENERATION_HOOK_REGISTRY, hook),
     oreLook: (provider) => add(ORE_LOOK_REGISTRY, provider),
     orePickup: (provider) => add(ORE_PICKUP_REGISTRY, provider),
+    orePremium: (provider) => add(ORE_PREMIUM_REGISTRY, provider),
+    oreSaleLift: (source) => add(ORE_SALE_LIFT_REGISTRY, source),
     cellGateLook: (provider) => add(CELL_GATE_LOOK_REGISTRY, provider),
     kindLook: (provider) => add(KIND_LOOK_REGISTRY, provider),
     magneticGround: (provider) => add(MAGNETIC_GROUND_REGISTRY, provider),
