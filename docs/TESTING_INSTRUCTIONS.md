@@ -422,7 +422,7 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   planet's dearest (a tie on every three-tier step: the ladder spans three tiers).
   `rosterGems.test.ts` holds the names, ranks and tiers per planet, no non-gem kind at a gem's tier
   (HS), a mythic gem's cell tier and its unit's gem mark, plain prices under rules 12 and none on
-  the P6-P7 pool. `rarityTripClamp.test.ts` pays a mythic gem in full past the cap.
+  a P6 or P7 a save holds on `foothold-p6-p7` (ticket 888). `rarityTripClamp.test.ts` pays a mythic gem in full past the cap.
   `src/features/roster/roster.gemTier.test.ts` (about a minute) reads whole P1 to P5 on the three
   pacing seeds: gems only in bands 3 to 5, a cluster of each gem on every seed, the gem tier at most
   15% of each planet's ore pool value, every hop at least 1.15 with the gems in (R3), and P3's step
@@ -525,6 +525,24 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   and the heaviest-first split. `materialPool.golden.test.ts` pins system 2 of seed 20261024 (planet
   2.1 kind by kind) and systems 10 and 1e6 by digest. `debug.test.ts` prints them through
   `steampunkDebug.features['solar-systems'].materialPoolsOf(system, worldSeed)`.
+- **Every planet after P5 on its generated pool, and per-planet ore rules stamps** (ticket 888, spec
+  #878): `src/features/solar-systems/systems/firstSystemPools.test.ts` holds every #777 guard on
+  system 1's P6 to P40 under two seeds (look groups by act run), refuses P1 to P5, ids
+  `system1-p<p>-<slot>`, and prices addresses that share a g (1.6 and 2.1, 1.11 and 3.1) alike while
+  their looks and ids differ; `poolRuns.test.ts` holds each run's least kinds under the VS's band-trip
+  bounds. `src/features/roster/roster.generatedPoolsInPlay.test.ts` digs cells on P6, P8, P40 and
+  system 2's p1 and p3 and checks every species the codex met is its planet's pool kind;
+  `roster.generatedPoolValue.test.ts` holds the top gem >= 1.5x and R3 >= 1.15x on paper along g in
+  system 1 (P5 to P40) and systems 2 and 3, the jump hop 1.5 -> 2.1, and the ladder at g = 1, 5, 30,
+  40 and 1e6 on Money; `rosterGuard.test.ts` runs the family-first bounds on the generated P6 and P7;
+  `planetRoster.test.ts`, `planetSpecies.test.ts`, `rosterGems.test.ts` and `kindLook.test.ts` read
+  `foothold-p6-p7` only under rules 13 (saves). `src/systems/authority/planetOreStamps.test.ts` is
+  the TD's list: an old save with P6 and P7 visited loads on v_pre with main's digests, a mixed save
+  holds P6 on 13 and P8 on 14 across save, reload and travel back, an unvisited P9 takes 14 with one
+  digest across runs, a newer stamp is refused (with its `ore_rules_refused` rows), and a joining
+  client gets the host's cells. `src/systems/world/generatorGolden.test.ts` holds P1 to P5 under rules
+  14 as 13 made them and pins the pool chunks of P6, P8, P20, P40, 2.1 and g = 1e6. Money per minute
+  against #551, planet minutes and felt speed are the Tester's: `npm run balance:report`.
 - **The "solar system 2" re-baseline** (ticket 779, spec #774): `src/features/solar-systems/systemTwoPace.test.ts`
   judges the system 2 bars on hand-built tallies: planets at g 6 to 10, each 22-30 min, felt speed
   at least 0.9x the planet before (the jump's step against system 1's planet 5), drill + tip majors

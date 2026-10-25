@@ -557,7 +557,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/rig-look/systems/rigLookSource.test.ts` | 13 | 13 |
 | `src/features/rig-look/systems/rigLookTable.test.ts` | 32 | 32 |
 
-### `roster`: 22 files, 390 tests
+### `roster`: 24 files, 410 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -567,6 +567,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/roster/roster.byteIdentity.test.ts` | 29 | 15 |
 | `src/features/roster/roster.gemGlint.test.ts` | 9 | 5 |
 | `src/features/roster/roster.gemTier.test.ts` | 5 | 5 |
+| `src/features/roster/roster.generatedPoolValue.test.ts` | 11 | 7 |
+| `src/features/roster/roster.generatedPoolsInPlay.test.ts` | 5 | 1 |
 | `src/features/roster/roster.p1Gems.test.ts` | 6 | 6 |
 | `src/features/roster/roster.p2OwnKinds.test.ts` | 5 | 5 |
 | `src/features/roster/roster.p2Pool.test.ts` | 3 | 3 |
@@ -574,12 +576,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/roster/roster.poolSeam.test.ts` | 7 | 1 |
 | `src/features/roster/roster.skinContactSheet.test.ts` | 78 | 18 |
 | `src/features/roster/roster.speciesAudit.test.ts` | 50 | 5 |
-| `src/features/roster/systems/planetRoster.test.ts` | 13 | 13 |
-| `src/features/roster/systems/planetSpecies.test.ts` | 9 | 8 |
+| `src/features/roster/systems/planetRoster.test.ts` | 15 | 15 |
+| `src/features/roster/systems/planetSpecies.test.ts` | 10 | 9 |
 | `src/features/roster/systems/render/gemRead.test.ts` | 7 | 7 |
 | `src/features/roster/systems/rosterFold.test.ts` | 6 | 6 |
 | `src/features/roster/systems/rosterGems.test.ts` | 10 | 10 |
-| `src/features/roster/systems/rosterGuard.test.ts` | 84 | 10 |
+| `src/features/roster/systems/rosterGuard.test.ts` | 85 | 12 |
 | `src/features/roster/systems/rosterSpecies.test.ts` | 11 | 7 |
 | `src/features/roster/systems/shareRows.test.ts` | 2 | 2 |
 | `src/features/roster/systems/tripLedger.test.ts` | 4 | 4 |
@@ -633,7 +635,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `solar-systems`: 20 files, 135 tests
+### `solar-systems`: 21 files, 144 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -645,13 +647,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/solar-systems/systems/economyRules.test.ts` | 5 | 5 |
 | `src/features/solar-systems/systems/familyBehaviours.test.ts` | 6 | 6 |
 | `src/features/solar-systems/systems/familyCopy.test.ts` | 7 | 7 |
+| `src/features/solar-systems/systems/firstSystemPools.test.ts` | 7 | 7 |
 | `src/features/solar-systems/systems/materialPool.golden.test.ts` | 3 | 3 |
 | `src/features/solar-systems/systems/materialPool.test.ts` | 17 | 17 |
 | `src/features/solar-systems/systems/newContentSlots.test.ts` | 4 | 4 |
 | `src/features/solar-systems/systems/paletteRows.test.ts` | 11 | 11 |
 | `src/features/solar-systems/systems/planetRecolour.test.ts` | 4 | 4 |
 | `src/features/solar-systems/systems/poolRecolour.test.ts` | 3 | 3 |
-| `src/features/solar-systems/systems/poolRuns.test.ts` | 4 | 4 |
+| `src/features/solar-systems/systems/poolRuns.test.ts` | 6 | 6 |
 | `src/features/solar-systems/systems/render/lookArt.test.ts` | 9 | 9 |
 | `src/features/solar-systems/systems/render/lookContactSheet.test.ts` | 7 | 7 |
 | `src/features/solar-systems/systems/systemMoneyTexts.golden.test.ts` | 5 | 3 |
@@ -995,6 +998,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/perPurchaseTrackEvents.test.ts` | 6 | 2 |
 | `src/systems/authority/planetCoreBays.test.ts` | 8 | 8 |
 | `src/systems/authority/planetOfState.test.ts` | 4 | 4 |
+| `src/systems/authority/planetOreStamps.test.ts` | 8 | 8 |
 | `src/systems/authority/platformCommands.test.ts` | 43 | 43 |
 | `src/systems/authority/premium/premiumLedger.test.ts` | 6 | 6 |
 | `src/systems/authority/premium/premiumLedgerRoutes.test.ts` | 8 | 8 |
@@ -1201,7 +1205,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/logging/goldenRun.test.ts` | 26 | 10 |
 | `src/logging/secondSliceGolden.test.ts` | 6 | 6 |
-| `src/systems/world/generatorGolden.test.ts` | 20 | 20 |
+| `src/systems/world/generatorGolden.test.ts` | 23 | 23 |
 
 ### `hints`
 
@@ -1995,7 +1999,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/world/lavaPockets.test.ts` | 7 | 7 |
 | `src/systems/world/openedDepth.test.ts` | 4 | 4 |
 | `src/systems/world/orePatches.test.ts` | 32 | 9 |
-| `src/systems/world/planetParams.test.ts` | 34 | 29 |
+| `src/systems/world/planetParams.test.ts` | 35 | 30 |
 | `src/systems/world/rareClusters.report.lane.test.ts` | 6 | 6 |
 | `src/systems/world/rareClusters.test.ts` | 10 | 10 |
 | `src/systems/world/rimDwell.test.ts` | 6 | 6 |
