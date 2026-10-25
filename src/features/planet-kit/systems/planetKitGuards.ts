@@ -10,6 +10,7 @@
  */
 import type { HazardEffect } from '../../ores'
 import type { PlanetKitEconomy } from './planetKitEconomy'
+import { TRADE_OFF_AXIS_OF_COST } from './kitActing'
 import { isSamePlanet, stockOfMerchant } from './planetKitSales'
 import type { KitItem, MerchantRow } from './planetKitTypes'
 
@@ -67,6 +68,8 @@ export function kitTableProblems(
     ...items.flatMap((item) => itemStackProblems(item, economy)),
     ...consumablePriceProblems(items, economy),
     ...heldFromSaleProblems(items, economy),
+    ...actingToolProblems(items, economy),
+    ...flaskActingProblems(items, economy),
     ...items.flatMap((item) => itemHazardProblems(item, context)),
     ...merchants.flatMap((merchant) => stockProblems(merchant, items)),
     ...behaviourProblems(items, context),
@@ -180,6 +183,36 @@ function heldFromSaleProblems(items: readonly KitItem[], economy: PlanetKitEcono
   return [...economy.heldFromSale]
     .filter((id) => !ids.includes(id))
     .map((id) => `heldFromSale.${id} names no kit item`)
+}
+
+/**
+ * Every hazard tool has its acting row and every row names one, whose trade-off costs a track
+ * (ticket 881), so no tool acts without numbers and no number acts on nothing.
+ */
+function actingToolProblems(items: readonly KitItem[], economy: PlanetKitEconomy): string[] {
+  const tools = items.filter((item) => item.kind === 'tool' && item.effect.hazard !== null)
+  const rows = economy.acting.tools.map((row) => row.itemId)
+  return [
+    ...tools
+      .filter((tool) => !rows.includes(tool.id))
+      .map((tool) => `acting.tools has no row for the hazard tool ${tool.id}`),
+    ...rows
+      .filter((id) => !tools.some((tool) => tool.id === id))
+      .map((id) => `acting.tools.${id} names no hazard tool`),
+    ...tools
+      .filter((tool) => TRADE_OFF_AXIS_OF_COST[tool.tradeOff.costs] === null)
+      .map(
+        (tool) => `${tool.id}: its trade-off ${tool.tradeOff.costs} is no track a tool can slow`,
+      ),
+  ]
+}
+
+/** The flask the acting block opens is a consumable kit item with a hazard. */
+function flaskActingProblems(items: readonly KitItem[], economy: PlanetKitEconomy): string[] {
+  const { itemId } = economy.acting.flask
+  const flask = items.find((item) => item.id === itemId)
+  if (flask !== undefined && flask.kind === 'consumable' && flask.effect.hazard !== null) return []
+  return [`acting.flask.${itemId} names no consumable kit item with a hazard`]
 }
 
 /** The item hooks on its home planet's hazard, or on none where the planet has none. */

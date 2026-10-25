@@ -10,7 +10,9 @@
  * parts, the merchant frontage on the Assay & Exchange and the Cache Crate prop. Ticket 850 sells
  * the kit items: the buy command and the player's holdings section, a content entry per item
  * claiming its schedule row, the Buy on each merchant line, the carried crates' count with the
- * drop beside the gauges, and the crate the pacing bot carries under its kit policy.
+ * drop beside the gauges, and the crate the pacing bot carries under its kit policy. Ticket 881
+ * makes the three hazard tools act by context: their trade-offs, their factors on their hazards'
+ * contacts and the kernel's pre-cut hook that decides when each acts.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { planetKitDebugActions } from './debug'
@@ -22,6 +24,7 @@ import { CONTAINER_RULES } from './systems/containerRules'
 import { CONTAINERS_SECTION } from './systems/containerSection'
 import { KIT_BUY_RULES } from './systems/kitBuyRules'
 import { KIT_HOLDINGS_SECTION } from './systems/kitHoldingsSection'
+import { KIT_TOOL_CONTEXTS, KIT_TOOL_FACTORS, KIT_TOOL_TRADE_OFFS } from './systems/kitToolRules'
 import { kitItemEntriesOf } from './systems/kitItemContent'
 import { MERCHANT_ORE_PREMIUM, MERCHANT_PREMIUM_LIFT } from './systems/merchantPremium'
 import { PLANET_KITS } from './systems/planetKitRows'
@@ -43,6 +46,10 @@ export const slice: SliceDefinition = {
     r.saveSection(KIT_HOLDINGS_SECTION)
     r.commandRules(CONTAINER_RULES)
     r.commandRules(KIT_BUY_RULES)
+    // The plough, tongs and vane act while their hazard is within the drill's reach (ticket 881).
+    r.preCutContext(KIT_TOOL_CONTEXTS)
+    KIT_TOOL_TRADE_OFFS.forEach((row) => r.toolTradeOff(row))
+    KIT_TOOL_FACTORS.forEach((factor) => r.contactFactor(factor))
     // The crate the pacing bot carries under `kitPolicy.crates: 'drop_on_full'` (ticket 850).
     r.botCrates(PLANET_KIT_BOT_CRATES)
     r.eventProjections(PLANET_KIT_PROJECTIONS)

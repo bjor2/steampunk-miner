@@ -7,9 +7,11 @@
  * `containers` holds the placed containers' caps per kind, per player and per planet, and the
  * access a new one is placed with (the TD's final ruling on #823, points 1 and 5). `heldFromSale`
  * lists the kit items no merchant sells yet (the GD's ship rule on #850: a hazard tool is held
- * until its verb lands, #882).
+ * until its verb lands, #882). `acting` holds what the hazard tools do while they act (ticket 881,
+ * `kitActing.ts`).
  */
 import { fromCanonical, isNonNegativeMoneyText, type Money } from '../../../systems/money'
+import { kitActingOf, kitActingProblems, type KitActing } from './kitActing'
 import { CONTAINER_ACCESS, type ContainerAccess } from './placedContainers'
 import { isPlainMap, isWholeFrom, SNAKE_ID, type Raw } from './planetKitRowShape'
 
@@ -39,6 +41,8 @@ export interface PlanetKitEconomy {
   containerDefaultAccess: ContainerAccess
   /** The kit item ids no merchant sells yet, though stocked. */
   heldFromSale: ReadonlySet<string>
+  /** The hazard tools' factors, trade-offs and tail, and the flask's window, while they act. */
+  acting: KitActing
 }
 
 /** VS row 4: the ore premium is at most +25%. */
@@ -52,6 +56,7 @@ const FIELDS: readonly string[] = [
   'consumables',
   'containers',
   'heldFromSale',
+  'acting',
 ]
 const CONSUMABLE_FIELDS: readonly string[] = [
   'carryLimit',
@@ -70,6 +75,7 @@ export function planetKitEconomyProblems(economy: unknown): string[] {
     ...consumablesProblems(economy.consumables),
     ...containersProblems(economy.containers),
     ...heldFromSaleProblems(economy.heldFromSale),
+    ...kitActingProblems(economy.acting),
     ...unknownFields(economy, '', FIELDS),
   ]
 }
@@ -92,6 +98,7 @@ export function planetKitEconomyOf(economy: Raw): PlanetKitEconomy {
     >,
     containerDefaultAccess: containers.defaultAccess as ContainerAccess,
     heldFromSale: new Set(economy.heldFromSale as string[]),
+    acting: kitActingOf(economy.acting as Raw),
   }
 }
 
