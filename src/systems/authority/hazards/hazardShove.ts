@@ -13,9 +13,15 @@
  *   input locked, on every machine alike (`vehicleMotionEffects.ts`). It never moves the drill tip
  *   off the body's front, and the drill rests while it runs.
  *
+ * - **Aimed outward** (ticket 882, the Vent Vane; Systems' correction on #850, 6395074595). While a
+ *   slice's shove aim answers for the player (`shoveAims.ts`), the shove goes outward from the core
+ *   from the rig's cell instead of along the normal, at the size its factor left it: never longer
+ *   than the bare shove, so it adds no speed.
+ *
  * `HazardShoved` logs it as `hazard_shove`, with the cells shoved and where the rig comes to rest.
  */
 import { scaledByFactor } from '../../registries/contactEffects'
+import { isShoveAimedOutward } from '../../registries/shoveAims'
 import type { MotionGlide } from '../../vehicle/motionGlide'
 import { tileOfPose, type VehiclePose } from '../../vehicle/vehiclePose'
 import { cellDensitySum, YIELD_SUM } from '../../world/cellYield'
@@ -46,7 +52,8 @@ export function shoveOnContact(
   }
   const scalded = takeHazardHit(state, playerId, params, tile, ask)
   const { pose } = vehicleOf(scalded.state, playerId)
-  const shove = ventShoveOf(scalded.state.world, params, pose, tile, {
+  const aim = { vent: tile, isOutward: isShoveAimedOutward(state, playerId, row.kind) }
+  const shove = ventShoveOf(scalded.state.world, params, pose, aim, {
     tiles: scaledByFactor(row.shoveTiles, factorBp),
     untilTick: scalded.state.tick + row.ticks,
   })
@@ -66,17 +73,23 @@ export function shoveOnContact(
   ])
 }
 
-/** The open cells along the vent's normal from the rig, at most `reach.tiles`. */
+/** Where a shove points: the vent's normal, or outward from the core under a shove aim. */
+interface ShoveAimAt {
+  vent: TilePoint
+  isOutward: boolean
+}
+
+/** The open cells along the shove's direction from the rig, at most `reach.tiles`. */
 function ventShoveOf(
   world: WorldState,
   params: PlanetParams,
   pose: VehiclePose | null,
-  vent: TilePoint,
+  aim: ShoveAimAt,
   reach: { tiles: number; untilTick: number },
 ): VentShove {
-  if (pose === null) return { tiles: 0, to: vent, untilTick: reach.untilTick }
+  if (pose === null) return { tiles: 0, to: aim.vent, untilTick: reach.untilTick }
   const from = tileOfPose(pose)
-  const step = ventNormalOf(vent, from)
+  const step = aim.isOutward ? outwardOf(from) : ventNormalOf(aim.vent, from)
   let tiles = 0
   while (tiles < reach.tiles && isOpenTile(world, params, stepped(from, step, tiles + 1))) tiles++
   return { tiles, to: stepped(from, step, tiles), untilTick: reach.untilTick }
@@ -105,7 +118,7 @@ function stepped(from: TilePoint, step: TilePoint, tiles: number): TilePoint {
  * Air whose density is at most the yield's half of a full cell, the line at which the drill counts
  * a cell removed: a cut cell that rubble or a fill raised past it is ground again.
  */
-function isOpenTile(world: WorldState, params: PlanetParams, tile: TilePoint): boolean {
+export function isOpenTile(world: WorldState, params: PlanetParams, tile: TilePoint): boolean {
   return isAirCell(cellAt(world, params, tile)) && cellDensitySum(world, params, tile) <= YIELD_SUM
 }
 

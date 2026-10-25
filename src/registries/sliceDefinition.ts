@@ -50,6 +50,8 @@ import type { SlotHoldCueSource } from '../systems/registries/slotHoldCues'
 import type { HullDamageIntercept } from '../systems/registries/hullDamageIntercepts'
 import type { ToolTradeOff } from '../systems/registries/toolTradeOffs'
 import type { PreCutContext } from '../systems/registries/preCutContexts'
+import type { HazardClear } from '../systems/registries/hazardClears'
+import type { ShoveAim } from '../systems/registries/shoveAims'
 import type { ItemDescriberProvider } from '../systems/registries/itemDescriber'
 import type { ItemDescriptionEntry } from '../systems/registries/itemDescriptionEntries'
 import type { OreLookProvider } from '../systems/registries/oreLook'
@@ -322,6 +324,10 @@ export interface SliceRegistrar {
    * the drill cuts (ticket 881); the kernel keeps the acting flag and the hook's tail.
    */
   preCutContext(hook: PreCutContext): void
+  /** A hazard kind cleared from cells for a while, a flag and never a cell (ticket 882). */
+  hazardClear(clear: HazardClear): void
+  /** A shove of one hazard kind turned outward from the core, its size kept (ticket 882). */
+  shoveAim(aim: ShoveAim): void
   /**
    * A planet class's tag, arrival line and values on the kernel's planet card (ticket 343): shown
    * once its `featureId` row is open, the hazard and gate kind only, never an unlock id.
