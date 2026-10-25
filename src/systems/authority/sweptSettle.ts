@@ -19,6 +19,7 @@ import {
   digSubStepsAfter,
   frontOfCursor,
   pointAtStep,
+  stampBodyPointOf,
   type SweepPath,
   type SweptCut,
 } from '../vehicle/sweptCut'
@@ -67,7 +68,7 @@ export function settleSweep(
         carved.reachedStep,
       ),
     }),
-    (current) => layRingsAlongCut(current, playerId, cutAxisOf(sweep.path, reached), carved),
+    (current) => layRingsAlongCut(current, playerId, cutAxisOf(sweep, reached), carved),
   ])
 }
 
@@ -93,9 +94,17 @@ function withRingsOffShare(
   return withVehicle(state, playerId, { ...vehicle, sweptCut: { ...cursor, cutSharePassed } })
 }
 
-/** The line the stamp's centre cut along: from the cursor, or a fresh path's one disc. */
-function cutAxisOf(path: SweepPath, reached: StampPoint): CutAxis {
-  return { from: path.isFresh ? reached : path.from, to: reached }
+/**
+ * The cut's own centre line (the GD and TD rulings on #662 Q2): the line its stamp's centre cut
+ * along, from the cursor or a fresh path's one disc, pulled back along the aim by the stamp's
+ * offset onto the body's line, never the swept stamp centres; the ring lag is still measured from
+ * where the stamp reached.
+ */
+function cutAxisOf({ path, stamp, aheadMm, step }: Sweep, reached: StampPoint): CutAxis {
+  const onBodyLine = (point: StampPoint) =>
+    stampBodyPointOf({ stamp: { ...stamp, ...point }, aheadMm }, step.pose)
+  const from = path.isFresh ? reached : path.from
+  return { from: onBodyLine(from), to: onBodyLine(reached), stampReach: reached }
 }
 
 /** A fresh path that could cut nothing stays at its start: the body. */

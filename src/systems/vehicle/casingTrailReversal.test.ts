@@ -45,7 +45,7 @@ type FollowTrail = (trail: CasingTrail, from: RingPoint, to: RingPoint) => Trail
 
 const byPoseReport: FollowTrail = (trail, _from, to) => followCasingTrail(trail, to, true)
 const bySweptCut: FollowTrail = (trail, from, to) =>
-  followCasingTrailAlongCut(trail, { from, to }, true)
+  followCasingTrailAlongCut(trail, { from, to, stampReach: to }, true)
 
 function cutForwardAndBack(follow: FollowTrail, strideMm: number, interval: number): ReversalRun {
   let trail: CasingTrail = EMPTY_CASING_TRAIL

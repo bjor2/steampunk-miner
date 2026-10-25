@@ -86,6 +86,11 @@ export interface Sweep {
   step: SweptStep
   stamp: DiscStamp
   /**
+   * How far ahead of the pose along the aim the stamp was placed: the swept stamp's offset, which
+   * the casing trail's axis is pulled back by onto the body's line (`sweptSettle.ts`, #662 Q2).
+   */
+  aheadMm: number
+  /**
    * Where a cutting step's carve runs from (ticket 570, `sweptStampAt.ts`): the stamp pulled back
    * to the body, or the point the casing rings behind the last front leave free.
    */
@@ -212,6 +217,7 @@ function sweepOf(state: AuthorityState, playerId: string, step: SweptStep): Swee
   return {
     step,
     stamp,
+    aheadMm,
     rear,
     crossed,
     cuttingMm,

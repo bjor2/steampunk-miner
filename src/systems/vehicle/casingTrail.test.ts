@@ -110,6 +110,7 @@ describe('casing trail along the swept cut (ticket 330)', () => {
   const cutTo = (x: number, stepMm: number) => ({
     from: { xMm: Math.max(0, x - stepMm), yMm: 0 },
     to: { xMm: x, yMm: 0 },
+    stampReach: { xMm: x, yMm: 0 },
   })
 
   /** The x of each ring due, cutting along x at `stepMm` a tick to `toMm`. */
@@ -153,7 +154,7 @@ describe('casing trail along the swept cut (ticket 330)', () => {
     let trail: CasingTrail = EMPTY_CASING_TRAIL
     const due: { xMm: number; yMm: number }[] = []
     for (let step = 0; step <= 100; step++) {
-      const cut = { from: diagonalAt(step - 1), to: diagonalAt(step) }
+      const cut = { from: diagonalAt(step - 1), to: diagonalAt(step), stampReach: diagonalAt(step) }
       const followed = followCasingTrailAlongCut(trail, cut, true)
       trail = followed.trail
       due.push(...followed.due)

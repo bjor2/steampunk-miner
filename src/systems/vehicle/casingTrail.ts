@@ -14,8 +14,14 @@
  * `CASING_CUT_CONTINUE_MM`). A dig recorded every 0.5 m and one recorded every 1 m charge the same.
  *
  * The swept cut (ticket 330) records along its cut instead (`followCasingTrailAlongCut`): a point
- * every `CASING_RING_SPACING_MM` on the line from the last recorded point to the centre the cut
- * reached, each standing for one spacing, so the rings keep their spacing at any step length. A
+ * every `CASING_RING_SPACING_MM` on the line from the last recorded point to where the cut
+ * reached, each standing for one spacing, so the rings keep their spacing at any step length. That
+ * line is the cut's own centre line, the body's, before the swept stamp's offset ahead of it (the
+ * GD and TD rulings on #662 Q2): the stamp sits up to a metre ahead along the aim, and where the
+ * body does not travel along its aim (a shaft dug straight down off the planet's top, the aim
+ * radial) its centres run beside the body's line, so rings on them lined one wall of the 1.2 m
+ * bore and left the other's rock out of reach. A due point is still measured from the stamp's
+ * reach, so a ring is never laid nearer the stamp than before. A
  * cut continues the trail when its sweep starts within `CASING_CUT_CONTINUE_MM` of the last point
  * (ticket 335, the ring lag until ticket 662 narrowed the bore): measured from the sweep's start,
  * not its end, so a step of any length (16 m at 960 m/s) keeps its rings every 0.5 m instead of
@@ -72,10 +78,14 @@ export function followCasingTrail(
   return splitDuePoints(recorded, stampCentre)
 }
 
-/** Where one swept cut's stamp centre ran: from its sweep's start to where the cut reached. */
+/**
+ * Where one swept cut ran: its centre line from its sweep's start to where the cut reached, and
+ * where its stamp's centre reached, which the ring lag is measured from.
+ */
 export interface CutAxis {
   from: RingPoint
   to: RingPoint
+  stampReach: RingPoint
 }
 
 /** The trail after the swept cut's stamp centre ran along `axis`, recording at fixed spacing. */
@@ -85,7 +95,7 @@ export function followCasingTrailAlongCut(
   isCutting: boolean,
 ): TrailStep {
   const recorded = isCutting ? recordAxisPointsAlong(trail, axis) : trail
-  return splitDuePoints(recorded, axis.to)
+  return splitDuePoints(recorded, axis.stampReach)
 }
 
 /** One point per whole spacing from the last point toward the cut's end; a new cut starts as before. */
