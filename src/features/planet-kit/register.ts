@@ -7,8 +7,10 @@
  * player own one). Ticket 821 stands the merchant counter on the dock (it claims the `merchants`
  * row), counts and pays the merchant's ore premium on the kernel's ledger and sale-lift seams, and
  * draws the planet's merchant on the Sell bay. Ticket 825 brought the Blender art: the sockets'
- * parts, the merchant frontage on the Assay & Exchange and the Cache Crate prop. Buying kit items
- * and the four hazard tools come with #850.
+ * parts, the merchant frontage on the Assay & Exchange and the Cache Crate prop. Ticket 850 sells
+ * the kit items: the buy command and the player's holdings section, a content entry per item
+ * claiming its schedule row, the Buy on each merchant line, and the carried crates' count with
+ * the drop beside the gauges.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { planetKitDebugActions } from './debug'
@@ -17,7 +19,11 @@ import { KIT_SOCKET_PIECE_ID, KitSocketParts } from './scene/KitSocketParts'
 import { MERCHANT_FRONTAGE_PIECE_ID, MerchantFrontage } from './scene/MerchantFrontage'
 import { CONTAINER_RULES } from './systems/containerRules'
 import { CONTAINERS_SECTION } from './systems/containerSection'
+import { KIT_BUY_RULES } from './systems/kitBuyRules'
+import { KIT_HOLDINGS_SECTION } from './systems/kitHoldingsSection'
+import { kitItemEntriesOf } from './systems/kitItemContent'
 import { MERCHANT_ORE_PREMIUM, MERCHANT_PREMIUM_LIFT } from './systems/merchantPremium'
+import { PLANET_KITS } from './systems/planetKitRows'
 import { MERCHANT_FACILITY } from './systems/sessionMerchant'
 import { planetKitArtAssets } from './systems/planetKitArt'
 import { CONTAINER_MARKER_PRIORITY, ContainerMarkers } from './ui/ContainerMarkers'
@@ -30,8 +36,11 @@ export const slice: SliceDefinition = {
     r.dockFacility(MERCHANT_FACILITY)
     r.orePremium(MERCHANT_ORE_PREMIUM)
     r.oreSaleLift(MERCHANT_PREMIUM_LIFT)
+    r.content('kit-item', kitItemEntriesOf(PLANET_KITS.items))
     r.saveSection(CONTAINERS_SECTION)
+    r.saveSection(KIT_HOLDINGS_SECTION)
     r.commandRules(CONTAINER_RULES)
+    r.commandRules(KIT_BUY_RULES)
     r.eventProjections(PLANET_KIT_PROJECTIONS)
     r.runEvents(PLANET_KIT_RUN_EVENTS)
     r.hudPanel({
@@ -49,7 +58,8 @@ export const slice: SliceDefinition = {
     // The kit sockets' parts, the merchant frontages and the Cache Crate prop (ticket 825, #214).
     r.artAssets(planetKitArtAssets())
     // steampunkDebug.features['planet-kit'].placeContainer({ tx, ty, ore }), .containers(),
-    // .showKitSockets(), .hideKitSockets(), .kitSockets(), .merchant(), .merchantFrontage()
+    // .showKitSockets(), .hideKitSockets(), .kitSockets(), .merchant(), .merchantFrontage(),
+    // .grantKitItem(itemId), .kitHoldings()
     r.debugActions(planetKitDebugActions)
   },
 }

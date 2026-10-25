@@ -76,6 +76,9 @@ function holdingOn(planet: number, premium: number, commons: number) {
   )
   const counts = { [`${tier}:1:${planet}:${AMBER}`]: String(premium) }
   withKit(() => held.submit(1, { type: 'debug.setPremiumLedger', payload: { counts } }))
+  withKit(() =>
+    held.submit(1, { type: 'debug.planet-kit.grantKitItem', payload: { itemId: CRATE } }),
+  )
   return { session: held, tier }
 }
 

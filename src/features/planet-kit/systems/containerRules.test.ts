@@ -17,10 +17,13 @@ import { cargoUnitsOf, EMPTY_CARGO, type Cargo } from '../../../systems/vehicle/
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import { dropContainerIntent, pickupContainerIntent } from './containerRules'
 import { placedContainersIn } from './containerSection'
+import { heldCountOf } from './kitHoldings'
+import { kitHoldingsOf } from './kitHoldingsSection'
 import { containedUnitsOf, containersOn } from './placedContainers'
 
 // The Cache Crate's host commands (ticket 823, the TD's final ruling on #823): drop and pickup on
-// the authority, with the scenario call to place a container, through save, load and a jump.
+// the authority, with the scenario call to place a container, through save, load and a jump. A
+// drop spends a carried crate (ticket 850).
 
 const CRATE = 'cache_crate'
 const P1 = '1:1'
@@ -30,6 +33,7 @@ const setMoney = { type: 'debug.setMoney', payload: { amount: '1e6' } } as const
 const dock = { type: 'dock', payload: { bay: 'sell' } } as const
 const undock = { type: 'undock', payload: {} } as const
 const buyFuel = { type: 'buyFuel', payload: { units: 10 } } as const
+const grantCrate = { type: 'debug.planet-kit.grantKitItem', payload: { itemId: CRATE } } as const
 const jumpTo = (planet: string) =>
   ({ type: 'jumpToPlanet', payload: { system: '1', planet } }) as const
 
@@ -51,13 +55,17 @@ function vehicleCell(session: ScriptedSession, playerId = 'p1'): TilePoint {
   return tileOfPose(session.vehicle(playerId).pose as VehiclePose)
 }
 
-/** A session whose players each hold `HOLD`, set up through the scenario call and a pickup. */
+/**
+ * A session whose players each hold `HOLD` and carry one crate, set up through the scenario calls
+ * and a pickup.
+ */
 function sessionWithHolds(playerIds: readonly string[] = ['p1']): ScriptedSession {
   const session = createScriptedSession(playerIds)
   playerIds.forEach((playerId) => {
     session.submit(1, placeAt(vehicleCell(session, playerId), HOLD, playerId), playerId)
     const [container] = containersOn(placedContainersIn(session.state()), P1)
     session.submit(1, pickupContainerIntent(container.containerId), playerId)
+    session.submit(1, grantCrate, playerId)
   })
   return session
 }
@@ -159,13 +167,24 @@ describe('cache crate commands (ticket 823)', () => {
     expect(cargoTotalOf(session.state())).toBe(total)
   })
 
-  it('refuses a 4th crate on one planet, keeping the hold', () => {
+  it('refuses a 4th crate on one planet, keeping the hold and the carried crate', () => {
     const session = sessionWithHolds()
     const cell = vehicleCell(session)
     for (let crate = 0; crate < 3; crate += 1) session.submit(2, placeAt(cell, HOLD))
     const events = session.submit(3, dropContainerIntent(CRATE))
     expect(rejectionOf(events)).toBe('planet-kit.container_cap')
     expect(session.vehicle().cargo).toEqual(HOLD)
+    expect(heldCountOf(kitHoldingsOf(session.state(), 'p1'), CRATE)).toBe(1n)
+  })
+
+  it('spends one carried crate on a drop and refuses a drop with none carried, changing nothing', () => {
+    const session = sessionWithHolds()
+    session.submit(2, dropContainerIntent(CRATE))
+    expect(heldCountOf(kitHoldingsOf(session.state(), 'p1'), CRATE)).toBe(0n)
+    session.submit(3, pickupContainerIntent(2))
+    const before = stateDigest(session.state())
+    expect(rejectionOf(session.submit(4, dropContainerIntent(CRATE)))).toBe('planet-kit.no_crate')
+    expect(stateDigest(session.state())).toBe(before)
   })
 
   it('refuses a scenario container past the cap too, never trimming the scenario', () => {
@@ -177,6 +196,7 @@ describe('cache crate commands (ticket 823)', () => {
 
   it('refuses to drop an empty hold or a kind with no cap row', () => {
     const session = createScriptedSession()
+    session.submit(1, grantCrate)
     expect(rejectionOf(session.submit(1, dropContainerIntent(CRATE)))).toBe('planet-kit.empty_hold')
     expect(rejectionOf(session.submit(1, dropContainerIntent('stash')))).toBe(
       'planet-kit.unknown_kind',

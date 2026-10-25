@@ -528,8 +528,14 @@ import type { JsonCount } from '../wholeCount'
  *    9-12), says so in `BlastCollapseRolled`, and under the chance warns and refills on the shared
  *    collapse path with the entry's optional `isBlast` bit: no crush, and the rigs' cells and every
  *    cell a rig could not drill stay open. A run that never blasts a size from 5 moves no digest.
+ * 115: the merchants sell the kit items (ticket 850, PK4b): `planet-kit.buy_kit_item {itemId}` at
+ *    the Sell bay, answered by `planet-kit.KitItemBought`, keeps a tool owned and a consumable in a
+ *    stack pinned to the g it was bought at in the player's `planet-kit.holdings` section;
+ *    `planet-kit.drop_container` spends one carried Cache Crate and is refused `no_crate` without
+ *    one; `debug.planet-kit.grantKitItem` holds an item for a scenario. A run that buys nothing
+ *    moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 114
+export const AUTHORITY_PROTOCOL_VERSION = 115
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

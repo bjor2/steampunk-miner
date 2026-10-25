@@ -80,13 +80,6 @@ export const DEFERRED_SCHEDULE_ROWS: Readonly<Record<DeferredScheduleHome, reado
     'finale_key',
     // The star map's jump drive (ticket 759, #650): shipped in kernel code (`starMap/jumpDriveRules`).
     'jump_drive',
-    // The planet kit items (ticket 823, GD lock of 24 Oct on #647): the planet-kit slice claims each
-    // once it registers the item (#850 sells them); the Cache Crate's container rules ship first.
-    'cache_crate',
-    'scree_plough',
-    'damp_flask',
-    'shard_tongs',
-    'vent_vane',
   ],
 }
 

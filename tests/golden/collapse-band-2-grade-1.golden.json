@@ -2,7 +2,7 @@
   "name": "collapse-band-2-grade-1",
   "description": "Grade 1 digs 8 m into band 2: the lined blocks behind warn for 60 ticks and refill (#43).",
   "generatorVersion": 17,
-  "authorityProtocolVersion": 114,
+  "authorityProtocolVersion": 115,
   "logSchemaVersion": 7,
   "numberFormatVersion": 1,
   "sliceSections": {
@@ -21,6 +21,7 @@
     "mobility": 1,
     "ores.rarity-trip": 1,
     "planet-kit.containers": 1,
+    "planet-kit.holdings": 1,
     "power-up-core": 1,
     "tech-tree": 1,
     "tech-tree.forks": 1,

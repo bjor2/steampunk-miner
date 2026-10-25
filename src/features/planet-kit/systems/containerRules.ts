@@ -13,8 +13,10 @@
  * - `debug.planet-kit.placeContainer`: a scenario's container with given cargo, refused (never
  *   trimmed) as a drop would be, or for cargo that is not whole units per tier.
  *
- * Spending the carried crate waits for the owned/stack section of #850; until then no control
- * sends a drop, only the scenario call and a spec do.
+ * A drop spends one carried unit of the kind's kit item (ticket 850: the Cache Crate is a
+ * consumable, bought at the Hearthmoor merchant), the one of the lowest g it was bought at, and is
+ * refused `no_crate`, costing nothing, while the player carries none. The scenario call spends
+ * nothing: it places a container as if one had been dropped.
  */
 import {
   vehicleOf,
@@ -63,6 +65,7 @@ import {
   type ContainerPickup,
   type PlacedContainer,
 } from './placedContainers'
+import { noCrateRejection, withCrateSpent } from './crateSpend'
 import { PLANET_KIT_ECONOMY } from './planetKitRows'
 import { scenarioCargoOf, scenarioCargoProblems } from './scenarioCargo'
 
@@ -104,7 +107,7 @@ export const CONTAINER_RULES: SliceCommandRules = {
   },
 }
 
-/** The intent a drop control sends (#850 wires one once a crate can be carried). */
+/** The intent the drop control sends. */
 export function dropContainerIntent(kind: string) {
   return { type: 'planet-kit.drop_container' as const, payload: { kind } }
 }
@@ -123,6 +126,7 @@ export function dropRejectionOf(
   return firstRejection([
     () => unknownKindRejection(kind),
     () => outOfPlayRejection(vehicleOf(state, playerId)),
+    () => noCrateRejection(state, playerId, kind),
     () => dropRejection(state, holdDropOf(state, playerId, kind)),
   ])
 }
@@ -144,7 +148,7 @@ export function pickupRejectionOf(
 function placeContainer(state: AuthorityState, playerId: string, drop: ContainerDrop): RuleEffect {
   const outcome = dropContainer(placedContainersIn(state), drop)
   if (!outcome.isDropped) return { state, events: [] }
-  const placed = withPlacedContainers(state, outcome.placed)
+  const placed = withPlacedContainers(withCrateSpent(state, playerId, drop.kind), outcome.placed)
   const emptied = withHold(placed, playerId, outcome.hold)
   return {
     state: withPremiumLedger(emptied, playerId, EMPTY_PREMIUM_LEDGER),
