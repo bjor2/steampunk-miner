@@ -3,13 +3,15 @@
  * player fires, never a context verb; the TD's seam as amended): the host command
  * `planet-kit.uncork_flask` spends one carried flask, the stack of the lowest g first, and opens
  * it until `openTicks` from now, kept as `flaskUntilTick` in the player's holdings. While it is
- * open, firedamp's drain plays at the flask's factor (−100%: none at all).
+ * open, firedamp's drain plays at the flask's factor (−100%: none at all). Since ticket 882 the
+ * rig's cell at the uncork is kept too, `flaskAt`, the centre of the firedamp the flask clears
+ * for its window (`flaskClear.ts`).
  *
  * Refused, costing nothing, while no flask is carried (`no_flask`) or one is still open
  * (`flask_open`). It is answered by `planet-kit.FlaskUncorked`, logged as `flask_uncorked`.
  */
 import type { CommandIntent } from '../../../systems/authority/authorityCommand'
-import type { AuthorityState } from '../../../systems/authority/authorityState'
+import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import {
   firstRejection,
   rejectionOf,
@@ -18,12 +20,15 @@ import {
 } from '../../../systems/authority/commandRule'
 import type { ContactFactor } from '../../../systems/registries/contactEffects'
 import type { SliceCommandRules } from '../../../systems/registries/commandRules'
+import { tileOfPose } from '../../../systems/vehicle/vehiclePose'
+import type { VehicleState } from '../../../systems/vehicle/vehicleState'
+import type { TilePoint } from '../../../systems/world/tileGrid'
 import { flaskUncorkedOf } from './flaskEvents'
 import {
   heldCountOf,
   isFlaskOpenAt,
   spendConsumable,
-  withFlaskOpenUntil,
+  withFlaskOpen,
   type KitSpend,
 } from './kitHoldings'
 import { kitHoldingsOf, withKitHoldings } from './kitHoldingsSection'
@@ -77,7 +82,8 @@ export function flaskStateOf(state: AuthorityState, playerId: string, tick: numb
 function uncorkFlask(state: AuthorityState, playerId: string, tick: number): RuleEffect {
   const spent = spendConsumable(kitHoldingsOf(state, playerId), FLASK.id) as KitSpend
   const untilTick = tick + FLASK_ACTING.openTicks
-  const holdings = withFlaskOpenUntil(spent.holdings, untilTick)
+  const at = rigCellOf(vehicleOf(state, playerId))
+  const holdings = withFlaskOpen(spent.holdings, { untilTick, at })
   return {
     state: withKitHoldings(state, playerId, holdings),
     events: [
@@ -87,9 +93,14 @@ function uncorkFlask(state: AuthorityState, playerId: string, tick: number): Rul
         boughtAt: spent.boughtAt,
         untilTick,
         left: heldCountOf(holdings, FLASK.id),
+        at,
       }),
     ],
   }
+}
+
+function rigCellOf(vehicle: VehicleState): TilePoint | null {
+  return vehicle.pose === null ? null : tileOfPose(vehicle.pose)
 }
 
 function noFlaskRejection(carried: bigint): Rejection | null {

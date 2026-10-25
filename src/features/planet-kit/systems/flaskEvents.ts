@@ -2,9 +2,10 @@
  * The command, domain event and rejection reasons the Damp Flask's uncork adds (ticket 881; the
  * TD's seam on #850 as amended for the HS's point 3), by augmentation, never by editing the
  * kernel's lists; and the event body its rule builds. The event names the g the spent flask was
- * bought at, the tick the flask closes at and the flasks still carried.
+ * bought at, the tick the flask closes at, the flasks still carried and the cell it clears round.
  */
 import { toIndexText } from '../../../systems/starMap/planetAddress'
+import type { TilePoint } from '../../../systems/world/tileGrid'
 
 declare module '../../../systems/authority/authorityCommand' {
   interface CommandPayloads {
@@ -24,6 +25,8 @@ declare module '../../../systems/authority/domainEvent' {
       untilTick: number
       /** The flasks still carried, as decimal text. */
       left: string
+      /** The rig's cell, the centre of the firedamp it clears; null with no pose (ticket 882). */
+      at: TilePoint | null
     }
   }
   interface RejectionReasons {
@@ -38,6 +41,7 @@ export interface FlaskUncork {
   boughtAt: bigint
   untilTick: number
   left: bigint
+  at: TilePoint | null
 }
 
 export function flaskUncorkedOf(uncork: FlaskUncork) {
@@ -48,5 +52,6 @@ export function flaskUncorkedOf(uncork: FlaskUncork) {
     g: toIndexText(uncork.boughtAt),
     untilTick: uncork.untilTick,
     left: uncork.left.toString(),
+    at: uncork.at,
   }
 }

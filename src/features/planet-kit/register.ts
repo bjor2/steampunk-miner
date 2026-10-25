@@ -13,6 +13,9 @@
  * drop beside the gauges, and the crate the pacing bot carries under its kit policy. Ticket 881
  * makes the three hazard tools act by context: their trade-offs, their factors on their hazards'
  * contacts and the kernel's pre-cut hook that decides when each acts; and the Damp Flask's uncork.
+ * Ticket 882 gives each tool its one visible outcome while it acts: the plough shoves the scree
+ * ahead aside through the terrain edit queue, the tongs loot the cluster, the vane turns the vent's
+ * shove outward, the flask clears firedamp round its cell; and puts the tools on sale.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { planetKitDebugActions } from './debug'
@@ -26,6 +29,10 @@ import { CONTAINERS_SECTION } from './systems/containerSection'
 import { KIT_BUY_RULES } from './systems/kitBuyRules'
 import { UNCORK_FLASK_REACTION } from './systems/flaskReaction'
 import { FLASK_FACTOR, FLASK_RULES } from './systems/flaskRules'
+import { FLASK_CLEAR } from './systems/flaskClear'
+import { SCREE_SHOVE_REACTION } from './systems/screeShove'
+import { SHARD_LOOT_REACTION } from './systems/shardLoot'
+import { VANE_RIDE_REACTION, VANE_SHOVE_AIM } from './systems/vaneAim'
 import { KIT_HOLDINGS_SECTION } from './systems/kitHoldingsSection'
 import { KIT_TOOL_CONTEXTS, KIT_TOOL_FACTORS, KIT_TOOL_TRADE_OFFS } from './systems/kitToolRules'
 import { kitItemEntriesOf } from './systems/kitItemContent'
@@ -60,6 +67,12 @@ export const slice: SliceDefinition = {
     r.contactFactor(FLASK_FACTOR)
     // U, LB+Y or the flask's cell in the bar's overflow uncorks one (ticket 881).
     r.inputReaction(UNCORK_FLASK_REACTION)
+    // One visible outcome per tool while it acts, each logged (ticket 882).
+    r.authorityReaction(SCREE_SHOVE_REACTION)
+    r.authorityReaction(SHARD_LOOT_REACTION)
+    r.shoveAim(VANE_SHOVE_AIM)
+    r.authorityReaction(VANE_RIDE_REACTION)
+    r.hazardClear(FLASK_CLEAR)
     r.toolSlot(FLASK_TOOL_SLOT)
     // The crate the pacing bot carries under `kitPolicy.crates: 'drop_on_full'` (ticket 850).
     r.botCrates(PLANET_KIT_BOT_CRATES)

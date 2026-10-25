@@ -16,8 +16,9 @@ import { PLANET_KITS } from './systems/planetKitRows'
 import { kitItemOf } from './systems/planetKitSales'
 
 // The planet kits' log lines, each checked against its registered schema: a kit item bought
-// (ticket 850), a grant's ledger debit and an uncorked flask (ticket 881), and the Cache Crate's drop and pickup (ticket 823, the TD's final ruling on #823,
-// point 8).
+// (ticket 850), a grant's ledger debit and an uncorked flask (ticket 881), the hazard tools'
+// outcomes (ticket 882), and the Cache Crate's drop and pickup (ticket 823, the TD's final ruling
+// on #823, point 8).
 
 function linesOf(events: readonly DomainEvent[]) {
   const sink = createMemorySink()
@@ -84,8 +85,52 @@ describe('kit tool log lines (ticket 881)', () => {
     const [line] = linesOf(session.events()).filter((line) =>
       line.event.startsWith('planet-kit.flask_'),
     )
-    expect(line.data).toEqual({ itemId: 'damp_flask', g: '1', untilTick: 3602, left: '0' })
+    const at = session.vehicle().pose
+    const cell = at === null ? {} : { cell: [tileOfPose(at).tx, tileOfPose(at).ty] }
+    expect(line.data).toEqual({
+      itemId: 'damp_flask',
+      g: '1',
+      untilTick: 3602,
+      left: '0',
+      ...cell,
+      clearRadiusTiles: 2,
+    })
     expect(runEventProblems(line)).toEqual([])
+  })
+})
+
+describe('hazard tool outcome log lines (ticket 882)', () => {
+  const OUTCOMES: DomainEvent[] = [
+    {
+      tick: 7,
+      type: 'planet-kit.ScreeShoved',
+      playerId: 'p1',
+      fromTx: 3,
+      fromTy: 40,
+      toTx: 4,
+      toTy: 40,
+    },
+    { tick: 8, type: 'planet-kit.ShardLooted', playerId: 'p1', tx: 3, ty: 39 },
+    {
+      tick: 9,
+      type: 'planet-kit.VaneRidden',
+      playerId: 'p1',
+      tx: 4,
+      ty: 38,
+      tiles: 1,
+      toTx: 3,
+      toTy: 39,
+    },
+  ]
+
+  it('logs a shove from the scree cell to the open one, a looted cell and a vane ride, at their ticks', () => {
+    const lines = linesOf(OUTCOMES)
+    expect(lines.map((line) => [line.event, line.tick, line.data])).toEqual([
+      ['planet-kit.scree_shoved', 7, { from: [3, 40], to: [4, 40] }],
+      ['planet-kit.shard_looted', 8, { cell: [3, 39] }],
+      ['planet-kit.vane_ride', 9, { vent: [4, 38], tiles: 1, to: [3, 39] }],
+    ])
+    expect(lines.flatMap((line) => runEventProblems(line))).toEqual([])
   })
 })
 

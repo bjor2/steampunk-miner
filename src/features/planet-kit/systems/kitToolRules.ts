@@ -17,7 +17,7 @@ import type { PreCutContext, RigAt, ToolContext } from '../../../systems/registr
 import type { ToolTradeOff } from '../../../systems/registries/toolTradeOffs'
 import { isToolActing } from '../../../systems/vehicle/actingTools'
 import type { PlanetParams } from '../../../systems/world/planetParams'
-import { TRADE_OFF_AXIS_OF_COST, type KitToolActing } from './kitActing'
+import { TRADE_OFF_AXIS_OF_COST, type KitToolActing, type KitToolVerb } from './kitActing'
 import { kitHoldingsOf } from './kitHoldingsSection'
 import { PLANET_KIT_ECONOMY, PLANET_KITS } from './planetKitRows'
 import { kitItemOf } from './planetKitSales'
@@ -56,6 +56,13 @@ export const KIT_TOOL_CONTEXTS: PreCutContext = {
   id: 'planet-kit.hazard_tools',
   tailTicks: PLANET_KIT_ECONOMY.acting.tailTicks,
   toolContextsOf: toolContextsAt,
+}
+
+/** The one tool whose outcome is `verb` (the guards hold one row per hazard tool). */
+export function actingToolWithVerb(verb: KitToolVerb): ActingKitTool {
+  const tool = ACTING_KIT_TOOLS.find((candidate) => candidate.acting.outcome.verb === verb)
+  if (tool === undefined) throw new Error(`no hazard tool's outcome is ${verb}`)
+  return tool
 }
 
 /** `planet-kit.scree_plough` for `scree_plough`. */

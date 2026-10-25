@@ -10,9 +10,11 @@
  *
  * An uncorked flask (ticket 881, the TD's seam on #850) keeps its window as `flaskUntilTick`, the
  * tick it closes at: saved state, not a timer, so it outlives a save and a load. Absent until the
- * first uncork.
+ * first uncork. Since ticket 882 it also keeps `flaskAt`, the rig's cell at the uncork, the centre
+ * of the firedamp it clears; absent when the rig had no pose there.
  */
 import { readIndexText, toIndexText } from '../../../systems/starMap/planetAddress'
+import type { TilePoint } from '../../../systems/world/tileGrid'
 
 export interface KitStack {
   itemId: string
@@ -28,6 +30,14 @@ export interface KitHoldings {
   stacks: readonly KitStack[]
   /** The tick the last uncorked flask closes at; absent before the first uncork. */
   flaskUntilTick?: number
+  /** The rig's cell when the last flask was uncorked; absent with no pose there (ticket 882). */
+  flaskAt?: TilePoint
+}
+
+/** A flask as it is uncorked: the tick it closes at and the rig's cell, if it had one. */
+export interface FlaskOpening {
+  untilTick: number
+  at: TilePoint | null
 }
 
 /** What a use took: the holdings left and the g the spent unit was bought at. */
@@ -110,9 +120,11 @@ export function isFlaskOpenAt(holdings: KitHoldings, tick: number): boolean {
   return holdings.flaskUntilTick !== undefined && tick < holdings.flaskUntilTick
 }
 
-/** The holdings with a flask open until `untilTick`. */
-export function withFlaskOpenUntil(holdings: KitHoldings, untilTick: number): KitHoldings {
-  return { ...holdings, flaskUntilTick: untilTick }
+/** The holdings with a flask open until `untilTick`, centred on its cell when it has one. */
+export function withFlaskOpen(holdings: KitHoldings, opening: FlaskOpening): KitHoldings {
+  const { flaskAt: _last, ...rest } = holdings
+  const at = opening.at === null ? {} : { flaskAt: { tx: opening.at.tx, ty: opening.at.ty } }
+  return { ...rest, flaskUntilTick: opening.untilTick, ...at }
 }
 
 /** Item id order, then ascending g. */
