@@ -6,7 +6,8 @@ import { KIT_TOOL_TRADE_OFFS } from './kitToolRules'
 
 // The hazard tools' numbers while they act (ticket 881; #850's rows under the GD lock): one row
 // per hazard tool, a factor on its hazard and a trade-off on the track its row names, the 30-tick
-// tail and the flask's 60 s window, refused whole when a row is missing, extra or out of range.
+// tail and the flask's 60 s window, refused whole when a row is missing, extra or out of range;
+// each tool's one outcome and the flask's clear radius (ticket 882).
 
 type Raw = Record<string, unknown>
 
@@ -29,7 +30,41 @@ describe('kit tools acting numbers', () => {
       ['vent_vane', 4000],
     ])
     expect(acting.tailTicks).toBe(30)
-    expect(acting.flask).toEqual({ itemId: 'damp_flask', factorBp: 0, openTicks: 3600 })
+    expect(acting.flask).toEqual({
+      itemId: 'damp_flask',
+      factorBp: 0,
+      openTicks: 3600,
+      clearRadiusTiles: 2,
+    })
+  })
+
+  it('gives each tool one outcome: the plough shoves 1 tile aside, the tongs loot, the vane aims out', () => {
+    expect(PLANET_KIT_ECONOMY.acting.tools.map((row) => [row.itemId, row.outcome])).toEqual([
+      ['scree_plough', { verb: 'shove_aside', sideTiles: 1 }],
+      ['shard_tongs', { verb: 'loot' }],
+      ['vent_vane', { verb: 'aim_outward' }],
+    ])
+  })
+
+  it('refuses a tool with no verb, an unknown verb, a shove of no tiles and a field no verb has', () => {
+    const { economy, acting, tools } = actingCopy()
+    delete tools.scree_plough.outcome
+    tools.shard_tongs.outcome = { verb: 'shatter' }
+    tools.vent_vane.outcome = { verb: 'aim_outward', liftBp: 1500 }
+    ;(acting.flask as Raw).clearRadiusTiles = -1
+    expect(problemsOf(economy)).toEqual([
+      'acting.tools.scree_plough.outcome must name its verb: shove_aside, loot, aim_outward',
+      'acting.tools.shard_tongs.outcome must name its verb: shove_aside, loot, aim_outward',
+      "acting.tools.vent_vane.outcome.liftBp is not a field of the kits' economy",
+      'acting.flask.clearRadiusTiles must be whole tiles from 0',
+    ])
+    tools.scree_plough.outcome = { verb: 'shove_aside', sideTiles: 0 }
+    tools.shard_tongs.outcome = { verb: 'loot' }
+    tools.vent_vane.outcome = { verb: 'aim_outward' }
+    ;(acting.flask as Raw).clearRadiusTiles = 2
+    expect(problemsOf(economy)).toEqual([
+      'acting.tools.scree_plough.outcome.sideTiles must be whole tiles from 1',
+    ])
   })
 
   it('pays thrust −10%, cut speed −25% and horizontal speed −30%, each over its floor', () => {
@@ -52,14 +87,15 @@ describe('kit tools acting numbers', () => {
 
   it('refuses a factor past the whole, a boost, a field no row has and a flask that is no consumable', () => {
     const { economy, acting, tools } = actingCopy()
-    tools.scree_plough = { factorBp: 10001, penaltyBp: 500, floorBp: 9000, extra: 1 }
-    acting.flask = { itemId: 'scree_plough', factorBp: 0, openTicks: 3600 }
+    const outcome = tools.scree_plough.outcome
+    tools.scree_plough = { factorBp: 10001, penaltyBp: 500, floorBp: 9000, outcome, extra: 1 }
+    acting.flask = { itemId: 'scree_plough', factorBp: 0, openTicks: 3600, clearRadiusTiles: 2 }
     expect(problemsOf(economy)).toEqual([
       'acting.tools.scree_plough.factorBp must be whole bp, 0 to 10000',
       'acting.tools.scree_plough.penaltyBp must be a whole number of bp, 0 or below',
       "acting.tools.scree_plough.extra is not a field of the kits' economy",
     ])
-    tools.scree_plough = { factorBp: 5000, penaltyBp: -1000, floorBp: 9000 }
+    tools.scree_plough = { factorBp: 5000, penaltyBp: -1000, floorBp: 9000, outcome }
     expect(problemsOf(economy)).toEqual([
       'acting.flask.scree_plough names no consumable kit item with a hazard',
     ])
