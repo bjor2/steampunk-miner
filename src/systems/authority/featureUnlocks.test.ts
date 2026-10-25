@@ -43,11 +43,12 @@ describe('feature unlocks on travel', () => {
     expect(isFeatureUnlocked(session.state(), 'tunnel_wrecker')).toBe(true)
   })
 
-  it('unlocks blasting_charges on arriving at planet 7, its built module (#95)', () => {
+  it('unlocks blast_rock on arriving at planet 7, where blasting_charges was before ticket 900', () => {
     const session = dockedOnPlanet(6)
-    expect(isFeatureUnlocked(session.state(), 'blasting_charges')).toBe(false)
-    expect(unlockedIdsOf(session.submit(10, travelTo(7)))).toEqual(['blasting_charges'])
     expect(isFeatureUnlocked(session.state(), 'blasting_charges')).toBe(true)
+    expect(isFeatureUnlocked(session.state(), 'blast_rock')).toBe(false)
+    expect(unlockedIdsOf(session.submit(10, travelTo(7)))).toEqual(['blast_rock'])
+    expect(isFeatureUnlocked(session.state(), 'blast_rock')).toBe(true)
   })
 
   it('unlocks no vision row on arriving at its planet (#90)', () => {

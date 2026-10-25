@@ -18,7 +18,82 @@ import {
  * The bytes of the locked file. Any edit to the schedule, even one that keeps its `source_hash`,
  * fails here until this pin is updated on purpose with the Horizontal Scaler's refresh.
  */
-const LOCKED_FILE_SHA256 = '0395075f762c362be7abe0aac9d3fa2db8949c2a08b8f67111b2eca66e704211'
+const LOCKED_FILE_SHA256 = '27ec1659b6023056a99fddd85060fdc8e07be0c91f1f2dcd972b5c3f7b5652b7'
+
+/**
+ * The pin before ticket 900 refreshed the schedule (HS/GD 25 Oct, the P1-P5 audit on #647): the
+ * rows built on main marked shipped, `blasting_charges` re-pinned from planet 7 to 1 as a price-band
+ * anchor (dynamite money-only from P1, GD lock on #863) and the `blast_rock` row added at planet 7.
+ */
+const PIN_BEFORE_STATS_REFRESH = '0395075f762c362be7abe0aac9d3fa2db8949c2a08b8f67111b2eca66e704211'
+
+/** The rows ticket 900 flipped to shipped, each with the status it had before. */
+const REFRESHED_ROW_STATUSES: readonly (readonly [string, string])[] = [
+  ['fluid_ground', 'building'],
+  ...[
+    'casing_cement',
+    'collapse_vacuum',
+    'two_bay_shops',
+    'artefacts',
+    'music_layers',
+    'ore_whisper',
+    'breathing_room',
+    'assay_beacon',
+    'bore_gun',
+    'merchants',
+    'cache_crate',
+    'scree_plough',
+    'damp_flask',
+    'shard_tongs',
+    'vent_vane',
+  ].map((id) => [id, 'planned'] as const),
+]
+
+/** The planet `blast_rock` opens on: every count from it on gained the row. */
+const BLAST_ROCK_PLANET = 7
+
+/** What ticket 900 wrote into the file besides the statuses, the row and the counts. */
+const STATS_REFRESH_EDIT: readonly (readonly [string, string])[] = [
+  ['"updated": "2026-10-06T20:04:18.487954+00:00"', '"updated": "2026-10-25T23:45:00+00:00"'],
+  ['    "issues/823"\n  ],', '    "issues/823",\n    "issues/900"\n  ],'],
+  [
+    'sha256:e1d74cdc56bc1b9f23a4177e5d6d11666f6186e857e57fe5f55c1bfbd7ed2b97',
+    'sha256:09985a8b29e109263896001851d58cf2e3112cf7406d0c8e4cc8484ea256fdb0',
+  ],
+  [
+    ' was not reproducible).',
+    ' was not reproducible). #900 (HS/GD 25 Oct, P1\\u2013P5 audit): statuses refreshed from the code on main (16 planned/building rows read shipped); blasting_charges re-pinned P7->P1 as a price-band anchor (dynamite money-only from P1) and blast_rock added at P7 (Environment, planet_gate, planned); P1\\u2013P40 cumulative +1 (P40 69).',
+  ],
+  [
+    '      "planetIndex": 7,\n      "lane": "Feature",\n      "progressionAxis": "horizontal",\n      "status": "shipped",\n      "bind": "planet_gate",\n      "name": "Blasting charges",\n      "slice": "campaign",\n      "origin": "new"\n',
+    '      "planetIndex": 1,\n      "lane": "Feature",\n      "progressionAxis": "horizontal",\n      "status": "shipped",\n      "bind": "planet_gate",\n      "name": "Blasting charges",\n      "slice": "campaign",\n      "origin": "new",\n      "repinNote": "Re-pinned P7 -> P1 (#900): a price-band anchor only, as dynamite is money-only from P1 (Bjor 25 Oct, GD lock on #863). Blast Radius and Blast Casing stay under this row, no own ids."\n',
+  ],
+]
+
+/**
+ * The file's text as it stood before ticket 900: the statuses back, `blast_rock` out,
+ * `blasting_charges` at planet 7, and every count one lower (P1-P6 by the move, P7 on by the row).
+ */
+function textBeforeStatsRefresh(text: string): string {
+  const unflipped = REFRESHED_ROW_STATUSES.reduce(
+    (current, [id, status]) =>
+      current.replace(
+        rowTextOf(current, id),
+        rowTextOf(current, id).replace('"status": "shipped",', `"status": "${status}",`),
+      ),
+    withoutRowOf(text, 'blast_rock'),
+  )
+  const counts = unflipped.indexOf('"cumulative_by_planet"')
+  const lowered =
+    unflipped.slice(0, counts) +
+    unflipped
+      .slice(counts)
+      .replace(/"cumulative": (\d+)/g, (_, count: string) => `"cumulative": ${+count - 1}`)
+  return STATS_REFRESH_EDIT.reduce(
+    (current, [before, after]) => current.replace(after, before),
+    lowered,
+  )
+}
 
 /**
  * The pin before ticket 823 re-pinned the schedule for the planet kits (GD lock of 24 Oct on #647):
@@ -88,9 +163,9 @@ function withRowBefore(text: string, rowId: string, rowText: string): string {
   return text.slice(0, row) + rowText + text.slice(row)
 }
 
-/** The file's text before the newest edit with an undo here, ticket 823's. */
+/** The file's text before ticket 823's edit, past ticket 900's refresh. */
 function fileTextBeforeKitRows(): string {
-  return textBeforeKitRows(lockedFileText())
+  return textBeforeKitRows(textBeforeStatsRefresh(lockedFileText()))
 }
 
 /** The pin before ticket 759 added the `jump_drive` row, the star map's one new row (#650 GD lock). */
@@ -284,13 +359,13 @@ function progressWithEveryBindMet(rows: readonly UnlockRow[]): UnlockProgress {
 }
 
 describe('locked unlock schedule', () => {
-  it('loads the 63 locked Schedule C rows', () => {
-    expect(LOCKED_SCHEDULE.rows).toHaveLength(63)
+  it('loads the 64 locked Schedule C rows', () => {
+    expect(LOCKED_SCHEDULE.rows).toHaveLength(64)
   })
 
   it('carries the Horizontal Scaler source hash pin', () => {
     expect(LOCKED_SCHEDULE.sourceHash).toBe(
-      'sha256:e1d74cdc56bc1b9f23a4177e5d6d11666f6186e857e57fe5f55c1bfbd7ed2b97',
+      'sha256:09985a8b29e109263896001851d58cf2e3112cf7406d0c8e4cc8484ea256fdb0',
     )
     expect(LOCKED_SCHEDULE_SOURCE_HASH).toBe(LOCKED_SCHEDULE.sourceHash)
   })
@@ -312,8 +387,8 @@ describe('locked unlock schedule', () => {
     expect(createHash('sha256').update(bytes).digest('hex')).toBe(LOCKED_FILE_SHA256)
   })
 
-  it('schedules 68 unlocks cumulatively by planet 40, the five kit rows of ticket 823 its re-pin', () => {
-    expect(unlockCountThrough(LOCKED_SCHEDULE, 40)).toBe(68)
+  it('schedules 69 unlocks cumulatively by planet 40, the blast_rock row of ticket 900 its re-pin', () => {
+    expect(unlockCountThrough(LOCKED_SCHEDULE, 40)).toBe(69)
   })
 
   it('matches the cumulative count the scaler recorded for every campaign planet', () => {
@@ -470,19 +545,24 @@ describe('locked unlock schedule', () => {
     )
   })
 
+  it('flipped only the built rows to shipped, re-pinned blasting_charges and added blast_rock in ticket 900', () => {
+    const before = textBeforeStatsRefresh(lockedFileText())
+    expect(createHash('sha256').update(before, 'utf8').digest('hex')).toBe(PIN_BEFORE_STATS_REFRESH)
+  })
+
   it('moved only merchants to planet 1 and added the five kit rows, their counts and provenance in ticket 823', () => {
     const before = fileTextBeforeKitRows()
     expect(createHash('sha256').update(before, 'utf8').digest('hex')).toBe(PIN_BEFORE_KIT_ROWS)
   })
 
-  it('opens each planned kit row on arriving at its home planet in the Merchant lane (ticket 823)', () => {
+  it('opens each shipped kit row on arriving at its home planet in the Merchant lane (ticket 823)', () => {
     for (const [id, planetIndex] of KIT_ROW_PLANETS) {
       const row = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === id)!
       expect(row).toMatchObject({
         planetIndex,
         lane: 'Merchant',
         bind: 'planet_gate',
-        status: 'planned',
+        status: 'shipped',
         progressionAxis: 'horizontal',
       })
       expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: planetIndex - 1 })).toBe(false)
@@ -490,9 +570,9 @@ describe('locked unlock schedule', () => {
     }
   })
 
-  it('opens the planned merchants row on planet 1 only once a dock facility builds it (ticket 823)', () => {
+  it('opens the shipped merchants row on planet 1 only once a dock facility builds it (ticket 823)', () => {
     const row = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === 'merchants')!
-    expect(row).toMatchObject({ planetIndex: 1, bind: 'facility', status: 'planned' })
+    expect(row).toMatchObject({ planetIndex: 1, bind: 'facility', status: 'shipped' })
     expect(isUnlocked(row, NO_PROGRESS)).toBe(false)
     expect(isUnlocked(row, { ...NO_PROGRESS, builtFacilityRowIds: new Set([row.id]) })).toBe(true)
   })
@@ -519,17 +599,18 @@ describe('locked unlock schedule', () => {
     )
   })
 
-  it('opens the planned bore_gun row on planet 1, in the Upgrade lane, pushing no other P1 row (#309)', () => {
+  it('opens the shipped bore_gun row on planet 1, in the Upgrade lane, pushing no other P1 row (#309)', () => {
     const row = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === 'bore_gun')!
     expect(row).toMatchObject({
       planetIndex: 1,
       lane: 'Upgrade',
       bind: 'planet_gate',
-      status: 'planned',
+      status: 'shipped',
     })
     expect(isUnlocked(row, NO_PROGRESS)).toBe(true)
+    const laterP1Rows = new Set(['merchants', 'cache_crate', 'blasting_charges'])
     const rowsBeforeKits = rowsAt(LOCKED_SCHEDULE, 1).filter(
-      (candidate) => candidate.id !== 'merchants' && candidate.id !== 'cache_crate',
+      (candidate) => !laterP1Rows.has(candidate.id),
     )
     expect(rowsBeforeKits).toHaveLength(15)
   })
@@ -541,15 +622,29 @@ describe('locked unlock schedule', () => {
     expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: 13 })).toBe(true)
   })
 
-  it('opens the built blasting_charges row at planet 7, its locked planet (#95)', () => {
+  it('opens the blasting_charges row on planet 1, its price-band anchor since ticket 900 (#863)', () => {
     const row = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === 'blasting_charges')!
     expect(row).toMatchObject({
-      planetIndex: 7,
+      planetIndex: 1,
       bind: 'planet_gate',
       progressionAxis: 'horizontal',
+      status: 'shipped',
     })
-    expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: 6 })).toBe(false)
-    expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: 7 })).toBe(true)
+    expect(isUnlocked(row, NO_PROGRESS)).toBe(true)
+  })
+
+  it('opens the planned blast_rock row at planet 7 in the Environment lane (ticket 900)', () => {
+    const row = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === 'blast_rock')!
+    expect(row).toMatchObject({
+      planetIndex: BLAST_ROCK_PLANET,
+      lane: 'Environment',
+      bind: 'planet_gate',
+      progressionAxis: 'horizontal',
+      status: 'planned',
+    })
+    const beforeIt = { ...NO_PROGRESS, highestPlanetIndex: BLAST_ROCK_PLANET - 1 }
+    expect(isUnlocked(row, beforeIt)).toBe(false)
+    expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: BLAST_ROCK_PLANET })).toBe(true)
   })
 })
 

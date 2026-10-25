@@ -70,6 +70,8 @@ export const DEFERRED_SCHEDULE_ROWS: Readonly<Record<DeferredScheduleHome, reado
     'music_layers',
     'auto_guns',
     'blasting_charges',
+    // Rock only blasting breaks, from P7 (ticket 900's re-pin); the dynamite gates of #863 build it.
+    'blast_rock',
     'refractory_lining',
     'insulated_lining',
     'grounded_lining',
@@ -125,4 +127,54 @@ function strayRowProblems(rowIds: readonly string[], places: Map<string, string[
   return [...places.entries()]
     .filter(([rowId]) => !known.has(rowId))
     .map(([rowId, homes]) => `${homes.join(', ')} names "${rowId}", which is no schedule row`)
+}
+
+/** A feature folder that ships a schedule row (ticket 900's planned-vs-shipped check). */
+export interface ShippingFolder {
+  rowId: string
+  /** The folder under `src/features/`. */
+  folder: string
+}
+
+/** The row's status as the locked file writes it. */
+export interface ScheduleRowStatus {
+  id: string
+  status: string
+}
+
+/** Statuses that say a row's feature is not on main yet. */
+const UNSHIPPED_STATUSES: ReadonlySet<string> = new Set(['planned', 'building'])
+
+/**
+ * Each row the file still marks planned or building while a feature folder ships it, naming the
+ * row and the folder: the drift the P1-P5 audit found in docs (ticket 900).
+ */
+export function unshippedRowStatusProblems(
+  rows: readonly ScheduleRowStatus[],
+  shipping: readonly ShippingFolder[],
+): string[] {
+  return rows
+    .filter((row) => UNSHIPPED_STATUSES.has(row.status))
+    .flatMap((row) => shippingFoldersOf(row.id, shipping).map((folder) => [row, folder] as const))
+    .map(([row, folder]) => unshippedRowProblem(row, folder))
+}
+
+/** The folders named for a row: its id kebab-cased (`casing_cement` ships in `casing-cement/`). */
+export function foldersNamedForRows(
+  rowIds: readonly string[],
+  folders: readonly string[],
+): ShippingFolder[] {
+  const present = new Set(folders)
+  return rowIds
+    .map((rowId) => ({ rowId, folder: rowId.replaceAll('_', '-') }))
+    .filter(({ folder }) => present.has(folder))
+}
+
+function shippingFoldersOf(rowId: string, shipping: readonly ShippingFolder[]): string[] {
+  const folders = shipping.filter((entry) => entry.rowId === rowId).map(({ folder }) => folder)
+  return [...new Set(folders)]
+}
+
+function unshippedRowProblem(row: ScheduleRowStatus, folder: string): string {
+  return `schedule row "${row.id}" reads ${row.status}, but src/features/${folder} ships it`
 }

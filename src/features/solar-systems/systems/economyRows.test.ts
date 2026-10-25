@@ -16,7 +16,8 @@ const SEED = 20261024
 const OTHER_SEED = 42
 const SYSTEMS_2_TO_40 = Array.from({ length: 39 }, (_, at) => BigInt(at + 2))
 const LAST_PLANET_OF_SYSTEM_1 = 5
-const P40_CUMULATIVE = 63
+/** Planet 40's count since ticket 900 added `blast_rock`; no row of this slice is in it. */
+const P40_CUMULATIVE = 69
 
 function textOf(amount: BigStat): string {
   return toCanonical(amount)
@@ -116,7 +117,7 @@ describe('system economy rows', () => {
     expect(economyRowProblemsOf(systemEconomyRowsOf(SEED, 1_000_000n))).toEqual([])
   })
 
-  it('adds no stats.json row: no schedule row is the slice, and planet 40 stays at 63', () => {
+  it('adds no stats.json row: no schedule row is the slice, and planet 40 stays at 69', () => {
     expect(scheduleFile.features.filter((row) => row.slice === 'solar-systems')).toEqual([])
     const p40 = scheduleFile.cumulative_by_planet.find((row) => row.planet === 40)
     expect(p40?.cumulative).toBe(P40_CUMULATIVE)

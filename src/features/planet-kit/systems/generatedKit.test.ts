@@ -104,10 +104,10 @@ describe('generated planet kits (ticket 824)', () => {
     expect(later.every((kit) => VARIANTS.includes(kit.merchantVariant))).toBe(true)
   })
 
-  it('mints no stats id: a drawn item is an authored one and P40 stays at 68 unlocks', () => {
+  it('mints no stats id: a drawn item is an authored one and P40 stays at 69 unlocks (blast_rock, ticket 900)', () => {
     const drawnItems = drawnKitsOf(DRAWN_SYSTEMS).flatMap((kit) => kit.itemId ?? [])
     expect(drawnItems.every((id) => AUTHORED_ITEM_IDS.includes(id))).toBe(true)
-    expect(unlockCountThrough(LOCKED_SCHEDULE, 40)).toBe(68)
+    expect(unlockCountThrough(LOCKED_SCHEDULE, 40)).toBe(69)
   })
 
   it('reads the same kits in any visit order, byte for byte', () => {

@@ -20,7 +20,7 @@ import {
  * it with `node docs/scaling/horizontal/source_hash.mjs` (#153).
  */
 export const LOCKED_SCHEDULE_SOURCE_HASH =
-  'sha256:e1d74cdc56bc1b9f23a4177e5d6d11666f6186e857e57fe5f55c1bfbd7ed2b97'
+  'sha256:09985a8b29e109263896001851d58cf2e3112cf7406d0c8e4cc8484ea256fdb0'
 
 export const LOCKED_SCHEDULE: UnlockSchedule = loadLockedSchedule(LOCKED_SCHEDULE_FILE)
 
