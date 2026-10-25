@@ -715,12 +715,18 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   bytes, format and filtering unchanged; `src/scene/terrainHeroAtlas.test.ts` the binder (one act
   resident, released and disposed before the next, RGBA8 refused) and the table drawing a hero from
   its cell only while bound, met or not (ticket 698); `roster.skinContactSheet.test.ts` every hero of
-  P1 to P5 drawn from page 2 of a synthetic overflow, shifted 16 cells and still apart. The browser
+  P1 to P5 drawn from page 2 of a synthetic overflow, shifted 16 cells and still apart, and (ticket 853) the five non-gem heroes of each of P3 to P5 drawn from the shipped page 2 of `foothold.heavy`
+  (`heroAtlases.test.ts` the fifteen on page 2 in planet order and every hero of the P3 to P5 pools
+  packed; `kindLook.test.ts` eight heroes with cells on each of P3 to P5); their cells are measured
+  into `hero-reads.json` like the gems', so the price-order row holds each planet's gems above its
+  showiest non-gem. The browser
   spec `e2e/browser/heroAtlas.spec.ts` checks through `ui.getKindLooks()` that a change of act binds
   once, a planet change inside an act binds none, and no bind links a program;
   `e2e/browser/heroAtlasPages.spec.ts` (box Tester) binds the synthetic overflow
   (`ui.packHeroAtlasOverflow`) on a 640x360 phone at 24 px a cell and at 1280x800: two layers, every
-  hero on page 2's cell, no new program, page 1 again after, with a screenshot attached for the eye.
+  hero on page 2's cell, no new program, page 1 again after, with a screenshot attached for the eye;
+  on P3 it binds the shipped page 2 at both screens, eight heroes drawing cells, five of them from
+  page 2 (ticket 853), with a screenshot attached.
 - **Pacing bot** (`src/systems/bot/`, #29): plays `scenarios/bot-slice.scenario.json` through
   authority commands with the #6 movement-time model, buying casing grades on-curve (grade `b`
   before it mines band `b`, grade 5 before the core, S11). Its scripted mining (`drillTile`) lays

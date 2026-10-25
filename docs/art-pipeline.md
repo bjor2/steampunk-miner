@@ -482,11 +482,12 @@ since the source is twelve family files. Nothing draws it yet; the kernel ore re
 ## Hero ore sprites
 
 The hero materials of [#452](https://github.com/bjor2/steampunk-miner/issues/452),
-[#744](https://github.com/bjor2/steampunk-miner/issues/744) and
-[#785](https://github.com/bjor2/steampunk-miner/issues/785) (the `hero: true` rows of
+[#744](https://github.com/bjor2/steampunk-miner/issues/744),
+[#785](https://github.com/bjor2/steampunk-miner/issues/785) and
+[#853](https://github.com/bjor2/steampunk-miner/issues/853) (the `hero: true` rows of
 `src/features/materials/materials.json` with art: the legacy pool's four for the P1 and P2 acts,
-P1's three gems for the P1 act, and the gems of P2's own pool and of the P3 to P5 pools for the P2
-act) are authored one species per file in `docs/art/ore-heroes/blend/hero-<species>.blend` on the
+P1's three gems for the P1 act, and the gems of P2's own pool and every hero of the P3 to P5 pools
+for the P2 act) are authored one species per file in `docs/art/ore-heroes/blend/hero-<species>.blend` on the
 same ore stage, an authored set at a time (`AUTHORED_SETS` in `hero_species.py`: a materials pool,
 the planets it paints and which of its heroes it draws), and rendered lit with the rock held out
 into 256 px albedo cells (`docs/art/ore-heroes/cells/`, the mask in alpha) that the per-act hero
@@ -498,9 +499,11 @@ sprite's. `hero_post.py` also measures every committed cell at the two gem-read 
 bright-or-saturated share, with the cell's SHA-256), which the roster's contact-sheet spec reads.
 See [docs/art/ore-heroes/README.md](art/ore-heroes/README.md).
 `python3 docs/art/ore-heroes/encode_hero_atlases.py` packs the cells into one `atlas` asset per
-act (`ground-hero-atlas-<act>`, an albedo map alone: ETC1S sRGB like every albedo map, but four
-mip levels it writes itself, since `toktx` 4.4.2 makes only full chains and a full chain would
-blur one cell into the next).
+page of each act (page 1 `ground-hero-atlas-<act>`, page n `ground-hero-atlas-<act>-page-<n>`; the
+page a hero sits on is its mineral skin row's `atlasPage`, #852), each an albedo map alone: ETC1S
+sRGB like every albedo map, but four mip levels it writes itself, since `toktx` 4.4.2 makes only
+full chains and a full chain would blur one cell into the next. A new page ships with its own
+`art/assets/<id>.json` entry, `final`, or its heroes keep the shader look.
 
 ## Mineral skins
 

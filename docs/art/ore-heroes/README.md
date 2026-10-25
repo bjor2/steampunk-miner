@@ -4,9 +4,11 @@ The hero sprites of
 [Art: hero ore looks for acts 1 and 2 (#452)](https://github.com/bjor2/steampunk-miner/issues/452),
 of P2's three gems
 ([Art: hero gem skins for P2 Star Garnet, Verdigris Opal, Aquamarine (#744)](https://github.com/bjor2/steampunk-miner/issues/744),
-below) and of the twelve gems of P1 and P3 to P5
-([Gem hero cells P1–P5 (#785)](https://github.com/bjor2/steampunk-miner/issues/785), below),
-under the Game Director's materials rulings on
+below) of the twelve gems of P1 and P3 to P5
+([Gem hero cells P1–P5 (#785)](https://github.com/bjor2/steampunk-miner/issues/785), below) and
+of the fifteen other heroes of P3 to P5
+([MB: Blender hero sprites for 15 P3–P5 heroes (#853)](https://github.com/bjor2/steampunk-miner/issues/853),
+below), under the Game Director's materials rulings on
 [Wayfinder: Materials expansion (#139)](https://github.com/bjor2/steampunk-miner/issues/139): a
 look layer under the 12 ore families, with 4 or 5 hero species per act drawn by Blender and shipped
 in a per-act atlas swapped in at the act change
@@ -19,7 +21,9 @@ under ore rules 5 or earlier (`foothold.heavy`, to P7) draw that pool, so both a
 cells first; the `foothold.base` atlas then packs P1's three gems (`p1-gems`, #785), and the
 `foothold.heavy` atlas the three gems of a fresh P2's own pool (`foothold-p2`, #744) and the nine
 gems of the P3 to P5 pools (`foothold-p3-gems` to `foothold-p5-gems`, #785), which fill its 16
-cells; the other `hero: true` rows of P3 to P7 have no art and draw the shader look. This folder
+cells, and on its second page the fifteen other `hero: true` rows of P3 to P5
+(`foothold-p3-heroes` to `foothold-p5-heroes`, #853); the P6 and P7 pool's heroes have no mineral
+skin row to record a page on yet, so they have no art and draw the shader look. This folder
 holds sources and renders; the game draws the cells from the per-act atlases
 `encode_hero_atlases.py` packs from them (#451).
 
@@ -178,6 +182,96 @@ From `hero-reads.json`, the twelve at the two screens (highlights · facet-edge 
 
 <!-- /gem-reads-785 -->
 
+## The fifteen heroes of P3 to P5 (#853)
+
+The other `hero: true` rows of the `foothold-p3` to `foothold-p5` pools, the two rares and three
+epics each planet keeps beside its three gems, which drew the shader look until the atlas had a
+second page (#852). Each is its own construction from its mineral-skin row
+([docs/art/mineral-skins](../mineral-skins/README.md): the vein layout, the base's pattern and the
+sheen) in its hue slot's colour, built by `hero_marks_p3.py`, `hero_marks_p4.py` and
+`hero_marks_p5.py` under the shared treatment of `hero_bodies.py`. The VS ruling of 24 Oct
+("an epic looks rarer than a rare, and neither looks like a gem") sets the treatment: no facet
+glint, no flat-shaded stone, a low rim; a **rare** is one matte body in its slot's colour; an
+**epic** adds a second tone in zones or bands (the etch's taenite, the sapphire's zoning, the
+alexandrite's raspberry, the steel's indigo temper, the heartwood's deep rings) and one sheen mark
+the skin names (a lamella flash, an asterism, an opal flash, a filed gleam, a sector flash, flame
+tongues, a banked glow, a chalcedony gleam), as emission under the bright threshold. The
+price-order rule of #785 (`roster.skinContactSheet.test.ts`) also binds them: Systems' score,
+rank k plus the share of the tile that is bright or saturated, must put every gem above its
+planet's showiest non-gem, and the cheapest gem has rank 0, so each non-gem's share stays under
+its planet's cheapest gem (Blue Topaz 0.028 and 0.036 on P3, Watermelon Tourmaline 0.013 and
+0.024 on P4, Fire Garnet 0.043 and 0.054 on P5, at 30 and 67 px). That is why the platinum is
+burnished and worn rather than polished, the amber and the alexandrite wear the gems' clear coat
+and translucency (which pale a saturated body as they pale the gems' glass), the silver is mostly
+tarnish and the brass mostly patina: the look the skins describe, and the quiet the rule asks.
+
+<!-- heroes-853 -->
+
+| page, cell | species                              | rarity | silhouette + pattern | what it is                                                                                                                                                                               |
+| ---------- | ------------------------------------ | ------ | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2, 0       | `native-platinum-brassvein` (P3)     | rare   | pebbles, burnished   | six flattened water-rolled pebbles along a gravel stringer, burnished grey with two crossing sets of hairline scratches and a mottle of wear                                             |
+| 2, 1       | `coiled-ammonite-amberbone` (P3)     | rare   | spirals, nacreous    | two shells coiled flat, each a tube widening as it winds out over two and a half turns, ribbed across the outer whorls, rose nacre paling toward the edge                                |
+| 2, 2       | `meteoric-iron-brassvein` (P3)       | epic   | slabs, etched        | four thick chamfered slabs lying nearly flat, etched in kamacite bands in three sets 60 degrees apart, one set a domain, with a taenite rim that flashes                                 |
+| 2, 3       | `star-sapphire-quartzine` (P3)       | epic   | domes, starred       | three cabochon domes sunk past the waist, blue-violet grown in stepped colour zones round one core, a six-rayed star on the two larger crowns                                            |
+| 2, 4       | `opal-jaw-amberbone` (P3)            | epic   | jaws, opaline        | a lower jaw gone to common opal, an arch of bone tapering to both ends with seven teeth standing in from it, a mosaic of potch patches with dark seams and a flash on a few              |
+| 2, 5       | `wire-silver-brassvein` (P4)         | rare   | curls, tarnished     | four wires curled like a ram's horn, nearly straight from the root and tight at the tip, silver under heavy dark tarnish with a slate fringe                                             |
+| 2, 6       | `belemnite-amberbone` (P4)           | rare   | darts, polished      | four bullet-shaped guards lying every way, one snapped in two, a dull cortex cut by one polished window along the crest that shows the amber calcite and its growth rings                |
+| 2, 7       | `clockspring-steel-brassvein` (P4)   | epic   | springs, blued       | three coil springs lying along the face, their coils rising clear of the rock, blued steel with an indigo temper and fine draw-file lines                                                |
+| 2, 8       | `alexandrite-quartzine` (P4)         | epic   | twins, colour-change | two sixlings of three tabular crystals grown through each other at 60 degrees, raspberry by the lamp with the slot's green in zones face-on, a pale sector flash on one face each        |
+| 2, 9       | `ichthyosaur-eye-amberbone` (P4)     | epic   | rings, plated        | the sclerotic ring, thirteen bone plates lapped like shingles round an open eye, and a broken ring of five beside it, slate bone pitted with pores                                       |
+| 2, 10      | `wolfram-brassvein` (P5)             | rare   | bars, satin          | a heap of five square bars, three laid one way and two crossed over them on the diagonals, steel grey in a fibre satin                                                                   |
+| 2, 11      | `saurian-vertebra-amberbone` (P5)    | rare   | vertebrae, porous    | four vertebrae along a gentle curve, each a waisted spool with flared ends, a neural spine above and a process below, pale spongy bone round dark pores                                  |
+| 2, 12      | `firebrass-brassvein` (P5)           | epic   | ribbons, flame-lit   | three brass ribbons wavering across the cell, narrowing where they twist and ending in a tight curl, dark under a furnace patina with the bright metal where flame tongues lick the foot |
+| 2, 13      | `heat-spinel-quartzine` (P5)         | epic   | octahedra, faceted   | three spinel-law macles, flat triangular stones with a smaller twin turned through 60 degrees on each, pink under a hard coat with a faint banked glow face-on                           |
+| 2, 14      | `petrified-heartwood-amberbone` (P5) | epic   | logs, growth-ringed  | two rounds of stone wood seen end-on with their growth rings, and a log lying across the cell, olive with deeper rings under a faint chalcedony gleam                                    |
+
+<!-- /heroes-853 -->
+
+Authored a set at a time: `author_ore_heroes.py -- <set>` and `hero_post.py <set>` for
+`foothold-p3-heroes`, `foothold-p4-heroes` and `foothold-p5-heroes`, leaving every page-1 cell
+byte-identical, then `encode_hero_atlases.py`, which writes `foothold.heavy`'s page 2
+(`ground-hero-atlas-foothold-heavy-page-2`) and leaves both page-1 maps byte-identical. The cells
+are measured into `hero-reads.json` like the gems' (the roster spec reads a non-gem's share from
+there), and the P6 and P7 heroes wait on skin rows.
+
+### Non-gem reads
+
+<!-- reads-853 -->
+
+From `hero-reads.json`, the fifteen at the two screens (highlights · facet-edge share · contrast · bright-or-saturated share), beside the bar each planet's cheapest gem sets (0.028 and 0.036, 0.013 and 0.024, 0.043 and 0.054):
+
+| species                         | 360x640 (30 px)         | 1280x800 (67 px)         |
+| ------------------------------- | ----------------------- | ------------------------ |
+| `native-platinum-brassvein`     | 0 · 0.97 · 1.97 · 0.017 | 0 · 0.34 · 1.96 · 0.019  |
+| `coiled-ammonite-amberbone`     | 0 · 0.92 · 2.13 · 0.008 | 10 · 0.75 · 2.21 · 0.017 |
+| `meteoric-iron-brassvein`       | 0 · 0.53 · 2.01 · 0.002 | 10 · 0.67 · 2.04 · 0.007 |
+| `star-sapphire-quartzine`       | 0 · 0.72 · 1.76 · 0.021 | 3 · 0.39 · 1.76 · 0.029  |
+| `opal-jaw-amberbone`            | 1 · 0.96 · 1.83 · 0.019 | 6 · 0.64 · 1.87 · 0.032  |
+| `wire-silver-brassvein`         | 0 · 0.90 · 1.51 · 0.000 | 10 · 0.81 · 1.54 · 0.006 |
+| `belemnite-amberbone`           | 0 · 0.79 · 1.39 · 0.000 | 0 · 0.33 · 1.41 · 0.000  |
+| `clockspring-steel-brassvein`   | 0 · 0.28 · 1.33 · 0.000 | 0 · 0.35 · 1.35 · 0.000  |
+| `alexandrite-quartzine`         | 0 · 0.81 · 1.59 · 0.008 | 0 · 0.50 · 1.61 · 0.007  |
+| `ichthyosaur-eye-amberbone`     | 0 · 0.60 · 1.78 · 0.000 | 0 · 0.53 · 1.80 · 0.007  |
+| `wolfram-brassvein`             | 0 · 0.28 · 1.30 · 0.000 | 0 · 0.18 · 1.32 · 0.000  |
+| `saurian-vertebra-amberbone`    | 0 · 0.92 · 2.09 · 0.000 | 0 · 0.63 · 2.16 · 0.006  |
+| `firebrass-brassvein`           | 0 · 0.55 · 1.41 · 0.033 | 0 · 0.48 · 1.45 · 0.035  |
+| `heat-spinel-quartzine`         | 0 · 0.62 · 1.97 · 0.000 | 0 · 0.32 · 2.00 · 0.000  |
+| `petrified-heartwood-amberbone` | 0 · 0.40 · 1.68 · 0.002 | 1 · 0.38 · 1.70 · 0.002  |
+
+- `foothold-p3-heroes`: the closest pair within the set at 40 px is meteoric-iron-brassvein vs star-sapphire-quartzine (silhouette 0.36 apart, 9° of hue, 0.09 of luma, 0.26 under deuteranopia); the closest pair of the whole atlas is meteoric-iron-brassvein vs star-sapphire-quartzine.
+- `foothold-p4-heroes`: the closest pair within the set at 40 px is wire-silver-brassvein vs clockspring-steel-brassvein (silhouette 0.85 apart, 12° of hue, 0.05 of luma, 0.15 under deuteranopia); the closest pair of the whole atlas is meteoric-iron-brassvein vs star-sapphire-quartzine.
+- `foothold-p5-heroes`: the closest pair within the set at 40 px is saurian-vertebra-amberbone vs petrified-heartwood-amberbone (silhouette 0.82 apart, 14° of hue, 0.03 of luma, 0.10 under deuteranopia); the closest pair of the whole atlas is meteoric-iron-brassvein vs star-sapphire-quartzine.
+
+Every non-gem sits under its planet's bar at both screens, and every one stands off its rock
+(contrast 1.3 for the wolfram bars to 2.2 for the ammonite). The closest pair of the whole heavy
+atlas is now Meteoric Iron against Star Sapphire, two P3 epics whose hue slots sit 10 degrees
+apart (236 and 246): the eye tells a stack of hatched grey slabs from glossy violet domes with
+their stars, and in the deuteranopia copy they are 0.26 apart, over the legacy floor (fluorite
+against corundum, 0.23). The scale strip `sheets/heroes-foothold-p5-heroes.scale-x4.png` holds
+the whole atlas, thirty-one heroes at 85, 67, 40, 30 and 22 px a tile, with its blind copies.
+
+<!-- /reads-853 -->
+
 ## Pages (#852)
 
 An act's atlas is an unbounded list of pages
@@ -227,9 +321,10 @@ python3 docs/art/ore-heroes/encode_hero_atlases.py            # every act's ship
 
 An authored set (`AUTHORED_SETS` in `hero_species.py`) is a materials pool, the planets it paints
 and which of the pool's heroes it draws: `legacy` (its non-gem heroes, P1 and an old P2),
-`p1-gems` (the legacy pool's gem slots, P1), `foothold-p2` (every hero, P2) and
-`foothold-p3-gems` to `foothold-p5-gems` (each pool's gem slots, its planet); the gem slots are
-the ores slice's `ore.gems.pools`. Set `PYTHONDONTWRITEBYTECODE=1` so importing the modules leaves
+`p1-gems` (the legacy pool's gem slots, P1), `foothold-p2` (every hero, P2),
+`foothold-p3-gems` to `foothold-p5-gems` (each pool's gem slots, its planet) and
+`foothold-p3-heroes` to `foothold-p5-heroes` (each pool's other heroes, its planet, #853); the
+gem slots are the ores slice's `ore.gems.pools`. Set `PYTHONDONTWRITEBYTECODE=1` so importing the modules leaves
 the tracked `__pycache__` alone.
 
 - `hero_species.py` reads a set's hero rows, the hue slot colour of each and the acts the set
@@ -241,7 +336,9 @@ the tracked `__pycache__` alone.
   `barrels`, `columns`, and the gems' `stars`, `ovals`, `prisms`) with the species' material,
   seeded per species, from the ore stage's shapes and materials; `gem_marks.py` and
   `gem_marks_deep.py` add the twelve gems of #785 under the row's silhouette and pattern pair,
-  looked up first. A set naming a look with no builder fails, never falls back.
+  looked up first, and `hero_marks_p3.py`, `hero_marks_p4.py` and `hero_marks_p5.py` the fifteen
+  non-gem heroes of #853 the same way, on the matte bodies and zone helpers of `hero_bodies.py`. A
+  set naming a look with no builder fails, never falls back.
 - `author_ore_heroes.py` stages each hero's cell, saves its `.blend`, and renders the sprite with
   the rock slab held out (`is_holdout`) on a transparent film: what stands off the face keeps its
   lamp shading, the rock and whatever is sunk into it come out transparent, and no compositor glow
