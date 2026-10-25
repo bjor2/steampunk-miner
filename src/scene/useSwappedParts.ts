@@ -15,6 +15,8 @@ export interface SwappedParts {
   partIds: readonly string[]
   /** Other assets' parts, each hiding the slot it stands in. */
   looks: readonly PartSwapRequest[]
+  /** The items whose own art the swaps stand for (ticket 892), sorted. */
+  coveredItemIds: readonly string[]
 }
 
 export function useSwappedParts(): SwappedParts {
@@ -26,6 +28,11 @@ export function useSwappedParts(): SwappedParts {
 }
 
 function swapsNow(): SwappedParts {
-  const { shownVersion, shownPartIds, shownLooks } = partMotion.requested
-  return { version: shownVersion, partIds: [...shownPartIds], looks: [...shownLooks] }
+  const { shownVersion, shownPartIds, shownLooks, coveredItemIds } = partMotion.requested
+  return {
+    version: shownVersion,
+    partIds: [...shownPartIds],
+    looks: [...shownLooks],
+    coveredItemIds: [...coveredItemIds],
+  }
 }

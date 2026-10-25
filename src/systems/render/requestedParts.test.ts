@@ -35,6 +35,16 @@ const hullLook: PartMotionRequest = {
   assetId: 'vehicle-look-hull',
 }
 
+/** A drill-type look standing for the twin bit's own art (ticket 892). */
+const twinBitLook: PartMotionRequest = {
+  kind: 'swap',
+  attach: 'drill.head',
+  partIds: ['twin-bit-head'],
+  assetId: 'vehicle-look-drill-type',
+  replacesSlot: 'drill-bit',
+  covers: ['gear.twin_bit'],
+}
+
 function sourceOf(id: string, requests: PartMotionRequest[]): PartMotionRequestSource {
   return { id, requestsNow: () => requests }
 }
@@ -97,5 +107,39 @@ describe('requested parts', () => {
     expect(requested.shownVersion).toBe(before + 1)
     foldPartRequests(requested, [sourceOf('a.one', [{ ...boilerLook, replacesSlot: undefined }])])
     expect(requested.shownVersion).toBe(before + 2)
+  })
+
+  it('holds no covered item while no swap names covers', () => {
+    const requested = createRequestedParts()
+    foldPartRequests(requested, [sourceOf('a.one', [bigLevel, hullLook, boilerLook])])
+    expect(requested.coveredItemIds).toEqual([])
+  })
+
+  it('carries the items a showing swap covers, and lets them go when it stops showing', () => {
+    const requested = createRequestedParts()
+    const covering = sourceOf('a.one', [twinBitLook, { ...bigLevel, covers: ['gear.reach_boom'] }])
+    foldPartRequests(requested, [covering])
+    expect(requested.coveredItemIds).toEqual(['gear.reach_boom', 'gear.twin_bit'])
+    expect(requested.shownLooks).toEqual([twinBitLook])
+    foldPartRequests(requested, [sourceOf('a.one', [bigLevel])])
+    expect(requested.coveredItemIds).toEqual([])
+  })
+
+  it('folds a look the same with or without covers, but for the items it covers', () => {
+    const plain = createRequestedParts()
+    const covering = createRequestedParts()
+    foldPartRequests(plain, [sourceOf('a.one', [{ ...twinBitLook, covers: undefined }])])
+    foldPartRequests(covering, [sourceOf('a.one', [twinBitLook])])
+    expect({ ...covering, shownLooks: plain.shownLooks, coveredItemIds: [] }).toEqual(plain)
+  })
+
+  it('moves the swap version when only the covers of a look change', () => {
+    const requested = createRequestedParts()
+    foldPartRequests(requested, [sourceOf('a.one', [twinBitLook])])
+    const before = requested.shownVersion
+    foldPartRequests(requested, [sourceOf('a.one', [{ ...twinBitLook }])])
+    expect(requested.shownVersion).toBe(before)
+    foldPartRequests(requested, [sourceOf('a.one', [{ ...twinBitLook, covers: [] }])])
+    expect(requested.shownVersion).toBe(before + 1)
   })
 })

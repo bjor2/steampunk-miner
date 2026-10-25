@@ -4,7 +4,9 @@
  * and written in place, so a step allocates nothing once each slot has been seen; the swapped parts
  * carry a version that moves only when they change, so the drawn car rebuilds its parts only then.
  * Swaps of another asset's parts (ticket 640) are kept apart as `shownLooks`, so a swap with no
- * `assetId` folds exactly as before. Presentation only.
+ * `assetId` folds exactly as before. The items the showing swaps cover (ticket 892) are resolved by
+ * `coveredItemIdsOf` into `coveredItemIds`, so the rig's item art steps aside for them; a fold
+ * with no covers holds none. Presentation only.
  */
 import type { AttachId } from '../registries/vehicleAttach'
 import {
@@ -14,6 +16,7 @@ import {
   type PartMotionRequestSource,
   type PartSwapRequest,
 } from '../registries/partMotionRequests'
+import { coveredItemIdsOf, coversOf, isCoveringSwap } from './swapCovers'
 
 /** The pose a part slot is asked to add to its own motion. */
 export interface RequestedPartPose {
@@ -30,7 +33,9 @@ export interface RequestedParts {
   shownPartIds: string[]
   /** The swaps of another asset's parts this step, as their sources keep them, by point then asset. */
   shownLooks: PartSwapRequest[]
-  /** Moves each time `shownPartIds` or `shownLooks` changes. */
+  /** The items whose own art the swaps this step stand for, sorted, each once (ticket 892). */
+  coveredItemIds: string[]
+  /** Moves each time `shownPartIds`, `shownLooks` or `coveredItemIds` changes. */
   shownVersion: number
   /** The attach points some request names this step, sorted: what a spec reads. */
   attach: AttachId[]
@@ -39,12 +44,26 @@ export interface RequestedParts {
 interface FoldScratch {
   shownPartIds: string[]
   shownLooks: PartSwapRequest[]
+  coveringSwaps: PartSwapRequest[]
+  coveredItemIds: string[]
 }
 
-const scratch: FoldScratch = { shownPartIds: [], shownLooks: [] }
+const scratch: FoldScratch = {
+  shownPartIds: [],
+  shownLooks: [],
+  coveringSwaps: [],
+  coveredItemIds: [],
+}
 
 export function createRequestedParts(): RequestedParts {
-  return { poses: new Map(), shownPartIds: [], shownLooks: [], shownVersion: 0, attach: [] }
+  return {
+    poses: new Map(),
+    shownPartIds: [],
+    shownLooks: [],
+    coveredItemIds: [],
+    shownVersion: 0,
+    attach: [],
+  }
 }
 
 /** Replaces last step's requests with what every source asks now. */
@@ -56,15 +75,20 @@ export function foldPartRequests(
   requested.attach.length = 0
   scratch.shownPartIds.length = 0
   scratch.shownLooks.length = 0
+  scratch.coveringSwaps.length = 0
   for (const source of sources) {
     for (const request of source.requestsNow()) foldRequest(requested, request)
   }
   requested.attach.sort()
-  showSwappedParts(
-    requested,
-    scratch.shownPartIds.sort(),
-    scratch.shownLooks.sort(byPointThenAsset),
-  )
+  settleStepSwaps()
+  showSwappedParts(requested, scratch)
+}
+
+/** Sorts the step's swaps in place and resolves the items they cover. */
+function settleStepSwaps(): void {
+  scratch.shownPartIds.sort()
+  scratch.shownLooks.sort(byPointThenAsset)
+  coveredItemIdsOf(scratch.coveringSwaps, scratch.coveredItemIds)
 }
 
 function clearPoses(requested: RequestedParts): void {
@@ -79,7 +103,12 @@ function clearPoses(requested: RequestedParts): void {
 function foldRequest(requested: RequestedParts, request: PartMotionRequest): void {
   if (!requested.attach.includes(request.attach)) requested.attach.push(request.attach)
   if (request.kind === 'pose') for (const slot of request.slots) addToSlot(requested, slot, request)
-  else if (isBaseVehicleSwap(request)) appendAll(scratch.shownPartIds, request.partIds)
+  else foldSwap(request)
+}
+
+function foldSwap(request: PartSwapRequest): void {
+  if (isCoveringSwap(request)) scratch.coveringSwaps.push(request)
+  if (isBaseVehicleSwap(request)) appendAll(scratch.shownPartIds, request.partIds)
   else scratch.shownLooks.push(request)
 }
 
@@ -101,19 +130,28 @@ function newSlotPose(requested: RequestedParts, slot: string): RequestedPartPose
   return pose
 }
 
+type ShownSwaps = Pick<RequestedParts, 'shownPartIds' | 'shownLooks' | 'coveredItemIds'>
+
 /** Copies the step's swaps in only when they differ, and then moves the version. */
-function showSwappedParts(
-  requested: RequestedParts,
-  shown: readonly string[],
-  looks: readonly PartSwapRequest[],
-): void {
-  const isSameParts = isSameList(requested.shownPartIds, shown, isSameId)
-  if (isSameParts && isSameList(requested.shownLooks, looks, isSameLook)) return
-  requested.shownPartIds.length = 0
-  appendAll(requested.shownPartIds, shown)
-  requested.shownLooks.length = 0
-  appendAll(requested.shownLooks, looks)
+function showSwappedParts(requested: RequestedParts, step: ShownSwaps): void {
+  if (isSameSwaps(requested, step)) return
+  copyInto(requested.shownPartIds, step.shownPartIds)
+  copyInto(requested.shownLooks, step.shownLooks)
+  copyInto(requested.coveredItemIds, step.coveredItemIds)
   requested.shownVersion++
+}
+
+function isSameSwaps(requested: RequestedParts, step: ShownSwaps): boolean {
+  return (
+    isSameList(requested.shownPartIds, step.shownPartIds, isSameId) &&
+    isSameList(requested.shownLooks, step.shownLooks, isSameLook) &&
+    isSameList(requested.coveredItemIds, step.coveredItemIds, isSameId)
+  )
+}
+
+function copyInto<T>(into: T[], items: readonly T[]): void {
+  into.length = 0
+  appendAll(into, items)
 }
 
 function isSameList<T>(a: readonly T[], b: readonly T[], isSame: (x: T, y: T) => boolean): boolean {
@@ -126,14 +164,18 @@ function isSameId(a: string, b: string): boolean {
   return a === b
 }
 
-/** Same asset, point, hidden slot and parts: a source that rebuilt its request moves nothing. */
+/**
+ * Same asset, point, hidden slot, parts and covers: a source that rebuilt its request moves
+ * nothing.
+ */
 function isSameLook(a: PartSwapRequest, b: PartSwapRequest): boolean {
   return (
     a === b ||
     (a.attach === b.attach &&
       swapAssetIdOf(a) === swapAssetIdOf(b) &&
       a.replacesSlot === b.replacesSlot &&
-      isSameList(a.partIds, b.partIds, isSameId))
+      isSameList(a.partIds, b.partIds, isSameId) &&
+      isSameList(coversOf(a), coversOf(b), isSameId))
   )
 }
 

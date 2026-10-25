@@ -41,6 +41,12 @@ export interface PartSwapRequest {
   assetId?: string
   /** For another asset's parts: the `vehicle` part slot (`boiler`) they hide; absent hides none. */
   replacesSlot?: string
+  /**
+   * Item ids (`gear.twin_bit`) whose own art this swap stands for (ticket 892, GD lock on #623):
+   * while it shows, every mount drawn for them draws nothing, and a point held only by their art
+   * does not make the swap yield it. Absent covers none, so the swap is exactly the old one.
+   */
+  covers?: readonly string[]
 }
 
 /** The asset a swap with no `assetId` draws from: the base vehicle. */
