@@ -6,7 +6,8 @@
  * defaults to the local vehicle's, the kind to `cache_crate`, the owner to the local player, the
  * cargo to none: ore units per tier, as numbers or decimal text). `.containers()` reads the rows the markers and the list draw.
  * `.showKitSockets()` / `.hideKitSockets()` hang the kit tools' placeholder parts on the car and
- * take them off (presentation only), and `.kitSockets()` lists the sockets.
+ * take them off (presentation only), and `.kitSockets()` lists the sockets. `.merchant()` reads
+ * the merchant the Sell bay draws on this planet (ticket 821), `merchant: null` where none trades.
  */
 import type { DebugAction } from '../../debug/debugActionRegistry'
 import type { DebugResult } from '../../debug/debugScreens'
@@ -18,6 +19,7 @@ import { tileOfPose } from '../../systems/vehicle/vehiclePose'
 import type { TilePoint } from '../../systems/world/tileGrid'
 import { readContainerRows } from './store/containerReads'
 import { hideKitSockets, showKitSockets, useKitSocketStore } from './store/kitSocketStore'
+import { readMerchantPanel } from './store/merchantReads'
 import { KIT_SOCKETS } from './systems/kitSockets'
 
 const CACHE_CRATE = 'cache_crate'
@@ -90,4 +92,5 @@ export const planetKitDebugActions: Readonly<Record<string, DebugAction>> = {
     areShown: useKitSocketStore.getState().areShown,
     sockets: KIT_SOCKETS.map(({ itemId, attach }) => ({ itemId, attach })),
   }),
+  merchant: () => ({ ok: true, merchant: readMerchantPanel() }),
 }

@@ -4,6 +4,10 @@
  * merchant under the bay's own rows and the bay's scroll area reaches the last one; desktop pages
  * them two at a time, Next and Previous turning round. With no merchant shown the slot draws
  * nothing. State and geometry through the DOM and `steampunkDebug` only, never pixels.
+ *
+ * Planets 1 to 5 also draw their own merchant (planet-kit, ticket 821), ordered after the samples,
+ * so the sample counts and pages read the `example.` panels only, and the empty slot is judged on
+ * planet 6, where no merchant trades.
  */
 import { expect, test, type Page } from '@playwright/test'
 import { UI_IDS } from '../../../src/ui/ids'
@@ -17,7 +21,9 @@ import { openSellBayWithMerchants } from './uiShotSheets'
 const TEST_TIMEOUT_MS = 180_000
 /** The ticket's two golden sizes. */
 const CELL_NAMES = ['phone-360x640', 'desktop-1280x800']
-const PANEL = '[data-bay-panel-id]'
+const PANEL = '[data-bay-panel-id^="example."]'
+/** The first planet with no merchant of its own (planet-kit's rows stop at 5). */
+const PLANET_WITHOUT_MERCHANT = 6
 const PLATFORM = `[data-testid="${UI_IDS.platformScreen}"]`
 
 const merchantId = (place: number) => `example.merchant-${place}`
@@ -34,6 +40,11 @@ for (const cell of UI_SHOT_CELLS.filter((candidate) => CELL_NAMES.includes(candi
     test('draws nothing in the slot while no merchant is shown', async ({ page }) => {
       test.setTimeout(TEST_TIMEOUT_MS)
       const errors = await openGame(page, cell)
+      const moved = await page.evaluate(
+        (planet) => window.steampunkDebug!.setPlanet(planet).ok,
+        PLANET_WITHOUT_MERCHANT,
+      )
+      expect(moved).toBe(true)
       await dockAt(page, 'sell')
       await expect(page.getByTestId(UI_IDS.sellbayScreen)).toBeVisible()
       await expect(page.getByTestId(BAY_PANEL_UI_IDS.list)).toHaveCount(0)

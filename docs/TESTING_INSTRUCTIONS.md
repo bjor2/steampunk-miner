@@ -158,7 +158,12 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   (mixed hold, beacon max, away sale, carry away and home, two origins; g = 1, 6 and 1e6 through
   `tierSaleOf`), `premiumLedgerRoutes.test.ts` (collect, tow, Refinery, the scenario call) and
   `premiumLedgerSaves.test.ts`; the crate's are `planet-kit/systems/containerPremium.test.ts`, with
-  `planet-kit`'s own slice registered beside the probe.
+  `planet-kit`'s crate rules registered beside the probe (its own premium rows left out, so the probe
+  merchant stands on any g). Since ticket 821 the loaded `planet-kit` slice registers the real
+  premium: `planet-kit/systems/merchantPremium.test.ts` mines Honey Amber on planet 1 through
+  `collectOreUnit` (the slot found by `planetSpeciesOf`) and sells it through `sellCargo`, and holds
+  the ⌊V·5/4⌋ and beacon-max goldens at g = 1, 2, 5, 6, 10 and 1e6; `merchantPanel.test.ts` (systems
+  and ui) holds the Sell bay's merchant view and its text budget, the store moved by `debug.setPlanet`.
   Collapse specs build a weak band-2 tunnel or dig one with `collapse/collapseFixtures.ts`. Bore gun specs (ticket 313) stand the rig in a pocket of band-1 rock with `bore/boreFixtures.ts` and register the gun's numbers through `boreGunSlice` inside `withRegistrations`, as no slice answers `boreGun` yet. Auto mode specs (ticket 317) use `bore/boreAutoFixtures.ts` `searSlice`, which adds the steam sear's numbers and its research, and stand the rig at `AUTO_RIG`, on the east edge of its collapse block, so a level shot east never warns the rig's own block. A slice's self-acting item (ticket 328: the steam shield) is specced with the real press path through `power-up-core`'s `withPowerUpCore([itemSlice, fixture])`, the fixture registering the item's research and a stand-in `autoFire` hook for the combo, in the corridor fight of `combat/combatFixtures.ts`. Collapse brace specs (ticket 331) register the fake `brace-probe` slice of `collapse/braceFixtures.ts` (a section, a command, a clock step and the provider) inside `withRegistrations`, so a brace can end by command, by clock step or by `untilTick`. Hazard strip specs (ticket 341) dig straight down the plain line of `render/hazardStrip/stripFixtures.ts`, fixtures placed in metres below the start, at a steady speed frame by frame; the per-frame cost is the sampler's own cost model (`spentUs`), and the wall clock is `npm run bench:strip`'s. Specs that mine deep (where crawlers live) freeze enemies first
   (`FREEZE_ENEMIES` in `scriptedSession.ts`); combat specs fight in the band-1 corridor of
   `combat/combatFixtures.ts`, where no spawn point is in reach. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.setPref(name, value)`,
@@ -1762,10 +1767,14 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   unprefixed; every loaded row names a registered kind. `features/example/bayPanelProbe.test.ts`
   holds the example's five sample merchants hidden until `showBayPanels(count)`, refuses a bad
   count, and keeps their text on registered elements within the budget.
-  `e2e/browser/ui/bayPanels.spec.ts` runs 360x640 and 1280x800 with 1 merchant and with 5: no list
-  with none shown, the phone's bay scrolling to the last merchant in one column, the desktop's three
+  `e2e/browser/ui/bayPanels.spec.ts` runs 360x640 and 1280x800 with 1 merchant and with 5, counting
+  the `example.` panels only (planets 1 to 5 also draw their own merchant, ticket 821): no list
+  with none shown on planet 6, where no merchant trades, the phone's bay scrolling to the last merchant in one column, the desktop's three
   pages turning round, every merchant reached inside the bay and no sideways scroll; the screenshot
   suite shoots `sell-bay-panels-1` and `sell-bay-panels-5` in every cell. Box Tester only.
+  `e2e/browser/merchantPanel.spec.ts` (ticket 821) draws the planet's real merchant at the same two
+  sizes: planet 1's name, premium tag and Cache Crate, each of planet 5's three tools reached
+  inside the bay, no sideways scroll, and no merchant on planet 6. Box Tester only.
 - **Sale receipt** (ticket 717, spec #678): the rules are pure in the sell-burst slice. The hold's
   kinds are tallied as units come in (`systems/heldManifest.ts`, read by `heldUnits.ts` as the pickup
   popup reads a species and rarity) and cut back to the authority's hold every batch; the trip's

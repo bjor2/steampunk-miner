@@ -944,8 +944,8 @@
           "children": [
             {
               "title": "Specialist merchants",
-              "description": "A merchant in the shops of each of planets 1 to 5 with its own stock and a premium on one home ore, selling that planet's kit item: the Cache Crate on planet 1, the Scree Plough, Damp Flask, Shard Tongs and Vent Vane on planets 2 to 5. Not built yet beyond the Cache Crate's containers.",
-              "status": "planned",
+              "description": "A merchant in the shops of each of planets 1 to 5 with its own stock and a premium on one home ore, selling that planet's kit item: the Cache Crate on planet 1, the Scree Plough, Damp Flask, Shard Tongs and Vent Vane on planets 2 to 5. The Sell bay shows the planet's merchant, the ore it pays extra for and its stock with prices; that ore mined there sells for a quarter more at its merchant, never on top of the assay beacon. Buying the kit items is not built yet.",
+              "status": "partial",
               "issues": [80, 647, 821, 850],
               "planet": 1,
               "children": [

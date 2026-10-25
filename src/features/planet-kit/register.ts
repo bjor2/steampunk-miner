@@ -5,8 +5,9 @@
  * call, their log lines, the map markers and the list on the base sheet, and the placeholder
  * parts on the sockets G&V named for the kit tools (shown by a debug switch until #850 lets a
  * player own one). Ticket 821 stands the merchant counter on the dock (it claims the `merchants`
- * row), and counts and pays the merchant's ore premium on the kernel's ledger and sale-lift
- * seams. Buying kit items and the four hazard tools come with #850.
+ * row), counts and pays the merchant's ore premium on the kernel's ledger and sale-lift seams, and
+ * draws the planet's merchant on the Sell bay. Buying kit items and the four hazard tools come
+ * with #850.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { planetKitDebugActions } from './debug'
@@ -18,6 +19,7 @@ import { MERCHANT_ORE_PREMIUM, MERCHANT_PREMIUM_LIFT } from './systems/merchantP
 import { MERCHANT_FACILITY } from './systems/sessionMerchant'
 import { CONTAINER_MARKER_PRIORITY, ContainerMarkers } from './ui/ContainerMarkers'
 import { CONTAINERS_TAB } from './ui/ContainersTab'
+import { MERCHANT_PANEL_KIND, MERCHANT_PANEL_ROW } from './ui/MerchantPanel'
 
 export const slice: SliceDefinition = {
   id: 'planet-kit',
@@ -36,9 +38,11 @@ export const slice: SliceDefinition = {
       Panel: ContainerMarkers,
     })
     r.sheetTab(CONTAINERS_TAB)
+    r.bayPanelKind(MERCHANT_PANEL_KIND)
+    r.bayPanelRow(MERCHANT_PANEL_ROW)
     r.vehiclePiece({ id: KIT_SOCKET_PIECE_ID, Piece: KitSocketParts })
     // steampunkDebug.features['planet-kit'].placeContainer({ tx, ty, ore }), .containers(),
-    // .showKitSockets(), .hideKitSockets(), .kitSockets()
+    // .showKitSockets(), .hideKitSockets(), .kitSockets(), .merchant()
     r.debugActions(planetKitDebugActions)
   },
 }

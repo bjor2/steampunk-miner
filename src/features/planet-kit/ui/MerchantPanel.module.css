@@ -1,0 +1,5 @@
+/* Ticket 821: the merchant's stock, one line an item, stacked in the bay's scroll area or page. */
+.stock {
+  display: grid;
+  gap: var(--space-1);
+}

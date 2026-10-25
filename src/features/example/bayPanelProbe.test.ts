@@ -15,6 +15,10 @@ import { showSampleMerchants } from './store/bayPanelProbeStore'
 
 const showBayPanels = (count: unknown) => exampleDebugActions.showBayPanels!(count)
 
+/** The sample merchants shown: the planet's own merchant (planet-kit, #821) may stand beside them. */
+const shownSamples = () =>
+  readShownBayPanelIds('sell').filter((panelId) => panelId.startsWith('example.'))
+
 beforeEach(() => {
   showSampleMerchants(0)
   forgetUiTexts()
@@ -22,12 +26,12 @@ beforeEach(() => {
 
 describe('example sample merchants', () => {
   it('keeps every sample merchant off the Sell bay until a spec shows them', () => {
-    expect(readShownBayPanelIds('sell')).toEqual([])
+    expect(shownSamples()).toEqual([])
   })
 
   it('shows the first merchants a spec asks for, in order', () => {
     expect(showBayPanels(5)).toEqual({ ok: true })
-    expect(readShownBayPanelIds('sell')).toEqual([
+    expect(shownSamples()).toEqual([
       'example.merchant-1',
       'example.merchant-2',
       'example.merchant-3',
@@ -35,7 +39,7 @@ describe('example sample merchants', () => {
       'example.merchant-5',
     ])
     expect(showBayPanels(1)).toEqual({ ok: true })
-    expect(readShownBayPanelIds('sell')).toEqual(['example.merchant-1'])
+    expect(shownSamples()).toEqual(['example.merchant-1'])
   })
 
   it('refuses a count that is not a whole number from 0 to 5, changing nothing', () => {
@@ -43,12 +47,12 @@ describe('example sample merchants', () => {
     for (const count of [6, -1, 1.5, '3', undefined]) {
       expect(showBayPanels(count)).toMatchObject({ ok: false })
     }
-    expect(readShownBayPanelIds('sell')).toHaveLength(2)
+    expect(shownSamples()).toHaveLength(2)
   })
 
   it('draws five merchants on a phone on registered elements within the text budget', () => {
     showBayPanels(5)
-    const panelIds = readShownBayPanelIds('sell')
+    const panelIds = shownSamples()
     const markup = renderToString(createElement(BayPanelPages, { panelIds, layout: 'phone' }))
     expect(markup).toContain('Boilerhouse')
     expect(unregisteredTextsOf(markup)).toEqual([])
