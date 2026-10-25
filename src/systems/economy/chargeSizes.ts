@@ -17,6 +17,8 @@
  *                 (#149) and disarmed 3600 ticks after planting (#153)
  *   self hit      selfHit(p) * r(n) / r(1); from size 4 the inner half of the radius wrecks
  *   minCharge     clamp(s(p) - 2 + lead, 1, band) for a dynamite-gated cell (#143 amendment 2)
+ *   collapse      a bare rim block collapses when its roll is under collapseBp: 0 for sizes 1-4,
+ *                 1250 2500 3750 5000 for 5-8 and 5000 for 9-12 (D6 #865, rolled by D2 #861)
  */
 import { MM_PER_METRE } from '../../constants/physics'
 import {
@@ -166,6 +168,11 @@ export function remoteDisarmTicks(): number {
 
 export function keptFractionOf(size: number): BigStat {
   return growGeometric(sizes.keptBase, sizes.keptRatio, indexOfSize(size))
+}
+
+/** The basis points out of 10000 under which a bare rim block's roll collapses it (D2 #861). */
+export function collapseBpOf(size: number): number {
+  return sizes.collapseBp[indexOfSize(size)]
 }
 
 export function rackSlotsOf(size: number): number {

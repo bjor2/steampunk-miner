@@ -1,7 +1,9 @@
 /**
  * Reads the `blasting_charges` part of `economy.json` (spec #109, the size ladder of K8 #218, its
- * 12 rows of 3 types and the Blast Radius track's growth from D1 #860).
+ * 12 rows of 3 types and the Blast Radius track's growth from D1 #860, the bare blast's collapse
+ * chance per size from D2 #861).
  */
+import { BASIS_POINTS } from '../../constants/balance'
 import { add, ceil, cmp, fromCanonical, type BigStat } from '../money'
 import type {
   BlastingChargeRules,
@@ -80,6 +82,7 @@ function readChargeSizes(reader: FieldReader, sizes: Record<string, unknown>): C
       `${SIZES_PATH}.remoteDisarmTicks`,
       sizes.remoteDisarmTicks,
     ),
+    collapseBp: readIntegerList(reader, `${SIZES_PATH}.collapseBp`, sizes.collapseBp),
   }
 }
 
@@ -129,6 +132,8 @@ function ladderProblems({ sizes, rackMax }: BlastingChargeRules): string[] {
       'unlockFrom and unlockEvery must be at least 1',
     ],
     [sizes.remoteDisarmTicks >= 1, 'remoteDisarmTicks must be at least 1'],
+    [sizes.collapseBp.length === count, 'collapseBp must hold one entry per radius'],
+    [sizes.collapseBp.every(isBasisPoints), 'collapseBp must lie in 0 to 10000'],
   ]
   return checks.filter(([isMet]) => !isMet).map(([, problem]) => problem)
 }
@@ -152,6 +157,10 @@ function isTypeLadder({ type, breaksGateByType }: ChargeSizeLadder): boolean {
   const steps = type.slice(1).map((kind, at) => kind - type[at])
   const isStepping = steps.every((step) => step === 0 || step === 1)
   return isStepping && type[0] === 1 && type[type.length - 1] === breaksGateByType.length
+}
+
+function isBasisPoints(bp: number): boolean {
+  return bp >= 0 && bp <= BASIS_POINTS
 }
 
 function isGrowing(radius: ChargeSizeLadder['radius']): boolean {

@@ -9,6 +9,7 @@ import {
   chargeSizeCount,
   chargeSpec,
   chargeTypeOf,
+  collapseBpOf,
   fuseTicksOf,
   isInChargeRadius,
   isInLethalCore,
@@ -113,6 +114,12 @@ describe('charge size ladder', () => {
       null,
     ])
     expect(remoteDisarmTicks()).toBe(3600)
+  })
+
+  it('never collapses a bare crater of sizes 1 to 4, rises to half at size 8 and stays there to 12', () => {
+    expect(SIZES.map(collapseBpOf)).toEqual([
+      0, 0, 0, 0, 1250, 2500, 3750, 5000, 5000, 5000, 5000, 5000,
+    ])
   })
 
   it('keeps 0.4 * 0.8^(n - 1) of the ordinary ore a blast breaks', () => {
@@ -236,6 +243,15 @@ describe('charge size ladder data', () => {
   it('keeps every fuse a whole number of ticks above zero', () => {
     const problems = readEconomy(economyWithSizes({ fuseTicks: [120, 0] })).problems
     expect(problems).toContain('blastingCharges.sizes.fuseTicks must be at least 1')
+  })
+
+  it('refuses a collapse chance outside 0 to 10000 basis points or missing a size', () => {
+    const collapseBp = [...economyFile.blastingCharges.sizes.collapseBp]
+    collapseBp[11] = 10001
+    const problems = readEconomy(economyWithSizes({ collapseBp })).problems
+    expect(problems).toContain('blastingCharges.sizes.collapseBp must lie in 0 to 10000')
+    const short = readEconomy(economyWithSizes({ collapseBp: [0] })).problems
+    expect(short).toContain('blastingCharges.sizes.collapseBp must hold one entry per radius')
   })
 
   it('refuses a radius that is not a whole number of half-tiles', () => {

@@ -380,7 +380,8 @@ export type ChargeGateTiers = readonly number[]
  * costs `oreUnitsBase * oreUnitsRatio^(n - 1)` ore units of band `oreUnitsBand`, keeps
  * `keptBase * keptRatio^(n - 1)` of the ordinary ore it breaks, takes `rackSlots[n - 1]` rack
  * slots, and blows `fuseTicks[n - 1]` ticks after planting; a size past the fuse list is remote
- * (the plunger, #149) and is disarmed `remoteDisarmTicks` after planting. From size
+ * (the plunger, #149) and is disarmed `remoteDisarmTicks` after planting. A bare blast of size n
+ * collapses each bare rim block it rolls under `collapseBp[n - 1]` (D2 #861, rows of D6 #865). From size
  * `lethalCoreFrom` the inner `lethalCoreFraction` of the radius wrecks the planter. A dynamite-gated
  * cell of lead `newestSizeLead` asks the newest open size, one of a lower lead that many sizes less.
  */
@@ -404,6 +405,8 @@ export interface ChargeSizeLadder {
   lethalCoreFraction: BigStat
   newestSizeLead: number
   remoteDisarmTicks: number
+  /** Per size, the basis points out of 10000 a bare rim block's roll collapses under (D6 #865). */
+  collapseBp: readonly number[]
 }
 
 /**

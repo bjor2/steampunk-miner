@@ -165,6 +165,7 @@
       "keptRatio": "0.8",
       "rackSlots": [1, 1, 1, 2, 2, 3, 4, 5, 6, 8, 8, 8],
       "fuseTicks": [120, 120, 120, 150, 180, 210],
+      "collapseBp": [0, 0, 0, 0, 1250, 2500, 3750, 5000, 5000, 5000, 5000, 5000],
       "lethalCoreFrom": 4,
       "lethalCoreFraction": "0.5",
       "newestSizeLead": 2,
