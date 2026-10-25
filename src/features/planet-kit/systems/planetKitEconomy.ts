@@ -7,7 +7,7 @@
  * `containers` holds the placed containers' caps per kind, per player and per planet, and the
  * access a new one is placed with (the TD's final ruling on #823, points 1 and 5). `heldFromSale`
  * lists the kit items no merchant sells yet (the GD's ship rule on #850: a hazard tool is held
- * until its verb lands, #882). `acting` holds what the hazard tools do while they act (ticket 881,
+ * until its verb lands; empty since ticket 882 landed them). `acting` holds what the hazard tools do while they act (ticket 881,
  * `kitActing.ts`).
  */
 import { fromCanonical, isNonNegativeMoneyText, type Money } from '../../../systems/money'

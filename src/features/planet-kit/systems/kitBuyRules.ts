@@ -10,8 +10,8 @@
  * docked at the Sell bay, no merchant trades on this planet (`no_merchant`), this merchant does not
  * stock it (`not_sold_here`), the player already owns the tool (`kit_tool_owned`) or carries the
  * most of the consumable (`stack_full`), the item is held from sale (`held_from_sale`: the GD's ship
- * rule on #850 keeps the four hazard tools off sale until their verbs land, #882), or the wallet is
- * short. A refused command changes nothing.
+ * rule on #850, a data flag; it held the four hazard tools until ticket 882 landed their verbs),
+ * or the wallet is short. A refused command changes nothing.
  * It is answered by `planet-kit.KitItemBought`.
  *
  * `debug.planet-kit.grantKitItem {itemId}` holds the item as if bought here, spending nothing; it

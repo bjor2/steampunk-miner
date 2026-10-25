@@ -113,13 +113,8 @@ describe('planet kits (ticket 820)', () => {
     ])
   })
 
-  it('holds the four hazard tools from sale and sells the crate (the GD’s ship rule on #850)', () => {
-    expect([...PLANET_KITS.heldFromSale].sort()).toEqual([
-      'damp_flask',
-      'scree_plough',
-      'shard_tongs',
-      'vent_vane',
-    ])
+  it('holds nothing from sale since each hazard tool has its verb (the GD’s ship rule, ticket 882)', () => {
+    expect([...PLANET_KITS.heldFromSale]).toEqual([])
   })
 
   it('registers nothing: no planet-kit id reaches the content registries before PK4', () => {

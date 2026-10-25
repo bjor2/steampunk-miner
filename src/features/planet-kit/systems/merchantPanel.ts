@@ -5,7 +5,7 @@
  * the rows make it; the bay's one scroll area (phone) or its pages (desktop) carry what overflows.
  * Text only, so the screen model compares by value. Each line carries what the player's Buy
  * would meet (ticket 850): a tool already owned, a consumable carried to its limit or an item held
- * from sale (the GD's ship rule on #850, until the hazard verbs land) is locked with the reason on
+ * from sale (the GD's ship rule on #850, a data flag) is locked with the reason on
  * the line, a consumable shows how many are carried, and a price the wallet cannot pay turns red.
  * The authority still decides; the line only says it ahead.
  */

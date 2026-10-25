@@ -1,8 +1,9 @@
 /**
  * Buying kit items at the merchant (ticket 850, PK4b) at 360x640 and 1280x800: planet 1's Cache
  * Crate bought through its line's Buy, carried as the HUD count and the Cache Crates list's drop,
- * locked with its reason once three are carried; planet 2's Scree Plough held from sale (the GD's
- * ship rule on #850, until #882 lands the hazard verbs) and its line locked as owned once granted.
+ * locked with its reason once three are carried; planet 2's Scree Plough on sale since ticket 882
+ * landed the hazard tools' verbs (the GD's ship rule on #850), bought through its Buy and its line
+ * locked as owned.
  * State and geometry through the DOM and `steampunkDebug` only, never pixels.
  */
 import { expect, test, type Page } from '@playwright/test'
@@ -98,7 +99,7 @@ for (const cell of UI_SHOT_CELLS.filter((candidate) => CELL_NAMES.includes(candi
       expect(errors).toEqual([])
     })
 
-    test('holds planet 2’s Scree Plough from sale, and locks it as owned once granted', async ({
+    test('sells planet 2’s Scree Plough through its Buy, and locks it as owned', async ({
       page,
     }) => {
       test.setTimeout(TEST_TIMEOUT_MS)
@@ -106,12 +107,8 @@ for (const cell of UI_SHOT_CELLS.filter((candidate) => CELL_NAMES.includes(candi
       await moveToPlanet(page, 2)
       await giveMoney(page)
       await openSellBay(page)
-      await expect(page.locator(MERCHANT)).toContainText('Not on sale yet.')
-      await expect(page.locator(`${MERCHANT} ${buyOf('scree_plough')}`)).toHaveCount(0)
-      const granted = await page.evaluate(
-        () => window.steampunkDebug!.features['planet-kit'].grantKitItem('scree_plough').ok,
-      )
-      expect(granted).toBe(true)
+      await expect(page.locator(MERCHANT)).not.toContainText('Not on sale yet.')
+      await pressBuy(page, 'scree_plough')
       await expect.poll(async () => (await readHoldings(page)).tools).toEqual(['scree_plough'])
       await expect(page.locator(MERCHANT)).toContainText('Owned.')
       await expect(page.locator(`${MERCHANT} ${buyOf('scree_plough')}`)).toHaveCount(0)

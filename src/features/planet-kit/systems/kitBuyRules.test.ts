@@ -21,7 +21,8 @@ import { kitItemOf } from './planetKitSales'
 
 // Buying a kit item at the merchant (ticket 850, PK4b): at the Sell bay, for money alone, a tool
 // owned for good and a consumable stacked at the g it was bought at, up to its carry limit. The
-// four hazard tools are held from sale until their verbs land (the GD's ship rule on #850, #882).
+// four hazard tools were held from sale until their verbs landed (the GD's ship rule on #850); ticket
+// 882 lands them and puts the tools on sale.
 
 const grantMoney: CommandIntent = { type: 'debug.grantMoney', payload: { amount: '1e12' } }
 const setPlanet = (planetIndex: number): CommandIntent => ({
@@ -98,7 +99,7 @@ describe('buying kit items (ticket 850)', () => {
     expect(stateDigest(session.state())).toBe(before)
   })
 
-  it('holds the four hazard tools from sale at every merchant that stocks them, spending nothing', () => {
+  it('sells the four hazard tools at every merchant that stocks them, now each has its verb', () => {
     const stocked: readonly [number, string][] = [
       [2, 'scree_plough'],
       [3, 'damp_flask'],
@@ -108,11 +109,8 @@ describe('buying kit items (ticket 850)', () => {
     ]
     for (const [planet, itemId] of stocked) {
       const session = dockedOn(planet)
-      const before = stateDigest(session.state())
-      expect(rejectionOf(session.submit(1, buyKitItemIntent(itemId)))).toBe(
-        'planet-kit.held_from_sale',
-      )
-      expect(stateDigest(session.state())).toBe(before)
+      expect(rejectionOf(session.submit(1, buyKitItemIntent(itemId)))).toBeNull()
+      expect(kitHoldingsOf(session.state(), 'p1')).not.toEqual({ tools: [], stacks: [] })
     }
   })
 

@@ -16,7 +16,7 @@ import { MERCHANTS_ROW_ID, sessionPlanetIdOf } from './sessionMerchant'
 
 // The merchant the Sell bay draws (ticket 821, PK2): the variant trading at the session's planet
 // once the `merchants` row is open, its premium tag and its id-keyed stock with #681 prices, and
-// what each line's Buy would meet (ticket 850), the hazard tools held from sale (the GD's ship rule).
+// what each line's Buy would meet (ticket 850), a line held from sale (the GD's ship rule, empty since ticket 882).
 
 /** Docked at the Sell bay of planet `planetIndex` with `money`. */
 function dockedSession(planetIndex: number, money: string) {
@@ -103,18 +103,22 @@ describe('merchant panel (ticket 821)', () => {
     expect(rich.isMoneyShort).toBe(false)
   })
 
-  it('locks every hazard tool’s line as not on sale yet, the GD’s ship rule until their verbs land', () => {
+  it('opens Buy on every hazard tool’s line now each has its verb (ticket 882)', () => {
     const lines = merchantPanelOf(PLANET_KITS, dockedSession(5, '1e12').state(), 'p1')!.stock
     expect(lines.map((line) => [line.itemId, line.lockReason])).toEqual([
-      ['scree_plough', HELD_FROM_SALE_LOCK_REASON],
-      ['shard_tongs', HELD_FROM_SALE_LOCK_REASON],
+      ['scree_plough', null],
+      ['shard_tongs', null],
+      ['vent_vane', null],
+    ])
+  })
+
+  it('locks a line held from sale as not on sale yet, the GD’s ship rule kept in data', () => {
+    const held = { ...PLANET_KITS, heldFromSale: new Set(['vent_vane']) }
+    const lines = merchantPanelOf(held, dockedSession(5, '1e12').state(), 'p1')!.stock
+    expect(lines.map((line) => [line.itemId, line.lockReason])).toEqual([
+      ['scree_plough', null],
+      ['shard_tongs', null],
       ['vent_vane', HELD_FROM_SALE_LOCK_REASON],
     ])
-    const [flask] = merchantPanelOf(
-      PLANET_KITS,
-      dockedSession(3, '1e12').state(),
-      'p1',
-    )!.stock.slice(1)
-    expect(flask).toMatchObject({ itemId: 'damp_flask', lockReason: HELD_FROM_SALE_LOCK_REASON })
   })
 })
