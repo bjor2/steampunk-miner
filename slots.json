@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25T16:23:46+01:00",
+  "updated_at": "2026-10-25T16:26:03+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -341,9 +341,9 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-25 16:19 CET",
+    "at": "2026-10-25 16:26 CET",
     "mode": "refill-dev",
-    "triggers": "#873",
+    "triggers": "#885",
     "started": "",
     "note": "no pickable build ticket"
   },
@@ -368,19 +368,6 @@
     "mode": "on",
     "parallel": 1,
     "list": [
-      {
-        "number": 887,
-        "key": "678-8A",
-        "map": 678,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          885
-        ],
-        "done": [],
-        "live": 0
-      },
       {
         "number": 880,
         "key": "878-1A",
