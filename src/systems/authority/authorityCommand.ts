@@ -535,8 +535,15 @@ import type { JsonCount } from '../wholeCount'
  *    one; `debug.planet-kit.grantKitItem` holds an item for a scenario. The four hazard tools
  *    are refused `held_from_sale` until their verbs land (the GD's ship rule, #882). A run that
  *    buys nothing moves no digest.
+ * 116: the hazard tools act (ticket 881, PK4c T1): before a pose report, a scripted cut or a drill
+ *    step cuts, the slices' pre-cut contexts start or stop each owned tool (`ToolActingChanged`),
+ *    kept acting for its tail by the vehicle's optional `toolsSeenAt`; `planet-kit.uncork_flask`
+ *    spends a carried Damp Flask and keeps its window as `flaskUntilTick` in `planet-kit.holdings`
+ *    (v2), answered by `planet-kit.FlaskUncorked` or refused `no_flask` / `flask_open`; a debug
+ *    grant answers `planet-kit.KitItemGranted` with its home price. A player who owns no tool and
+ *    carries no flask reads and changes nothing new, so no run moves a digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 115
+export const AUTHORITY_PROTOCOL_VERSION = 116
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
