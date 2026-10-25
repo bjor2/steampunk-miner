@@ -1,8 +1,11 @@
 /**
- * The dynamite rack on the car (#215, the rack swap of the #145 TD lock): a vehicle piece (#235)
- * that hangs `vehicle-dynamite-rack` at the point its attach use registers (`hull.rear`), with a
- * stick for every size open on the planet and the wire reel once the plunger is. It changes only
- * when the rack is bolted on, the planet changes or a size opens, so it renders through React.
+ * The dynamite rack on the car (#215, the rack swap of the #145 TD lock; D7 ticket 866): a vehicle
+ * piece (#235) that hangs `vehicle-dynamite-rack` at the point its attach use registers
+ * (`hull.rear`), with a bay for every charge type open on the planet, a lit pip per charge of the
+ * type carried, the reel and plunger once the detonator is open and the nozzle once Blast Casing
+ * is owned, the bays grown for the Blast Radius band. It changes only when the rack is bolted on,
+ * the planet changes, a type opens, the stock changes or a node is bought, so it renders through
+ * React.
  * Behind the body's parts, as the kernel rack it replaces hung; listed in
  * `steampunkDebug.vehicleParts().mounted` while on the car.
  */
@@ -13,7 +16,7 @@ import { PartQuadMesh } from '../../../scene/PartQuadMesh'
 import { showMountedParts } from '../../../scene/mountedPartsPresence'
 import { SHIPPED_ART } from '../../../scene/shippedArt'
 import { useGameStore } from '../../../store/gameStore'
-import { readRackPartIds } from '../store/rackSightReads'
+import { readRackPartIds, readRackSight } from '../store/rackSightReads'
 import { rackMaps, rackMountOf, rackQuadsOf } from '../systems/render/rackLook'
 
 export const DYNAMITE_RACK_PIECE_ID = 'dynamite-visuals.rack'
@@ -25,10 +28,11 @@ const maps = rackMaps(SHIPPED_ART)
 export function DynamiteRackPiece() {
   // One string, so the piece renders again only when the shown parts change.
   const shownKey = useGameStore(() => readRackPartIds().join(' '))
+  const radiusLevel = useGameStore(() => readRackSight().radiusLevel)
   const mount = useMemo(rackMountOf, [])
   const quads = useMemo(
-    () => (mount === null ? [] : rackQuadsOf(SHIPPED_ART, mount, shownKey.split(' '))),
-    [mount, shownKey],
+    () => (mount === null ? [] : rackQuadsOf(SHIPPED_ART, mount, shownKey.split(' '), radiusLevel)),
+    [mount, shownKey, radiusLevel],
   )
   useEffect(() => showRackParts(mount, quads), [mount, quads])
   return (

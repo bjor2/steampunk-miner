@@ -1,0 +1,63 @@
+{
+  "assetId": "prop-blast-crater",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/prop-blast-crater/prop-blast-crater.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [1024, 2048],
+  "maps": {
+    "albedo": "prop-blast-crater.albedo.ktx2",
+    "normal": "prop-blast-crater.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "crater-1",
+      "tier": 1,
+      "rect": [485, 527, 480, 484],
+      "sizeM": [0.9368, 0.9452],
+      "pivotM": [0.4762, 0.4794],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "crater-2",
+      "tier": 1,
+      "rect": [8, 527, 461, 492],
+      "sizeM": [0.9, 0.9601],
+      "pivotM": [0.45, 0.48],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "crater-3",
+      "tier": 1,
+      "rect": [8, 8, 492, 503],
+      "sizeM": [0.96, 0.9823],
+      "pivotM": [0.49, 0.4911],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "crater-cased-rim",
+      "tier": 1,
+      "rect": [516, 8, 500, 500],
+      "sizeM": [0.9751, 0.9751],
+      "pivotM": [0.4876, 0.4876],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "crater-cased-trim",
+      "tier": 1,
+      "rect": [8, 1035, 377, 377],
+      "sizeM": [0.7346, 0.7346],
+      "pivotM": [0.3673, 0.3673],
+      "atM": [0.0, 0.0],
+      "z": 0
+    }
+  ]
+}
