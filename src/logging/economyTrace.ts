@@ -10,7 +10,9 @@
  *   buy, its price, and the tick the wallet first covered it, or the tick a buy replaced it;
  * - **upgrades**: what was bought, by track or purchase;
  * - **deaths**: every rescue by cause (`economyTraceLabels.ts`);
- * - **trips**: each trip's deepest band and what its hold then sold for, a rescued trip at 0.
+ * - **trips**: each trip from dock to dock, by the deepest band it mined, and what its hold sold
+ *   for until the next trip that mined something ended; a rescued trip sells 0. A trip that mined
+ *   nothing (a hop from bay to bay: the pads of P3 on sit below the surface line) ends no trip.
  *
  * A step that applied a debug command (a scenario's set-up) is skipped whole (#11 section 4).
  */
@@ -23,12 +25,14 @@ import { bandOfTile } from '../systems/world/planetGeometry'
 import { openUpgradeAsk, settleUpgradeAsks, type UpgradeAsk } from './economyTraceAsks'
 import { deathCauseOf, purchaseLabelOf } from './economyTraceLabels'
 
-/** One trip: its deepest band and what its hold sold for at the dock that ended it. */
+/** One trip: the deepest band it mined and what its hold sold for after the dock that ended it. */
 export interface TripSale {
   band: number
   value: Money
   isRescued: boolean
 }
+
+const FIRST_BAND = 1
 
 export interface PlanetEconomy {
   planet: number
@@ -45,9 +49,12 @@ export interface PlanetEconomy {
   trips: TripSale[]
 }
 
-/** The trip under way: below the surface since its first step there. */
+/** The trip under way since the last dock or rescue. */
 interface OpenTrip {
-  deepestBand: number
+  /** The deepest band of a cell it broke; null while it broke none. */
+  minedBand: number | null
+  /** The deepest band the rig stood in, for a rescue that mined nothing. */
+  poseBand: number | null
   /** The last hazard that drained the rig's energy on the trip, for a strand's cause. */
   drainedBy: string | null
 }
@@ -56,15 +63,19 @@ export interface EconomyTrace {
   planets: Map<number, PlanetEconomy>
   /** The planet the last folded step was on; 0 before the first. */
   planetIndex: number
-  trip: OpenTrip | null
-  /** The ended trip whose hold is still being sold; null once the next trip leaves. */
+  trip: OpenTrip
+  /** The ended trip whose hold is still being sold; null once a rescue lost it. */
   selling: TripSale | null
   /** What wrecked the rig, until the rescue that follows counts the death. */
   destroyedBy: string | null
 }
 
 export function emptyEconomyTrace(): EconomyTrace {
-  return { planets: new Map(), planetIndex: 0, trip: null, selling: null, destroyedBy: null }
+  return { planets: new Map(), planetIndex: 0, trip: newTrip(), selling: null, destroyedBy: null }
+}
+
+function newTrip(): OpenTrip {
+  return { minedBand: null, poseBand: null, drainedBy: null }
 }
 
 /** One bot step: the state after it and the events it answered, folded in place. */
@@ -78,7 +89,7 @@ export function traceEconomyStep(
   const planet = planetEconomyOf(trace, state, playerId)
   planet.lastTick = state.tick
   followTrip(trace, state, playerId)
-  events.forEach((event) => traceEconomyEvent(trace, planet, event))
+  events.forEach((event) => traceEconomyEvent(trace, planet, state, event))
   settleUpgradeAsks(planet.asks, state, playerId, events)
 }
 
@@ -99,7 +110,7 @@ function planetEconomyOf(
 /** A new planet starts with no trip under way and no hold being sold. */
 function leavePlanet(trace: EconomyTrace, index: number): void {
   trace.planetIndex = index
-  trace.trip = null
+  trace.trip = newTrip()
   trace.selling = null
   trace.destroyedBy = null
 }
@@ -118,16 +129,10 @@ function arrivedPlanetOf(state: AuthorityState, playerId: string): PlanetEconomy
   }
 }
 
-/** A trip opens below the surface, ending the last one's selling; its band follows the depth. */
+/** The trip's pose band follows the deepest band the rig stood in below the surface. */
 function followTrip(trace: EconomyTrace, state: AuthorityState, playerId: string): void {
   const band = bandBelowSurfaceOf(state, playerId)
-  if (band === null) return
-  if (trace.trip === null) {
-    trace.trip = { deepestBand: band, drainedBy: null }
-    trace.selling = null
-    return
-  }
-  trace.trip.deepestBand = Math.max(trace.trip.deepestBand, band)
+  if (band !== null) trace.trip.poseBand = deeperBandOf(trace.trip.poseBand, band)
 }
 
 /** The band of the tile the rig stands in, null at or above the surface. */
@@ -139,13 +144,28 @@ function bandBelowSurfaceOf(state: AuthorityState, playerId: string): number | n
   return bandOfTile(params, tile.tx, tile.ty)
 }
 
-function traceEconomyEvent(trace: EconomyTrace, planet: PlanetEconomy, event: DomainEvent): void {
+function traceEconomyEvent(
+  trace: EconomyTrace,
+  planet: PlanetEconomy,
+  state: AuthorityState,
+  event: DomainEvent,
+): void {
   if (event.type === 'ResourceSold') addSale(trace, planet, fromCanonical(event.value))
-  if (event.type === 'DockEntered') endTrip(trace, planet, false)
-  if (event.type === 'HazardDrained' && trace.trip !== null) trace.trip.drainedBy = event.kind
+  if (event.type === 'TileDestroyed') followMinedBand(trace.trip, state, event.tx, event.ty)
+  if (event.type === 'DockEntered') endTripAtDock(trace, planet)
+  if (event.type === 'HazardDrained') trace.trip.drainedBy = event.kind
   if (event.type === 'VehicleDestroyed') trace.destroyedBy = event.cause
   if (event.type === 'RescueTriggered') countRescue(trace, planet, event.cause)
   countPurchase(planet, purchaseLabelOf(event))
+}
+
+function followMinedBand(trip: OpenTrip, state: AuthorityState, tx: number, ty: number): void {
+  const params = planetParamsOf(state.planet)
+  if (params !== null) trip.minedBand = deeperBandOf(trip.minedBand, bandOfTile(params, tx, ty))
+}
+
+function deeperBandOf(known: number | null, band: number): number {
+  return known === null ? band : Math.max(known, band)
 }
 
 function addSale(trace: EconomyTrace, planet: PlanetEconomy, value: Money): void {
@@ -153,20 +173,28 @@ function addSale(trace: EconomyTrace, planet: PlanetEconomy, value: Money): void
   if (trace.selling !== null) trace.selling.value = add(trace.selling.value, value)
 }
 
-/** A dock ends the trip and sells its hold; a rescue ends it with the hold lost. */
-function endTrip(trace: EconomyTrace, planet: PlanetEconomy, isRescued: boolean): void {
-  if (trace.trip === null) return
-  const sale: TripSale = { band: trace.trip.deepestBand, value: ZERO_MONEY, isRescued }
+/** A dock ends a trip that mined something, whose hold the sales from now on are. */
+function endTripAtDock(trace: EconomyTrace, planet: PlanetEconomy): void {
+  const band = trace.trip.minedBand
+  trace.trip = newTrip()
+  if (band === null) return
+  const sale: TripSale = { band, value: ZERO_MONEY, isRescued: false }
   planet.trips.push(sale)
-  trace.selling = isRescued ? null : sale
-  trace.trip = null
+  trace.selling = sale
+}
+
+/** A rescue ends the trip with its hold lost, at the band it mined, else the band it reached. */
+function endTripAtRescue(trace: EconomyTrace, planet: PlanetEconomy): void {
+  const band = trace.trip.minedBand ?? trace.trip.poseBand ?? FIRST_BAND
+  planet.trips.push({ band, value: ZERO_MONEY, isRescued: true })
+  trace.trip = newTrip()
+  trace.selling = null
 }
 
 function countRescue(trace: EconomyTrace, planet: PlanetEconomy, cause: string): void {
-  const drainedBy = trace.trip?.drainedBy ?? null
-  countInto(planet.deaths, deathCauseOf(cause, trace.destroyedBy, drainedBy))
+  countInto(planet.deaths, deathCauseOf(cause, trace.destroyedBy, trace.trip.drainedBy))
   trace.destroyedBy = null
-  endTrip(trace, planet, true)
+  endTripAtRescue(trace, planet)
 }
 
 function countPurchase(planet: PlanetEconomy, label: string | null): void {

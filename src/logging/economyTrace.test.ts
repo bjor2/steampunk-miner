@@ -35,11 +35,11 @@ describe('economy trace (ticket 907)', () => {
     expect(toFixedText(planetOf(trace, 1).income, 0)).toBe('90')
   })
 
-  it('gives a trip the deepest band it reached and the sales after the dock that ended it', () => {
+  it('gives a trip the deepest band it mined and the sales after the dock that ended it', () => {
     const trace = emptyEconomyTrace()
     step(trace, stateAt(0, 1, 0, '0'), [])
-    step(trace, stateAt(100, 1, 3, '0'), [])
-    step(trace, stateAt(200, 1, deepDepthTiles(1), '0'), [])
+    step(trace, stateAt(100, 1, 3, '0'), [broke(3)])
+    step(trace, stateAt(200, 1, deepDepthTiles(1), '0'), [broke(deepDepthTiles(1))])
     step(trace, stateAt(300, 1, 3, '0'), [])
     step(trace, stateAt(400, 1, 0, '0'), [docked()])
     step(trace, stateAt(410, 1, 0, '70'), [sold('70')])
@@ -49,6 +49,19 @@ describe('economy trace (ticket 907)', () => {
     expect(trip.band).toBeGreaterThan(1)
     expect(toFixedText(trip.value, 0)).toBe('75')
     expect(trip.isRescued).toBe(false)
+  })
+
+  it('ends no trip at a bay hop that mined nothing, so its sales stay with the trip before', () => {
+    const trace = emptyEconomyTrace()
+    step(trace, stateAt(0, 1, 0, '0'), [])
+    step(trace, stateAt(100, 1, 3, '0'), [broke(3)])
+    step(trace, stateAt(200, 1, 1, '0'), [docked()])
+    step(trace, stateAt(300, 1, 1, '0'), [docked()])
+    step(trace, stateAt(310, 1, 1, '40'), [sold('40')])
+
+    const { trips } = planetOf(trace, 1)
+    expect(trips).toHaveLength(1)
+    expect(toFixedText(trips[0].value, 0)).toBe('40')
   })
 
   it('ends a trip at its rescue with nothing sold, and the next sales count for no trip', () => {
@@ -203,6 +216,13 @@ function setUp(): DomainEventBody {
 
 function sold(value: string): DomainEventBody {
   return { type: 'ResourceSold', items: [], value, mode: 'all', coinsShown: 0 }
+}
+
+/** The cell `depthTiles` below column 0's surface on planet 1 broke. */
+function broke(depthTiles: number): DomainEventBody {
+  const { radiusTiles } = freshPlanetParamsFor(SEED, 1)
+  const ty = surfaceRowOfColumn(0, radiusTiles) - depthTiles
+  return { type: 'TileDestroyed', tx: 0, ty, kind: 'ground' }
 }
 
 function docked(): DomainEventBody {
