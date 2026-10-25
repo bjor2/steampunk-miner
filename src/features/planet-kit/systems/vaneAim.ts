@@ -2,9 +2,10 @@
  * The Vent Vane's outcome (ticket 882, PK4c T2; the GD's final lock on #850 and Systems' vane
  * correction 6395074595, which replaced the 1500 bp lift row): while the vane acts, a vent's shove
  * is turned outward from the core (the kernel's `shoveAims`), kept at the vaned size, the row's
- * `shoveTiles` scaled by the vane's −60% factor, over the row's 20 ticks. There is no `liftBp`:
- * the vaned shove is never longer than the bare one, so a vaned rig never climbs out over a vent
- * faster (the VS's no-net-speed row). `VaneRidden` logs each vaned shove as `vane_ride`.
+ * `shoveTiles` scaled by the vane's −60% factor, over the row's 20 ticks, and never more cells
+ * than it would have walked along the vent's normal. There is no `liftBp`: the vaned shove is
+ * never longer than the bare one, so a vaned rig never climbs out over a vent faster (the VS's
+ * no-net-speed row). `VaneRidden` logs each vaned shove as `vane_ride`.
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import { unchanged, type RuleEffect } from '../../../systems/authority/commandRule'

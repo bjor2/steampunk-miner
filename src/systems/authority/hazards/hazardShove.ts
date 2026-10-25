@@ -15,8 +15,9 @@
  *
  * - **Aimed outward** (ticket 882, the Vent Vane; Systems' correction on #850, 6395074595). While a
  *   slice's shove aim answers for the player (`shoveAims.ts`), the shove goes outward from the core
- *   from the rig's cell instead of along the normal, at the size its factor left it: never longer
- *   than the bare shove, so it adds no speed.
+ *   from the rig's cell instead of along the normal, at the size its factor left it and never more
+ *   cells than the shove would have walked along the normal from there: the GD's "speed capped at
+ *   the size of the unvaned shove", so it adds no speed.
  *
  * `HazardShoved` logs it as `hazard_shove`, with the cells shoved and where the rig comes to rest.
  */
@@ -79,7 +80,10 @@ interface ShoveAimAt {
   isOutward: boolean
 }
 
-/** The open cells along the shove's direction from the rig, at most `reach.tiles`. */
+/**
+ * The open cells along the vent's normal from the rig, at most `reach.tiles`; under a shove aim the
+ * same count or fewer outward, so the aimed shove is never longer than the one it replaces.
+ */
 function ventShoveOf(
   world: WorldState,
   params: PlanetParams,
@@ -89,10 +93,30 @@ function ventShoveOf(
 ): VentShove {
   if (pose === null) return { tiles: 0, to: aim.vent, untilTick: reach.untilTick }
   const from = tileOfPose(pose)
-  const step = aim.isOutward ? outwardOf(from) : ventNormalOf(aim.vent, from)
+  const along = openRunOf(world, params, { from, step: ventNormalOf(aim.vent, from) }, reach.tiles)
+  if (!aim.isOutward) return { ...along, untilTick: reach.untilTick }
+  const outward = openRunOf(world, params, { from, step: outwardOf(from) }, along.tiles)
+  return { ...outward, untilTick: reach.untilTick }
+}
+
+/** A walk from a cell one step at a time. */
+interface CellWalk {
+  from: TilePoint
+  step: TilePoint
+}
+
+/** How many open cells follow `walk.from` along its step, at most `most`, and the last of them. */
+function openRunOf(
+  world: WorldState,
+  params: PlanetParams,
+  walk: CellWalk,
+  most: number,
+): { tiles: number; to: TilePoint } {
   let tiles = 0
-  while (tiles < reach.tiles && isOpenTile(world, params, stepped(from, step, tiles + 1))) tiles++
-  return { tiles, to: stepped(from, step, tiles), untilTick: reach.untilTick }
+  while (tiles < most && isOpenTile(world, params, stepped(walk.from, walk.step, tiles + 1))) {
+    tiles++
+  }
+  return { tiles, to: stepped(walk.from, walk.step, tiles) }
 }
 
 /** One of the four directions from the vent to the rig; outward when the rig is in the vent. */

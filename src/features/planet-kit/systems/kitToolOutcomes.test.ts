@@ -170,16 +170,20 @@ describe('shard tongs outcome', () => {
 })
 
 describe('vent vane outcome', () => {
-  /** A vent beside the rig in the mined BELOW, cut from the side: its normal points sideways. */
+  /**
+   * A vent beside the rig in the mined BELOW, cut from its right: its normal points left, where
+   * one cell is open, and outward is up the open shaft.
+   */
   function sideVentShove(withVane: boolean) {
     const session = createScriptedSession()
     mineTile(session, START, GROUND)
     mineTile(session, START + 50, BELOW)
+    mineTile(session, START + 100, { tx: BELOW.tx - 1, ty: BELOW.ty })
     const vent = { tx: BELOW.tx + 1, ty: BELOW.ty }
-    if (withVane) session.submit(START + 99, grantKitItem('vent_vane'))
-    session.submit(START + 99, placeHazardCommand('steamvent', vent.tx, vent.ty))
-    session.submit(START + 100, poseAbove({ tx: BELOW.tx, ty: BELOW.ty - 1 }, FACING.right))
-    return session.submit(START + 140, drill(vent, 40))
+    if (withVane) session.submit(START + 149, grantKitItem('vent_vane'))
+    session.submit(START + 149, placeHazardCommand('steamvent', vent.tx, vent.ty))
+    session.submit(START + 150, poseAbove({ tx: BELOW.tx, ty: BELOW.ty - 1 }, FACING.right))
+    return session.submit(START + 190, drill(vent, 40))
   }
 
   it('turns the shove outward from the core at the vaned size and logs the ride', () => {
@@ -209,7 +213,9 @@ describe('vent vane outcome', () => {
 
   it('leaves a bare rig’s shove along the vent normal, with no ride logged', () => {
     const events = sideVentShove(false)
-    expect(eventsOfType(events, 'HazardShoved')).toMatchObject([{ tiles: 0 }])
+    expect(eventsOfType(events, 'HazardShoved')).toMatchObject([
+      { tiles: 1, toTx: BELOW.tx - 1, toTy: BELOW.ty },
+    ])
     expect(eventsOfType(events, 'planet-kit.VaneRidden')).toEqual([])
   })
 })

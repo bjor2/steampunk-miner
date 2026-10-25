@@ -70,37 +70,56 @@ function probeSlice(
   }
 }
 
-/** GROUND and BELOW mined, then a vent beside the rig in BELOW cut from the side. */
-function shoveFromSideVent(session: ScriptedSession): DomainEvent[] {
+/** The cells to the left of BELOW, nearest first, which the side vent's normal walks. */
+const LEFT_OF_BELOW = [1, 2, 3].map((step) => ({ tx: BELOW.tx - step, ty: BELOW.ty }))
+
+/**
+ * GROUND and BELOW mined, then `leftOpen` cells to BELOW's left, then a vent beside the rig in
+ * BELOW cut from its right: its normal points left, and outward is up the open shaft.
+ */
+function shoveFromSideVent(session: ScriptedSession, leftOpen: number): DomainEvent[] {
   mineTile(session, START, GROUND)
   mineTile(session, START + 50, BELOW)
-  session.submit(START + 99, placeHazardCommand('steamvent', SIDE_VENT.tx, SIDE_VENT.ty))
-  session.submit(START + 100, poseAbove({ tx: BELOW.tx, ty: BELOW.ty - 1 }, FACING.right))
-  return session.submit(START + 140, drill(SIDE_VENT, 40))
+  LEFT_OF_BELOW.slice(0, leftOpen).forEach((tile, at) =>
+    mineTile(session, START + 100 + at * 50, tile),
+  )
+  session.submit(START + 299, placeHazardCommand('steamvent', SIDE_VENT.tx, SIDE_VENT.ty))
+  session.submit(START + 300, poseAbove({ tx: BELOW.tx, ty: BELOW.ty - 1 }, FACING.right))
+  return session.submit(START + 340, drill(SIDE_VENT, 40))
 }
 
+function sideShove(aims: readonly ShoveAim[], leftOpen: number) {
+  const slice = probeSlice((r) => aims.forEach((aim) => r.shoveAim(aim)))
+  const [shove] = withRegistrations([slice], () =>
+    eventsOfType(shoveFromSideVent(createScriptedSession(), leftOpen), 'HazardShoved'),
+  )
+  return shove
+}
+
+const VANE_AIM: ShoveAim = { id: 'probe.vane', kind: 'steamvent', isAimedOutward: () => true }
+
 describe('shove aims', () => {
-  it('shoves along the vent normal with no aim: into the wall beside, so nowhere', () => {
-    const [shove] = withRegistrations([probeSlice(() => {})], () =>
-      eventsOfType(shoveFromSideVent(createScriptedSession()), 'HazardShoved'),
-    )
-    expect(shove).toMatchObject({ tiles: 0, toTx: BELOW.tx, toTy: BELOW.ty })
+  it('shoves along the vent normal with no aim', () => {
+    const left = LEFT_OF_BELOW[2]
+    expect(sideShove([], 3)).toMatchObject({ tiles: 3, toTx: left.tx, toTy: left.ty })
   })
 
   it('turns the shove outward from the core while an aim answers, at the same size', () => {
-    const aim: ShoveAim = { id: 'probe.vane', kind: 'steamvent', isAimedOutward: () => true }
-    const [shove] = withRegistrations([probeSlice((r) => r.shoveAim(aim))], () =>
-      eventsOfType(shoveFromSideVent(createScriptedSession()), 'HazardShoved'),
-    )
-    expect(shove).toMatchObject({ tiles: 3, toTx: BELOW.tx, toTy: BELOW.ty + 3 })
+    expect(sideShove([VANE_AIM], 3)).toMatchObject({
+      tiles: 3,
+      toTx: BELOW.tx,
+      toTy: BELOW.ty + 3,
+    })
+  })
+
+  it('never shoves farther outward than the shove would have gone along its normal', () => {
+    expect(sideShove([VANE_AIM], 1)).toMatchObject({ tiles: 1, toTy: BELOW.ty + 1 })
+    expect(sideShove([VANE_AIM], 0)).toMatchObject({ tiles: 0, toTy: BELOW.ty })
   })
 
   it('never aims a shove of another kind', () => {
-    const aim: ShoveAim = { id: 'probe.vane', kind: 'firedamp', isAimedOutward: () => true }
-    const [shove] = withRegistrations([probeSlice((r) => r.shoveAim(aim))], () =>
-      eventsOfType(shoveFromSideVent(createScriptedSession()), 'HazardShoved'),
-    )
-    expect(shove).toMatchObject({ tiles: 0 })
+    const aim: ShoveAim = { ...VANE_AIM, kind: 'firedamp' }
+    expect(sideShove([aim], 3)).toMatchObject({ tiles: 3, toTy: BELOW.ty })
   })
 })
 
