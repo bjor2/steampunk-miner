@@ -11,22 +11,25 @@ import { goldenRunProblems, type GoldenRun } from './goldenRun'
 // cut is the body plus a side clearance. At decision #36's clearance (0.5 m) the stamp's radius,
 // its lift and the ring lag are protocol 100's: the commit that derived them from the row
 // (b144b7312), with every rule as it was, replayed every committed golden of protocol 100 byte for
-// byte, digests and mined orders. Ticket 662 then changed rules that do not read the row: the ring
-// moved into the wall, the drill's disc took its bore-wall edge, a level cut its floor band and a
-// report its run-on stamp. At 0.5 m those move each drilling golden's digests and nothing else, so
-// the six replay the digests below and the rest their committed files, all with the committed
-// mined orders. A size that stops reading the row (a hardcoded radius, lift or lag) moves a replay.
+// byte, digests and mined orders. Ticket 662 then changed rules that do not read the row: the
+// drill's disc took its bore-wall edge, a level cut its floor band, a report its run-on stamp, the
+// level floor a ramp on its circle and the swept cut's casing trail the body's line, its rings
+// measured from their stretch of axis swept by the stamp's offset (the ring, which went into the
+// wall and back to a sample inside it, is #36's own again at 0.5 m). At 0.5 m those move each
+// drilling golden's digests and nothing else, so the six replay the digests below and the rest
+// their committed files, all with the committed mined orders. A size that stops reading the row (a
+// hardcoded radius, lift or lag) moves a replay.
 
 type MovedDigests = Readonly<Record<string, Readonly<Record<number, string>>>>
 
-/** Protocol 103's digests at the 0.5 m clearance, by tick, of the goldens the 0.15 m bore moves. */
+/** Protocol 118's digests at the 0.5 m clearance, by tick, of the goldens the 0.15 m bore moves. */
 const WIDE_BORE_DIGESTS: MovedDigests = {
-  'casing-lined-band-2': { 2137: '5614fbdc5c606e86' },
-  'collapse-band-2-grade-1': { 2125: '2f5e2c0a8eaf194a' },
-  'destroyed-and-towed': { 704: '031687b79542f344' },
-  'dig-and-return': { 247: '6747dfad71e3567b', 3600: 'cde1bb3e9abce134', 4000: '796b09bd67af67b5' },
-  'mined-order-mixed': { 307: 'd7ab0627ecc59d9c' },
-  'money-past-1e40': { 124: 'c8ea00df5bb63559', 166: '8d1ce7f50f4f6aa8', 2000: '563ed1565f617c83' },
+  'casing-lined-band-2': { 2137: '151428c425a115cf' },
+  'collapse-band-2-grade-1': { 2125: '55ab50a9026a8b7c' },
+  'destroyed-and-towed': { 704: 'b0c160d11e71ac43' },
+  'dig-and-return': { 247: '96e1f52d455e4dae', 3600: '41f11c6db1ef9ba1', 4000: 'ca74782db75f2fa8' },
+  'mined-order-mixed': { 307: '3f0f5d489e5df2f0' },
+  'money-past-1e40': { 124: '51287765f47bbf8a', 166: '3d70299e1d6342cb', 2000: 'c4d130e49009575a' },
 }
 
 const goldens = committedGoldenRuns().map((golden) => [golden.name, golden] as const)

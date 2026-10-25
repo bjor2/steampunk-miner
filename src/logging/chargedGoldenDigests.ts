@@ -13,7 +13,9 @@
  * (ticket 737's rare clusters): the stamp alone moved them, as with planet 1 stamped 2 again they
  * replay to the old pins, 0bb6c4e93bdba1e5 and fca832a15047704b. Re-pinned for ticket 713 to the
  * gems' ore rules 12 stamp the same way: with no planet stamped 12 they replay to 6fc430d094a4b3e6
- * and 48aad988d5ddd282. Spec support for the kill-switch pins; it reads, never writes.
+ * and 48aad988d5ddd282. Ticket 662's 1.2 m bore and its casing trail, rings measured from the
+ * hole each tick cut (protocol 118), moved both again, still the only two the charge moves. Spec
+ * support for the kill-switch pins; it reads, never writes.
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import type { GoldenRun } from './goldenRun'
@@ -22,8 +24,8 @@ const GOLDEN_FOLDER = new URL('../../tests/golden/', import.meta.url)
 
 /** The end digest of each golden the charge moves, with the exact carry off, by tick. */
 export const UNCHARGED_DIGESTS: Readonly<Record<string, Readonly<Record<number, string>>>> = {
-  'casing-lined-band-2': { 2137: '706019711daadea0' },
-  'collapse-band-2-grade-1': { 2125: 'c2ed8e47dc1c2c44' },
+  'casing-lined-band-2': { 2137: 'db2644f1b1597b1f' },
+  'collapse-band-2-grade-1': { 2125: 'bbfc5b542efcf29c' },
 }
 
 export function committedGoldenRuns(): GoldenRun[] {

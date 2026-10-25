@@ -14,23 +14,25 @@ import { withMaterialContact } from './systems/materialFixtures'
 // (the per-purchase drill of ticket 552) with the record off. Ticket 762 re-pinned all of them to
 // planet 1's ore rules 10 stamp (ticket 737's rare clusters), which alone moved them: with planet 1
 // stamped 2 again each replays to the pin it replaced. Ticket 713 re-pinned them to the gems' ore
-// rules 12 stamp the same way: with no planet stamped 12 each replays to ticket 762's pin.
+// rules 12 stamp the same way: with no planet stamped 12 each replays to ticket 762's pin. Ticket
+// 662's 1.2 m bore and its casing trail, rings measured from the hole each tick cut (protocol
+// 118), moved all four again, and only them.
 
 type MovedDigests = Readonly<Record<string, Readonly<Record<number, string>>>>
 
 /** Protocol 88's digests of the goldens the record moves, by tick (91's for the two digs). */
 const PROTOCOL_88_DIGESTS: MovedDigests = {
-  'casing-lined-band-2': { 2137: '09efcb309107d955' },
-  'collapse-band-2-grade-1': { 2125: '94909523d95e8731' },
-  'dig-and-return': { 247: '9b250aae0e1bc5a2', 3600: 'f0c43969e6670d4b', 4000: '5d4b98cadd0ecc5a' },
-  'mined-order-mixed': { 307: '8fc94cadd8059139' },
+  'casing-lined-band-2': { 2137: 'dad6225409d47136' },
+  'collapse-band-2-grade-1': { 2125: '9c781106c485ea85' },
+  'dig-and-return': { 247: 'c4db3f9c9dcff509', 3600: '180cf9913df8c848', 4000: '7a6bbd2124ee07d1' },
+  'mined-order-mixed': { 307: '89db921635aa40b9' },
 }
 
 /** Protocol 88's charged digests (A6, `drill.exactCarry` on) of the same goldens. */
 const PROTOCOL_88_CHARGED_DIGESTS: MovedDigests = {
   ...PROTOCOL_88_DIGESTS,
-  'casing-lined-band-2': { 2137: '0213e9590bb5f4cd' },
-  'collapse-band-2-grade-1': { 2125: '563e4fe169425f8e' },
+  'casing-lined-band-2': { 2137: '6f16a4e6fdd78057' },
+  'collapse-band-2-grade-1': { 2125: '26d3b8b63020e895' },
 }
 
 const goldens = committedGoldenRuns().map((golden) => [golden.name, golden] as const)
