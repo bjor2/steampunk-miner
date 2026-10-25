@@ -8,6 +8,7 @@
 import { hudLabelIconIdOf } from '../art/icons/iconSet'
 import { planetDisplayNameOf } from '../registries/planetRow'
 import type { TravelTransition } from '../sliceProgress'
+import { TRAVEL_CARD_FACT_IDS } from './travelCardIds'
 import { planetGravityTraitOf } from './localGravityReading'
 import type { UiTextUnderTitle } from './uiText'
 
@@ -28,15 +29,6 @@ export interface TravelCardView {
 }
 
 export const TRAVEL_CARD_TEXT_ID = 'travel-card'
-
-/** The card's root, the hook the specs find it by. */
-export const TRAVEL_CARD_TEST_ID = 'travel-card'
-
-/** The facts' hooks: the destination's name and its gravity. */
-export const TRAVEL_CARD_FACT_IDS = {
-  destination: 'travel-card-destination',
-  gravity: 'travel-card-gravity',
-} as const
 
 const TITLE = 'Core drive engaged'
 const ONE_LINE = 'Hold fast while the rig crosses the void.'

@@ -8,14 +8,16 @@
  * (ticket 684); and the base sheet's Hold and Ledger (ticket 688: the Sell bay's ore and the pause
  * menu's save page as were), and the sale receipt over the Sell bay after a wide P41+ haul, its lines
  * scrolling past eight (ticket 717), and the unlock reveal's plate over the Upgrade bay after the
- * guns are mounted from the Outfitter, held so the shot finds it (ticket 718); and the Sell bay
- * with 1 and with 5 sample merchants in its panel slot (ticket 845).
+ * guns are mounted from the Outfitter, held so the shot finds it (ticket 718); the Sell bay
+ * with 1 and with 5 sample merchants in its panel slot (ticket 845); and the artefact cache's
+ * cards and the travel card on brass (ticket 885), which `brassScreens.spec.ts` also crops.
  */
 import { expect, type Page } from '@playwright/test'
 import { TREE_TEST_IDS } from '../../../src/features/tech-tree/ui/nodeTestIds'
 import { UI_IDS } from '../../../src/ui/ids'
 import { BAY_PANEL_UI_IDS } from '../../../src/ui/platform/bayPanelIds'
 import { SHEET_UI_IDS } from '../../../src/ui/sheet/sheetIds'
+import { TRAVEL_CARD_TEST_ID } from '../../../src/systems/views/travelCardIds'
 import { dockAt } from '../screens/screenHelpers'
 import { RECEIPT_ROWS_TEST_ID, RECEIPT_TEST_ID, sellWideHaul } from '../sellReceiptSales'
 import { REVEAL_PLATE_TEST_ID, revealTurretMount } from '../unlockRevealBuys'
@@ -33,6 +35,8 @@ const PATENT_OFFICE_TAB_ID = 'tech-tree.patent-office'
 const PLANET_WITH_CARD = 25
 /** Software WebGL on a loaded box opens a screen slowly; a wait, not a judgement. */
 const OPEN_TIMEOUT_MS = 30_000
+/** Planet 1's core in the bay (`setCoreFragments`): Travel to planet 2 is then allowed. */
+const PLANET_1_CORE = 63
 
 export const UI_SHEETS: readonly UiSheet[] = [
   { shot: 'sell-bay', rootSelector: PLATFORM, pannedTestIds: [], open: openSellBay },
@@ -113,6 +117,18 @@ export const UI_SHEETS: readonly UiSheet[] = [
     rootSelector: `[data-testid="${REVEAL_PLATE_TEST_ID}"]`,
     pannedTestIds: [],
     open: revealTurretMount,
+  },
+  {
+    shot: 'artefact-choice',
+    rootSelector: `[data-testid="${UI_IDS.artefactChoice}"] > section`,
+    pannedTestIds: [],
+    open: openArtefactChoice,
+  },
+  {
+    shot: 'travel-card',
+    rootSelector: `[data-testid="${TRAVEL_CARD_TEST_ID}"] > section`,
+    pannedTestIds: [],
+    open: openTravelCard,
   },
   {
     shot: 'title-menu',
@@ -231,6 +247,66 @@ async function openSellReceipt(page: Page): Promise<void> {
     timeout: OPEN_TIMEOUT_MS,
   })
   await expect(page.getByTestId(RECEIPT_ROWS_TEST_ID)).toBeVisible()
+}
+
+/**
+ * Ticket 885: the cache's three cards, as interact over the cache opens them. The live game is
+ * held, then the rig reports itself at rest on the cache's tile and opens it, so its Choose
+ * buttons stay live (the pose stays on the cache while the game is held).
+ */
+export async function openArtefactChoice(page: Page): Promise<void> {
+  await undock(page)
+  await page.evaluate(() => {
+    const debug = window.steampunkDebug!
+    const cache = debug.artefactCacheTile()
+    if (!cache.ok) throw new Error(cache.problems.join('; '))
+    debug.freezeEnemies(true)
+    const held = debug.pause()
+    if (!held.ok) throw new Error(held.problems.join('; '))
+    const centre = (index: number) => index * 1000 + 500
+    const pose = {
+      x: centre(cache.tile.tx),
+      y: centre(cache.tile.ty),
+      vx: 0,
+      vy: 0,
+      upx: 0,
+      upy: 1024,
+      facing: 2,
+      driving: false,
+      thrusting: false,
+      drilling: false,
+      thrustTicks: 0,
+      driveTicks: 0,
+      drillTicks: 0,
+      drive: { x: 0, y: 0 },
+    }
+    const commands = [
+      { tick: held.tick + 1, type: 'reportPose', payload: pose },
+      { tick: held.tick + 2, type: 'openArtefactCache', payload: {} },
+    ]
+    const played = debug.fastForward(2, commands as Parameters<typeof debug.fastForward>[1])
+    if (!played.ok) throw new Error(played.problems.join('; '))
+  })
+  await expect(page.getByTestId(UI_IDS.artefactChoice)).toBeVisible({ timeout: OPEN_TIMEOUT_MS })
+}
+
+/**
+ * Ticket 885: the travel card of a hop from planet 1 to planet 2, docked with the core in the
+ * bay. It shows for its 10 s (`TRAVEL_TRANSITION_SECONDS`); the live game is held meanwhile.
+ */
+export async function openTravelCard(page: Page): Promise<void> {
+  await dockAt(page, 'sell')
+  await page.evaluate((core) => {
+    const debug = window.steampunkDebug!
+    const filled = debug.setCoreFragments(core)
+    if (!filled.ok) throw new Error(filled.problems.join('; '))
+    const held = debug.pause()
+    if (!held.ok) throw new Error(held.problems.join('; '))
+    const travel = { tick: held.tick + 1, type: 'travel', payload: { toPlanet: 2 } }
+    const played = debug.fastForward(1, [travel] as Parameters<typeof debug.fastForward>[1])
+    if (!played.ok) throw new Error(played.problems.join('; '))
+  }, PLANET_1_CORE)
+  await expect(page.getByTestId(TRAVEL_CARD_TEST_ID)).toBeVisible({ timeout: OPEN_TIMEOUT_MS })
 }
 
 async function openTitleMenu(page: Page): Promise<void> {

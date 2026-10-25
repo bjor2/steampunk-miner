@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { TITLE_WORDS_MAX, ONE_LINE_WORDS_MAX } from '../../constants/uiParts'
 import { planetDisplayNameOf } from '../registries/planetRow'
 import { planetGravityTraitOf } from './localGravityReading'
-import { TRAVEL_CARD_FACT_IDS, travelCardViewOf } from './travelCardView'
+import { TRAVEL_CARD_FACT_IDS } from './travelCardIds'
+import { travelCardViewOf } from './travelCardView'
 
 const HOP = { fromPlanet: 1, toPlanet: 2, seconds: 10 }
 

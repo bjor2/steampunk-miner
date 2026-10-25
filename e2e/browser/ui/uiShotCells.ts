@@ -25,3 +25,15 @@ export const UI_SHOT_CELLS: readonly UiShotCell[] = [
   { name: 'desktop-1440x900', viewport: { width: 1440, height: 900 }, ...DESKTOP, ...PLAIN },
   { name: 'desktop-1920x1080', viewport: { width: 1920, height: 1080 }, ...DESKTOP, ...PLAIN },
 ]
+
+/**
+ * Ticket 885's cells for the brass screens (the artefact choice and the travel card): the 360 px
+ * phone and the 1280, 1920 and 2560 desktops; 2560x1440 is ticket 772's widest golden, shot here
+ * for these two screens only.
+ */
+export const BRASS_SHOT_CELLS: readonly UiShotCell[] = [
+  ...UI_SHOT_CELLS.filter((cell) =>
+    ['phone-360x640', 'desktop-1280x800', 'desktop-1920x1080'].includes(cell.name),
+  ),
+  { name: 'desktop-2560x1440', viewport: { width: 2560, height: 1440 }, ...DESKTOP, ...PLAIN },
+]

@@ -3,6 +3,8 @@ import { createMemorySink, type MemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { resetGameStore } from '../store/gameStore'
 import { validateScenario } from '../systems/scenario'
+import { artefactCacheTile } from '../systems/world/artefactCache'
+import { planetParamsFor } from '../systems/world/planetParams'
 import { createDebugApi } from './debugApi'
 
 let sink: MemorySink
@@ -64,6 +66,13 @@ describe('debug api: artefacts (#46)', () => {
     })
     debug.setPlanet(2)
     expect(debug.artefact()).toMatchObject({ cacheState: 'inert' })
+  })
+
+  it('reads where this planet’s cache lies, for a spec that reports the rig onto it', () => {
+    expect(createDebugApi().artefactCacheTile()).toEqual({
+      ok: true,
+      tile: artefactCacheTile(planetParamsFor(1, 1)),
+    })
   })
 
   it('refuses a scenario whose artefact id is not registered', () => {

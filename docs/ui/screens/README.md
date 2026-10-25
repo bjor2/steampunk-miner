@@ -23,12 +23,14 @@ npm run ui:screens:update
 It runs the suite and writes `docs/ui/screens/<cell>/<shot>.jpg`. A failing test still writes its
 shot first, so the picture of a broken layout is there to look at.
 
-| Cell               | Window (CSS px) | Layout  | Budget |
-| ------------------ | --------------- | ------- | ------ |
-| `phone-360x640`    | 360 x 640       | phone   | 12%    |
-| `phone-390x844`    | 390 x 844       | phone   | 12%    |
-| `desktop-1280x800` | 1280 x 800      | desktop | 8%     |
-| `desktop-1440x900` | 1440 x 900      | desktop | 8%     |
+| Cell                | Window (CSS px) | Layout  | Budget |
+| ------------------- | --------------- | ------- | ------ |
+| `phone-360x640`     | 360 x 640       | phone   | 12%    |
+| `phone-390x844`     | 390 x 844       | phone   | 12%    |
+| `desktop-1280x800`  | 1280 x 800      | desktop | 8%     |
+| `desktop-1440x900`  | 1440 x 900      | desktop | 8%     |
+| `desktop-1920x1080` | 1920 x 1080     | desktop | 8%     |
+| `desktop-2560x1440` | 2560 x 1440     | desktop | 8%     |
 
 The phones are Chromium emulation (`isMobile`, `hasTouch`) at DPR 1, not shots from a device.
 
@@ -49,7 +51,12 @@ The phones are Chromium emulation (`isMobile`, `hasTouch`) at DPR 1, not shots f
 | `base-sheet`        | the shared sheet on the example's probe tabs    |
 | `sell-receipt`      | the sale receipt after a wide P41+ haul         |
 | `unlock-reveal`     | the reveal plate after the guns are mounted     |
+| `artefact-choice`   | the artefact cache's cards, on brass (885)      |
+| `travel-card`       | the travel card of a P1 to P2 hop (885)         |
 | `title-menu`        | the title menu                                  |
+
+`desktop-2560x1440` holds only the two brass screens, shot by `brassScreens.spec.ts` (ticket
+885), which also fails on a control off the kit or a figure outside an icon-plus-value fact.
 
 The sheets are a table, `e2e/browser/ui/uiShotSheets.ts`: a sheet the shared sheet component (#686)
 or a later ticket adds joins as one row.

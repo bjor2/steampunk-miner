@@ -9,7 +9,10 @@ import {
   setArtefactCommand,
 } from '../systems/artefacts/artefactCommands'
 import { artefactReportOf, type ArtefactReport } from '../systems/authority/heldArtefact'
+import { planetParamsOf } from '../systems/authority/planetOfState'
 import { isCacheLive, isOreWhispering, type ArtefactLook } from '../systems/render/artefactLook'
+import { artefactCacheTile } from '../systems/world/artefactCache'
+import type { TilePoint } from '../systems/world/tileGrid'
 import { readAuthorityState, submitCommand, submitUnlessRefused } from './authorityLink'
 
 export interface ArtefactActions {
@@ -33,6 +36,12 @@ export function artefactActionsOf(playerIdOf: () => string): ArtefactActions {
 export function readArtefactReport(playerId: string): ArtefactReport {
   const state = readAuthorityState()
   return artefactReportOf(state.players[playerId].artefact, state.planet.index)
+}
+
+/** Where this planet's cache lies (#46), for a spec that drives onto it; null off a planet. */
+export function readArtefactCacheTile(): TilePoint | null {
+  const params = planetParamsOf(readAuthorityState().planet)
+  return params === null ? null : artefactCacheTile(params)
 }
 
 /** The local player's artefact look, written into the frame's scratch (no allocation). */

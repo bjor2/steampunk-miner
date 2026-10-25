@@ -56,7 +56,7 @@ import {
 import { facilityLevelProblems } from '../systems/authority/platformState'
 import type { ArtefactReport } from '../systems/authority/heldArtefact'
 import { setArtefactCommand } from '../systems/artefacts/artefactCommands'
-import { readArtefactReport } from '../store/artefactActions'
+import { readArtefactCacheTile, readArtefactReport } from '../store/artefactActions'
 import { readPremiumLedger } from '../store/premiumLedgerDebugActions'
 import type { PremiumLedger } from '../systems/authority/premium/premiumLedger'
 import { setPremiumLedgerCommand } from '../systems/authority/premium/premiumLedgerDebugRules'
@@ -66,6 +66,7 @@ import { setVehicleLoadoutCommand } from '../systems/authority/loadoutCommands'
 import { readSnapshot, type SessionSnapshot } from '../systems/authority/sessionSnapshot'
 import { fastForwardProblems, type ScriptedCommand } from '../systems/fastForward'
 import { validateScenario, type Scenario } from '../systems/scenario'
+import type { TilePoint } from '../systems/world/tileGrid'
 import { startScenarioProblems } from '../systems/startScenario'
 import { setCoreFragmentsCommand } from '../systems/startScenarioCommands'
 import { carveCircleCommand, fillCircleCommand } from '../systems/authority/groundCommands'
@@ -215,6 +216,8 @@ export interface DebugApi {
   setArtefact(optionId: string): DebugResult
   /** `{ artefactId, breathingRoomCharges, cacheState }` for the local player on this planet. */
   artefact(): DebugResult<ArtefactReport>
+  /** This planet's cache tile (ticket 885: the shot suite reports the rig onto it); not logged. */
+  artefactCacheTile(): DebugResult<{ tile: TilePoint }>
   // premium ledger (ticket 844): the setter is a `debug.*` command, the read is not logged
   /** The local player's ledger replaced with `counts`, keyed `tier:s:p:speciesId`. */
   setPremiumLedger(counts: Readonly<Record<string, string>>): DebugResult
@@ -311,6 +314,12 @@ function runAndReportPoint(problems: string[], run: () => void): DebugResult<Ses
 }
 
 const game = (): GameState => useGameStore.getState()
+
+function artefactCacheTileNow(): DebugResult<{ tile: TilePoint }> {
+  const tile = readArtefactCacheTile()
+  if (tile === null) return { ok: false, problems: ['the session is on no generated planet'] }
+  return { ok: true, tile }
+}
 
 function enemyKindProblems(kind: unknown): string[] {
   if (isEnemyKind(kind)) return []
@@ -439,6 +448,7 @@ export function createDebugApi(): DebugApi {
         game().setArtefact(optionId),
       ),
     artefact: () => ({ ok: true, ...readArtefactReport(game().playerId) }),
+    artefactCacheTile: artefactCacheTileNow,
     setPremiumLedger: (counts) =>
       runUnlessRefused(vehicleDebugProblems(setPremiumLedgerCommand(counts)), () =>
         game().setPremiumLedger(counts),

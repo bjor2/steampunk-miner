@@ -1069,6 +1069,28 @@
       "specs": ["e2e/browser/ui/desktopGoldens.spec.ts"]
     },
     {
+      "why": "The artefact choice and the travel card on brass (ticket 885): at 360x640, 1280x800, 1920x1080 and 2560x1440 each in the kit's sheet frame, no control off the kit, no shown figure outside an icon-plus-value fact, the travel card out of the middle band; its title is what the jump specs wait on.",
+      "paths": [
+        "src/ui/artefact/**",
+        "src/ui/travel/**",
+        "src/ui/kit/IconFacts*",
+        "src/ui/kit/Panel*",
+        "src/ui/kit/Button*",
+        "src/ui/ScreenButtonView*",
+        "src/systems/views/artefactChoiceModel.ts",
+        "src/systems/views/artefactCardFace.ts",
+        "src/systems/views/travelCardView.ts",
+        "src/systems/views/travelCardIds.ts",
+        "src/systems/views/brassCrop.ts",
+        "src/store/artefactActions.ts"
+      ],
+      "specs": [
+        "e2e/browser/ui/brassScreens.spec.ts",
+        "e2e/browser/ui/uiShots.spec.ts",
+        "e2e/browser/ui/starMapJump.spec.ts"
+      ]
+    },
+    {
       "why": "One menu per building (ticket 734): the sheet a dock opens is that bay's one menu, closed once, with no bay frame hidden behind a phone's full sheet. The sheet slice, the bay screen's shutter, the workshop's dock hook and the debug sheet reads reach it.",
       "paths": [
         "src/store/sheetSlice.ts",

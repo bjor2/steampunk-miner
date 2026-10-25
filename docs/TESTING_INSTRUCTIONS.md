@@ -1766,6 +1766,15 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   cluster's goldens (ticket 716): on P41 with money at 1e15 and the hull and fuel red, on the
   surface and at 9000 bp deep, the strip must not spill, the depth dial must carry its five planet
   marks, and on desktop every hovered dial's number tag must be the same width. Box Tester only.
+- **Brass screens** (ticket 885, spec #678): the artefact choice and the travel card are rows of
+  `ui/uiShotSheets.ts` (the rig reported onto the cache's tile with the game held, through
+  `steampunkDebug.artefactCacheTile()`; a P1 to P2 Travel with the core in the bay), and
+  `e2e/browser/ui/brassScreens.spec.ts` crops both at 360x640, 1280x800, 1920x1080 and 2560x1440
+  (`BRASS_SHOT_CELLS`): it fails on a shown control without `data-kit-control`, a shown text with a
+  digit outside a `data-fact` icon-plus-value fact, a root outside `data-frame="sheet"`, and the
+  travel card in the middle band (`ui/brassCrop.ts`). The same marks are judged on a server render
+  in the unit suite (`systems/views/brassCrop.test.ts`, `ui/brassScreens.test.ts`). Box Tester
+  only for the browser half.
 - **Sell bay panel slot** (ticket 845, spec #647; the TD ruling on #821 Q3, HS 3): the order and the
   pages are pure (`systems/views/bayPanelPages.test.ts`: by order then panel id, every row on a
   phone, `layout.bayPanels.desktopPerPage` (2) a desktop page turning round, a 1001-row list drawn
