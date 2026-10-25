@@ -103,11 +103,15 @@ function bandCellsOf(entries: readonly OreMixEntry[]): BandCell[] {
 }
 
 function valueOf(cell: Pick<BandCell, 'weightBp' | 'lead'>, top: number): number {
-  return (
-    cell.weightBp *
-    VALUE_RATIO_NUMERATOR ** cell.lead *
-    VALUE_RATIO_DENOMINATOR ** (top - cell.lead)
-  )
+  const numerator = wholePowerOf(VALUE_RATIO_NUMERATOR, cell.lead)
+  return cell.weightBp * numerator * wholePowerOf(VALUE_RATIO_DENOMINATOR, top - cell.lead)
+}
+
+/** `base^exponent` by a multiply loop, exact for the small leads a mix paints. */
+function wholePowerOf(base: number, exponent: number): number {
+  let power = 1
+  for (let at = 0; at < exponent; at += 1) power *= base
+  return power
 }
 
 function isCellOfRun(cell: BandCell, run: PaintedRun): boolean {
