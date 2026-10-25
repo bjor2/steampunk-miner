@@ -1,7 +1,8 @@
 """
-Review renders of the dynamite sizes (#145, for the #153 look and the #143 ladder): the rack with
-its ten stick models and the wire reel, front and three-quarter, and the ten planted props as a
-ladder on their tiles, front and three-quarter.
+Review renders of the dynamite art (#145, for the #153 look and the #143 ladder; D7 ticket 866 for
+the 12 typed sizes): the rack with its three type bays, stock pips, reel, plunger and nozzle, front
+and three-quarter; the twelve planted props as a ladder on their tiles, front and three-quarter;
+and the five crater decals in a row.
 
     blender -b --factory-startup --python-exit-code 1 -P docs/art/dynamite/render_dynamite.py
     python3 docs/art/dynamite/sheet_dynamite.py
@@ -27,7 +28,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.abspath(os.path.join(HERE, '..', '..', '..'))
 RACK_ID = 'vehicle-dynamite-rack'
 PROP_ID = 'prop-dynamite-charge'
-SIZE_COUNT = 10
+CRATER_ID = 'prop-blast-crater'
+SIZE_COUNT = 12
+DECAL_IDS = ('crater-1', 'crater-2', 'crater-3', 'crater-cased-rim', 'crater-cased-trim')
 LADDER_PITCH_M = 1.25
 RACK_PX_PER_M = 768
 LADDER_PX_PER_M = 256
@@ -43,6 +46,8 @@ def main():
     render_rack()
     stage_ladder()
     render_ladder()
+    stage_decals()
+    render_decals()
 
 
 # --- scenes --------------------------------------------------------------------------------------
@@ -57,7 +62,7 @@ def open_source(asset_id):
 
 
 def stage_ladder():
-    """The ten planted sizes side by side, each on its own tile, size 1 on the left."""
+    """The twelve planted sizes side by side, each on its own tile, size 1 on the left."""
     bpy.ops.wm.read_factory_settings(use_empty=True)
     for obj in append_parts_of(PROP_ID):
         obj.location.x += ladder_x(size_of(obj.name))
@@ -68,6 +73,36 @@ def stage_ladder():
 
 def ladder_x(size):
     return (size - 1 - (SIZE_COUNT - 1) / 2) * LADDER_PITCH_M
+
+
+def stage_decals():
+    """The five crater decals in a row on band rock, each tinted as the build would: soot for the
+    types, a brass plate and its cement seam for the cased rim and trim."""
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    tints = {'crater-1': (0.16, 0.10, 0.07), 'crater-2': (0.12, 0.10, 0.16), 'crater-3': (0.06, 0.10, 0.14),
+             'crater-cased-rim': (0.86, 0.70, 0.35), 'crater-cased-trim': (0.24, 0.17, 0.08)}
+    for obj in append_parts_of(CRATER_ID):
+        obj.location.x += decal_x(obj.name)
+        tint_decal(obj, tints[obj.name])
+    for part_id in DECAL_IDS:
+        add_tile(decal_x(part_id), size=1.4)
+    stage_lights_and_world()
+
+
+def decal_x(part_id):
+    return (DECAL_IDS.index(part_id) - (len(DECAL_IDS) - 1) / 2) * 1.6
+
+
+def tint_decal(obj, tint):
+    """Multiplies each material's base colour by the tint, as the decal shader does at run time."""
+    for slot in obj.material_slots:
+        material = slot.material.copy()
+        slot.material = material
+        shader = next(node for node in material.node_tree.nodes if node.type == 'BSDF_PRINCIPLED')
+        mix = next((node for node in material.node_tree.nodes if node.type == 'MIX' and node.data_type == 'RGBA'), None)
+        for socket in ([mix.inputs['A'], mix.inputs['B']] if mix is not None else [shader.inputs['Base Color']]):
+            r, g, b, a = socket.default_value
+            socket.default_value = (r * tint[0] * 1.6, g * tint[1] * 1.6, b * tint[2] * 1.6, a)
 
 
 def size_of(part_name):
@@ -83,10 +118,10 @@ def append_parts_of(asset_id):
     return parts
 
 
-def add_tile(x):
+def add_tile(x, size=1.0):
     bpy.ops.mesh.primitive_cube_add(size=1.0, location=(x, 0.6, 0.0))
     tile = bpy.context.view_layer.objects.active
-    tile.scale = (1.0, 0.2, 1.0)
+    tile.scale = (size, 0.2, size)
     tile.data.materials.append(tile_material())
 
 
@@ -206,7 +241,7 @@ def render_rack():
 
 
 def render_ladder():
-    """The ten sizes on their tiles at 256 px/m, then the same from front-right and above."""
+    """The twelve sizes on their tiles at 256 px/m, then the same from front-right and above."""
     width = SIZE_COUNT * LADDER_PITCH_M + 0.5
     height = 1.4
     frame_orthographic((0.0, 0.0), width, height, LADDER_PX_PER_M)
@@ -214,6 +249,13 @@ def render_ladder():
     eye = (width * 0.3, -width * 1.15, height * 3.5)
     frame_perspective(eye, (0.0, 0.0, 0.0), 40.0, 2400, 720)
     render_to(output_path('planted.three-quarter.raw.png'))
+
+
+def render_decals():
+    """The five decals on their tiles at 256 px/m."""
+    width = len(DECAL_IDS) * 1.6 + 0.4
+    frame_orthographic((0.0, 0.0), width, 1.6, LADDER_PX_PER_M)
+    render_to(output_path('crater.decals.raw.png'))
 
 
 if __name__ == '__main__':

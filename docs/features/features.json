@@ -391,9 +391,9 @@
             },
             {
               "title": "Dynamite sizes",
-              "description": "Ten charge sizes from a 2.5- to a 24-tile blast, one more every 3 planets from planet 10, each taking more rack slots and costing more; V picks the size B plants. Sizes 7 to 10 wait for the plunger, and their own looks and rack panel are still to come.",
+              "description": "Twelve charge sizes in three types from a 2.5- to a 37-tile blast, one more every 3 planets from planet 10, each taking more rack slots and costing more; V picks the size B plants. Sizes 7 to 12 wait for the plunger. Every size has its own model on the wall; each type has its own stick colour, fuse sparks and crater decal; the rack on the rig shows a bay per type with a lit pip per charge carried, the plunger beside its reel, and two rings round a live charge, the dashed danger zone inside the ground it will clear.",
               "status": "partial",
-              "issues": [218, 149, 215],
+              "issues": [218, 149, 215, 860, 866],
               "planet": 10
             }
           ]

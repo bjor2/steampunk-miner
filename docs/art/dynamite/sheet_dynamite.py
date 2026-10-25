@@ -1,6 +1,6 @@
 """
-The review sheets cut from render_dynamite.py's renders (#145): each render flattened on the
-review background, the rack and the ladder in grayscale, and the ladder resampled to a 1080p
+The review sheets cut from render_dynamite.py's renders (#145, D7 #866): each render flattened on
+the review background, the rack, the ladder and the decals in grayscale, and the ladder resampled to a 1080p
 screen's 90 px/m at the default 12 m zoom (#39), the size the player sees a planted charge at.
 Needs Pillow; run after the Blender render:
 
@@ -18,7 +18,7 @@ INGAME_PX_PER_M = 90
 
 
 def main():
-    for name in ('rack.front', 'rack.three-quarter', 'planted.ladder', 'planted.three-quarter'):
+    for name in ('rack.front', 'rack.three-quarter', 'planted.ladder', 'planted.three-quarter', 'crater.decals'):
         raw = Image.open(raw_path(name)).convert('RGBA')
         flatten(raw).save(output_path(name + '.png'))
         if not name.endswith('three-quarter'):

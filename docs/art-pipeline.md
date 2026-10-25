@@ -369,36 +369,56 @@ replaced them ([#215](https://github.com/bjor2/steampunk-miner/issues/215), belo
 
 ## Dynamite sizes
 
-The art of the ten dynamite sizes ([#145](https://github.com/bjor2/steampunk-miner/issues/145),
+The art of the twelve dynamite sizes ([#145](https://github.com/bjor2/steampunk-miner/issues/145),
 for the design [#153](https://github.com/bjor2/steampunk-miner/issues/153) and the ladder on
-[#143](https://github.com/bjor2/steampunk-miner/issues/143)), owned by the `dynamite-visuals`
-slice, which registers both ids through `r.artAssets` (#214) and draws them
+[#143](https://github.com/bjor2/steampunk-miner/issues/143); the 12-row, three-type ladder of D1
+[#860](https://github.com/bjor2/steampunk-miner/issues/860) and the typed art of D7
+[#866](https://github.com/bjor2/steampunk-miner/issues/866)), owned by the `dynamite-visuals`
+slice, which registers the ids through `r.artAssets` (#214) and draws them
 ([#215](https://github.com/bjor2/steampunk-miner/issues/215)). Their part ids follow the kernel's
-`blastingCharges.sizes`, so a size the economy table doesn't list is never registered, and a new
-rung fails the asset lint until it is modelled.
+`blastingCharges.sizes` (a planted body and lamp per size, a rack bay per type), so a size or type
+the economy table doesn't list is never registered, and a new rung fails the asset lint until it
+is modelled.
 
-| Id                      | Source         | What the build draws                                                                       |
-| ----------------------- | -------------- | ------------------------------------------------------------------------------------------ |
-| `vehicle-dynamite-rack` | Blender, parts | the rack at `hull.rear`: `rack-frame`, `stick-1` to `stick-10` as they open, `wire-reel`   |
-| `prop-dynamite-charge`  | Blender, parts | the planted size: `planted-<n>` at the charge's tile, with `lamp-<n>` blinking on its fuse |
+| Id                      | Source         | What the build draws                                                                                                                                        |
+| ----------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `vehicle-dynamite-rack` | Blender, parts | the rack at `hull.rear`: `rack-frame`, `slot-<type>` as a type opens, `pip-<type>-<n>` per charge carried, `wire-reel` and `plunger` (P22), `casing-nozzle` |
+| `prop-dynamite-charge`  | Blender, parts | the planted size: `planted-<n>` at the charge's tile, with `lamp-<n>` blinking on its fuse                                                                  |
+| `prop-blast-crater`     | Blender, parts | the crater decals: `crater-<type>` in the type's soot, `crater-cased-rim` and `crater-cased-trim` tinted in the laid casing's plate and trim                |
 
+- The look rows live in `src/features/dynamite-visuals/dynamiteLooks.json` (D7): one row per
+  charge type with its stick colour, spark colour, ring colour, soot tint and crater part, plus
+  the fuse sparks, the Blast Casing row (#862) and the Blast Radius row (#869). The author script
+  reads the type colours from it, so the art and the rows never drift, and the per-upgrade looks
+  check (`rigLookLines.test.ts`, ticket 809) asserts every type has a row.
 - The rack is authored in its own frame with the attach point at the origin, like the other gear
-  (K5), and holds one model per size on five shelves. The slice registers the attach use
-  `dynamite-visuals.rack` (`blasting_charges` on `hull.rear`) and hangs the rack there as a
-  vehicle piece (#235), behind the body's parts. Once the rack is bolted on it shows its frame and
-  a stick for every size open on the planet, so a new size shows the day it opens; the reel shows
-  from the remote detonator's unlock (#153 amendment 2: no new attach point).
-  `steampunkDebug.features['dynamite-visuals'].getRack()` lists the parts it shows.
+  (K5), with three bays, one a type, each over eight pip sockets. The slice registers the attach
+  use `dynamite-visuals.rack` (`blasting_charges` on `hull.rear`) and hangs the rack there as a
+  vehicle piece (#235), behind the body's parts. Once the rack is bolted on it shows its frame, a
+  bay's bundle for every type with a size open on the planet, and one lit pip per charge of the
+  type carried; the reel and plunger from the remote detonator's unlock (#153 amendment 2: no new
+  attach point); the nozzle once the Blast Casing node is owned. The bundles grow with the Blast
+  Radius band about their pivot. `steampunkDebug.features['dynamite-visuals'].getRack()` lists the
+  parts it shows.
 - Every planted size sits at the origin with its pivot at its centre, so the slice's planted layer
   draws the charge's size where the charge is. The lamp is apart from the body so it blinks by
-  showing and hiding, faster in the fuse's last second; a remote charge's never hurries.
-- The blast itself is procedural, the slice's second scene layer: each `BlastFront` slice (K6)
-  throws fire and dust across the ring it uncovered and debris out of it, so the ring rides the
+  showing and hiding, faster in the fuse's last second; a remote charge's never hurries. Every
+  size of a type wears the type's stick colour on its charge bodies and its spark colour in the
+  lamp glass; sizes 11 (a caisson of two bombs) and 12 (a spiked mine) are the biggest.
+- The blast itself is procedural, the slice's front layer: each `BlastFront` slice (K6) throws
+  fire and dust across the ring it uncovered and debris out of it, so the ring rides the
   clearing's edge; each detonation lights the size's flash sprite for two frames while the flash
-  switch is on. Four pooled draw calls (fire and dust points, one instanced debris mesh, the
-  sprite), declared with the planted layer's eight within `SCENE_LAYER_LINE` (#213).
-- `scripts/art/author_dynamite_sizes.py` wrote the first version of both `.blend` files. From
-  then on the `.blend` files are the sources. The review renders are in
+  switch is on. Three pooled draw calls (fire and dust points of 256 each, the sprite), the debris
+  in the kernel spray (ticket 348).
+- The marks layer (D7) draws what a charge leaves and wears in five pooled calls within what the
+  dust pool gave up: the planet's last six craters as decals cut from `prop-blast-crater`, scaled
+  to the ground radius and tinted (the type's soot, or with casing laid the grade's plate colour
+  and the lining's trim from `casingGradeLooks.json`); a ring quad per planted slot whose shader
+  draws the dashed danger ring inside the solid ground ring in the type's colour; and a fuse-spark
+  point pool per type in its spark colour, fed from each burning charge's lamp.
+  `steampunkDebug.features['dynamite-visuals'].getMarks()` reports what it holds and its peak.
+- `scripts/art/author_dynamite_sizes.py` wrote every version of the three `.blend` files and
+  writes each placeholder sidecar from the scene it authored. The review renders are in
   [docs/art/dynamite/](art/dynamite/README.md).
 
 ## Tech gear
