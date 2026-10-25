@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25T08:44:10+01:00",
+  "updated_at": "2026-10-25T08:46:56+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -91,12 +91,11 @@
         },
         {
           "slot": "C8",
-          "state": "busy",
-          "ticket": 825,
-          "grok_slot": 5,
-          "kind": "dev",
-          "since": "2026-10-25T08:19:00+01:00",
-          "wave": "647-7U"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C9",
@@ -116,14 +115,14 @@
         }
       ],
       "size": 4,
-      "used": 2,
-      "free": 2,
+      "used": 1,
+      "free": 3,
       "claims_last_hour": 2,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -206,11 +205,9 @@
     },
     {
       "slot": 5,
-      "state": "dev",
-      "ticket": 825,
-      "since": "2026-10-25T08:19:00+01:00",
-      "claude_slot": 8,
-      "wave": "647-7U"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 6,
@@ -316,12 +313,11 @@
     },
     {
       "slot": 8,
-      "state": "busy",
-      "ticket": 825,
-      "grok_slot": 5,
-      "since": "2026-10-25T08:19:00+01:00",
-      "account": 2,
-      "wave": "647-7U"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 2
     },
     {
       "slot": 9,
@@ -350,8 +346,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 3,
-      "dev": 3,
+      "used": 2,
+      "dev": 2,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -359,8 +355,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 3,
-      "free": 7,
+      "used": 2,
+      "free": 8,
       "external": 0
     }
   },
@@ -465,7 +461,7 @@
         "done": [
           821
         ],
-        "live": 1
+        "live": 0
       },
       {
         "number": 846,
