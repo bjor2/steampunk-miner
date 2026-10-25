@@ -172,17 +172,18 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/drill-look/drillLook.test.ts` | 6 | 6 |
 | `src/features/drill-look/systems/render/drillLookSteps.test.ts` | 8 | 8 |
 
-### `dynamite`: 5 files, 21 tests
+### `dynamite`: 6 files, 24 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/dynamite/logging.test.ts` | 2 | 2 |
+| `src/features/dynamite/systems/chargeRings.test.ts` | 2 | 2 |
 | `src/features/dynamite/systems/detonateReaction.test.ts` | 3 | 3 |
 | `src/features/dynamite/systems/dynamiteSizes.test.ts` | 4 | 4 |
 | `src/features/dynamite/systems/plunger.test.ts` | 6 | 6 |
-| `src/features/dynamite/systems/rackPanel.test.ts` | 6 | 6 |
+| `src/features/dynamite/systems/rackPanel.test.ts` | 7 | 7 |
 
-### `dynamite-visuals`: 11 files, 57 tests
+### `dynamite-visuals`: 11 files, 58 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -194,7 +195,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dynamite-visuals/systems/render/blastEventQueue.test.ts` | 3 | 3 |
 | `src/features/dynamite-visuals/systems/render/blastFrontLook.test.ts` | 14 | 14 |
 | `src/features/dynamite-visuals/systems/render/blastPreview.test.ts` | 2 | 2 |
-| `src/features/dynamite-visuals/systems/render/dynamiteArt.test.ts` | 3 | 3 |
+| `src/features/dynamite-visuals/systems/render/dynamiteArt.test.ts` | 4 | 4 |
 | `src/features/dynamite-visuals/systems/render/plantedDynamiteLook.test.ts` | 4 | 4 |
 | `src/features/dynamite-visuals/systems/render/rackLook.test.ts` | 6 | 6 |
 
@@ -861,11 +862,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/casingRules.test.ts` | 6 | 6 |
 | `src/systems/authority/casingSupport.test.ts` | 4 | 4 |
 | `src/systems/authority/cellDigEnergy.test.ts` | 4 | 4 |
-| `src/systems/authority/charges/blastFront.test.ts` | 5 | 5 |
+| `src/systems/authority/charges/blastDisc.test.ts` | 8 | 8 |
+| `src/systems/authority/charges/blastFront.test.ts` | 10 | 10 |
 | `src/systems/authority/charges/blastPrefetch.test.ts` | 2 | 2 |
+| `src/systems/authority/charges/chargeBackOut.test.ts` | 4 | 4 |
 | `src/systems/authority/charges/chargeBlast.test.ts` | 17 | 17 |
 | `src/systems/authority/charges/chargeBlastEffects.test.ts` | 3 | 3 |
 | `src/systems/authority/charges/chargeBlastGates.test.ts` | 6 | 6 |
+| `src/systems/authority/charges/chargeDisc.test.ts` | 9 | 9 |
 | `src/systems/authority/charges/chargeLiveBlast.test.ts` | 12 | 12 |
 | `src/systems/authority/charges/chargeShop.test.ts` | 10 | 10 |
 | `src/systems/authority/charges/chargeSizeRules.test.ts` | 14 | 14 |
@@ -1059,6 +1063,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/debug/debugApi.test.ts` | 52 | 51 |
 | `src/debug/debugArtefact.test.ts` | 5 | 5 |
 | `src/debug/debugBot.test.ts` | 2 | 2 |
+| `src/debug/debugCharges.test.ts` | 1 | 1 |
 | `src/debug/debugDevFlags.test.ts` | 4 | 4 |
 | `src/debug/debugHudCoverage.test.ts` | 5 | 5 |
 | `src/debug/debugHudLayout.test.ts` | 5 | 5 |
@@ -1095,7 +1100,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/casingCementGrades.test.ts` | 7 | 7 |
 | `src/systems/economy/casingGrades.test.ts` | 10 | 10 |
 | `src/systems/economy/casingPrices.test.ts` | 8 | 8 |
-| `src/systems/economy/chargeSizes.test.ts` | 23 | 23 |
+| `src/systems/economy/chargeSizes.test.ts` | 29 | 29 |
 | `src/systems/economy/collapseCrush.test.ts` | 2 | 2 |
 | `src/systems/economy/costCurveLookup.test.ts` | 3 | 3 |
 | `src/systems/economy/depthDensityCurve.test.ts` | 7 | 7 |
@@ -1487,6 +1492,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/save/jumpDriveSaves.test.ts` | 4 | 4 |
 | `src/systems/save/loadedSaveDigest.test.ts` | 4 | 4 |
 | `src/systems/save/newerSaveText.test.ts` | 5 | 5 |
+| `src/systems/save/numberedBlasts.test.ts` | 3 | 3 |
 | `src/systems/save/oreRulesOldSaves.test.ts` | 17 | 11 |
 | `src/systems/save/playerProfile.test.ts` | 4 | 4 |
 | `src/systems/save/saveBytesWatch.test.ts` | 2 | 2 |
