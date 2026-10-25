@@ -7,7 +7,7 @@
  * Look only: no price, gate or income reads it.
  */
 import { heroCellsOf, type HeroAtlasCells } from '../../../../systems/render/heroAtlas'
-import { kindEntryOf, type KindLook } from '../../../../systems/render/kindLookTable'
+import { kindEntryOf, spriteIdOf, type KindLook } from '../../../../systems/render/kindLookTable'
 import type { PlanetParams } from '../../../../systems/world/planetParams'
 import { MATERIALS } from '../../../materials'
 import { gemSaleTiersOf, type KindSlot } from '../../../ores'
@@ -36,6 +36,8 @@ export interface ContactSheetRow {
   gemRank: number | null
   /** The tier the gem sells at, `t_top + Δ_k` (ticket 741); null for a non-gem. */
   gemSaleTier: number | null
+  /** The gem-cut library cut a generated gem draws its cell from (ticket 889); absent otherwise. */
+  gemCut?: string
 }
 
 /** Which gem of its planet a kind is: its rank k and the tier it sells at. */
@@ -90,7 +92,7 @@ function contactSheetRowOf(
   heroCells: ReadonlyMap<string, number>,
   gem: GemPlace | null,
 ): ContactSheetRow {
-  const heroCell = look.isHero ? (heroCells.get(look.speciesId) ?? null) : null
+  const heroCell = look.isHero ? (heroCells.get(spriteIdOf(look)) ?? null) : null
   const [silhouetteCode, patternCode, packedColour] = kindEntryOf(look, heroCell)
   const species = MATERIALS.materials.find((row) => row.id === look.speciesId)
   return {
@@ -106,6 +108,7 @@ function contactSheetRowOf(
     heroCell,
     gemRank: gem?.rank ?? null,
     gemSaleTier: gem?.saleTier ?? null,
+    ...(look.spriteId === undefined ? {} : { gemCut: look.spriteId }),
   }
 }
 

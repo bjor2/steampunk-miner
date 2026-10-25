@@ -14,6 +14,7 @@ import {
   packedRgbOf,
   rarityLeadOfEntry,
   rgbOfPacked,
+  spriteIdOf,
   type KindLook,
   type RarityLook,
 } from './kindLookTable'
@@ -72,6 +73,17 @@ describe('material look table', () => {
     expect(rarity).toBe(2 + HERO_LOOK_FLAG * 4)
     expect(rarityLeadOfEntry(rarity)).toBe(2)
     expect(heroCellOfEntry(rarity)).toBe(3)
+  })
+
+  it('looks a hero up by its sprite id where it names one, as a generated gem names its cut (ticket 889)', () => {
+    const cut: KindLook = { ...GEM, speciesId: 'system1-p6-m2', spriteId: 'gem-cut.pear' }
+    const cells = new Map([['gem-cut.pear', 20]])
+    const [, , , packed] = entryOf(kindLookTableOf([cut], [], () => true, cells).kinds, 1)
+    expect(heroCellOfEntry(packed)).toBe(20)
+    const bySpecies = kindLookTableOf([cut], [], () => true, new Map([['system1-p6-m2', 3]]))
+    expect(heroCellOfEntry(entryOf(bySpecies.kinds, 1)[3])).toBe(null)
+    expect(spriteIdOf(cut)).toBe('gem-cut.pear')
+    expect(spriteIdOf(GEM)).toBe('probe-gem')
   })
 
   it('draws a hero with no sprite in the resident atlas with the shader look (ticket 451)', () => {

@@ -1,0 +1,98 @@
+{
+  "$comment": "The gem cuts and overlay of fixed addresses under world seed 20261024 and ore rules 14, the gem slots e3, m1, m2 in pool order (ticket 889). The library is append-only: a cut added with a later `since` never moves these; a change here means a pick moved for a planet already generated. Rewrite only with a deliberate ruling.",
+  "worldSeed": 20261024,
+  "oreRulesVersion": 14,
+  "slots": ["e3", "m1", "m2"],
+  "planets": [
+    {
+      "system": "1",
+      "place": "6",
+      "cuts": {
+        "e3": "gem-cut.pear",
+        "m1": "gem-cut.shield",
+        "m2": "gem-cut.bullet"
+      },
+      "overlay": "veil"
+    },
+    {
+      "system": "1",
+      "place": "7",
+      "cuts": {
+        "e3": "gem-cut.oval",
+        "m1": "gem-cut.briolette",
+        "m2": "gem-cut.half-moon"
+      },
+      "overlay": "star"
+    },
+    {
+      "system": "1",
+      "place": "8",
+      "cuts": {
+        "e3": "gem-cut.radiant",
+        "m1": "gem-cut.cushion",
+        "m2": "gem-cut.shield"
+      },
+      "overlay": "zoning"
+    },
+    {
+      "system": "1",
+      "place": "20",
+      "cuts": {
+        "e3": "gem-cut.radiant",
+        "m1": "gem-cut.hexagon",
+        "m2": "gem-cut.briolette"
+      },
+      "overlay": "facets"
+    },
+    {
+      "system": "1",
+      "place": "40",
+      "cuts": {
+        "e3": "gem-cut.octagon",
+        "m1": "gem-cut.kite",
+        "m2": "gem-cut.baguette"
+      },
+      "overlay": "needles"
+    },
+    {
+      "system": "2",
+      "place": "1",
+      "cuts": {
+        "e3": "gem-cut.princess",
+        "m1": "gem-cut.emerald",
+        "m2": "gem-cut.heart"
+      },
+      "overlay": "fire"
+    },
+    {
+      "system": "2",
+      "place": "3",
+      "cuts": {
+        "e3": "gem-cut.princess",
+        "m1": "gem-cut.lozenge",
+        "m2": "gem-cut.oval"
+      },
+      "overlay": "dew"
+    },
+    {
+      "system": "3",
+      "place": "1",
+      "cuts": {
+        "e3": "gem-cut.lozenge",
+        "m1": "gem-cut.hexagon",
+        "m2": "gem-cut.checkerboard"
+      },
+      "overlay": "silk"
+    },
+    {
+      "system": "1000000",
+      "place": "1",
+      "cuts": {
+        "e3": "gem-cut.heart",
+        "m1": "gem-cut.radiant",
+        "m2": "gem-cut.pear"
+      },
+      "overlay": "veil"
+    }
+  ]
+}

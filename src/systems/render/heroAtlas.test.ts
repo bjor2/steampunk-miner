@@ -17,6 +17,7 @@ import {
   overflowedHeroAtlasOf,
   packHeroPages,
   residentBytesOf,
+  firstHueTintedCellOf,
   type HeroAtlasCells,
   type HeroPlacement,
 } from './heroAtlas'
@@ -44,6 +45,14 @@ const TWO_PAGES: HeroAtlasCells = {
   })),
 }
 
+const CUT_PAGE = 'ground-gem-cut-atlas'
+
+/** Ticket 889: the gem-cut library's hue-tinted page after the act's own page. */
+const WITH_CUTS: HeroAtlasCells = {
+  id: 'foothold.heavy',
+  pages: [...ATLAS.pages, { assetId: CUT_PAGE, cells: ['gem-cut.brilliant'], isHueTinted: true }],
+}
+
 const atlasEntry = (id: string, status: ManifestEntry['status']): ManifestEntry => ({
   id,
   source: 'blender',
@@ -64,6 +73,7 @@ describe('hero atlas (ticket 451)', () => {
         ['violet-fluorite-quartzine', 0],
         ['vein-gold-brassvein', 1],
       ]),
+      firstHueTintedCell: null,
     })
   })
 
@@ -196,6 +206,35 @@ describe('hero atlas pages (ticket 852)', () => {
         ['violet-fluorite-quartzine', HERO_ATLAS_CELLS],
         ['vein-gold-brassvein', HERO_ATLAS_CELLS + 1],
       ]),
+      firstHueTintedCell: null,
     })
+  })
+
+  it("draws the gem-cut library's hue-tinted page after the act's own and says where it begins (ticket 889)", () => {
+    const art = artWith([atlasEntry(PAGE_ONE, 'final'), atlasEntry(CUT_PAGE, 'final')])
+    const drawn = drawnHeroAtlasOf(WITH_CUTS, art)
+    expect(drawn?.albedos).toEqual([mapOf(PAGE_ONE), mapOf(CUT_PAGE)])
+    expect(drawn?.heroCells.get('gem-cut.brilliant')).toBe(HERO_ATLAS_CELLS)
+    expect(drawn?.firstHueTintedCell).toBe(HERO_ATLAS_CELLS)
+    expect(firstHueTintedCellOf(WITH_CUTS.pages)).toBe(HERO_ATLAS_CELLS)
+    expect(firstHueTintedCellOf(ATLAS.pages)).toBe(null)
+    expect(heroAtlasProblems(WITH_CUTS)).toEqual([])
+  })
+
+  it('tints no cell while the cut page has no final map, and moves the first tinted cell with an overflow', () => {
+    const art = artWith([atlasEntry(PAGE_ONE, 'final'), atlasEntry(CUT_PAGE, 'placeholder')])
+    expect(drawnHeroAtlasOf(WITH_CUTS, art)?.firstHueTintedCell).toBe(null)
+    const both = artWith([atlasEntry(PAGE_ONE, 'final'), atlasEntry(CUT_PAGE, 'final')])
+    const drawn = drawnHeroAtlasOf(WITH_CUTS, both)
+    const overflowed = drawn === null ? null : overflowedHeroAtlasOf(drawn)
+    expect(overflowed?.firstHueTintedCell).toBe(3 * HERO_ATLAS_CELLS)
+    expect(overflowed?.heroCells.get('gem-cut.brilliant')).toBe(3 * HERO_ATLAS_CELLS)
+  })
+
+  it('refuses a page that is not hue-tinted after one that is, since the shader tints every cell from the first', () => {
+    const pages = [...WITH_CUTS.pages, { assetId: PAGE_TWO, cells: ['late-hero'] }]
+    expect(heroAtlasProblems({ id: 'foothold.heavy', pages })).toEqual([
+      'foothold.heavy page 3 is not hue-tinted but follows a page that is',
+    ])
   })
 })

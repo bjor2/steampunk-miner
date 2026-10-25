@@ -60,6 +60,7 @@ describe('terrain hero atlas (ticket 451)', () => {
       id: planetOne.id,
       albedos: ['assets/ground/fixture.albedo.ktx2'],
       heroCells: heroCellsOf(planetOne.pages),
+      firstHueTintedCell: null,
     }
   })
   afterEach(() => {

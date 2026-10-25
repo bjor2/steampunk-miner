@@ -25,6 +25,12 @@
  * count come from the ladder's step, and past the authored steps a row of pips in a finish tint
  * along the tile's top as the planet stands. The ladder is written in as constant tables, so a new
  * rank is a data row and the material adds no uniform; reduce motion holds the twinkle at its mean.
+ *
+ * A generated gem draws a cut of the gem-cut library (ticket 889): a neutral sprite on the
+ * hue-tinted pages that follow the act's own, which the shader colours by the kind's hue slot, its
+ * luma kept so a facet highlight stays white, under the planet's overlay (`gemOverlays.ts`), one
+ * of the grain patterns laid over the cut's luma at a bounded strength. `uGemCuts` says where the
+ * tinted cells begin and which overlay the planet wears.
  */
 import {
   HERO_ATLAS_CELL_PX,
@@ -83,6 +89,9 @@ uniform vec4 uKindLooks[KIND_LOOK_SLOTS];
 uniform vec4 uRarityLooks[RARITY_LOOK_LEADS];
 // The first-contact flourish (ticket 698): the roster slot met, the uTime it started, its seconds.
 uniform vec4 uRarityReveal;
+// The gem cuts (ticket 889, gemCutsLook.ts): the act-wide cell the hue-tinted library pages begin
+// at (past every cell with none), the planet's overlay pattern code and its signed strength.
+uniform vec4 uGemCuts;
 #ifdef TERRAIN_HERO_ATLAS
 // The resident act's hero sprites (ticket 451), albedo with the mask in alpha: the 16th unit,
 // one layer per page (ticket 852).
@@ -290,9 +299,27 @@ float heroMaskOff(float cell, vec2 sprite, vec2 off, vec2 dx, vec2 dy) {
   return textureGrad(uHeroAtlas, heroAtlasUv(cell, clamp(sprite + off, 0.0, 1.0)), dx, dy).a;
 }
 
+// A neutral cut coloured by the kind's hue (ticket 889): the planet's overlay swings the cut's own
+// luma first, then the hue takes the luma below the middle and the luma above it runs to white, so
+// a facet highlight stays a highlight whatever the hue.
+vec3 gemCutSkin(vec3 skin, vec3 hue, vec2 sprite, vec2 tile) {
+  float luma = dot(skin, vec3(0.299, 0.587, 0.114));
+  int overlay = int(uGemCuts.y + 0.5);
+  if (overlay > 0) {
+    vec4 pattern = KIND_PATTERNS[overlay];
+    vec4 standIn = vec4(length(sprite - 0.5) - 0.4, 1.0, sprite - 0.5);
+    float value = patternValue(int(pattern.x + 0.5), pattern, KIND_PATTERN_AXES[overlay], sprite, tile, standIn);
+    luma = clamp(luma * (1.0 + uGemCuts.z * clamp(value, -1.0, 1.0)), 0.0, 1.0);
+  }
+  vec3 shaded = hue * luma * 2.0;
+  vec3 lit = mix(hue, vec3(1.0), (luma - 0.5) * 2.0);
+  return luma < 0.5 ? shaded : lit;
+}
+
 // Draws the cell's sprite upright on the planet (its image top along up) and the rarity's tint
 // and glow, the frame on the band just outside its mask; answers the share of the tile it covers.
 // Gradients come from the world's, taken outside the ore branch, since the cell differs per tile.
+// A cell on the hue-tinted pages is a neutral gem cut coloured by the kind's hue (ticket 889).
 float drawHeroSprite(vec4 kind, float reveal, float cell, vec2 local, vec2 up, vec2 worldDx, vec2 worldDy, vec2 tile, inout vec3 colour, inout vec3 emissive) {
   vec2 right = vec2(up.y, -up.x);
   vec2 fromCentre = local - 0.5;
@@ -303,7 +330,9 @@ float drawHeroSprite(vec4 kind, float reveal, float cell, vec2 local, vec2 up, v
   vec4 texel = textureGrad(uHeroAtlas, heroAtlasUv(cell, sprite), dx, dy);
   float isInCell = step(0.0, sprite.x) * step(sprite.x, 1.0) * step(0.0, sprite.y) * step(sprite.y, 1.0);
   float inside = texel.a * isInCell;
-  colour = mix(colour, linearToDisplay(texel.rgb), inside);
+  vec3 skin = linearToDisplay(texel.rgb);
+  if (cell >= uGemCuts.x) skin = gemCutSkin(skin, rgbOfPacked(kind.z), sprite, tile);
+  colour = mix(colour, skin, inside);
   int lead = rarityLeadOf(kind);
   if (lead < 1) return inside;
   vec4 rarity = uRarityLooks[lead - 1];

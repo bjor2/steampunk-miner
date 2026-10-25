@@ -6,12 +6,14 @@
  * per-act hero atlas (ticket 451): whether the probe gave it the 16th unit, the act resident, its
  * pages and cells (ticket 852) and how many binds there have been, so a spec sees a swap happen only at a change of act,
  * and the first-contact flourishes started (ticket 698), so a spec sees one per species met, and
- * each gem's rank glint (ticket 786) as the shader unpacks it.
+ * each gem's rank glint (ticket 786) as the shader unpacks it, and the planet's gem cuts (ticket
+ * 889): where the hue-tinted library pages begin and the overlay laid over every cut.
  */
 import { packHeroAtlasOverflow } from '../scene/heroAtlasOverflowSwitch'
 import { heroAtlasPresence } from '../scene/heroAtlasPresence'
 import { kindLookPresence } from '../scene/kindLookPresence'
 import { speciesRevealPresence } from '../scene/speciesRevealPresence'
+import type { GemCutsLook } from '../systems/render/gemCutsLook'
 import { gemGlintOfCode, type GemGlint } from '../systems/render/gemGlint'
 import {
   gemGlintCodeOfEntry,
@@ -57,10 +59,12 @@ export interface DrawnKindLooks {
   heroAtlas: DrawnHeroAtlasRead
   /** First-contact flourishes since the page loaded (ticket 698): one per species met. */
   reveals: typeof speciesRevealPresence
+  /** The gem cuts' uniform as last written (ticket 889). */
+  gemCuts: GemCutsLook
 }
 
 export function readDrawnKindLooks(): DebugResult<{ looks: DrawnKindLooks }> {
-  const { table, isEveryKindShown } = kindLookPresence
+  const { table, isEveryKindShown, gemCuts } = kindLookPresence
   const slots = Array.from({ length: KIND_LOOK_SLOTS }, (_, at) => drawnLookOf(table.kinds, at))
   return {
     ok: true,
@@ -69,6 +73,7 @@ export function readDrawnKindLooks(): DebugResult<{ looks: DrawnKindLooks }> {
       shown: slots.filter((look) => look.silhouetteCode > 0),
       heroAtlas: { ...heroAtlasPresence, heroCells: [...heroAtlasPresence.heroCells] },
       reveals: { ...speciesRevealPresence },
+      gemCuts: { ...gemCuts, overlay: { ...gemCuts.overlay } },
     },
   }
 }

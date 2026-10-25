@@ -39,6 +39,7 @@ export function bindHeroAtlas(
   heroAtlasPresence.residentId = atlas.id
   heroAtlasPresence.pages = pages.length
   heroAtlasPresence.heroCells = atlas.heroCells
+  heroAtlasPresence.firstHueTintedCell = atlas.firstHueTintedCell
   heroAtlasPresence.binds++
   return layers
 }
@@ -59,6 +60,7 @@ function unbindHeroAtlas(material: ShaderMaterial): void {
   heroAtlasPresence.residentId = null
   heroAtlasPresence.pages = 0
   heroAtlasPresence.heroCells = NO_HERO_CELLS_BOUND
+  heroAtlasPresence.firstHueTintedCell = null
 }
 
 function refuseHeroAtlas(pages: readonly Texture[], atlas: DrawnHeroAtlas): void {

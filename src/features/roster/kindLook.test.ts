@@ -41,6 +41,8 @@ import { NAMED_SEEDS } from './rosterFixtures'
 import { renderStateDigestOf } from './renderStateFixtures'
 import { planetRosterOf, ROSTER_ORE_RULES } from './systems/planetRoster'
 import { gemSaleTierOfKind } from './systems/rosterGems'
+import { gemCutPagesOf } from '../gem-cuts'
+import { heroAtlasOfAct } from '../mineral-skins'
 import { actOf } from '../planet-mix'
 import {
   heroAtlasOfPlanet,
@@ -299,9 +301,23 @@ describe('roster hero atlases (ticket 451)', () => {
     expect([3, 4, 5, 6, 7].every((planet) => heroAtlasOfPlanet(planet) === heavy)).toBe(true)
   })
 
-  it('hands an act with no hero art no atlas, so its heroes draw the shader look', () => {
+  it("hands an act with no hero art the gem-cut library's hue-tinted pages alone, one object per act (ticket 889)", () => {
     expect(actOf(8).id).toBe('fire')
-    expect(heroAtlasOfPlanet(8)).toBe(null)
+    const fire = heroAtlasOfPlanet(8)
+    expect(fire?.id).toBe('fire')
+    expect(fire?.pages.map((page) => page.assetId)).toEqual(
+      gemCutPagesOf().map((page) => page.assetId),
+    )
+    expect(fire?.pages.every((page) => page.isHueTinted)).toBe(true)
+    expect([9, 12, 16].every((planet) => heroAtlasOfPlanet(planet) === fire)).toBe(true)
+  })
+
+  it("appends the library's pages after the P2 act's own, and gives P1's act none (ticket 889)", () => {
+    const heavy = heroAtlasOfPlanet(2)
+    const own = heroAtlasOfAct('foothold.heavy')?.pages ?? []
+    expect(heavy?.pages.slice(0, own.length)).toEqual(own)
+    expect(heavy?.pages.slice(own.length)).toEqual(gemCutPagesOf())
+    expect(heroAtlasOfPlanet(1)?.pages.some((page) => page.isHueTinted)).toBe(false)
   })
 
   // P2's own pool (ticket 632) has hero art for its three gems (ticket 744), so a fresh P2 shows

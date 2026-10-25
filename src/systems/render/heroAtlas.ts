@@ -7,7 +7,10 @@
  * resident together, one layer each of one array texture on the same unit, and the set swaps only
  * when the act changes, so the cost scales per act and never per planet; the slice hands the same
  * atlas object to every planet of an act. A hero with no cell in the resident pages, or a GPU that
- * cannot sample them, draws the shader look. Look only: no price, gate or income reads it.
+ * cannot sample them, draws the shader look. The gem-cut library's pages (ticket 889) follow an
+ * act's own pages as hue-tinted pages: their sprites are neutral cuts the shader colours by the
+ * kind's hue, so one library serves every planet, and `firstHueTintedCell` tells the shader where
+ * they begin. Look only: no price, gate or income reads it.
  */
 import { HERO_ATLAS_CELLS } from '../../constants/scene'
 import { manifestEntryOf, type ArtCatalogue } from '../art/artCatalogue'
@@ -17,8 +20,13 @@ import { HERO_LOOK_CELL_SPAN } from './kindLookTable'
 /** One page of an act's atlas: its `atlas` asset under `public/assets/ground/` and its cells. */
 export interface HeroAtlasPage {
   assetId: string
-  /** The species of each cell, cell 0 first (column `i mod 4`, row `i div 4`). */
+  /** The sprite of each cell, cell 0 first (column `i mod 4`, row `i div 4`): a species or a cut. */
   cells: readonly string[]
+  /**
+   * The page's sprites are neutral and the shader colours each by its kind's hue (the gem-cut
+   * library, ticket 889); such pages follow every page that is not.
+   */
+  isHueTinted?: boolean
 }
 
 /** One act's atlas as the slice names it. */
@@ -40,8 +48,10 @@ export interface DrawnHeroAtlas {
   id: string
   /** One albedo map per drawn page, page 1 first: the layers of the bound texture. */
   albedos: readonly string[]
-  /** Each species of the drawn pages by its act-wide cell (`heroCellsOf`). */
+  /** Each sprite of the drawn pages by its act-wide cell (`heroCellsOf`). */
   heroCells: ReadonlyMap<string, number>
+  /** The act-wide cell the drawn hue-tinted pages begin at; null while none is drawn. */
+  firstHueTintedCell: number | null
 }
 
 const PUBLIC_FOLDER = 'public/'
@@ -108,7 +118,19 @@ export function drawnHeroAtlasOf(
   if (atlas === null) return null
   const albedos = leadingAlbedoMapsOf(atlas.pages, art)
   if (albedos.length === 0) return null
-  return { id: atlas.id, albedos, heroCells: heroCellsOf(atlas.pages.slice(0, albedos.length)) }
+  const drawnPages = atlas.pages.slice(0, albedos.length)
+  return {
+    id: atlas.id,
+    albedos,
+    heroCells: heroCellsOf(drawnPages),
+    firstHueTintedCell: firstHueTintedCellOf(drawnPages),
+  }
+}
+
+/** The act-wide cell the first hue-tinted page begins at, or null with none. */
+export function firstHueTintedCellOf(pages: readonly HeroAtlasPage[]): number | null {
+  const first = pages.findIndex((page) => page.isHueTinted === true)
+  return first === -1 ? null : first * HERO_ATLAS_CELLS
 }
 
 function leadingAlbedoMapsOf(pages: readonly HeroAtlasPage[], art: ArtCatalogue): string[] {
@@ -131,6 +153,7 @@ export function overflowedHeroAtlasOf(drawn: DrawnHeroAtlas): DrawnHeroAtlas {
     id: `${drawn.id}${OVERFLOW_ATLAS_SUFFIX}`,
     albedos: [...drawn.albedos, ...drawn.albedos],
     heroCells: new Map([...drawn.heroCells].map(([id, cell]) => [id, cell + shift])),
+    firstHueTintedCell: drawn.firstHueTintedCell === null ? null : drawn.firstHueTintedCell + shift,
   }
 }
 
@@ -172,12 +195,26 @@ export function heroAtlasProblems(atlas: HeroAtlasCells): string[] {
   return [
     ...atlas.pages.flatMap((page, at) => pageProblems(atlas.id, page, at + 1)),
     ...repeated.map((id) => `${atlas.id} packs ${id} twice`),
+    ...hueTintedOrderProblems(atlas),
     ...(atlas.pages.length <= HERO_ATLAS_MAX_PAGES
       ? []
       : [
           `${atlas.id} has ${atlas.pages.length} pages, over the ${HERO_ATLAS_MAX_PAGES} the look table numbers`,
         ]),
   ]
+}
+
+/** A page that is not hue-tinted after one that is: the shader tints every cell from the first. */
+function hueTintedOrderProblems(atlas: HeroAtlasCells): string[] {
+  const first = atlas.pages.findIndex((page) => page.isHueTinted === true)
+  if (first === -1) return []
+  return atlas.pages
+    .slice(first)
+    .flatMap((page, at) =>
+      page.isHueTinted === true
+        ? []
+        : [`${atlas.id} page ${first + at + 1} is not hue-tinted but follows a page that is`],
+    )
 }
 
 function pageProblems(act: string, page: HeroAtlasPage, number: number): string[] {

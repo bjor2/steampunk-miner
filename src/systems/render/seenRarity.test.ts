@@ -46,6 +46,7 @@ function probeSlice(met: readonly string[]): SliceDefinition {
         rarityIdOfLead: (lead) => RARITY_IDS[lead] ?? null,
         hasSeenKind: (_state, _playerId, speciesId) => met.includes(speciesId),
         heroAtlasOf: () => null,
+        gemOverlayOf: () => null,
       })
     },
   }

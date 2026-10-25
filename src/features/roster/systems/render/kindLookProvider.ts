@@ -18,13 +18,23 @@
  *
  * Gems (ticket 786): a slot naming one of the planet's gems carries its rank k, cheapest first,
  * from the price table (`gemRankOfKind`), which the kernel's rank glint draws.
+ *
+ * Generated gems (ticket 889): a gem of a planet drawing its generated pool looks its cell up by
+ * the cut the `gem-cuts` slice picked for it (`spriteId`), on the library's hue-tinted pages that
+ * follow the act's own in the atlas handed out here, one object per act that holds a generated
+ * planet; the planet's overlay comes from the same slice.
  */
 import type { AuthorityState } from '../../../../systems/authority/authorityState'
 import { hasDiscovered, type DiscoveryFallback } from '../../../../systems/registries/discovery'
 import type { KindLookProvider } from '../../../../systems/registries/kindLook'
+import type { GemOverlay } from '../../../../systems/render/gemOverlays'
 import type { HeroAtlasCells } from '../../../../systems/render/heroAtlas'
 import type { KindLook, RarityLook } from '../../../../systems/render/kindLookTable'
-import type { PlanetParams } from '../../../../systems/world/planetParams'
+import {
+  GENERATED_POOLS_FIRST_PLANET,
+  type PlanetParams,
+} from '../../../../systems/world/planetParams'
+import { gemCutPagesOf } from '../../../gem-cuts'
 import {
   FRAMED_RARITIES,
   hueSlotColourOf,
@@ -34,8 +44,9 @@ import {
   type MaterialTable,
 } from '../../../materials'
 import { heroAtlasOfAct } from '../../../mineral-skins'
-import { rarityTiers } from '../../../ores'
-import { actOf } from '../../../planet-mix'
+import { rarityTiers, type KindSlot } from '../../../ores'
+import { actOf, type OreAct } from '../../../planet-mix'
+import { generatedGemCutOf, generatedGemOverlayOf, isGeneratedPoolPlanet } from '../generatedRoster'
 import { planetRosterOf } from '../planetRoster'
 import { planetSpeciesOf } from '../planetSpecies'
 import { gemRankOfKind } from '../rosterGems'
@@ -64,25 +75,63 @@ export const ROSTER_KIND_LOOK: KindLookProvider = {
   rarityIdOfLead,
   hasSeenKind: hasMetSpecies,
   heroAtlasOf: heroAtlasOfPlanet,
+  gemOverlayOf: gemOverlayOfPlanet,
 }
 
-/** The atlas of the act holding the planet; null where the act has none. */
+const atlasByAct = new Map<string, HeroAtlasCells | null>()
+
+/**
+ * The atlas of the act holding the planet: the act's own pages, then the gem-cut library's
+ * hue-tinted pages where the act holds a generated planet (ticket 889); null where there is
+ * neither. One object per act, so a planet change inside an act swaps nothing.
+ */
 export function heroAtlasOfPlanet(planetIndex: number): HeroAtlasCells | null {
-  return heroAtlasOfAct(actOf(planetIndex).id)
+  const act = actOf(planetIndex)
+  const known = atlasByAct.get(act.id)
+  if (known !== undefined) return known
+  const atlas = atlasOfAct(act)
+  atlasByAct.set(act.id, atlas)
+  return atlas
+}
+
+function atlasOfAct(act: OreAct): HeroAtlasCells | null {
+  const own = heroAtlasOfAct(act.id)
+  if (!holdsGeneratedPlanet(act)) return own
+  return { id: act.id, pages: [...(own?.pages ?? []), ...gemCutPagesOf()] }
+}
+
+/** Whether any planet of the act draws its generated pool: every act but system 1's first. */
+function holdsGeneratedPlanet(act: OreAct): boolean {
+  return act.lastPlanet >= GENERATED_POOLS_FIRST_PLANET
+}
+
+/** The planet's gem overlay (ticket 889); null for a planet whose gems draw no cut. */
+export function gemOverlayOfPlanet(params: PlanetParams): GemOverlay | null {
+  return isGeneratedPoolPlanet(params) ? generatedGemOverlayOf(params) : null
 }
 
 /** By roster index, slot 1 first; null where the planet's pool binds no species to the slot. */
 export function planetKindLooksOf(params: PlanetParams): (KindLook | null)[] {
   return planetRosterOf(params).map((kind, index) => {
     const species = planetSpeciesOf(params, index + 1)
-    return species === null ? null : kindLookOfSpecies(species, gemRankOfKind(params, kind))
+    if (species === null) return null
+    return kindLookOfSpecies(species, gemRankOfKind(params, kind), gemCutOfKind(params, kind))
   })
 }
 
-/** The species' look; `gemRank` is its slot's rank among the planet's gems, null for a non-gem. */
+/** The library cut a generated gem draws (ticket 889); null for every other kind. */
+function gemCutOfKind(params: PlanetParams, kind: KindSlot): string | null {
+  return isGeneratedPoolPlanet(params) ? generatedGemCutOf(params, kind.slotId) : null
+}
+
+/**
+ * The species' look; `gemRank` is its slot's rank among the planet's gems, null for a non-gem;
+ * `gemCut` the library cut a generated gem draws its cell from, null for every other kind.
+ */
 export function kindLookOfSpecies(
   species: Material,
   gemRank: number | null,
+  gemCut: string | null = null,
   table: MaterialTable = MATERIALS,
 ): KindLook {
   return {
@@ -93,6 +142,7 @@ export function kindLookOfSpecies(
     rarityLead: rarityLeadOf(species.rarity),
     isHero: species.hero,
     gemRank,
+    ...(gemCut === null ? {} : { spriteId: gemCut }),
   }
 }
 

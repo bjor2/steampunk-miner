@@ -1,0 +1,18 @@
+{
+  "$comment": "The planet gem overlays (ticket 889, the HS's condition in the GD's Materials Expansion lock of 25 Oct: a recolour alone is not enough, so a planet-seeded facet or inclusion overlay goes on top of the hue, chosen from data by (s, p)). Each row names a pattern of `kindLooks.json` the terrain shader already draws and the signed strength it modulates a generated gem's cut by over the sprite's own luma before the hue is laid on: a positive strength lightens where the pattern is high (silk, dew, fire), a negative one darkens there (veils, smoke). `strengthCap` bounds every row so the overlay never drowns the cut's facets, its highlight or the rank glint (HS condition 2 on #746, the #450 reads). The `gem-cuts` slice picks one row per planet from the address alone; the kernel shader reads the pattern code and strength from `uGemCuts`. Append rows at the end: a planet's row is pinned by the gem-cuts spec. Look only: no price, gate, income, save or digest reads it.",
+  "strengthCap": 0.4,
+  "overlays": [
+    { "id": "silk", "pattern": "silky", "strength": 0.22 },
+    { "id": "needles", "pattern": "feathered", "strength": 0.3 },
+    { "id": "zoning", "pattern": "zoned", "strength": 0.25 },
+    { "id": "cloud", "pattern": "clouded", "strength": 0.24 },
+    { "id": "veil", "pattern": "veined", "strength": -0.32 },
+    { "id": "frost", "pattern": "frosted", "strength": 0.2 },
+    { "id": "fire", "pattern": "fiery", "strength": 0.36 },
+    { "id": "star", "pattern": "starred", "strength": 0.3 },
+    { "id": "facets", "pattern": "faceted", "strength": 0.18 },
+    { "id": "iridescence", "pattern": "iridescent", "strength": 0.2 },
+    { "id": "steps", "pattern": "stepped", "strength": 0.18 },
+    { "id": "dew", "pattern": "dewed", "strength": 0.3 }
+  ]
+}

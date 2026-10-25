@@ -16,8 +16,10 @@ export const heroAtlasPresence: {
   residentId: string | null
   /** The bound layers, one per page; 0 with none bound. */
   pages: number
-  /** The resident pages' species by act-wide cell; a new map only when another atlas is bound. */
+  /** The resident pages' sprites by act-wide cell; a new map only when another atlas is bound. */
   heroCells: ReadonlyMap<string, number>
+  /** The act-wide cell the bound hue-tinted pages begin at (ticket 889); null with none. */
+  firstHueTintedCell: number | null
   binds: number
   /** The last atlas refused because the GPU would hold it uncompressed. */
   refusedId: string | null
@@ -26,6 +28,7 @@ export const heroAtlasPresence: {
   residentId: null,
   pages: 0,
   heroCells: NO_HERO_CELLS_BOUND,
+  firstHueTintedCell: null,
   binds: 0,
   refusedId: null,
 }

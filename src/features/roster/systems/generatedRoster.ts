@@ -12,7 +12,9 @@
  *   is `g - planetsBefore(s)`.
  * - **Slots.** One per pool kind, common first, its slot id the kind's own `system<s>-p<p>-<slot>`,
  *   so a stored cell's slot reads back the kind it was drawn as.
- * - **Species.** A kind is its own species, its procedural look the pool's (no hero art, no copy).
+ * - **Species.** A kind is its own species, its procedural look the pool's (no copy). A gem kind
+ *   is a hero drawn from the gem-cut library (ticket 889): the `gem-cuts` slice picks its cut and
+ *   the planet's overlay from the address and the stamp, so nothing is authored per planet.
  *
  * One pool per planet and stamp, cached, so the per-patch fold allocates none.
  */
@@ -24,6 +26,8 @@ import {
   GENERATED_POOLS_ORE_RULES,
   type PlanetParams,
 } from '../../../systems/world/planetParams'
+import type { GemOverlay } from '../../../systems/render/gemOverlays'
+import { planetGemCutsOf, planetGemOverlayOf, type PlanetAddress } from '../../gem-cuts'
 import { MATERIAL_RARITIES, type Material, type MaterialRarity } from '../../materials'
 import type { KindSlot } from '../../ores'
 import { materialPoolAt, type MaterialPool, type PoolKind } from '../../solar-systems'
@@ -33,6 +37,10 @@ interface GeneratedRoster {
   pool: MaterialPool
   slots: readonly KindSlot[]
   species: readonly Material[]
+  /** Each gem kind's cut of the gem-cut library by kind id (ticket 889); empty before the library. */
+  gemCuts: ReadonlyMap<string, string>
+  /** The overlay the planet lays over every cut. */
+  gemOverlay: GemOverlay
 }
 
 const rosterByKey = new Map<string, GeneratedRoster>()
@@ -64,32 +72,60 @@ export function generatedGemSaleTierOf(params: PlanetParams, slotId: string): nu
   return kind?.gemSaleTier ?? null
 }
 
+/** The gem-cut library cut a generated gem kind draws (ticket 889); null for any other kind. */
+export function generatedGemCutOf(params: PlanetParams, slotId: string): string | null {
+  return generatedRosterOf(params).gemCuts.get(slotId) ?? null
+}
+
+/** The overlay the generated planet lays over its gems' cuts (ticket 889). */
+export function generatedGemOverlayOf(params: PlanetParams): GemOverlay {
+  return generatedRosterOf(params).gemOverlay
+}
+
 function generatedRosterOf(params: PlanetParams): GeneratedRoster {
   const system = systemOfParams(params)
   const place = placeOf(params)
   const key = `${params.worldSeed}|${system}|${place}|${params.oreRulesVersion ?? 0}`
   const known = rosterByKey.get(key)
   if (known !== undefined) return known
+  const address: PlanetAddress = { worldSeed: params.worldSeed, system, place }
   const roster = rosterOfPool(
     materialPoolAt(params.worldSeed, system, place, params.oreRulesVersion),
+    address,
+    params.oreRulesVersion,
   )
   rosterByKey.set(key, roster)
   return roster
 }
 
-function rosterOfPool(pool: MaterialPool): GeneratedRoster {
+function rosterOfPool(
+  pool: MaterialPool,
+  address: PlanetAddress,
+  oreRulesVersion: number | undefined,
+): GeneratedRoster {
+  const gemCuts = planetGemCutsOf(address, gemKindIdsOf(pool), oreRulesVersion)
   return Object.freeze({
     pool,
     slots: Object.freeze(pool.kinds.map(slotOfKind)),
-    species: Object.freeze(pool.kinds.map((kind) => speciesOfKind(pool, kind))),
+    species: Object.freeze(
+      pool.kinds.map((kind) => speciesOfKind(pool, kind, gemCuts.has(kind.id))),
+    ),
+    gemCuts,
+    gemOverlay: planetGemOverlayOf(address),
   })
+}
+
+/** The pool's gem kinds in pool order: the slots the cut picks are drawn for. */
+function gemKindIdsOf(pool: MaterialPool): string[] {
+  return pool.kinds.filter((kind) => kind.gemSaleTier !== null).map((kind) => kind.id)
 }
 
 function slotOfKind(kind: PoolKind): KindSlot {
   return { slotId: kind.id, family: kind.family, rarity: kind.rarity, window: kind.window }
 }
 
-function speciesOfKind(pool: MaterialPool, kind: PoolKind): Material {
+/** `isCutHero`: the kind is a gem with a cut of the library, drawn from the atlas (ticket 889). */
+function speciesOfKind(pool: MaterialPool, kind: PoolKind, isCutHero: boolean): Material {
   return {
     id: kind.id,
     pool: pool.id,
@@ -102,7 +138,7 @@ function speciesOfKind(pool: MaterialPool, kind: PoolKind): Material {
     hueSlot: kind.hueSlot,
     gradeBand: kind.window,
     rarity: materialRarityOf(kind.rarity),
-    hero: false,
+    hero: isCutHero,
     // No copy is written per generated kind (#777 choice 4); the name carries its look.
     flavour: '',
   }

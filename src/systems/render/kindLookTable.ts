@@ -7,7 +7,8 @@
  * A slot's entry is (silhouette code, pattern code, colour as 0xRRGGBB, rarity lead + 8 × (cell + 1)
  * for a hero drawn from the resident act's atlas, ticket 451, its cell act-wide over the pages of
  * ticket 852, + 8192 × the gem's glint code, ticket 786). A hero whose sprite is not in the
- * resident atlas, or with no atlas at all, keeps the lead alone and draws the shader look. A gem carries the glint of its rank k within its planet
+ * resident atlas, or with no atlas at all, keeps the lead alone and draws the shader look; a generated
+ * gem looks its cell up by the cut it names (`spriteId`, ticket 889). A gem carries the glint of its rank k within its planet
  * (`gemGlint.ts`), shown from the first frame because it is not rarity (TD ruling 6374381455 on
  * #746), and keyed on k alone, so the field is the same whole number on every planet. A slot that
  * binds no species stays all zeros, which the shader draws as today's family look.
@@ -61,6 +62,11 @@ export interface KindLook {
    * (ticket 786); null for a species that is no gem of the planet.
    */
   gemRank: number | null
+  /**
+   * The id the resident atlas's cell is looked up by when it is not the species id: a generated
+   * gem names the cut of the gem-cut library it draws (ticket 889). Absent, the species id.
+   */
+  spriteId?: string
 }
 
 /** One rarity lead's tint, frame and glow. */
@@ -123,7 +129,7 @@ export function kindLookTableOf(
     if (look === null) return
     const drawn = isRaritySeen(look) ? look : withoutRarity(look)
     table.kinds.set(
-      kindEntryOf(drawn, heroCells.get(look.speciesId) ?? null, catalogue),
+      kindEntryOf(drawn, heroCells.get(spriteIdOf(look)) ?? null, catalogue),
       at * LOOK_VECTOR,
     )
     table.seenLeads[at] = drawn === look ? look.rarityLead : NO_SEEN_LEAD
@@ -170,6 +176,11 @@ function heroShareOf(look: KindLook, heroCell: number | null): number {
 function glintShareOf(look: KindLook, ladder: GemGlintLadder): number {
   if (look.gemRank === null) return 0
   return GEM_GLINT_FLAG * gemGlintCodeOf(gemGlintOf(look.gemRank, ladder), ladder)
+}
+
+/** The id the look's atlas cell is keyed by: its sprite id, else its species id (ticket 889). */
+export function spriteIdOf(look: Pick<KindLook, 'speciesId' | 'spriteId'>): string {
+  return look.spriteId ?? look.speciesId
 }
 
 /** The rarity lead an entry's fourth float carries. */

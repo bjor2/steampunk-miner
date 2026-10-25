@@ -1,0 +1,149 @@
+{
+  "$comment": "The gem-cut library (ticket 889, ME of the GD's Materials Expansion lock of 25 Oct: P&N's ~24-cut library replaces the earlier 12 per-act silhouettes). Each cut is one Blender stone rendered neutral on the ore stage (docs/art/gem-cuts) into a 256 px cell of the library's hue-tinted atlas pages, which follow every act's own hero pages; the terrain shader colours the cut by the gem's hue slot and lays the planet's overlay over it. Append-only: a cut is never removed, renamed or reordered, its cell is its place in this list (16 a page, `ground-gem-cut-atlas`, then `-page-<n>`), and `since` is the first ore rules version a planet must be stamped with to draw it, never below the version before it, so a cut added later waits for the next ore rules version and never moves the pick of a planet already generated (the gem-cuts spec pins picks for fixed addresses). `shape` is the stone the builder makes, for the README. Look only: no price, gate, income, save or digest reads it.",
+  "cuts": [
+    {
+      "id": "gem-cut.brilliant",
+      "name": "Brilliant",
+      "since": 14,
+      "shape": "a round brilliant: eight-sided table, kite and star facets on an eight-fold crown"
+    },
+    {
+      "id": "gem-cut.oval",
+      "name": "Oval",
+      "since": 14,
+      "shape": "an oval brilliant lying across the cell, a long table on a stepped crown"
+    },
+    {
+      "id": "gem-cut.cushion",
+      "name": "Cushion",
+      "since": 14,
+      "shape": "a pillow square with rounded corners and a broad soft crown"
+    },
+    {
+      "id": "gem-cut.emerald",
+      "name": "Emerald",
+      "since": 14,
+      "shape": "a step-cut rectangle with clipped corners, three parallel crown steps"
+    },
+    {
+      "id": "gem-cut.asscher",
+      "name": "Asscher",
+      "since": 14,
+      "shape": "a step-cut square with wide clipped corners, deep concentric steps to a small table"
+    },
+    {
+      "id": "gem-cut.princess",
+      "name": "Princess",
+      "since": 14,
+      "shape": "a sharp square standing on a corner, four crown facets meeting at a point"
+    },
+    {
+      "id": "gem-cut.radiant",
+      "name": "Radiant",
+      "since": 14,
+      "shape": "a clipped-corner rectangle with a brilliant crown of sixteen facets"
+    },
+    {
+      "id": "gem-cut.pear",
+      "name": "Pear",
+      "since": 14,
+      "shape": "a teardrop, round at the foot and drawn to a point at the head"
+    },
+    {
+      "id": "gem-cut.marquise",
+      "name": "Marquise",
+      "since": 14,
+      "shape": "a boat with two points, lying across the cell, a long narrow table"
+    },
+    {
+      "id": "gem-cut.heart",
+      "name": "Heart",
+      "since": 14,
+      "shape": "a heart with a cleft top and a point below, lobed crown facets"
+    },
+    {
+      "id": "gem-cut.trillion",
+      "name": "Trillion",
+      "since": 14,
+      "shape": "a triangle with softly curved sides, a three-fold crown"
+    },
+    {
+      "id": "gem-cut.baguette",
+      "name": "Baguette",
+      "since": 14,
+      "shape": "a long narrow step-cut bar standing upright, two crown steps"
+    },
+    {
+      "id": "gem-cut.kite",
+      "name": "Kite",
+      "since": 14,
+      "shape": "a kite with a short head and a long tail, a ridge down its middle"
+    },
+    {
+      "id": "gem-cut.shield",
+      "name": "Shield",
+      "since": 14,
+      "shape": "a five-sided shield, flat top and a point below, stepped crown"
+    },
+    {
+      "id": "gem-cut.hexagon",
+      "name": "Hexagon",
+      "since": 14,
+      "shape": "a regular hexagon with a flat top edge, six crown facets to a hexagonal table"
+    },
+    {
+      "id": "gem-cut.octagon",
+      "name": "Octagon",
+      "since": 14,
+      "shape": "a regular octagon, eight crown facets round a large table"
+    },
+    {
+      "id": "gem-cut.lozenge",
+      "name": "Lozenge",
+      "since": 14,
+      "shape": "a tall diamond rhombus, four crown facets meeting on a ridge"
+    },
+    {
+      "id": "gem-cut.half-moon",
+      "name": "Half-moon",
+      "since": 14,
+      "shape": "a half disc with its flat edge up, stepped crown along the curve"
+    },
+    {
+      "id": "gem-cut.bullet",
+      "name": "Bullet",
+      "since": 14,
+      "shape": "a bar with a pointed head and a square foot, standing upright"
+    },
+    {
+      "id": "gem-cut.trapeze",
+      "name": "Trapeze",
+      "since": 14,
+      "shape": "a wide trapezoid, the long side down, two crown steps"
+    },
+    {
+      "id": "gem-cut.rose",
+      "name": "Rose",
+      "since": 14,
+      "shape": "a round dome of triangular facets rising to a point, no table"
+    },
+    {
+      "id": "gem-cut.briolette",
+      "name": "Briolette",
+      "since": 14,
+      "shape": "a drop covered all over in small triangular facets, the point up"
+    },
+    {
+      "id": "gem-cut.checkerboard",
+      "name": "Checkerboard",
+      "since": 14,
+      "shape": "a cushion whose crown is a chequer of square facets"
+    },
+    {
+      "id": "gem-cut.sugarloaf",
+      "name": "Sugarloaf",
+      "since": 14,
+      "shape": "a four-sided pyramid with a square foot, its four faces lit one at a time"
+    }
+  ]
+}
