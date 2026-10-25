@@ -13,7 +13,7 @@
  * planet where the bot met a tile it would blast with none in stock (#129); travel starts afresh.
  * When no band the casing holds pays a trip, as after a rescue that took the last of the wallet
  * with those bands bored out and the next grade unaffordable (#216), the bot retreats to the
- * shallowest of them, widens its galleries and plays on; broke with a tank too low even for that,
+ * shallowest of them, widens its galleries and plays on, saving for the next grade (#894); broke with a tank too low even for that,
  * it strands itself for the tow that leaves a quarter of the tank (#8). On every planet (ticket
  * 753), the second death on one route closes it, and every deeper one, until the vehicle has
  * changed; the bot mines the bands above meanwhile, widening them as it would the held bands once
@@ -259,6 +259,7 @@ function shopAtUpgradeBay(session: BotSession, planet: BotPlanet, run: BotRun): 
     restockSize: restockSizeOf(planet),
     chainPolicy: run.chainPolicy,
     arrivalLevels: planet.arrivalLevels,
+    hasRetreated: planet.hasRetreatedHere === true,
   }
   if (!hasPurchase(session, situation)) return
   driveToUpgradeBay(session, planet)
@@ -310,7 +311,9 @@ function chooseRetreatGoal(
   const deepest = Math.min(deepestBand, deepestHeldBand(session))
   if (!areBandsBoredOut(session, planet, deepest)) return null
   const hasWidened = widenShallowestBand(planet.layout, deepest)
-  return hasWidened ? chooseOreGoal(session, planet, deepest) : null
+  if (!hasWidened) return null
+  planet.hasRetreatedHere = true
+  return chooseOreGoal(session, planet, deepest)
 }
 
 function areBandsBoredOut(session: BotSession, planet: BotPlanet, deepestBand: number): boolean {

@@ -18,6 +18,8 @@
  * due ahead of the tracks (ticket 296: an extractor on its planet, within 4 trips by #142
  * acceptance 7) is bought first, and while one is due and the wallet short, the bot saves for it:
  * the casing, lining, guns and charges still come, no track level or other slice purchase does.
+ * A bot that retreated on the planet (#216) saves the same way for the casing grade its next trip
+ * wants (#894).
  *
  * Every track buy is one step (#180): the on-curve rule buys toward its next level once the steps
  * left to it are paid for whole, the boiler and the forced rule a step at a time, and the marginal
@@ -90,6 +92,8 @@ export interface ShoppingSituation {
    * against (ticket 763); absent in a spec's hand-built visit, which shops without that rule.
    */
   arrivalLevels?: UpgradeLevels
+  /** It widened a held band here because none paid a trip (#216), so it saves for casing (#894). */
+  hasRetreated?: boolean
 }
 
 export function serviceAtDock(session: BotSession): void {
@@ -130,6 +134,7 @@ export function buyUpgrades(session: BotSession, situation: ShoppingSituation): 
   const kernel = buyKernelPurchases(session, situation)
   const spends = [...due, ...kernel.spends]
   if (kernel.isHoldRefused || isSavingForDuePurchase(session)) return spends
+  if (isSavingForCasing(session, situation)) return spends
   return [...spends, ...buySlicePurchases(session)]
 }
 
@@ -173,6 +178,7 @@ function nextPurchase(session: BotSession, situation: ShoppingSituation): Purcha
   const restock = chargeRestockDue(session, situation)
   if (restock !== null) return restock
   if (isSavingForDuePurchase(session)) return null
+  if (isSavingForCasing(session, situation)) return null
   const track = nextTrackPurchase(session, situation)
   if (track === null) return null
   return { type: 'buyUpgrade', payload: { upgradeId: track, chain: CLICK_CHAIN } }
@@ -191,12 +197,27 @@ function nextTrackPurchase(session: BotSession, situation: ShoppingSituation): U
 
 /**
  * The next trip wants a deeper band (or the core) than the casing grade holds, and the grade is
- * affordable; when it is not yet, the bot buys tracks and mines the bands it holds meanwhile.
+ * affordable; when it is not yet, the bot buys tracks and mines the bands it holds meanwhile,
+ * unless it has retreated here (`isSavingForCasing`).
  */
 function isCasingDue(session: BotSession, situation: ShoppingSituation): boolean {
+  return isCasingWanted(session, situation) && canAffordCasing(session)
+}
+
+/**
+ * After a retreat (#216) the bands it holds are bored out, so tracks bought meanwhile pay nothing:
+ * the bot keeps its money for the grade the next trip wants (#894), as the forced rule saves for
+ * its drill level.
+ */
+function isSavingForCasing(session: BotSession, situation: ShoppingSituation): boolean {
+  return situation.hasRetreated === true && isCasingWanted(session, situation)
+}
+
+/** The next trip wants a deeper band (or the core) than the casing grade holds. */
+function isCasingWanted(session: BotSession, situation: ShoppingSituation): boolean {
   const wantedBand = plannedBand(situation.layout, session.vehicle().levels)
   const wanted = { isCoreTheGoal: situation.isCoreTheGoal, wantedBand }
-  return isCasingGradeShort(session, wanted) && canAffordCasing(session)
+  return isCasingGradeShort(session, wanted)
 }
 
 /** The band a full tank with these levels would mine best, whatever the casing grade holds. */

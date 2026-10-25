@@ -75,6 +75,12 @@ export interface BotPlanet {
    * reflex only between bores, a fatal dive replayed after every tow. Travel starts afresh.
    */
   hasBeenDestroyedHere: boolean
+  /**
+   * No held band paid a trip here, so it widened one (#216). From then it saves for the casing grade
+   * its next trip wants, buying no track meanwhile (#894): at 240 a grade, the bored-out dead end's
+   * ore went on tracks and the grade was never paid. Absent is never.
+   */
+  hasRetreatedHere?: boolean
   /** Deaths per route here, and the routes it retreated from (#198, `botDeathReplay.ts`). */
   routeDeaths: RouteDeaths
   /**

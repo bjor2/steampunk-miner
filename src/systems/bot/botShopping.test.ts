@@ -220,3 +220,38 @@ describe('bot: the down-cut drill rule at the Upgrade bay (ticket 763)', () => {
     expect(session.events().filter((event) => event.type === 'CommandRejected')).toEqual([])
   })
 })
+
+/** Shops for ore on planet 1's mine with band 1 bored out, so its next trip wants band 2. */
+function shopForBandTwo(session: BotSession, hasRetreated: boolean) {
+  return buyUpgrades(session, {
+    layout: mineWithBandOneBoredOut(session),
+    isCoreTheGoal: false,
+    gunPolicy: 'never',
+    hasMetBlastTile: false,
+    restockSize: 1,
+    chainPolicy: 'click',
+    hasRetreated,
+  })
+}
+
+// #894: grade 2 costs 240, so the #216 dead end's ore must not go on tracks that mine nothing new.
+describe('bot: saving for casing after a retreat (#894)', () => {
+  it('buys no track while it saves for the grade its next trip wants', () => {
+    const session = botAtUpgradeBayOn(1, '200')
+    expect(shopForBandTwo(session, true)).toEqual([])
+    expect(session.vehicle().casingGrade).toBe(1)
+  })
+
+  it('buys the grade first once the savings pay for it', () => {
+    const session = botAtUpgradeBayOn(1, '300')
+    const [first] = shopForBandTwo(session, true)
+    expect(first).toMatchObject({ purchaseId: 'buyCasingGrade' })
+    expect(session.vehicle().casingGrade).toBe(2)
+  })
+
+  it('still buys tracks meanwhile on a planet it never retreated on', () => {
+    const session = botAtUpgradeBayOn(1, '200')
+    expect(shopForBandTwo(session, false).length).toBeGreaterThan(0)
+    expect(session.vehicle().casingGrade).toBe(1)
+  })
+})
