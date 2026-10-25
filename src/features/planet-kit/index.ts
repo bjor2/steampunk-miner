@@ -4,13 +4,15 @@
  * buy list of the planet's own pool, one +25% premium ore, stock) and five kit items (tools and
  * consumables with their effect, trade-off, home planet, sale rule, stack limit and price rule),
  * plus the read selectors the later kit tickets build on: PK2 (#821) merchants, PK4 (#823) items
- * and the stats.json re-pin, PK5 (#824) generator rows. PK2 adds the prices at g and the merchant
- * variant a shop reads (stock rows with their #681 readout, the premium tag and the once-per-ore
- * lift). Types, pure selectors and constants only; never React, zustand or a store.
+ * and the stats.json re-pin, PK5 (#824) generator rows and `generatedKitOf`, every planet's kit
+ * from data alone. PK2 adds the prices at g and the merchant variant a shop reads (stock rows with
+ * their #681 readout, the premium tag and the once-per-ore lift). Types, pure selectors and constants only; never React, zustand or a store.
  */
 export const PLANET_KIT_SLICE_ID = 'planet-kit'
 
 export type {
+  FamilyKitRow,
+  FamilyKits,
   KitEffect,
   KitItem,
   KitItemKind,
@@ -18,8 +20,11 @@ export type {
   KitSale,
   KitTradeOff,
   MerchantRow,
+  NoFamilyKitRow,
+  PlanetKit,
   PlanetKits,
   PremiumOre,
+  PremiumRule,
   PricedAt,
   TradeOffCost,
 } from './systems/planetKitTypes'
@@ -46,6 +51,11 @@ export {
   stockedItemsOf,
   stockOfMerchant,
 } from './systems/planetKitSales'
+export {
+  generatedKitOf,
+  generatedMerchantNameOf,
+  NAME_CHARACTERS_MAX,
+} from './systems/generatedKit'
 export { kitItemPriceAt, kitPriceAtIndex, planetIndexOfKitPlanet } from './systems/planetKitPrices'
 export type { MerchantStockRow, MerchantVariant } from './systems/merchantVariant'
 export { merchantVariantOf } from './systems/merchantVariant'

@@ -12,7 +12,8 @@
  * `.merchantFrontage()` reads the frontage drawn on this planet's Assay & Exchange, or null.
  * `.grantKitItem(itemId)` holds a kit item as if bought here (ticket 850) through
  * `debug.planet-kit.grantKitItem`, spending nothing; `.kitHoldings()` reads what the local player
- * owns and carries.
+ * owns and carries. `.kitOf(system, planet, worldSeed)` prints any planet's kit as the generator
+ * composes it (ticket 824; `kitDebugReads.ts`).
  */
 import type { DebugAction } from '../../debug/debugActionRegistry'
 import type { DebugResult } from '../../debug/debugScreens'
@@ -22,6 +23,7 @@ import { useGameStore } from '../../store/gameStore'
 import { vehicleOf } from '../../systems/authority/authorityState'
 import { tileOfPose } from '../../systems/vehicle/vehiclePose'
 import type { TilePoint } from '../../systems/world/tileGrid'
+import { kitResultOf } from './kitDebugReads'
 import { readContainerRows } from './store/containerReads'
 import { kitHoldingsOf } from './systems/kitHoldingsSection'
 import { readMerchantFrontageDrawn } from './store/merchantArtReads'
@@ -141,6 +143,7 @@ export const planetKitDebugActions: Readonly<Record<string, DebugAction>> = {
   }),
   merchant: () => ({ ok: true, merchant: readMerchantPanel() }),
   grantKitItem,
+  kitOf: kitResultOf,
   kitHoldings: () => ({
     ok: true,
     holdings: kitHoldingsOf(readAuthorityState(), localPlayerId()),
