@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
   freshPlanetParamsFor,
+  GENERATED_POOLS_FIRST_PLANET,
+  GENERATED_POOLS_ORE_RULES,
   ORE_RULES_VERSION,
   planetParamsFor,
 } from '../../../systems/world/planetParams'
@@ -17,6 +19,8 @@ import { planetRosterOf, poolOfPlanet } from './planetRoster'
 // holds under ore rules 5 or earlier keeps the legacy species. Under ore rules 9 it adds three own
 // slots (ticket 709), so a fresh P2 shows 15 species and an older P2 its 12, and three of its shared
 // slots swap species (ticket 736), so "exactly one" is counted under the planet's ore rules.
+// From ore rules 14 P6 and P7 draw their generated pools (ticket 888), so `foothold-p6-p7` is asked
+// for only by a P6 or P7 a save holds under rules 13 or earlier.
 
 const SEED = 83921
 const ALL_SLOTS: readonly KindSlot[] = Object.values(ORE_ROWS.kinds.slotsByTable).flat()
@@ -27,9 +31,16 @@ const MAPPED_POOLS = [...new Set(POOL_BY_PLANET.values())]
 function slotIdsAskedOf(pool: string): string[] {
   const planets = [...POOL_BY_PLANET].filter(([, mapped]) => mapped === pool)
   const asked = planets.flatMap(([index]) =>
-    planetRosterOf(freshPlanetParamsFor(SEED, index)).map((slot) => slot.slotId),
+    planetRosterOf(authoredParamsOf(index)).map((slot) => slot.slotId),
   )
   return [...new Set(asked)]
+}
+
+/** The planet as its authored pool draws it: from P6 under the rules before the generated pools. */
+function authoredParamsOf(index: number) {
+  return index >= GENERATED_POOLS_FIRST_PLANET
+    ? planetParamsFor(SEED, index, GENERATED_POOLS_ORE_RULES - 1)
+    : freshPlanetParamsFor(SEED, index)
 }
 
 function slotOf(material: Material): KindSlot | undefined {

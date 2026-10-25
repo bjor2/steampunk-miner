@@ -509,6 +509,17 @@ export interface KernelDomainEventBodies {
   PlanetUnlocked: { planetIndex: number }
   /** A locked-schedule row opened by arriving at its planet (#88), keyed by its #79 row id. */
   FeatureUnlocked: { featureId: string }
+  /**
+   * A planet generated for the first time (ticket 888): its address `(s, p)` and campaign index `g`
+   * as canonical index text, and the ore rules it was stamped with, absent on none. Said once per
+   * planet, never when the session comes back to one.
+   */
+  PlanetGenerated: {
+    system: string
+    place: string
+    campaignIndex: string
+    oreRulesVersion?: number
+  }
   /** `oreRulesVersion` only on a planet entered under the ore rules (ticket 445). */
   PlanetEntered: {
     planetSeed: number

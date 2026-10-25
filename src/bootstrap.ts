@@ -42,6 +42,7 @@ import { listenForDomainEvents } from './store/domainEventBroadcast'
 import { routeKeyChange, routeScrollNotch } from './store/inputRuntime'
 import { routePadFrame } from './store/padRuntime'
 import { turnOnPerfLog } from './store/perfLog'
+import { recordOreRulesRefused } from './store/checkpointLines'
 import { recordStartingPlanetEntered } from './store/planetArrivalLog'
 import { installPreferencesStorage, loadPreferences } from './store/preferencesFile'
 import {
@@ -285,9 +286,12 @@ function startFreshSession(checkpoint: CheckpointLoad): void {
   useGameStore.getState().startSessionDevFlags()
 }
 
+/** On the console, and as `ore_rules_refused` for each planet stamped newer (ticket 888). */
 function reportRefusedCheckpoint(checkpoint: CheckpointLoad): void {
-  if (checkpoint !== null && 'problems' in checkpoint)
-    console.error(`checkpoint refused, starting fresh: ${checkpoint.problems.join('; ')}`)
+  if (checkpoint === null || !('problems' in checkpoint)) return
+  console.error(`checkpoint refused, starting fresh: ${checkpoint.problems.join('; ')}`)
+  const place = runEventPlaceOf(useGameStore.getState())
+  recordOreRulesRefused(checkpoint, place, readAuthorityState().tick)
 }
 
 /** Before the scene mounts, so `getPhysicsStats()` sees Rapier's WASM memory as it loads (#119). */

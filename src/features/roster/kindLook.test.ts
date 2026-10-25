@@ -21,6 +21,8 @@ import {
 import { bandOfTile } from '../../systems/world/planetGeometry'
 import {
   freshPlanetParamsFor,
+  GENERATED_POOLS_FIRST_PLANET,
+  GENERATED_POOLS_ORE_RULES,
   planetParamsFor,
   type PlanetParams,
 } from '../../systems/world/planetParams'
@@ -34,10 +36,11 @@ import {
 } from '../../systems/world/worldCell'
 import { generateChunk } from '../../systems/world/generateChunk'
 import { MATERIAL_RARITIES, MATERIALS } from '../materials'
-import { gemSaleTierOfSlot, ORE_ROWS, rarityTiers } from '../ores'
+import { ORE_ROWS, rarityTiers } from '../ores'
 import { NAMED_SEEDS } from './rosterFixtures'
 import { renderStateDigestOf } from './renderStateFixtures'
 import { planetRosterOf, ROSTER_ORE_RULES } from './systems/planetRoster'
+import { gemSaleTierOfKind } from './systems/rosterGems'
 import { actOf } from '../planet-mix'
 import {
   heroAtlasOfPlanet,
@@ -59,12 +62,26 @@ const POOLED_PLANETS = [...ORE_ROWS.kinds.poolByPlanet.keys()]
 /** The ore rules that swap three of P2's species (ticket 736): a P2 entered before shows the old three. */
 const P2_SWAP_ORE_RULES = 9
 
-/** Every pooled planet fresh, and P2 entered before its swap, so every species row is shown once. */
+/**
+ * Every pooled planet as its authored pool shows it, fresh to P5 and P6 and P7 from before their
+ * generated pools (ticket 888), and P2 entered before its swap, so every species row is shown once.
+ */
 function everyShownPlanetOf(seed: number): PlanetParams[] {
   return [
-    ...POOLED_PLANETS.map((planetIndex) => freshPlanetParamsFor(seed, planetIndex)),
+    ...POOLED_PLANETS.map((planetIndex) => authoredParamsOf(seed, planetIndex)),
     planetParamsFor(seed, 2, P2_SWAP_ORE_RULES - 1),
   ]
+}
+
+function authoredParamsOf(seed: number, planetIndex: number): PlanetParams {
+  return planetIndex >= GENERATED_POOLS_FIRST_PLANET
+    ? planetParamsFor(seed, planetIndex, GENERATED_POOLS_ORE_RULES - 1)
+    : freshPlanetParamsFor(seed, planetIndex)
+}
+
+/** Fresh planets that draw their generated pools (ticket 888): system 1's P6, P8 and P40. */
+function generatedPlanetsOf(seed: number): PlanetParams[] {
+  return [6, 8, 40].map((planetIndex) => freshPlanetParamsFor(seed, planetIndex))
 }
 
 /** Main's render-state digests at a157e171, before the kind look (renderStateFixtures.ts). */
@@ -184,11 +201,11 @@ describe('roster kind looks', () => {
   })
 
   it('glints exactly the kinds the price table sells as gems of their planet (ticket 786)', () => {
-    for (const params of everyShownPlanetOf(SEED)) {
+    for (const params of [...everyShownPlanetOf(SEED), ...generatedPlanetsOf(SEED)]) {
       const roster = planetRosterOf(params)
       planetKindLooksOf(params).forEach((look, at) => {
         if (look === null) return
-        const isGem = gemSaleTierOfSlot(params, roster[at].slotId) !== null
+        const isGem = gemSaleTierOfKind(params, roster[at]) !== null
         expect(gemGlintCodeOfEntry(kindEntryOf(look)[3]) > 0, look.speciesId).toBe(isGem)
       })
     }

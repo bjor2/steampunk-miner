@@ -42,11 +42,23 @@ const BAND_EDGES_PERCENT = [0, ...BAND_START_DEPTH_PERCENT, WHOLE_PERCENT]
 
 /** The gems' share of the pool's ore value, in whole basis points rounded down. */
 export function gemValueShareBpOf(mix: OreMix, runs: readonly RunSale[]): number {
-  const value = mix.bands.reduce(
+  const value = poolValueOf(mix, runs)
+  return toSafeInteger(floor(mul(div(value.gems, value.whole), fromSafeInteger(BASIS_POINTS))))
+}
+
+/**
+ * The pool's whole ore value on paper, the gems at their sale tiers (ticket 888, the VS's R3 row):
+ * per share of the disc, so a planet's pool is this times its radius squared.
+ */
+export function poolOreValueOf(mix: OreMix, runs: readonly RunSale[]): Money {
+  return poolValueOf(mix, runs).whole
+}
+
+function poolValueOf(mix: OreMix, runs: readonly RunSale[]): PoolValue {
+  return mix.bands.reduce(
     (sum, entries, at) => addValues(sum, bandValueOf(entries, at + 1, runs)),
     { whole: ZERO_MONEY, gems: ZERO_MONEY },
   )
-  return toSafeInteger(floor(mul(div(value.gems, value.whole), fromSafeInteger(BASIS_POINTS))))
 }
 
 function bandValueOf(

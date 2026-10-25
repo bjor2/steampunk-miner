@@ -43,6 +43,7 @@ export {
   lookGroupOf,
   lookGroupPoolsOf,
   materialPoolAt,
+  poolOreValueAt,
 } from './systems/firstSystemPools'
 export { materialPoolProblemsOf } from './systems/materialPoolGuards'
 export type { MaterialPoolRules } from './systems/materialPoolRules'

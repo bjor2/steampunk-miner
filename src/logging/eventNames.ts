@@ -238,6 +238,19 @@ export const RUN_EVENT_REGISTRY = {
       oreRulesVersion: { optional: 'integer' },
     },
   },
+  // Ticket 888: a planet generated for the first time, said once per planet: its address and
+  // campaign index as canonical index text (`g` may pass the safe range) and the ore rules stamp it
+  // took, absent on none. Coming back to a planet generates nothing new and says nothing.
+  planet_generated: {
+    group: 'progression',
+    level: 'core',
+    payload: {
+      system: 'text',
+      place: 'text',
+      campaignIndex: 'text',
+      oreRulesVersion: { optional: 'integer' },
+    },
+  },
   // The unlocked planet by index: the envelope's `planet` is whichever planet the line was on.
   planet_unlocked: { group: 'progression', level: 'core', payload: { planetIndex: 'integer' } },
   // The envelope's `planet` says which core (#10); nothing else to carry.
@@ -526,6 +539,13 @@ export const RUN_EVENT_REGISTRY = {
       to: { optional: 'integer' },
       restoredSections: { optional: { listOf: { section: 'text' } } },
     },
+  },
+  // Ticket 888: a save refused at load because a planet in it is stamped with ore rules newer than
+  // this build's, one line per such planet: its address as canonical index text and the stamp.
+  ore_rules_refused: {
+    group: 'platform',
+    level: 'core',
+    payload: { system: 'text', place: 'text', oreRulesVersion: 'integer' },
   },
   // #26: the run resumed from a checkpoint; its commands replay from this state, not the seed.
   checkpoint_loaded: {

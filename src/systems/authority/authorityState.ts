@@ -17,6 +17,7 @@ import type { PendingBore } from './bore/boreState'
 import type { StandingStruts } from './bore/strutState'
 import type { GroundedLine } from './magnetic/groundedLines'
 import type { PlacedHazards } from './hazards/placedHazards'
+import type { AwayOreRules } from './planetOreStamps'
 import type { AutoMode } from './autoMode/autoModeState'
 import { NO_COLLAPSE, type CollapseState } from './collapse/collapseState'
 import { NO_LOOSE_LAVA, type LavaState } from './lava/lavaState'
@@ -93,6 +94,12 @@ export interface AuthorityState {
    * a session that never placed one digests as before. Emptied on every planet.
    */
   placedHazards?: PlacedHazards
+  /**
+   * The ore rules stamps of the planets the session has left, by `s:p` (ticket 888,
+   * `planetOreStamps.ts`); absent while no planet is left stamped, so a session that never travels
+   * digests as before. Kept across planets.
+   */
+  awayOreRules?: AwayOreRules
   /** Set by the first accepted `debug.*` command and never reset (#11 section 4). */
   debugApplied: boolean
   /**

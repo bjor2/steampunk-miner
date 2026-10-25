@@ -30,10 +30,10 @@ function onPlanet(state: AuthorityState, planetIndex: number): AuthorityState {
 }
 
 describe('ore rules stamp', () => {
-  it("stamps planet 1 with its gems' rules 12 and every later planet with the P2-P5 gem tier's 13", () => {
-    const planets = [1, 2, 3, 10].map((index) => sessionOn(index).planet)
-    expect(planets.map((planet) => planet.oreRulesVersion)).toEqual([12, 13, 13, 13])
-    expect(ORE_RULES_VERSION).toBe(13)
+  it("stamps planet 1 with its gems' rules 12, P2 to P5 with the gem tier's 13 and P6 on with the generated pools' 14", () => {
+    const planets = [1, 2, 3, 5, 6, 10].map((index) => sessionOn(index).planet)
+    expect(planets.map((planet) => planet.oreRulesVersion)).toEqual([12, 13, 13, 13, 14, 14])
+    expect(ORE_RULES_VERSION).toBe(14)
   })
 
   it('keeps a planet a save holds without the stamp on the legacy rows', () => {

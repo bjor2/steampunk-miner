@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   freshPlanetParamsFor,
+  GENERATED_POOLS_ORE_RULES,
   ORE_RULES_VERSION,
   planetParamsFor,
 } from '../../../systems/world/planetParams'
@@ -91,7 +92,13 @@ describe('planet species', () => {
     expect(planetSpeciesOf(freshPlanetParamsFor(SEED, 2), NO_KIND_SLOT)).toBeNull()
   })
 
-  it('reads no species past planet 7, where no pool binds', () => {
-    expect(planetSpeciesOf(freshPlanetParamsFor(SEED, 8), 1)).toBeNull()
+  it('reads no species past planet 7 on a planet a save holds from before the generated pools', () => {
+    expect(planetSpeciesOf(planetParamsFor(SEED, 8, GENERATED_POOLS_ORE_RULES - 1), 1)).toBeNull()
+  })
+
+  it("reads a generated planet's species from its pool at its address (ticket 888)", () => {
+    const species = planetSpeciesOf(freshPlanetParamsFor(SEED, 8), 1)
+    expect(species?.id).toBe('system1-p8-c1')
+    expect(species?.pool).toBe('system1-p8')
   })
 })

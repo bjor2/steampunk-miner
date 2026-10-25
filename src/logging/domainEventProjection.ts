@@ -302,6 +302,15 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
   JumpDriveBought: ({ cost }) => ({ event: 'jump_drive_bought', data: { cost } }),
   PlanetUnlocked: ({ planetIndex }) => ({ event: 'planet_unlocked', data: { planetIndex } }),
   FeatureUnlocked: ({ featureId }) => ({ event: 'feature_unlocked', data: { featureId } }),
+  PlanetGenerated: ({ system, place, campaignIndex, oreRulesVersion }) => ({
+    event: 'planet_generated',
+    data: {
+      system,
+      place,
+      campaignIndex,
+      ...(oreRulesVersion === undefined ? {} : { oreRulesVersion }),
+    },
+  }),
   PlanetEntered: ({ planetSeed, generatorVersion, radius, oreRulesVersion }) => ({
     event: 'planet_entered',
     data: {

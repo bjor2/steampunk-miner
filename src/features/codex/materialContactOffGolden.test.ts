@@ -16,7 +16,9 @@ import { withMaterialContact } from './systems/materialFixtures'
 // stamped 2 again each replays to the pin it replaced. Ticket 713 re-pinned them to the gems' ore
 // rules 12 stamp the same way: with no planet stamped 12 each replays to ticket 762's pin. Ticket
 // 662's 1.2 m bore and its casing trail, rings measured from the hole each tick cut (protocol
-// 118), moved all four again, and only them.
+// 118), moved all four again, and only them. Ticket 888 gave planet 80 its generated pool's
+// species, so the record moves money-past-1e40 too: with the switch off it replays to the digests
+// of its stamp-14 planet with no species touched.
 
 type MovedDigests = Readonly<Record<string, Readonly<Record<number, string>>>>
 
@@ -26,6 +28,7 @@ const PROTOCOL_88_DIGESTS: MovedDigests = {
   'collapse-band-2-grade-1': { 2125: '9c781106c485ea85' },
   'dig-and-return': { 247: 'c4db3f9c9dcff509', 3600: '180cf9913df8c848', 4000: '7a6bbd2124ee07d1' },
   'mined-order-mixed': { 307: '89db921635aa40b9' },
+  'money-past-1e40': { 124: '80d0d52ae58e3434', 166: '2fb0ce610afa68d7', 2000: '26a52901206eb78a' },
 }
 
 /** Protocol 88's charged digests (A6, `drill.exactCarry` on) of the same goldens. */

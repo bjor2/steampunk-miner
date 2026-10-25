@@ -686,7 +686,7 @@
     {
       "planet": 10,
       "hold": 255,
-      "hasRoster": false,
+      "hasRoster": true,
       "isSignatureBoosted": false,
       "planetMeanShiftBp": "-1.12",
       "bands": [
@@ -696,9 +696,9 @@
             "uncommon": 371
           },
           "epicAndMythicBp": 0,
-          "worstCommonKindBp": null,
-          "worstOtherKindBp": null,
-          "fewestLiveCommons": null,
+          "worstCommonKindBp": 4815,
+          "worstOtherKindBp": 371,
+          "fewestLiveCommons": 2,
           "meanShiftBp": "0.00",
           "cvBp": 49,
           "p999OfExpectedBp": 10187,
@@ -711,9 +711,9 @@
             "uncommon": 212
           },
           "epicAndMythicBp": 0,
-          "worstCommonKindBp": null,
-          "worstOtherKindBp": null,
-          "fewestLiveCommons": null,
+          "worstCommonKindBp": 4895,
+          "worstOtherKindBp": 212,
+          "fewestLiveCommons": 2,
           "meanShiftBp": "-77.83",
           "cvBp": 37,
           "p999OfExpectedBp": 10164,
@@ -728,9 +728,9 @@
             "epic": 57
           },
           "epicAndMythicBp": 57,
-          "worstCommonKindBp": null,
-          "worstOtherKindBp": null,
-          "fewestLiveCommons": null,
+          "worstCommonKindBp": 4796,
+          "worstOtherKindBp": 229,
+          "fewestLiveCommons": 2,
           "meanShiftBp": "-48.47",
           "cvBp": 91,
           "p999OfExpectedBp": 10413,
@@ -747,9 +747,9 @@
             "signature": 633
           },
           "epicAndMythicBp": 149,
-          "worstCommonKindBp": null,
-          "worstOtherKindBp": null,
-          "fewestLiveCommons": null,
+          "worstCommonKindBp": 4425,
+          "worstOtherKindBp": 234,
+          "fewestLiveCommons": 2,
           "meanShiftBp": "121.21",
           "cvBp": 181,
           "p999OfExpectedBp": 10750,
@@ -766,9 +766,9 @@
             "signature": 418
           },
           "epicAndMythicBp": 300,
-          "worstCommonKindBp": null,
-          "worstOtherKindBp": null,
-          "fewestLiveCommons": null,
+          "worstCommonKindBp": 4253,
+          "worstOtherKindBp": 466,
+          "fewestLiveCommons": 2,
           "meanShiftBp": "202.19",
           "cvBp": 193,
           "p999OfExpectedBp": 10702,
@@ -776,14 +776,14 @@
           "clampLossBp": "0.01"
         }
       ],
-      "worstCommonKindOfPlanetBp": null,
-      "worstOtherKindOfPlanetBp": null,
+      "worstCommonKindOfPlanetBp": 2502,
+      "worstOtherKindOfPlanetBp": 103,
       "violations": []
     },
     {
       "planet": 20,
       "hold": 255,
-      "hasRoster": false,
+      "hasRoster": true,
       "isSignatureBoosted": false,
       "planetMeanShiftBp": "-1.08",
       "bands": [
@@ -793,9 +793,9 @@
             "uncommon": 371
           },
           "epicAndMythicBp": 0,
-          "worstCommonKindBp": null,
-          "worstOtherKindBp": null,
-          "fewestLiveCommons": null,
+          "worstCommonKindBp": 4815,
+          "worstOtherKindBp": 371,
+          "fewestLiveCommons": 2,
           "meanShiftBp": "0.00",
           "cvBp": 49,
           "p999OfExpectedBp": 10226,
@@ -808,9 +808,9 @@
             "uncommon": 212
           },
           "epicAndMythicBp": 0,
-          "worstCommonKindBp": null,
-          "worstOtherKindBp": null,
-          "fewestLiveCommons": null,
+          "worstCommonKindBp": 4895,
+          "worstOtherKindBp": 212,
+          "fewestLiveCommons": 2,
           "meanShiftBp": "-77.83",
           "cvBp": 37,
           "p999OfExpectedBp": 10144,
@@ -825,9 +825,9 @@
             "epic": 57
           },
           "epicAndMythicBp": 57,
-          "worstCommonKindBp": null,
-          "worstOtherKindBp": null,
-          "fewestLiveCommons": null,
+          "worstCommonKindBp": 4796,
+          "worstOtherKindBp": 229,
+          "fewestLiveCommons": 2,
           "meanShiftBp": "-48.47",
           "cvBp": 91,
           "p999OfExpectedBp": 10341,
@@ -844,9 +844,9 @@
             "signature": 633
           },
           "epicAndMythicBp": 149,
-          "worstCommonKindBp": null,
-          "worstOtherKindBp": null,
-          "fewestLiveCommons": null,
+          "worstCommonKindBp": 4425,
+          "worstOtherKindBp": 234,
+          "fewestLiveCommons": 2,
           "meanShiftBp": "121.21",
           "cvBp": 181,
           "p999OfExpectedBp": 10750,
@@ -863,9 +863,9 @@
             "signature": 418
           },
           "epicAndMythicBp": 300,
-          "worstCommonKindBp": null,
-          "worstOtherKindBp": null,
-          "fewestLiveCommons": null,
+          "worstCommonKindBp": 4253,
+          "worstOtherKindBp": 466,
+          "fewestLiveCommons": 2,
           "meanShiftBp": "202.19",
           "cvBp": 193,
           "p999OfExpectedBp": 10731,
@@ -873,14 +873,14 @@
           "clampLossBp": "0.01"
         }
       ],
-      "worstCommonKindOfPlanetBp": null,
-      "worstOtherKindOfPlanetBp": null,
+      "worstCommonKindOfPlanetBp": 2501,
+      "worstOtherKindOfPlanetBp": 103,
       "violations": []
     },
     {
       "planet": 40,
       "hold": 255,
-      "hasRoster": false,
+      "hasRoster": true,
       "isSignatureBoosted": true,
       "planetMeanShiftBp": "-1.06",
       "bands": [
@@ -890,9 +890,9 @@
             "uncommon": 371
           },
           "epicAndMythicBp": 0,
-          "worstCommonKindBp": null,
-          "worstOtherKindBp": null,
-          "fewestLiveCommons": null,
+          "worstCommonKindBp": 4815,
+          "worstOtherKindBp": 371,
+          "fewestLiveCommons": 2,
           "meanShiftBp": "0.00",
           "cvBp": 49,
           "p999OfExpectedBp": 10168,
@@ -909,9 +909,9 @@
             "uncommon": 212
           },
           "epicAndMythicBp": 0,
-          "worstCommonKindBp": null,
-          "worstOtherKindBp": null,
-          "fewestLiveCommons": null,
+          "worstCommonKindBp": 4895,
+          "worstOtherKindBp": 212,
+          "fewestLiveCommons": 2,
           "meanShiftBp": "-77.83",
           "cvBp": 37,
           "p999OfExpectedBp": 10164,
@@ -930,9 +930,9 @@
             "epic": 57
           },
           "epicAndMythicBp": 57,
-          "worstCommonKindBp": null,
-          "worstOtherKindBp": null,
-          "fewestLiveCommons": null,
+          "worstCommonKindBp": 4796,
+          "worstOtherKindBp": 229,
+          "fewestLiveCommons": 2,
           "meanShiftBp": "-48.47",
           "cvBp": 91,
           "p999OfExpectedBp": 10437,
@@ -955,9 +955,9 @@
             "signature": 633
           },
           "epicAndMythicBp": 144,
-          "worstCommonKindBp": null,
-          "worstOtherKindBp": null,
-          "fewestLiveCommons": null,
+          "worstCommonKindBp": 4139,
+          "worstOtherKindBp": 226,
+          "fewestLiveCommons": 2,
           "meanShiftBp": "121.21",
           "cvBp": 209,
           "p999OfExpectedBp": 10764,
@@ -982,9 +982,9 @@
             "signature": 418
           },
           "epicAndMythicBp": 295,
-          "worstCommonKindBp": null,
-          "worstOtherKindBp": null,
-          "fewestLiveCommons": null,
+          "worstCommonKindBp": 4058,
+          "worstOtherKindBp": 460,
+          "fewestLiveCommons": 2,
           "meanShiftBp": "202.19",
           "cvBp": 194,
           "p999OfExpectedBp": 10683,
@@ -1000,14 +1000,14 @@
           "boostedMeanShiftBp": "344.20"
         }
       ],
-      "worstCommonKindOfPlanetBp": null,
-      "worstOtherKindOfPlanetBp": null,
+      "worstCommonKindOfPlanetBp": 2440,
+      "worstOtherKindOfPlanetBp": 102,
       "violations": []
     },
     {
       "planet": 60,
       "hold": 255,
-      "hasRoster": false,
+      "hasRoster": true,
       "isSignatureBoosted": false,
       "planetMeanShiftBp": "-1.06",
       "bands": [
@@ -1017,9 +1017,9 @@
             "uncommon": 371
           },
           "epicAndMythicBp": 0,
-          "worstCommonKindBp": null,
-          "worstOtherKindBp": null,
-          "fewestLiveCommons": null,
+          "worstCommonKindBp": 4815,
+          "worstOtherKindBp": 371,
+          "fewestLiveCommons": 2,
           "meanShiftBp": "0.00",
           "cvBp": 49,
           "p999OfExpectedBp": 10187,
@@ -1032,9 +1032,9 @@
             "uncommon": 212
           },
           "epicAndMythicBp": 0,
-          "worstCommonKindBp": null,
-          "worstOtherKindBp": null,
-          "fewestLiveCommons": null,
+          "worstCommonKindBp": 4895,
+          "worstOtherKindBp": 212,
+          "fewestLiveCommons": 2,
           "meanShiftBp": "-77.83",
           "cvBp": 37,
           "p999OfExpectedBp": 10125,
@@ -1049,9 +1049,9 @@
             "epic": 57
           },
           "epicAndMythicBp": 57,
-          "worstCommonKindBp": null,
-          "worstOtherKindBp": null,
-          "fewestLiveCommons": null,
+          "worstCommonKindBp": 4796,
+          "worstOtherKindBp": 229,
+          "fewestLiveCommons": 2,
           "meanShiftBp": "-48.47",
           "cvBp": 91,
           "p999OfExpectedBp": 10393,
@@ -1068,9 +1068,9 @@
             "signature": 633
           },
           "epicAndMythicBp": 149,
-          "worstCommonKindBp": null,
-          "worstOtherKindBp": null,
-          "fewestLiveCommons": null,
+          "worstCommonKindBp": 4425,
+          "worstOtherKindBp": 234,
+          "fewestLiveCommons": 2,
           "meanShiftBp": "121.21",
           "cvBp": 181,
           "p999OfExpectedBp": 10688,
@@ -1087,9 +1087,9 @@
             "signature": 418
           },
           "epicAndMythicBp": 300,
-          "worstCommonKindBp": null,
-          "worstOtherKindBp": null,
-          "fewestLiveCommons": null,
+          "worstCommonKindBp": 4253,
+          "worstOtherKindBp": 466,
+          "fewestLiveCommons": 2,
           "meanShiftBp": "202.19",
           "cvBp": 193,
           "p999OfExpectedBp": 10750,
@@ -1097,8 +1097,8 @@
           "clampLossBp": "0.01"
         }
       ],
-      "worstCommonKindOfPlanetBp": null,
-      "worstOtherKindOfPlanetBp": null,
+      "worstCommonKindOfPlanetBp": 2501,
+      "worstOtherKindOfPlanetBp": 103,
       "violations": []
     }
   ],

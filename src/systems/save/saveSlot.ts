@@ -40,6 +40,7 @@ import { isJsonObject, isWholeNumber } from '../authority/payloadFields'
 import { planetParamsOf } from '../authority/planetOfState'
 import { placedHazardsFieldOf } from '../authority/hazards/placedHazards'
 import { blastSeqFieldOf } from '../authority/charges/blastSeq'
+import { awayOreRulesFieldOf } from '../authority/planetOreStamps'
 import {
   boreFieldsOf,
   oreRulesFieldOf,
@@ -118,6 +119,8 @@ export interface SaveWorldSection extends WorldSectionPlanet {
   groundedLines?: PortableState['groundedLines']
   /** The hazards a scenario placed (ticket 848); omitted while there are none. */
   placedHazards?: PortableState['placedHazards']
+  /** The left planets' ore rules stamps by `s:p`, beside their core bays (ticket 888); omitted while none. */
+  awayOreRules?: PortableState['awayOreRules']
   debugApplied: boolean
   /** The dev flags off their defaults, so the world runs as it ran (ticket 547); omitted while none is. */
   devFlagDelta?: PortableState['devFlagDelta']
@@ -206,6 +209,7 @@ function worldSectionOf(state: PortableState, saveEpoch: number): SaveWorldSecti
     terrainEdits: state.terrainEdits,
     ...boreFieldsOf(state),
     ...placedHazardsFieldOf(state.placedHazards),
+    ...awayOreRulesFieldOf(state.awayOreRules),
     debugApplied: state.debugApplied,
     ...devFlagFieldsOf(state),
     ...(state.slices === undefined ? {} : { slices: state.slices }),
@@ -280,6 +284,7 @@ export function snapshotOfSaveSlot(file: SaveSections): SessionSnapshot {
       terrainEdits: world.terrainEdits,
       ...boreFieldsOf(world),
       ...placedHazardsFieldOf(world.placedHazards),
+      ...awayOreRulesFieldOf(world.awayOreRules),
       debugApplied: world.debugApplied,
       ...devFlagFieldsOf(world),
       ...(world.slices === undefined ? {} : { slices: world.slices }),

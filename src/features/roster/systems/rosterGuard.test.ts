@@ -4,9 +4,12 @@ import { BAND_COUNT } from '../../../systems/world/planetGeometry'
 import type { ResourceFamily } from '../../../systems/world/worldCell'
 import { oreFamilies, ORE_ROWS, rarityTiers } from '../../ores'
 import { oreMixOf } from '../../planet-mix'
+import { MATERIAL_POOL_RULES } from '../../solar-systems'
+import { isGeneratedPoolPlanet } from './generatedRoster'
 import { planetRosterOf } from './planetRoster'
 import { rareClusterKindsOf } from './rosterClusterKinds'
 import { liveRosterIndicesOf } from './rosterFold'
+import { SHARE_ROWS } from './shareRows'
 
 // Systems' family-first rule on ticket 446 (6226198316), with the Vertical Scaler's bounds
 // (6226208534) and the TD's test list (6226236698 section 5 C): a kind's share of a band trip is
@@ -15,7 +18,8 @@ import { liveRosterIndicesOf } from './rosterFold'
 // are asserts on the real roster. Checked on every planet whose roster holds kinds: P1 and P2 on
 // the legacy table, P3 to P7 on the mixed one (#453), each on the three pacing seeds so a swapped
 // band 3 (fossil commons, from P4) is read too. A cell only the relic signature paints is the
-// slotless 16th material and asks for no kind (E1, Systems and TD on #453).
+// slotless 16th material and asks for no kind (E1, Systems and TD on #453). From ore rules 14 P6 and
+// P7 draw their generated pools (ticket 888), held to the same bounds by each run's least kinds.
 
 const SEED = 83921
 const SEEDS = [83921, 31415, 27182]
@@ -130,7 +134,8 @@ function labelOf(params: PlanetParams): string {
   return `P${params.planetIndex} seed ${params.worldSeed}`
 }
 
-const MIXED = ROSTERED.filter((params) => params.planetIndex >= 3)
+const MIXED = ROSTERED.filter((params) => params.planetIndex >= 3 && !isGeneratedPoolPlanet(params))
+const GENERATED = ROSTERED.filter(isGeneratedPoolPlanet)
 /** Option B's rows (#453), appended after Systems' 15 slots for a swapped band 3's fossil commons. */
 const APPENDED_SLOT_IDS = ['mixed.c5', 'mixed.c6']
 
@@ -246,6 +251,24 @@ describe('roster guard (Systems, ticket 446)', () => {
       expect(drawn.size).toBeLessThanOrEqual(ORE_ROWS.kinds.rosterMaxKinds)
     },
   )
+
+  it.each(GENERATED.map((params) => [labelOf(params), params] as const))(
+    'draws every kind of the generated pool of %s, 15 to 17 of them (ticket 888)',
+    (_, params) => {
+      const drawn = drawnSlotIdsOf(params)
+      expect(drawn.size).toBe(planetRosterOf(params).length)
+      expect(drawn.size).toBeGreaterThanOrEqual(15)
+      expect(drawn.size).toBeLessThanOrEqual(ORE_ROWS.kinds.rosterMaxKinds)
+    },
+  )
+
+  it("cuts the generated pools under the roster's own band-trip bounds (ticket 888)", () => {
+    expect(MATERIAL_POOL_RULES.kindTripCaps).toEqual({
+      commonBp: SHARE_ROWS.bounds.perCommonKindMaxOfBandTrip,
+      otherBp: SHARE_ROWS.bounds.perNonCommonKindMax,
+    })
+    expect([COMMON_BOUND_BP, RARE_BOUND_BP]).toEqual([5000, 1500])
+  })
 
   it("needs Option B's two rows: without them only a swapped band 3's fossil commons fall short", () => {
     const short = MIXED.flatMap((params) =>

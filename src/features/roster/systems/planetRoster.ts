@@ -19,6 +19,9 @@
  * cell. A pool may also own slots of its table from an ore rules version on (ticket 709): P2 entered
  * under rules 9 draws its three own kinds after the 12 shared legacy slots, while P1 and a P2 a save
  * holds under older rules keep the 12.
+ *
+ * From ore rules 14 (ticket 888) every planet after system 1's P5 resolves to its generated pool
+ * at its address instead (`generatedRoster.ts`): no pool row, kind table or planet index names it.
  */
 import {
   kindTableOf,
@@ -31,6 +34,7 @@ import {
 } from '../../ores'
 import type { PlanetParams } from '../../../systems/world/planetParams'
 import { NO_KIND_SLOT } from '../../../systems/world/worldCell'
+import { generatedPoolOf, generatedSlotsOf, isGeneratedPoolPlanet } from './generatedRoster'
 
 /** The ore rules version that brought the roster (ticket 446): 1 was the rarity rows alone. */
 export const ROSTER_ORE_RULES = 2
@@ -45,6 +49,7 @@ const rosterByKey = new Map<string, readonly KindSlot[]>()
 
 /** The kinds a planet's patches draw from, in roster order; empty before the roster's rules. */
 export function planetRosterOf(params: PlanetParams): readonly KindSlot[] {
+  if (isGeneratedPoolPlanet(params)) return generatedSlotsOf(params)
   const set = rarityRowSetOfPlanet(params)
   if (!hasRosterOfSet(params, set)) return NO_KINDS
   return rosterOfPool(set, poolOfPlanet(params) as string, params.oreRulesVersion)
@@ -59,10 +64,12 @@ export function rosterKindOf(params: PlanetParams, kindSlot: number): KindSlot |
 /**
  * The species pool the planet's kind slots resolve to, from its index and ore rules stamp, never
  * the seed: a planet a save holds under rules older than its pool's keeps the pool it was entered
- * with (ticket 632). Null past the pools table (P8+, #453): there a slot binds no species instead
- * of borrowing another planet's pool.
+ * with (ticket 632). Null past the pools table (P8+, #453) under rules before 14: there a slot binds
+ * no species instead of borrowing another planet's pool. From rules 14 a planet after system 1's P5
+ * resolves to its generated pool, `system<s>-p<p>` (ticket 888).
  */
 export function poolOfPlanet(params: PlanetParams): string | null {
+  if (isGeneratedPoolPlanet(params)) return generatedPoolOf(params).id
   return poolOfPlanetUnder(ORE_ROWS.kinds, params.planetIndex, params.oreRulesVersion)
 }
 

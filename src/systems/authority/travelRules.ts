@@ -29,8 +29,14 @@ import { coreNeededOf } from './coreBay'
 import { featureUnlocksOfTravel } from './featureUnlocks'
 import type { DomainEventBody } from './domainEvent'
 import { notDockedRejection } from './dockRules'
-import { artefactCacheSpawnOf, planetEntryOf, withSessionOnPlanet } from './planetEntry'
+import {
+  artefactCacheSpawnOf,
+  planetEntryOf,
+  planetGenerationOf,
+  withSessionOnPlanet,
+} from './planetEntry'
 import { noPlanetRejection, planetParamsOf, type SessionPlanet } from './planetOfState'
+import { landingStampOf } from './planetOreStamps'
 import { stateDigest } from './stateDigest'
 
 export const TRAVEL_RULES: { readonly travel: CommandRule<'travel'> } = {
@@ -120,7 +126,8 @@ function arriveAtPlanet(state: AuthorityState, to: SessionPlanet): RuleEffect {
 
 /**
  * The session moved to `to` and the arrival said: `unlocked` first, then the schedule rows the
- * move opens (#88), `planet_entered` and `artefact_cache_spawned`. `Travel` and the star map's
+ * move opens (#88), `planet_generated` the first time the session generates the planet (ticket
+ * 888), `planet_entered` and `artefact_cache_spawned`. `Travel` and the star map's
  * jump (ticket 755) both arrive through here.
  */
 export function enterPlanetByTravel(
@@ -128,6 +135,7 @@ export function enterPlanetByTravel(
   to: SessionPlanet,
   unlocked: readonly DomainEventBody[],
 ): RuleEffect {
+  const { isFirstGeneration } = landingStampOf(state, to)
   const arrived = withSessionOnPlanet(state, to)
   const params = planetParamsOf(arrived.planet)
   return {
@@ -135,9 +143,14 @@ export function enterPlanetByTravel(
     events: [
       ...unlocked,
       ...featureUnlocksOfTravel(state.planet.index, to.index),
+      ...(isFirstGeneration ? generationEventsOf(arrived.planet) : []),
       ...(params === null ? [] : arrivalEventsOf(params)),
     ],
   }
+}
+
+function generationEventsOf(planet: SessionPlanet): DomainEventBody[] {
+  return [{ type: 'PlanetGenerated', ...planetGenerationOf(planet) }]
 }
 
 function arrivalEventsOf(params: PlanetParams): DomainEventBody[] {

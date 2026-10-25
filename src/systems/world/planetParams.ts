@@ -31,6 +31,11 @@
  *
  * From ore rules 11 (ticket 738, the same rule) a planet from P3 draws its rare, epic and mythic ore
  * only from band 3 (`d >= 0.35`), weighted toward the core: the `ores` slice's deep rarity rows.
+ *
+ * From ore rules 14 (ticket 888, GD lock M1 on the Materials Expansion) every planet after system
+ * 1's P5, system 1's P6 on and every planet of a later system, draws its kinds from its generated
+ * material pool (the `solar-systems` slice), keyed on its address `(s, p)`: P6 and P7 leave
+ * `foothold-p6-p7`, which only a planet a save holds under older rules keeps.
  */
 import { hashCell } from '../cellRandom'
 import { ECONOMY } from '../economy/economy'
@@ -119,11 +124,12 @@ export interface PlanetParams {
  * P2's own three kinds after the legacy slots (ticket 709), 10 the rare-ore clusters on every
  * planet (ticket 737), 11 the rare windows from band 3 on from planet 3 (ticket 738), 12 planet 1's
  * three gems after the legacy slots (ticket 713), 13 the gem tier of planets 2 to 5 on three of
- * their rare and mythic kinds (ticket 741), a price that moves no cell. The stamp
+ * their rare and mythic kinds (ticket 741), a price that moves no cell, 14 the generated material
+ * pools of every planet after system 1's P5 (ticket 888). The stamp
  * records the ground rules a planet was entered under, its rock's hardness, its species pool and
  * its size with them.
  */
-export const ORE_RULES_VERSION = 13
+export const ORE_RULES_VERSION = 14
 
 /** The ore rules that add the depth density curve (ticket 448). */
 export const DEPTH_CURVE_ORE_RULES = 3
@@ -189,6 +195,9 @@ export const P2_TO_P5_GEMS_ORE_RULES = 13
 /** P1's gems are rules 12's, so the gem tier first changes planet 2 (ticket 741). */
 const P2_TO_P5_GEMS_FIRST_PLANET = 2
 
+/** The ore rules that draw every planet after system 1's P5 from its generated pool (ticket 888). */
+export const GENERATED_POOLS_ORE_RULES = 14
+
 /**
  * The first planet of system 1 that draws a generated material pool (ticket 888, GD lock M1 on the
  * Materials Expansion): P1 to P5 keep their authored species byte for byte.
@@ -207,7 +216,8 @@ export const GENERATED_POOLS_FIRST_PLANET = 6
  * P2's pool alone, so P3 on draw the kinds they drew), the rare clusters from planet 1 (ticket 737),
  * the deep rare window from planet 3 (ticket 738: P1 and P2 draw rare from band 3 already), P1's
  * gems from planet 1 (ticket 713: the `ores` slice's own slots name P1's pool alone), the gems of
- * P2 to P5 from planet 2 (ticket 741: the `ores` slice's gem table names their pools alone).
+ * P2 to P5 from planet 2 (ticket 741: the `ores` slice's gem table names their pools alone), the
+ * generated pools from planet 6 (ticket 888: a later system's planets all sit at `g >= 6`).
  */
 const ORE_RULES_FIRST_PLANETS: readonly number[] = [
   3,
@@ -223,6 +233,7 @@ const ORE_RULES_FIRST_PLANETS: readonly number[] = [
   DEEP_RARE_WINDOW_FIRST_PLANET,
   P1_GEMS_FIRST_PLANET,
   P2_TO_P5_GEMS_FIRST_PLANET,
+  GENERATED_POOLS_FIRST_PLANET,
 ]
 
 /** The first planet any ore rules change, so the first a fresh session stamps: planet 1. */
@@ -274,12 +285,26 @@ export function planetParamsFor(
  * before `ORE_RULES_FROM_PLANET`. Planet 1 stayed on rules 2, which the curve, the surface layer,
  * P2's pool, the registry radius, the hazard pockets and P2's own kinds leave as they were (tickets
  * 448, 625, 632, 643, 652, 709); the rare clusters change it, so it was stamped 10 (ticket 737),
- * and its gems change it again, so it is stamped 12 (ticket 713). Planets 2 on are stamped 13, the
- * gem tier of P2 to P5 (ticket 741).
+ * and its gems change it again, so it is stamped 12 (ticket 713). Planets 2 to 5 are stamped 13,
+ * the gem tier of P2 to P5 (ticket 741), and planets 6 on 14, the generated pools (ticket 888).
  */
 export function oreRulesVersionOnEntry(planetIndex: number): number | undefined {
-  const changing = ORE_RULES_FIRST_PLANETS.map((first, at) => (planetIndex >= first ? at + 1 : 0))
-  const newest = Math.max(...changing)
+  return oreRulesStampBefore(planetIndex, ORE_RULES_VERSION + 1)
+}
+
+/**
+ * The stamp a planet entered by a build whose newest ore rules came before `beforeOreRules` took:
+ * how a planet a save holds state for, with no stamp of its own, loads (ticket 888, the TD's
+ * `v_pre`), as the build that left it would have entered it.
+ */
+export function oreRulesStampBefore(
+  planetIndex: number,
+  beforeOreRules: number,
+): number | undefined {
+  const changing = ORE_RULES_FIRST_PLANETS.slice(0, beforeOreRules - 1).map((first, at) =>
+    planetIndex >= first ? at + 1 : 0,
+  )
+  const newest = Math.max(0, ...changing)
   return newest === 0 ? undefined : newest
 }
 

@@ -34,6 +34,7 @@ import type { DomainEvent } from '../systems/authority/domainEvent'
 import { takeSnapshot } from '../systems/authority/sessionSnapshot'
 import { stateDigest } from '../systems/authority/stateDigest'
 import { isCheckpointMoment } from '../systems/save/checkpointMoment'
+import { refusedOreRulesOfSave, type RefusedOreRules } from '../systems/save/refusedOreRules'
 import {
   readMigratedSaveSlot,
   type MigratedSaveSlotReading,
@@ -94,7 +95,14 @@ export interface Checkpoint {
 }
 
 /** What a start finds in a slot: a session to resume, a refused save, or nothing. */
-export type CheckpointLoad = Checkpoint | { problems: string[] } | null
+/** A save this build refuses: why, and the planets stamped newer than this build (ticket 888). */
+export interface CheckpointRefusal {
+  problems: string[]
+  /** Present only when the save holds such a planet. */
+  refusedOreRules?: readonly RefusedOreRules[]
+}
+
+export type CheckpointLoad = Checkpoint | CheckpointRefusal | null
 
 let installed: SaveFolderInstall | null = null
 let lastEpoch = 0
@@ -219,6 +227,12 @@ export async function loadSaveSlot(slot: SaveSlotKey): Promise<CheckpointLoad> {
   return text === null ? null : adoptOrSetAside(folder, { slot, text }, readSaveSlotText(text))
 }
 
+/** The refusal of a save file with the planets it is refused for, named only when there are any. */
+function refusalOf(text: string, problems: string[]): CheckpointRefusal {
+  const refused = refusedOreRulesOfSave(parsedJson(text))
+  return refused.length === 0 ? { problems } : { problems, refusedOreRules: refused }
+}
+
 /** The save Export hands over: the last one written, tried, loaded or imported; null before any. */
 export function saveToExport(): SaveExport | null {
   if (lastSave === null) return null
@@ -293,14 +307,14 @@ async function adoptOrSetAside(
   folder: SaveFolder,
   stored: { slot: SaveSlotKey; text: string },
   reading: MigratedSaveSlotReading,
-): Promise<Checkpoint | { problems: string[] }> {
+): Promise<Checkpoint | CheckpointRefusal> {
   if ('state' in reading) {
     role = 'host'
     lastSave = { slot: stored.slot, json: stored.text, saveEpoch: reading.saveEpoch }
     return checkpointOfReading(stored.slot, reading)
   }
   await folder.setAside(stored.slot)
-  return { problems: reading.problems }
+  return refusalOf(stored.text, reading.problems)
 }
 
 function checkpointOfReading(slot: Checkpoint['slot'], reading: ResumableReading): Checkpoint {

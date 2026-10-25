@@ -11,12 +11,16 @@
  * `Travel`, the star map's jump (ticket 755) and `debug.setPlanet` all go through here; the planet
  * keeps the star-map system it is moved to.
  *
- * The planet is entered under this build's ore rules (ticket 445): the stamp is set here from the
- * index, never carried over, so a legacy planet loaded from a save never passes its missing stamp on
- * to the next planet. `planet_entered` names the rules when the planet has them, so a report can
- * rebuild the exact params.
+ * A planet is stamped with its ore rules once, the first time the session generates it (ticket
+ * 445; ticket 888, `planetOreStamps.ts`): a planet entered before lands under the stamp it was
+ * first made with, so it regenerates as it was, and a planet never entered takes this build's
+ * stamp from its index. The stamp is never carried from one planet to the next, so a legacy planet
+ * loaded from a save never passes its missing stamp on. `planet_entered` names the rules when the
+ * planet has them, so a report can rebuild the exact params.
  */
 import { GENERATOR_VERSION } from '../generatorVersion'
+import { placeOfCampaign } from '../starMap/campaignIndex'
+import { toIndexText } from '../starMap/planetAddress'
 import type { VehicleCharges } from '../vehicle/vehicleCharges'
 import { withoutCutCarry } from '../vehicle/cutCarry'
 import { withoutGatedBite } from '../vehicle/gatedBite'
@@ -41,14 +45,16 @@ import type { DomainEventBodies } from './domainEvent'
 import { coreBaysOnLanding } from './planetCoreBays'
 import {
   dockSiteOfPlanet,
-  enteredPlanetOf,
   systemOfPlanet,
+  withOreRulesVersion,
   withSystem,
   type SessionPlanet,
 } from './planetOfState'
+import { landingStampOf, withAwayOreRules } from './planetOreStamps'
 
 export function withSessionOnPlanet(state: AuthorityState, to: SessionPlanet): AuthorityState {
-  const planet = withSystem(enteredPlanetOf(to.index, to.seed), systemOfPlanet(to))
+  const landing = landingStampOf(state, to)
+  const planet = withSystem(withOreRulesVersion(to, landing.oreRulesVersion), systemOfPlanet(to))
   const site = dockSiteOfPlanet(planet)
   const pose = site === null ? null : dockedPoseAt(site)
   const players = Object.fromEntries(
@@ -66,7 +72,10 @@ export function withSessionOnPlanet(state: AuthorityState, to: SessionPlanet): A
   )
   return {
     ...withoutPlacedHazards(
-      withGroundedLines(withStruts(withBores(state, NO_BORES), NO_STRUTS), NO_GROUNDED_LINES),
+      withGroundedLines(
+        withStruts(withBores(withAwayOreRules(state, landing.awayOreRules), NO_BORES), NO_STRUTS),
+        NO_GROUNDED_LINES,
+      ),
     ),
     ...coreBaysOnLanding(state, planet),
     planet,
@@ -91,6 +100,20 @@ export function planetEntryOf(params: PlanetParams): DomainEventBodies['PlanetEn
     generatorVersion: GENERATOR_VERSION,
     radius: params.radiusTiles,
     ...(params.oreRulesVersion === undefined ? {} : { oreRulesVersion: params.oreRulesVersion }),
+  }
+}
+
+/**
+ * What `planet_generated` says about a planet the session generates for the first time (ticket
+ * 888): its address and campaign index as canonical index text, and the stamp it took.
+ */
+export function planetGenerationOf(planet: SessionPlanet): DomainEventBodies['PlanetGenerated'] {
+  const system = systemOfPlanet(planet)
+  return {
+    system: toIndexText(system),
+    place: toIndexText(placeOfCampaign(system, BigInt(planet.index))),
+    campaignIndex: toIndexText(BigInt(planet.index)),
+    ...(planet.oreRulesVersion === undefined ? {} : { oreRulesVersion: planet.oreRulesVersion }),
   }
 }
 

@@ -5,6 +5,7 @@ import {
 } from '../../../systems/authority/authorityState'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import { planetParamsOf } from '../../../systems/authority/planetOfState'
+import { GENERATED_POOLS_ORE_RULES } from '../../../systems/world/planetParams'
 import {
   createScriptedSession,
   mineTile,
@@ -187,7 +188,12 @@ describe('codex: material:<species id> (ticket 546)', () => {
   })
 
   it('records nothing on a planet whose cells bind no species, every ore event as before', () => {
-    const p8 = createAuthorityState({ planetIndex: 8, planetSeed: 83921, playerIds: ['p1'] })
+    // P8 as a save from before the generated pools holds it (ticket 888): no pool binds there.
+    const fresh = createAuthorityState({ planetIndex: 8, planetSeed: 83921, playerIds: ['p1'] })
+    const p8 = {
+      ...fresh,
+      planet: { ...fresh.planet, oreRulesVersion: GENERATED_POOLS_ORE_RULES - 1 },
+    }
     const tile = surfaceOreTiles(1, planetParamsOf(p8.planet)!)[0]
     const heard = [drillDamageAt(tile)]
     const on = heardOn(p8, heard)

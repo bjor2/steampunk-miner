@@ -14,6 +14,7 @@ import {
   DEEP_RARE_WINDOW_ORE_RULES,
   DEPTH_CURVE_ORE_RULES,
   freshPlanetParamsFor,
+  GENERATED_POOLS_ORE_RULES,
   freshRadiusTilesOf,
   HAZARD_POCKET_ORE_RULES,
   P2_OWN_KINDS_ORE_RULES,
@@ -21,6 +22,8 @@ import {
   isHazardPocketPlanet,
   ORE_RULES_FROM_PLANET,
   ORE_RULES_VERSION,
+  oreRulesStampBefore,
+  oreRulesVersionOnEntry,
   planetParamsFor,
   RADIUS_ROWS_ORE_RULES,
   P1_GEMS_ORE_RULES,
@@ -163,15 +166,26 @@ describe('planet params ore rules (ticket 445)', () => {
     expect(Object.keys(stamped).at(-1)).toBe('oreRulesVersion')
   })
 
-  it('stamps planet 1 with its gems, rules 12 (713), and planets from 2 with the P2-P5 gem tier, rules 13 (741)', () => {
-    const stamps = [1, 2, 3, 4, 60].map((index) => freshPlanetParamsFor(1, index).oreRulesVersion)
+  it('stamps planet 1 with its gems, rules 12 (713), planets 2 to 5 with the P2-P5 gem tier, rules 13 (741), and planets from 6 with the generated pools, rules 14 (888)', () => {
+    const stamps = [1, 2, 3, 4, 5, 6, 7, 60].map(
+      (index) => freshPlanetParamsFor(1, index).oreRulesVersion,
+    )
     expect(ORE_RULES_FROM_PLANET).toBe(1)
-    expect(ORE_RULES_VERSION).toBe(13)
+    expect(ORE_RULES_VERSION).toBe(14)
     expect(DEEP_RARE_WINDOW_ORE_RULES).toBe(11)
     expect(P1_GEMS_ORE_RULES).toBe(12)
-    expect(P2_TO_P5_GEMS_ORE_RULES).toBe(ORE_RULES_VERSION)
+    expect(P2_TO_P5_GEMS_ORE_RULES).toBe(13)
+    expect(GENERATED_POOLS_ORE_RULES).toBe(ORE_RULES_VERSION)
     expect(P2_OWN_KINDS_ORE_RULES).toBe(9)
-    expect(stamps).toEqual([12, 13, 13, 13, 13])
+    expect(stamps).toEqual([12, 13, 13, 13, 13, 14, 14, 14])
+  })
+
+  it('stamps a planet a save holds state for with no stamp as the build before the generated pools would (ticket 888)', () => {
+    const before = [1, 2, 5, 6, 60].map((index) =>
+      oreRulesStampBefore(index, GENERATED_POOLS_ORE_RULES),
+    )
+    expect(before).toEqual([12, 13, 13, 13, 13])
+    expect(oreRulesStampBefore(6, ORE_RULES_VERSION + 1)).toBe(oreRulesVersionOnEntry(6))
   })
 
   it('holds hazard pockets only on a planet from 2 entered under ore rules 8 (ticket 652)', () => {

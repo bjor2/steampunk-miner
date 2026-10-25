@@ -3,7 +3,11 @@ import { withRegistrations } from '../../../registries/registrar'
 import type { SliceDefinition } from '../../../registries/sliceDefinition'
 import { readAuthorityState } from '../../../store/authorityLink'
 import { resetGameStore, useGameStore } from '../../../store/gameStore'
-import { freshPlanetParamsFor } from '../../../systems/world/planetParams'
+import {
+  freshPlanetParamsFor,
+  GENERATED_POOLS_ORE_RULES,
+  planetParamsFor,
+} from '../../../systems/world/planetParams'
 import { planetRosterOf, planetSpeciesOf } from '../../roster'
 import { oreTierOf } from '../../ores'
 import type { SignatureSkinRow, SkinRow } from './skinLayers'
@@ -99,7 +103,8 @@ describe('mineral skin generator', () => {
   })
 
   it('gives a planet with no species pool no skins', () => {
-    expect(planetSkinsOf(freshPlanetParamsFor(SEED, 8), tableOf([]))).toEqual([])
+    const held = planetParamsFor(SEED, 8, GENERATED_POOLS_ORE_RULES - 1)
+    expect(planetSkinsOf(held, tableOf([]))).toEqual([])
   })
 
   it('names two species of one planet that share all four layers', () => {

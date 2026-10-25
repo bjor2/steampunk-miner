@@ -39,5 +39,9 @@
  * clusters, while planets 2 on and every planet a save holds keep the cells of 16. Ore rules 13
  * (ticket 741) sells three rare or mythic kinds of planets 2 to 5 as gems, a sale tier that moves no
  * generated cell, so it needs no bump.
+ * Version 18 draws the kinds of every planet after system 1's P5 entered under ore rules 14 from
+ * its generated material pool at its address (ticket 888), which rewrites the kind slot of their
+ * ore patches and the guaranteed clusters of their rare kinds, while P1 to P5 and every planet a
+ * save holds keep the cells of 17.
  */
-export const GENERATOR_VERSION = 17
+export const GENERATOR_VERSION = 18

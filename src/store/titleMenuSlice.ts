@@ -9,6 +9,7 @@
  * Once a game is picked, play starts as a launch without the title does: the starting planet's
  * lines, its card, then the hints.
  */
+import type { RunEventPlace } from '../logging/runEvent'
 import { recordStartingPlanet } from '../logging/startingPlanetLines'
 import { getRunLog } from '../logging/runLog'
 import { planetParamsOf } from '../systems/authority/planetOfState'
@@ -20,6 +21,7 @@ import {
 } from '../systems/views/titleMenuModel'
 import { readAuthorityState } from './authorityLink'
 import { listSaveSlots, loadSaveSlot, type Checkpoint, type CheckpointLoad } from './checkpoint'
+import { recordOreRulesRefused } from './checkpointLines'
 
 export interface TitleMenuValues {
   /** The title menu on screen; null once play started. */
@@ -97,6 +99,7 @@ async function resumeOrReport(
 ): Promise<void> {
   const checkpoint = await loadSaveSlot(slot)
   if (isResumable(checkpoint)) return resumeFromTitle(set, get, checkpoint)
+  recordRefusedStamps(get(), checkpoint)
   const page = get().titleMenu?.page ?? 'main'
   const titleMenu = { page, slots: await listSaveSlots(), problems: problemsOf(slot, checkpoint) }
   set({ titleMenu })
@@ -123,13 +126,17 @@ function recordPlanetEntered(host: SliceHost): void {
   const state = readAuthorityState()
   const params = planetParamsOf(state.planet)
   if (params === null) return
-  const stamp = {
-    playerId: host.playerId,
-    planet: host.planetTier,
-    depthTiles: host.depthTiles,
-    tick: state.tick,
-  }
-  recordStartingPlanet(getRunLog(), stamp, params)
+  recordStartingPlanet(getRunLog(), { ...placeOf(host), tick: state.tick }, params)
+}
+
+/** A refused slot's planets stamped newer than this build, as `ore_rules_refused` (ticket 888). */
+function recordRefusedStamps(host: SliceHost, checkpoint: CheckpointLoad): void {
+  if (checkpoint === null || !('problems' in checkpoint)) return
+  recordOreRulesRefused(checkpoint, placeOf(host), readAuthorityState().tick)
+}
+
+function placeOf(host: SliceHost): RunEventPlace {
+  return { playerId: host.playerId, planet: host.planetTier, depthTiles: host.depthTiles }
 }
 
 function titleMenuOf(slots: TitleMenu['slots']): TitleMenu {

@@ -15,8 +15,10 @@ import {
   SURFACE_LAYER_ORE_RULES,
   P1_GEMS_ORE_RULES,
   P2_TO_P5_GEMS_ORE_RULES,
+  GENERATED_POOLS_ORE_RULES,
   type PlanetParams,
 } from './planetParams'
+import { planetParamsAt } from '../starMap/systemPlanetParams'
 
 /** The ore rules of the roster (ticket 446), the last before the depth density curve. */
 const ROSTER_ORE_RULES = 2
@@ -48,14 +50,16 @@ import { chunkRangeOfDisc } from './tileGrid'
  * pinned by the deep digests of planets 3 to 7, and planet 1's gems of a planet 1 entered under ore
  * rules 12 under 17, ticket 713, pinned by the gem digest and leaving planets 2 on as rules 11 made
  * them, and the gem tier of planets 2 to 5 under ore rules 13, ticket 741, a sale tier that moves no
- * cell and so needs no bump, with the features loaded as the game loads them):
+ * cell and so needs no bump, and the generated pools of every planet after system 1's P5 entered
+ * under ore rules 14 under 18, ticket 888, pinned by the pool digests and leaving P1 to P5 as rules
+ * 13 made them, with the features loaded as the game loads them):
  * a committed
  * digest of the generator's cells and density. If this fails, the
  * generator changed what a seed makes: bump GENERATOR_VERSION (saves and replays of the old
  * world are then refused) and update the version and digests below in the same commit.
  */
 const GOLDEN = {
-  generatorVersion: 17,
+  generatorVersion: 18,
   wholePlanet1: '4219af3346401cb7',
   wholePlanet2: 'ff1572afae8b0e0f',
   farPlanetChunks: 'c602124184c77617',
@@ -85,6 +89,14 @@ const GOLDEN = {
     '21c74c40bdd1a43e',
   ],
   gemsWholePlanet1: '64c25a9a2cd73db0',
+  poolChunks: {
+    planet6: '3c76a52245944a30',
+    planet8: 'a80a27eada66f820',
+    planet20: 'e531e0ea031be751',
+    planet40: 'd32b6000eccf76a9',
+    system2Planet1: 'bc1a58d22447baff',
+    campaignIndex1e6: '6c9dcec1af8bdef6',
+  },
 }
 
 /** One digest over every chunk's digest in a fixed order. */
@@ -288,5 +300,51 @@ describe('generator golden digest', () => {
     expect(deep.map((params) => digestOfChunks(params, everyChunkOf(params)))).toEqual(
       GOLDEN.deepWholePlanets3To7.slice(0, 3),
     )
+  })
+
+  // Ticket 888 (TD tests 1 and 6): P1 to P5 under the generated pools' rules make the cells rules 13
+  // made, and every planet after system 1's P5 draws its pool's kinds, the same cells on every run
+  // for one seed and stamp, a later system's planet from its address, g = 1e6 included.
+  it('makes planets 1 to 5 under ore rules 14, the generated pools, as rules 13 did (ticket 888)', () => {
+    const pools = (seed: number, planet: number) =>
+      planetParamsFor(seed, planet, GENERATED_POOLS_ORE_RULES)
+    const [planet1, planet2] = [pools(83921, 1), pools(4_000_000_000, 2)]
+    expect(digestOfChunks(planet1, everyChunkOf(planet1))).toBe(GOLDEN.gemsWholePlanet1)
+    expect(digestOfChunks(planet2, everyChunkOf(planet2))).toBe(GOLDEN.clusterWholePlanet2)
+    const deep = [3, 4, 5].map((planet) => pools(83921, planet))
+    expect(deep.map((params) => digestOfChunks(params, everyChunkOf(params)))).toEqual(
+      GOLDEN.deepWholePlanets3To7.slice(0, 3),
+    )
+  })
+
+  it('makes the committed pool chunks of P6, P8, P20, P40, SS2 p1 and g = 1e6 under ore rules 14 (ticket 888)', () => {
+    const rules = GENERATED_POOLS_ORE_RULES
+    const pooled = {
+      planet6: planetParamsFor(83921, 6, rules),
+      planet8: planetParamsFor(83921, 8, rules),
+      planet20: planetParamsFor(83921, 20, rules),
+      planet40: planetParamsFor(83921, 40, rules),
+      system2Planet1: planetParamsAt(83921, 2n, 6, rules),
+      campaignIndex1e6: planetParamsAt(83921, 200_000n, 1_000_000, rules),
+    }
+    const digests = Object.fromEntries(
+      Object.entries(pooled).map(([name, params]) => [
+        name,
+        digestOfChunks(params, HEAT_PLANET_CHUNKS),
+      ]),
+    )
+    expect(digests).toEqual(GOLDEN.poolChunks)
+    const again = digestOfChunks(planetParamsFor(83921, 6, rules), HEAT_PLANET_CHUNKS)
+    expect(again).toBe(GOLDEN.poolChunks.planet6)
+  })
+
+  it('draws other kinds on P6 and P8 under ore rules 14 than under 13, from the same lattice', () => {
+    for (const planet of [6, 8]) {
+      const before = planetParamsFor(83921, planet, GENERATED_POOLS_ORE_RULES - 1)
+      const pooled = planetParamsFor(83921, planet, GENERATED_POOLS_ORE_RULES)
+      expect(digestOfChunks(pooled, HEAT_PLANET_CHUNKS), `planet ${planet}`).not.toBe(
+        digestOfChunks(before, HEAT_PLANET_CHUNKS),
+      )
+    }
   })
 })

@@ -1,7 +1,7 @@
 /**
  * What the checkpoint logs about the save folder (#26, #123, #470 P1-8): a slot save once the
- * shell has it, a save no store took, a save handed to the player as a file, a file brought in
- * and a slot the player scrapped. Each save's line carries its epoch and bytes, so a lost or moved
+ * shell has it, a save no store took, a save handed to the player as a file, a file brought in,
+ * a slot the player scrapped and the newer planets a refused save holds (ticket 888). Each save's line carries its epoch and bytes, so a lost or moved
  * save can be traced in the log.
  */
 import { getRunLog } from '../logging/runLog'
@@ -10,6 +10,7 @@ import { stateDigest } from '../systems/authority/stateDigest'
 import type { SaveMigration } from '../systems/save/saveMigrations'
 import type { SaveFailureCause } from '../systems/save/saveWriteFailure'
 import type { SaveSlotKey } from '../systems/save/saveSlotIndex'
+import type { CheckpointRefusal } from './checkpoint'
 import { readAuthorityState } from './authorityLink'
 
 /** A save's exact text and the slot and epoch it was written under. */
@@ -98,6 +99,20 @@ export function recordSaveImported(save: SlotSave, place: RunEventPlace): void {
 /** Stamped at the session's tick now, as the player confirmed the Scrap. */
 export function recordSaveDeleted(slot: SaveSlotKey, place: RunEventPlace, tick: number): void {
   getRunLog().record({ ...place, tick }, 'save_deleted', { slot })
+}
+
+/**
+ * One `ore_rules_refused` line per planet a refused save holds under ore rules newer than this
+ * build's (ticket 888), stamped at the session's tick now: the load that refused it started fresh.
+ */
+export function recordOreRulesRefused(
+  refusal: CheckpointRefusal,
+  place: RunEventPlace,
+  tick: number,
+): void {
+  for (const refused of refusal.refusedOreRules ?? []) {
+    getRunLog().record({ ...place, tick }, 'ore_rules_refused', { ...refused })
+  }
 }
 
 /** UTF-8 bytes, as the shell stores them. */

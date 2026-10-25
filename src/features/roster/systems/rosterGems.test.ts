@@ -5,6 +5,7 @@ import { minedOreOf, oreTypeOfCell } from '../../../systems/authority/minedOre'
 import { saleTierOf } from '../../../systems/registries/oreTypes'
 import {
   freshPlanetParamsFor,
+  GENERATED_POOLS_ORE_RULES,
   P1_GEMS_ORE_RULES,
   P2_TO_P5_GEMS_ORE_RULES,
   planetParamsFor,
@@ -13,7 +14,7 @@ import {
 import { oreCell, RESOURCE_FAMILY } from '../../../systems/world/worldCell'
 import { ORE_ROWS, rarityRowSetOfPlanet, topLeadOf, topOreTierOf } from '../../ores'
 import { planetSpeciesOf } from './planetSpecies'
-import { planetRosterOf } from './planetRoster'
+import { planetRosterOf, poolOfPlanet } from './planetRoster'
 import { gemSaleTierOfKind } from './rosterGems'
 
 // P1's gems (ticket 713, Systems' decision on #713 with Bjor's OK of 23 Oct): Diamond, Emerald and
@@ -154,7 +155,11 @@ describe('the gem tier of P2 to P5', () => {
     expect(older.map(gemsOf)).toEqual([[], [], [], []])
   })
 
-  it('names no gem on the P6 and P7 pool, whose rows the lock leaves plain', () => {
-    expect([6, 7].map((planet) => gemsOf(freshPlanetParamsFor(SEED, planet)))).toEqual([[], []])
+  it('names no gem on a P6 or P7 a save holds on foothold-p6-p7, which is saves-only (ticket 888)', () => {
+    const held = [6, 7].map((planet) =>
+      planetParamsFor(SEED, planet, GENERATED_POOLS_ORE_RULES - 1),
+    )
+    expect(held.map(poolOfPlanet)).toEqual(['foothold-p6-p7', 'foothold-p6-p7'])
+    expect(held.map(gemsOf)).toEqual([[], []])
   })
 })

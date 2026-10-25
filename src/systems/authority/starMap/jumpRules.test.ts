@@ -48,7 +48,7 @@ describe('star map jump (ticket 755)', () => {
     })
   })
 
-  it('logs travel_started, planet_unlocked, feature_unlocked, planet_entered, the cache and a travel digest, in order', () => {
+  it('logs travel_started, planet_unlocked, feature_unlocked, planet_generated, planet_entered, the cache and a travel digest, in order', () => {
     const session = fuelledWith(5)
     const events = session.submit(10, jumpTo('2'))
     expect(typesOf(events)).toEqual([
@@ -56,11 +56,12 @@ describe('star map jump (ticket 755)', () => {
       'PlanetUnlocked',
       'FeatureUnlocked',
       'FeatureUnlocked',
+      'PlanetGenerated',
       'PlanetEntered',
       'ArtefactCacheSpawned',
       'StateDigested',
     ])
-    expect(events[6]).toMatchObject({ scope: 'travel', digest: stateDigest(session.state()) })
+    expect(events[7]).toMatchObject({ scope: 'travel', digest: stateDigest(session.state()) })
   })
 
   it('skips ahead to any planet of the system, burning a quarter of U0 more per planet crossed', () => {
@@ -73,12 +74,13 @@ describe('star map jump (ticket 755)', () => {
     expect(session.vehicle()).toMatchObject({ mode: 'docked', pose: dockedPoseAt(site) })
   })
 
-  it('jumps back to an earlier planet without unlocking it again', () => {
+  it('jumps back to an earlier planet without unlocking or generating it again', () => {
     const session = fuelledWith(10)
     session.submit(10, jumpTo('2'))
     const events = session.submit(20, jumpTo('1'))
     expect(session.state().planet.index).toBe(1)
     expect(typesOf(events)).not.toContain('PlanetUnlocked')
+    expect(typesOf(events)).not.toContain('PlanetGenerated')
     expect(events[0]).toMatchObject({ fromPlanet: 2, toPlanet: 1, fuelSpent: '5e+0' })
   })
 

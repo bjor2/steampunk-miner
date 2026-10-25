@@ -46,6 +46,7 @@ describe('save migration: snapshot 22 -> 23, the fuel tank track (ticket 756)', 
       { version: 'snapshotVersion', from: 26, to: 27 },
       { version: 'snapshotVersion', from: 27, to: 28 },
       { version: 'snapshotVersion', from: 28, to: 29 },
+      { version: 'snapshotVersion', from: 29, to: 30 },
     ])
     expect(reading.state).toEqual(state)
     expect(stateDigest(reading.state)).toBe(stateDigest(state))

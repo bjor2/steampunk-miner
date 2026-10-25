@@ -54,6 +54,12 @@
  * the one it would have been. The rack is kept as saved: the 12-row ladder keeps sizes 1 to 10
  * as they were, so every owned charge is the same row.
  *
+ * Snapshot 29 -> 30 (ticket 888, the ore rules stamp of each planet): a save from before it keeps no
+ * left planet's stamp, the absent key of this build, so the old digest is checked and the state is
+ * kept as saved. A left planet with a saved core bay then lands as the build before the generated
+ * pools made it, and the planet the save is on keeps its own stamp; a build from before the stamps
+ * refuses a save that holds one it would drop.
+ *
  * Generator 5 -> 6 (#175): the pad grew to -8..+12 under the two shop buildings, so the chunk edits
  * of every chunk the old or new pad and its cleared air touch are dropped and regenerate under the
  * new stamp, every vehicle is put on the Sell bay's rest pose, and the params are recomputed from
@@ -117,6 +123,12 @@
  * each. A save written before it holds its planet under rules 11 or earlier, so that planet keeps
  * its 12 species and never regenerates mid-run; every cell, edit and the whole state are kept, and
  * the next planet is stamped with rules 12.
+ *
+ * Generator 17 -> 18 (ticket 888): every planet after system 1's P5 entered under ore rules 14 draws
+ * its kinds from its generated material pool. A save written before it holds its planet under
+ * rules 13 or earlier, so that planet keeps the pool it was entered with (`foothold-p6-p7` on P6
+ * and P7, none from P8) and never regenerates mid-run; every cell, edit and the whole state are
+ * kept, and the next planet the player first enters from P6 is stamped with rules 14.
  *
  * Format 1 -> 2 (#401): the slot layout. A v1 file was the checkpoint of the single slot, so it
  * becomes the autosave with no wall time, and its header gains the ids of the rows its state opens
@@ -217,6 +229,7 @@ const SAVE_MIGRATION_STEPS: readonly SaveMigrationStep[] = [
   { version: 'snapshotVersion', from: 26, to: 27, migrate: keepHoldsWithoutPremium },
   { version: 'snapshotVersion', from: 27, to: 28, migrate: keepSafeHoldCounts },
   { version: 'snapshotVersion', from: 28, to: 29, migrate: numberLiveBlasts },
+  { version: 'snapshotVersion', from: 29, to: 30, migrate: keepPlanetsWithoutStamps },
   { version: 'generatorVersion', from: 5, to: 6, migrate: regeneratePadArea },
   { version: 'generatorVersion', from: 6, to: 7, migrate: keepEditsUnderOreLeads },
   { version: 'generatorVersion', from: 7, to: 8, migrate: keepEditsUnderOreMix },
@@ -229,6 +242,7 @@ const SAVE_MIGRATION_STEPS: readonly SaveMigrationStep[] = [
   { version: 'generatorVersion', from: 14, to: 15, migrate: keepRarePatches },
   { version: 'generatorVersion', from: 15, to: 16, migrate: keepBandTwoRares },
   { version: 'generatorVersion', from: 16, to: 17, migrate: keepPlanetOneWithoutGems },
+  { version: 'generatorVersion', from: 17, to: 18, migrate: keepPlanetsWithoutPools },
   { version: 'formatVersion', from: 1, to: 2, migrate: addSlotHeader },
   { version: 'formatVersion', from: 2, to: 3, migrate: packChunkTable },
 ]
@@ -369,6 +383,11 @@ function numberLiveBlasts(file: MigratingFile): MigratingFile | null {
   return reshapedFile(file, 29, withNumberedBlasts)
 }
 
+/** Snapshot 29 -> 30: no left planet's stamp is the absent key, so the state is kept. */
+function keepPlanetsWithoutStamps(file: MigratingFile): MigratingFile | null {
+  return reshapedFile(file, 30, (state) => state)
+}
+
 /** Generator 5 -> 6: the state is read as saved (the digest must hold), then moved off the pad. */
 function regeneratePadArea(file: MigratingFile): MigratingFile | null {
   const restored = restoreUnderThisGenerator(file)
@@ -423,6 +442,11 @@ function keepBandTwoRares(file: MigratingFile): MigratingFile | null {
 
 function keepPlanetOneWithoutGems(file: MigratingFile): MigratingFile | null {
   return keptUnderGenerator(file, 17)
+}
+
+/** Generator 17 -> 18: as 16 -> 17, the saved planet keeps its stamp and so the pool it drew. */
+function keepPlanetsWithoutPools(file: MigratingFile): MigratingFile | null {
+  return keptUnderGenerator(file, 18)
 }
 
 function keptUnderGenerator(file: MigratingFile, generatorVersion: number): MigratingFile | null {

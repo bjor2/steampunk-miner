@@ -50,7 +50,7 @@ describe('travel', () => {
     })
   })
 
-  it('logs travel_started, planet_unlocked, feature_unlocked, planet_entered, the cache and a travel digest, in order', () => {
+  it('logs travel_started, planet_unlocked, feature_unlocked, planet_generated, planet_entered, the cache and a travel digest, in order', () => {
     const session = dockedWith(63)
     const events = session.submit(10, travelTo(2))
     expect(typesOf(events)).toEqual([
@@ -59,6 +59,7 @@ describe('travel', () => {
       'PlanetUnlocked',
       'FeatureUnlocked',
       'FeatureUnlocked',
+      'PlanetGenerated',
       'PlanetEntered',
       'ArtefactCacheSpawned',
       'StateDigested',
@@ -68,12 +69,19 @@ describe('travel', () => {
     expect(events[3]).toMatchObject({ featureId: 'planet_2' })
     expect(events[4]).toMatchObject({ featureId: 'scree_plough' })
     expect(events[5]).toMatchObject({
+      type: 'PlanetGenerated',
+      system: '1',
+      place: '2',
+      campaignIndex: '2',
+      oreRulesVersion: 13,
+    })
+    expect(events[6]).toMatchObject({
       planetSeed: planet2.planetSeed,
       generatorVersion: GENERATOR_VERSION,
       radius: 421,
     })
-    expect(events[6]).toMatchObject({ band: 2 })
-    expect(events[7]).toMatchObject({ scope: 'travel', digest: stateDigest(session.state()) })
+    expect(events[7]).toMatchObject({ band: 2 })
+    expect(events[8]).toMatchObject({ scope: 'travel', digest: stateDigest(session.state()) })
   })
 
   it('travels from the Upgrade bay as from the Sell bay (#37), landing in the Sell bay', () => {

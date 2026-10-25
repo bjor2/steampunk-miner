@@ -103,7 +103,7 @@ function awayBayValueProblems(bay: unknown, path: string): string[] {
 }
 
 /** The system as index text, the place as an integer (a planet with no world may sit below 1). */
-function isCorePlanetKey(key: string): boolean {
+export function isCorePlanetKey(key: string): boolean {
   const [system, place, ...rest] = key.split(':')
   return rest.length === 0 && readIndexText(system) !== null && /^(0|-?[1-9]\d*)$/.test(place ?? '')
 }

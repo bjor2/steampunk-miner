@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  GENERATED_POOLS_ORE_RULES,
   ORE_RULES_VERSION,
   P1_GEMS_ORE_RULES,
   P2_OWN_KINDS_ORE_RULES,
@@ -80,9 +81,9 @@ describe('planet roster', () => {
     expect(planetRosterOf(planetParamsFor(SEED, 2, 2))).toEqual(SHARED_LEGACY)
   })
 
-  it('gives no roster to a planet without a species pool, from planet 8 (#453)', () => {
+  it('gives no roster to a planet a save holds without a species pool, from planet 8 (#453)', () => {
     const rosters = [7, 8, 9, 60, 200].map((index) =>
-      planetRosterOf(freshPlanetParamsFor(SEED, index)),
+      planetRosterOf(planetParamsFor(SEED, index, GENERATED_POOLS_ORE_RULES - 1)),
     )
     expect(rosters.map((roster) => roster.length > 0)).toEqual([
       ORE_ROWS.kinds.slotsByTable.mixed.length > 0,
@@ -122,9 +123,36 @@ describe('planet roster', () => {
     expect(new Set(poolsOf(SEED).slice(2, 5)).size).toBe(3)
   })
 
-  it('gives no pool past planet 7, so a slot there binds no species', () => {
-    expect([8, 9, 41, 200].map((index) => poolOfPlanet(freshPlanetParamsFor(SEED, index)))).toEqual(
-      [null, null, null, null],
+  it('gives no pool past planet 7 on a planet a save holds from before the generated pools', () => {
+    const held = [8, 9, 41, 200].map((index) =>
+      planetParamsFor(SEED, index, GENERATED_POOLS_ORE_RULES - 1),
     )
+    expect(held.map(poolOfPlanet)).toEqual([null, null, null, null])
+  })
+
+  // Ticket 888: from ore rules 14 every planet after system 1's P5 draws its generated pool at its
+  // address, so P6 to P200 all hold kinds and none of them reads foothold-p6-p7.
+  it('resolves every fresh planet from P6 to its generated pool, system1-p<p>', () => {
+    const fresh = [6, 7, 8, 9, 41, 200].map((index) => freshPlanetParamsFor(SEED, index))
+    expect(fresh.map(poolOfPlanet)).toEqual([
+      'system1-p6',
+      'system1-p7',
+      'system1-p8',
+      'system1-p9',
+      'system1-p41',
+      'system1-p200',
+    ])
+    for (const params of fresh) {
+      const roster = planetRosterOf(params)
+      expect(roster.length).toBeGreaterThanOrEqual(15)
+      expect(
+        roster.every((slot) => slot.slotId.startsWith(`system1-p${params.planetIndex}-`)),
+      ).toBe(true)
+    }
+  })
+
+  it('keeps P1 to P5 on their authored pools under the generated pools rules', () => {
+    const authored = [1, 2, 3, 4, 5].map((index) => poolOfPlanet(freshPlanetParamsFor(SEED, index)))
+    expect(authored.every((pool) => pool !== null && !pool.startsWith('system'))).toBe(true)
   })
 })

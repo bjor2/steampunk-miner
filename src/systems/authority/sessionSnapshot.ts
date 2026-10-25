@@ -56,6 +56,7 @@ import { heldArtefactProblems, type HeldArtefact } from './heldArtefact'
 import { isJsonObject, isWholeNumber } from './payloadFields'
 import { isPortableSystem, systemOfPlanet, withSystem, type SessionPlanet } from './planetOfState'
 import { isKnownOreRulesVersion } from '../world/planetParams'
+import { awayOreRulesFieldOf, awayOreRulesProblems } from './planetOreStamps'
 import {
   platformOfPortable,
   platformProblems,
@@ -89,6 +90,10 @@ import {
 } from './vehicleSnapshot'
 
 /**
+ * 30: the ore rules stamp of each planet (ticket 888): the stamps of the planets the session has
+ * left, by `s:p`, under `awayOreRules` (older saves keep no left planet's stamp, the absent key: a
+ * left planet with a saved core bay lands as the build before the generated pools made it,
+ * `planetOreStamps.ts`);
  * 29: the blast's disc record (ticket 860): each live blast's `blast` holds the planter's
  * `radiusLevel` and its `blastSeq`, and the session counts its blasts under `blastSeq`, absent
  * before the first (older saves number their live blasts in order, `saveMigrations.ts`);
@@ -126,7 +131,7 @@ import {
  * vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
  * progress (#24); 3 the platform (#23).
  */
-export const SNAPSHOT_VERSION = 29
+export const SNAPSHOT_VERSION = 30
 
 export interface SessionSnapshot {
   snapshotVersion: number
@@ -164,6 +169,8 @@ export interface PortableState {
   groundedLines?: GroundedLine[]
   /** The hazards a scenario placed (ticket 848); omitted while there are none. */
   placedHazards?: Record<string, string>
+  /** The left planets' ore rules stamps by `s:p` (ticket 888); omitted while there are none. */
+  awayOreRules?: Record<string, number>
   debugApplied: boolean
   /** The dev flags off their defaults (ticket 547); omitted while none is. */
   devFlagDelta?: DevFlagDelta
@@ -227,6 +234,7 @@ function portableStateOf(state: AuthorityState): PortableState {
     ...portableStrutsField(state.struts),
     ...portableGroundedLinesField(state.groundedLines),
     ...placedHazardsFieldOf(state.placedHazards),
+    ...awayOreRulesFieldOf(state.awayOreRules),
     debugApplied: state.debugApplied,
     ...devFlagFieldsOf(state),
     ...portableSectionsOf(state.slices, 'session'),
@@ -297,6 +305,7 @@ function authorityStateOf(portable: PortableState): AuthorityState {
     ...portableStrutsField(portable.struts),
     ...portableGroundedLinesField(portable.groundedLines),
     ...placedHazardsFieldOf(portable.placedHazards),
+    ...awayOreRulesFieldOf(portable.awayOreRules),
     debugApplied: portable.debugApplied,
     ...devFlagFieldsOf(portable),
     ...sectionsOfPortable(portable.slices, 'session'),
@@ -351,6 +360,7 @@ function portableStateProblems(state: unknown, tick: unknown): string[] {
     ...portableStrutsProblems(state.struts, 'snapshot.state.struts'),
     ...portableGroundedLinesProblems(state.groundedLines, 'snapshot.state.groundedLines'),
     ...portablePlacedHazardsProblems(state.placedHazards, 'snapshot.state.placedHazards'),
+    ...awayOreRulesProblems(state.awayOreRules, 'snapshot.state.awayOreRules'),
     ...(typeof state.debugApplied === 'boolean'
       ? []
       : ['snapshot.state.debugApplied must be a boolean']),

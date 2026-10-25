@@ -569,8 +569,14 @@ import type { JsonCount } from '../wholeCount'
  *    gated drill time paying the mm crossed in it, up to the cutting bound, so a 3600 m/s tick
  *    spends its work where one hard cell ahead held it a quarter short. A rig at most a cell a
  *    tick steps as before, so no golden digest moves.
+ * 120: the ore rules stamp of each planet (ticket 888, the TD's bump row): clients generate their
+ *    terrain themselves, so the stamp rides on what the host decides, once: a planet after system
+ *    1's P5 first entered is stamped with ore rules 14 and draws its generated pool, a planet left
+ *    keeps its stamp under `awayOreRules` by `s:p` and lands under it again, and a first arrival
+ *    says `PlanetGenerated`. The join snapshot carries both. A run that stays on P1 to P5 of system
+ *    1 moves no cell; its digests move only where it travels.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 119
+export const AUTHORITY_PROTOCOL_VERSION = 120
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

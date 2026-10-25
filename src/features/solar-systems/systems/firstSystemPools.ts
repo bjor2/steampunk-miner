@@ -21,15 +21,18 @@ import { planetIndexOfCampaign } from '../../../systems/starMap/campaignIndex'
 import { FIRST_SYSTEM, toIndexText } from '../../../systems/starMap/planetAddress'
 import { GENERATED_POOLS_FIRST_PLANET } from '../../../systems/world/planetParams'
 import { actOf } from '../../planet-mix'
+import type { Money } from '../../../systems/money'
 import {
   planetMaterialPoolOf,
   poolDraftOf,
+  poolMixOf,
   poolOf,
   type MaterialPool,
   type PoolDraft,
   type PoolPlanet,
 } from './materialPool'
 import { MATERIAL_POOL_RULES, type MaterialPoolRules } from './materialPoolRules'
+import { poolOreValueOf, type RunSale } from './poolGemShare'
 import { placedKindLooksOf } from './poolKindLooks'
 
 /** The pool of system 1's place `place` (from P6) under ore rules `oreRulesVersion`. */
@@ -115,4 +118,37 @@ export function materialPoolAt(
   if (system !== FIRST_SYSTEM)
     return planetMaterialPoolOf(worldSeed, system, place, oreRulesVersion)
   return firstSystemPoolOf(worldSeed, planetIndexOfCampaign(place), oreRulesVersion)
+}
+
+/**
+ * The paper ore value of the generated pool at `(system, place)`, gems at their sale tiers, per
+ * share of the disc (`poolGemShare.ts`): the VS's R3 reads it times the radius squared (ticket 888).
+ */
+export function poolOreValueAt(
+  worldSeed: number,
+  system: bigint,
+  place: bigint,
+  oreRulesVersion?: number,
+): Money {
+  const pool = materialPoolAt(worldSeed, system, place, oreRulesVersion)
+  const planet = { id: pool.planet, campaignIndex: pool.campaignIndex, act: pool.act, slot: null }
+  return poolOreValueOf(poolMixOf(worldSeed, system, planet, oreRulesVersion), runSalesOfPool(pool))
+}
+
+/** The pool's kinds as the runs they were split from: one per family and lead. */
+function runSalesOfPool(pool: MaterialPool): RunSale[] {
+  const runs = new Map<string, RunSale>()
+  for (const kind of pool.kinds) {
+    const key = `${kind.family}+${kind.lead}`
+    const held = runs.get(key) ?? {
+      family: kind.family,
+      lead: kind.lead,
+      kinds: 0,
+      gemSaleTiers: [],
+    }
+    const gemSaleTiers =
+      kind.gemSaleTier === null ? held.gemSaleTiers : [...held.gemSaleTiers, kind.gemSaleTier]
+    runs.set(key, { ...held, kinds: held.kinds + 1, gemSaleTiers })
+  }
+  return [...runs.values()]
 }

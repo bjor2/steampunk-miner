@@ -5,11 +5,13 @@
  * Found from the descriptor a cell's stored slot reads back as, never from the stored number or a
  * row's position, so choosing a pool per planet changes no cell. A row binds only under the ore
  * rules span it names (ticket 736), so a pool may swap one slot's species at a rules version and a
- * planet a save holds under older rules keeps the species it was entered with. Look only.
+ * planet a save holds under older rules keeps the species it was entered with. A planet drawing its
+ * generated pool (ticket 888) wears the pool's own kinds as its species. Look only.
  */
 import { isSpeciesBoundUnder, MATERIALS, type Material } from '../../materials'
 import type { KindSlot } from '../../ores'
 import type { PlanetParams } from '../../../systems/world/planetParams'
+import { generatedSpeciesOf, isGeneratedPoolPlanet } from './generatedRoster'
 import { poolOfPlanet, rosterKindOf } from './planetRoster'
 
 /**
@@ -30,6 +32,7 @@ export function speciesOfKind(
 
 /** The species a cell's stored kind slot wears on its planet; null for no kind or no pool (P8+). */
 export function planetSpeciesOf(params: PlanetParams, kindSlot: number): Material | null {
+  if (isGeneratedPoolPlanet(params)) return generatedSpeciesOf(params, kindSlot)
   const pool = poolOfPlanet(params)
   const kind = rosterKindOf(params, kindSlot)
   if (pool === null || kind === null) return null

@@ -21,7 +21,10 @@ function migratedState(state: AuthorityState): AuthorityState {
   const file = saveSlotOf({ ...takeSnapshot(beforeTheDiscRecord(state)), snapshotVersion: 28 }, 1)
   const reading = readMigratedSaveSlot(JSON.parse(JSON.stringify(file)))
   if (!('state' in reading)) throw new Error(reading.problems.join('; '))
-  expect(reading.migrations).toEqual([{ version: 'snapshotVersion', from: 28, to: 29 }])
+  expect(reading.migrations).toEqual([
+    { version: 'snapshotVersion', from: 28, to: 29 },
+    { version: 'snapshotVersion', from: 29, to: 30 },
+  ])
   return reading.state
 }
 

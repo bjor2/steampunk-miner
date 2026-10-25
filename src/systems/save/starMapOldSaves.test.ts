@@ -23,6 +23,8 @@ const PREMIUM_STEP = { version: 'snapshotVersion', from: 26, to: 27 }
 const BIGNUM_HOLD_STEP = { version: 'snapshotVersion', from: 27, to: 28 }
 /** Ticket 860: every fixture was written before the blast's disc record. */
 const BLAST_RECORD_STEP = { version: 'snapshotVersion', from: 28, to: 29 }
+/** Ticket 888: every fixture was written before the planets' ore rules stamps were kept. */
+const STAMPS_STEP = { version: 'snapshotVersion', from: 29, to: 30 }
 
 function restoredState(file: unknown): AuthorityState {
   const reading = readMigratedSaveSlot(file)
@@ -68,6 +70,7 @@ describe('save migration: snapshot 21 -> 22, the star map (ticket 755)', () => {
       PREMIUM_STEP,
       BIGNUM_HOLD_STEP,
       BLAST_RECORD_STEP,
+      STAMPS_STEP,
     ])
     expect(reading.state).toEqual(state)
     expect(stateDigest(reading.state)).toBe(stateDigest(state))

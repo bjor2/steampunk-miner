@@ -263,6 +263,7 @@ describe('saves written before the ore rules', () => {
       { version: 'generatorVersion', from: 14, to: 15 },
       { version: 'generatorVersion', from: 15, to: 16 },
       { version: 'generatorVersion', from: 16, to: 17 },
+      { version: 'generatorVersion', from: 17, to: 18 },
     ])
     expect('state' in reading && stateDigest(reading.state)).toBe(stateDigest(loaded(file)))
   })
@@ -279,6 +280,7 @@ describe('saves written before the ore rules', () => {
       { version: 'generatorVersion', from: 14, to: 15 },
       { version: 'generatorVersion', from: 15, to: 16 },
       { version: 'generatorVersion', from: 16, to: 17 },
+      { version: 'generatorVersion', from: 17, to: 18 },
     ])
     expect(reading.state.planet.oreRulesVersion).toBe(1)
     expect(stateDigest(reading.state)).toBe(stateDigest(rulesOnePlanet5()))
@@ -298,6 +300,7 @@ describe('saves written before the ore rules', () => {
       { version: 'generatorVersion', from: 14, to: 15 },
       { version: 'generatorVersion', from: 15, to: 16 },
       { version: 'generatorVersion', from: 16, to: 17 },
+      { version: 'generatorVersion', from: 17, to: 18 },
     ])
     expect(reading.state.planet.oreRulesVersion).toBe(2)
     expect(stateDigest(reading.state)).toBe(stateDigest(rulesTwoPlanet5()))
@@ -316,6 +319,7 @@ describe('saves written before the ore rules', () => {
       { version: 'generatorVersion', from: 14, to: 15 },
       { version: 'generatorVersion', from: 15, to: 16 },
       { version: 'generatorVersion', from: 16, to: 17 },
+      { version: 'generatorVersion', from: 17, to: 18 },
     ])
     expect(reading.state.planet.oreRulesVersion).toBe(4)
     expect(stateDigest(reading.state)).toBe(stateDigest(rulesFourPlanet5()))
@@ -336,6 +340,7 @@ describe('saves written before the ore rules', () => {
       { version: 'generatorVersion', from: 14, to: 15 },
       { version: 'generatorVersion', from: 15, to: 16 },
       { version: 'generatorVersion', from: 16, to: 17 },
+      { version: 'generatorVersion', from: 17, to: 18 },
     ])
     expect(reading.state.planet.oreRulesVersion).toBe(6)
     expect(stateDigest(reading.state)).toBe(stateDigest(rulesSixPlanet5()))
@@ -352,6 +357,7 @@ describe('saves written before the ore rules', () => {
       { version: 'generatorVersion', from: 14, to: 15 },
       { version: 'generatorVersion', from: 15, to: 16 },
       { version: 'generatorVersion', from: 16, to: 17 },
+      { version: 'generatorVersion', from: 17, to: 18 },
     ])
     expect(reading.state.planet.oreRulesVersion).toBe(8)
     expect(stateDigest(reading.state)).toBe(stateDigest(rulesEightPlanet2()))
@@ -366,6 +372,7 @@ describe('saves written before the ore rules', () => {
       { version: 'generatorVersion', from: 14, to: 15 },
       { version: 'generatorVersion', from: 15, to: 16 },
       { version: 'generatorVersion', from: 16, to: 17 },
+      { version: 'generatorVersion', from: 17, to: 18 },
     ])
     expect(reading.state.planet.oreRulesVersion).toBe(9)
     expect(stateDigest(reading.state)).toBe(stateDigest(rulesNinePlanet2()))
@@ -381,6 +388,7 @@ describe('saves written before the ore rules', () => {
     expect(reading.migrations.filter((step) => 'version' in step)).toEqual([
       { version: 'generatorVersion', from: 15, to: 16 },
       { version: 'generatorVersion', from: 16, to: 17 },
+      { version: 'generatorVersion', from: 17, to: 18 },
     ])
     expect(reading.state.planet.oreRulesVersion).toBe(10)
     expect(stateDigest(reading.state)).toBe(stateDigest(rulesTenPlanet3()))
@@ -395,6 +403,7 @@ describe('saves written before the ore rules', () => {
     if (!('state' in reading)) throw new Error(reading.problems.join('; '))
     expect(reading.migrations.filter((step) => 'version' in step)).toEqual([
       { version: 'generatorVersion', from: 16, to: 17 },
+      { version: 'generatorVersion', from: 17, to: 18 },
     ])
     expect(reading.state.planet.oreRulesVersion).toBe(10)
     expect(stateDigest(reading.state)).toBe(stateDigest(rulesTenPlanet1()))
