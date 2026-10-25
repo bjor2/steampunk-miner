@@ -1,0 +1,45 @@
+{
+  "assetId": "vehicle-item-vent-vane",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-vent-vane/vehicle-item-vent-vane.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [256, 256],
+  "maps": {
+    "albedo": "vehicle-item-vent-vane.albedo.ktx2",
+    "normal": "vehicle-item-vent-vane.normal.ktx2",
+    "emissive": "vehicle-item-vent-vane.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "vane-hinge",
+      "tier": 1,
+      "rect": [8, 8, 16, 16],
+      "sizeM": [0.2, 0.07],
+      "pivotM": [0.02, 0.05],
+      "atM": [0, 0],
+      "z": 6
+    },
+    {
+      "id": "vane-leaf",
+      "tier": 1,
+      "rect": [8, 8, 16, 16],
+      "sizeM": [0.18, 0.04],
+      "pivotM": [0.01, 0.02],
+      "atM": [0, 0],
+      "z": 7
+    },
+    {
+      "id": "vane-leaf-2",
+      "tier": 1,
+      "rect": [8, 8, 16, 16],
+      "sizeM": [0.18, 0.04],
+      "pivotM": [0.01, 0.02],
+      "atM": [0, 0],
+      "z": 8
+    }
+  ]
+}

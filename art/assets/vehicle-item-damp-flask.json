@@ -1,0 +1,13 @@
+{
+  "id": "vehicle-item-damp-flask",
+  "source": "blender",
+  "form": "parts",
+  "status": "placeholder",
+  "color": "#3b3631",
+  "partColors": {
+    "flask-rack": "#3b3631",
+    "flask-1": "#7fcf8f",
+    "flask-2": "#7fcf8f",
+    "flask-3": "#7fcf8f"
+  }
+}

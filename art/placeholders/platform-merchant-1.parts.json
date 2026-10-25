@@ -1,0 +1,36 @@
+{
+  "assetId": "platform-merchant-1",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/platform-merchant-1/platform-merchant-1.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 256,
+  "atlasPx": [256, 256],
+  "maps": {
+    "albedo": "platform-merchant-1.albedo.ktx2",
+    "normal": "platform-merchant-1.normal.ktx2",
+    "emissive": "platform-merchant-1.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "platform-merchant-1",
+      "tier": 1,
+      "rect": [8, 8, 16, 16],
+      "sizeM": [2.2, 2.6],
+      "pivotM": [1.1, 0.0],
+      "atM": [0, 0],
+      "z": 1
+    },
+    {
+      "id": "merchant-banner",
+      "tier": 1,
+      "rect": [8, 8, 16, 16],
+      "sizeM": [0.5, 1.4],
+      "pivotM": [0.1, 1.4],
+      "atM": [1.35, 6.9],
+      "z": 2
+    }
+  ]
+}

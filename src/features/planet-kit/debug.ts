@@ -5,8 +5,9 @@
  * `debug.planet-kit.placeContainer`, so it replays and logs `debug_command_applied` (the cell
  * defaults to the local vehicle's, the kind to `cache_crate`, the owner to the local player, the
  * cargo to none: ore units per tier, as numbers or decimal text). `.containers()` reads the rows the markers and the list draw.
- * `.showKitSockets()` / `.hideKitSockets()` hang the kit tools' placeholder parts on the car and
- * take them off (presentation only), and `.kitSockets()` lists the sockets. `.merchant()` reads
+ * `.showKitSockets({ heldFlasks, isActing })` / `.hideKitSockets()` hang the kit tools' parts on
+ * the car (by default every flask held and the tools acting) and take them off (presentation only),
+ * and `.kitSockets()` lists the sockets with their assets and what they show. `.merchant()` reads
  * the merchant the Sell bay draws on this planet (ticket 821), `merchant: null` where none trades.
  */
 import type { DebugAction } from '../../debug/debugActionRegistry'
@@ -20,6 +21,7 @@ import type { TilePoint } from '../../systems/world/tileGrid'
 import { readContainerRows } from './store/containerReads'
 import { hideKitSockets, showKitSockets, useKitSocketStore } from './store/kitSocketStore'
 import { readMerchantPanel } from './store/merchantReads'
+import { KIT_SOCKET_ALL_SHOWN, type KitSocketShow } from './systems/render/kitSocketLook'
 import { KIT_SOCKETS } from './systems/kitSockets'
 
 const CACHE_CRATE = 'cache_crate'
@@ -82,15 +84,37 @@ function okAfter(act: () => void): DebugResult {
   return { ok: true }
 }
 
+const NOT_A_SHOW = 'showKitSockets takes { heldFlasks: 0..3, isActing: boolean }, both optional'
+
+/** The kit tools on the car as the debug call asks, each field defaulting to everything shown. */
+function showKitSocketsAs(spec: unknown = {}): DebugResult {
+  if (!isPlainMap(spec)) return { ok: false, problems: [NOT_A_SHOW] }
+  const heldFlasks = spec.heldFlasks ?? KIT_SOCKET_ALL_SHOWN.heldFlasks
+  const isActing = spec.isActing ?? KIT_SOCKET_ALL_SHOWN.isActing
+  if (!isHeldCount(heldFlasks) || typeof isActing !== 'boolean') {
+    return { ok: false, problems: [NOT_A_SHOW] }
+  }
+  return okAfter(() => showKitSockets({ heldFlasks, isActing }))
+}
+
+function isPlainMap(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function isHeldCount(value: unknown): value is KitSocketShow['heldFlasks'] {
+  return Number.isSafeInteger(value) && (value as number) >= 0 && (value as number) <= 3
+}
+
 export const planetKitDebugActions: Readonly<Record<string, DebugAction>> = {
   placeContainer,
   containers: () => ({ ok: true, containers: readContainerRows() }),
-  showKitSockets: () => okAfter(showKitSockets),
+  showKitSockets: showKitSocketsAs,
   hideKitSockets: () => okAfter(hideKitSockets),
   kitSockets: () => ({
     ok: true,
     areShown: useKitSocketStore.getState().areShown,
-    sockets: KIT_SOCKETS.map(({ itemId, attach }) => ({ itemId, attach })),
+    show: useKitSocketStore.getState().show,
+    sockets: KIT_SOCKETS.map(({ itemId, attach, assetId }) => ({ itemId, attach, assetId })),
   }),
   merchant: () => ({ ok: true, merchant: readMerchantPanel() }),
 }

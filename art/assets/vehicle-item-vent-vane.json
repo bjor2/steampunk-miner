@@ -1,0 +1,12 @@
+{
+  "id": "vehicle-item-vent-vane",
+  "source": "blender",
+  "form": "parts",
+  "status": "placeholder",
+  "color": "#c9a24b",
+  "partColors": {
+    "vane-hinge": "#3b3631",
+    "vane-leaf": "#c9a24b",
+    "vane-leaf-2": "#d8b35a"
+  }
+}

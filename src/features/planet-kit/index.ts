@@ -94,5 +94,29 @@ export {
 export { CONTAINERS_SECTION, placedContainersIn } from './systems/containerSection'
 export type { ContainerMoveBody } from './systems/containerEvents'
 export { contentsValueOf } from './systems/containerEvents'
-export type { KitSocket } from './systems/kitSockets'
-export { KIT_SOCKETS } from './systems/kitSockets'
+export type { KitSocket, KitSocketPart, KitSocketPose } from './systems/kitSockets'
+export { KIT_SOCKETS, kitSocketArtAssets, kitSocketOf, kitSocketPoseOf } from './systems/kitSockets'
+export type { FrameBox, KitSocketQuad, KitSocketShow } from './systems/render/kitSocketLook'
+export {
+  drillTipFrontOf,
+  isBoxInside,
+  KIT_SOCKET_ALL_SHOWN,
+  KIT_SOCKET_AT_REST,
+  kitSocketQuadBoxOf,
+  kitSocketQuadsOf,
+  rigBoundsOf,
+} from './systems/render/kitSocketLook'
+export type { MerchantArt, MerchantFrontage } from './systems/merchantArt'
+export {
+  MERCHANT_ART,
+  merchantArtAssets,
+  merchantFrontageAssetIdOf,
+  merchantFrontageOf,
+} from './systems/merchantArt'
+export { merchantCanvasColourOf } from './systems/render/merchantLook'
+export {
+  CACHE_CRATE_ASSET_ID,
+  CACHE_CRATE_TAG_PART_ID,
+  cacheCrateArtAsset,
+} from './systems/cacheCrateArt'
+export { planetKitArtAssets } from './systems/planetKitArt'

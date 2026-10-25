@@ -1,29 +1,69 @@
 {
-  "source": "G&V on ticket 823 (sockets for the PK4 kit items, the last open part of needs-planner): each kit item that shows on the rig names one vehicle-attach point outside those #809-#816 own and outside MODULE_ATTACH_POINTS. The Cache Crate has none: it is a placed world object drawn at its cell, held crates only a HUD count. Until the Blender art (design + tier:fable) each socket draws a flat placeholder part, inside the rig's outline at every state, off the drill tip and the colliders (the LK1 guard); placeholder sizes and colours are tuned by eye.",
+  "source": "G&V on ticket 823 (sockets for the PK4 kit items, the last open part of needs-planner): each kit item that shows on the rig names one vehicle-attach point outside those #809-#816 own and outside MODULE_ATTACH_POINTS. The Cache Crate has none: it is a placed world object drawn at its cell, held crates only a HUD count. Ticket 825 replaced the flat placeholders with Blender art: each socket names its asset (the kernel's slotItemAssetIdOf rule, vehicle-item-<id>), its parts and each part's draw order over the rig's. A part that moves carries a resting and an acting pose (a turn in radians about its pivot, counter-clockwise on screen, and a shift in metres); #850 sets the acting pose while the tool acts. A flask part shows from a held count (G&V: one flask per held flask up to the stack limit of 3); the shard shows only while the tongs act. Every part keeps inside the rig's bounds at every pose and behind the drawn drill tip (#789), which kitSocketLook.test.ts holds against the vehicle sidecar.",
   "sockets": [
     {
       "itemId": "scree_plough",
       "attach": "drill.hood",
+      "assetId": "vehicle-item-scree-plough",
       "shows": "A scree cowl over the drill collar, blades swept back; they flex outward when it shoves rubble.",
-      "placeholder": { "sizeM": [0.2, 0.12], "colour": "#9c6b30" }
+      "parts": [
+        { "id": "plough-cowl", "z": 9 },
+        {
+          "id": "plough-blade",
+          "z": 10,
+          "resting": { "turn": 0, "shift": [0, 0] },
+          "acting": { "turn": -0.5, "shift": [0, 0] }
+        }
+      ]
     },
     {
       "itemId": "damp_flask",
       "attach": "cab.gauge",
+      "assetId": "vehicle-item-damp-flask",
       "shows": "A small rack by the cab with one flask per held flask, up to the stack limit of 3; a bottled flask glows faintly.",
-      "placeholder": { "sizeM": [0.12, 0.1], "colour": "#5f8f6a" }
+      "parts": [
+        { "id": "flask-rack", "z": 6 },
+        { "id": "flask-1", "z": 7, "shownFromHeld": 1 },
+        { "id": "flask-2", "z": 7, "shownFromHeld": 2 },
+        { "id": "flask-3", "z": 7, "shownFromHeld": 3 }
+      ]
     },
     {
       "itemId": "shard_tongs",
       "attach": "hull.arm.left",
+      "assetId": "vehicle-item-shard-tongs",
       "shows": "A gripper arm mirroring the mobility arm on hull.arm.right; it closes on a lifted spinecrystal, which rides in its jaws.",
-      "placeholder": { "sizeM": [0.16, 0.1], "colour": "#8a8f99" }
+      "parts": [
+        { "id": "tongs-arm", "z": 6 },
+        { "id": "tongs-shard", "z": 7, "shownWhileActing": true },
+        {
+          "id": "tongs-jaw",
+          "z": 8,
+          "resting": { "turn": 0, "shift": [0, 0] },
+          "acting": { "turn": -0.55, "shift": [0, 0] }
+        }
+      ]
     },
     {
       "itemId": "vent_vane",
       "attach": "hull.roof.mid",
+      "assetId": "vehicle-item-vent-vane",
       "shows": "A folded brass vane on the roof that fans open while it rides a vent blast and folds shut afterwards.",
-      "placeholder": { "sizeM": [0.22, 0.08], "colour": "#c9a24a" }
+      "parts": [
+        { "id": "vane-hinge", "z": 6 },
+        {
+          "id": "vane-leaf",
+          "z": 7,
+          "resting": { "turn": 0, "shift": [0, 0] },
+          "acting": { "turn": -0.55, "shift": [0, 0] }
+        },
+        {
+          "id": "vane-leaf-2",
+          "z": 8,
+          "resting": { "turn": 0, "shift": [0, 0] },
+          "acting": { "turn": -1.1, "shift": [0, 0] }
+        }
+      ]
     }
   ]
 }

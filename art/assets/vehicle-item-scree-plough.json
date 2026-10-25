@@ -1,0 +1,11 @@
+{
+  "id": "vehicle-item-scree-plough",
+  "source": "blender",
+  "form": "parts",
+  "status": "placeholder",
+  "color": "#6b5a4a",
+  "partColors": {
+    "plough-cowl": "#6b5a4a",
+    "plough-blade": "#8a8f99"
+  }
+}

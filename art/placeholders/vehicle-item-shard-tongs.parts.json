@@ -1,0 +1,45 @@
+{
+  "assetId": "vehicle-item-shard-tongs",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-shard-tongs/vehicle-item-shard-tongs.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [256, 256],
+  "maps": {
+    "albedo": "vehicle-item-shard-tongs.albedo.ktx2",
+    "normal": "vehicle-item-shard-tongs.normal.ktx2",
+    "emissive": "vehicle-item-shard-tongs.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "tongs-arm",
+      "tier": 1,
+      "rect": [8, 8, 16, 16],
+      "sizeM": [0.26, 0.12],
+      "pivotM": [0.24, 0.08],
+      "atM": [0, 0],
+      "z": 6
+    },
+    {
+      "id": "tongs-shard",
+      "tier": 1,
+      "rect": [8, 8, 16, 16],
+      "sizeM": [0.08, 0.08],
+      "pivotM": [0.04, 0.04],
+      "atM": [-0.2, -0.08],
+      "z": 7
+    },
+    {
+      "id": "tongs-jaw",
+      "tier": 1,
+      "rect": [8, 8, 16, 16],
+      "sizeM": [0.12, 0.06],
+      "pivotM": [0.11, 0.05],
+      "atM": [-0.14, -0.04],
+      "z": 8
+    }
+  ]
+}

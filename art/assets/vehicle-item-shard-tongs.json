@@ -1,0 +1,12 @@
+{
+  "id": "vehicle-item-shard-tongs",
+  "source": "blender",
+  "form": "parts",
+  "status": "placeholder",
+  "color": "#3b3631",
+  "partColors": {
+    "tongs-arm": "#4c4f55",
+    "tongs-jaw": "#8a8f99",
+    "tongs-shard": "#a8e4ff"
+  }
+}

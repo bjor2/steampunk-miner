@@ -1,0 +1,10 @@
+{
+  "id": "platform-merchant-1",
+  "source": "blender",
+  "form": "parts",
+  "status": "placeholder",
+  "color": "#c98f5c",
+  "partColors": {
+    "merchant-banner": "#c98f5c"
+  }
+}
