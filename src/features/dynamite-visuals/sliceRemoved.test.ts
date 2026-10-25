@@ -28,7 +28,22 @@ import { attachOf } from '../../systems/registries/vehicleAttach'
 import { createSprayPool } from '../../systems/render/sprayPool'
 import { DETONATE_INTENT } from '../dynamite'
 import { slice } from './register'
+import { createBlastFrontPools, throwFront } from './scene/blastFrontPools'
+import { playBlast, playFall } from './scene/blastStages'
 import { RACK_ITEM_ID } from './systems/render/rackLook'
+import {
+  clearBlastEventQueue,
+  createBlastEventQueue,
+  queueBlastEvents,
+  queueFalls,
+} from './systems/render/blastEventQueue'
+import { collapseFallsAfter, EMPTY_FALL_WATCH } from './systems/render/blastCollapseFall'
+import {
+  blastEffectSwitchesOf,
+  blastVfxPlanOf,
+  type BlastEffectSwitches,
+} from './systems/render/blastVfxPlan'
+import { blastVfxSeedOf } from './systems/render/blastVfxSeed'
 
 // The #145 TD lock: "with the slice removed, the scene, the cue table and the art lint match
 // main", and sizes 1, 5 and 10 detonate with `size` and `radiusMm` in the log while the
@@ -96,6 +111,50 @@ describe('dynamite-visuals removed', () => {
       const withSlice = withRegistrations([slice], () => fusedBlastEvents(size))
       const withoutSlice = withRegistrations([], () => fusedBlastEvents(size))
       expect(withSlice).toEqual(withoutSlice)
+    }
+  })
+})
+
+/** Hears a session's events as the front layer does and plays every blast, front and fall. */
+function playEventsThroughLayer(
+  events: readonly DomainEvent[],
+  switches: BlastEffectSwitches,
+): void {
+  const pools = createBlastFrontPools()
+  const queue = createBlastEventQueue(64)
+  queueBlastEvents(queue, events, {
+    seedOf: (blastSeq) => blastVfxSeedOf(1, blastSeq),
+    groundColourOf: () => [0.5, 0.4, 0.3],
+    isShowcaseOf: () => true,
+    noticePurchase: () => undefined,
+  })
+  queueFalls(queue, collapseFallsAfter(EMPTY_FALL_WATCH, events).falls)
+  for (let at = 0; at < queue.blastCount; at++) {
+    const blast = queue.blasts[at]
+    playBlast(pools, blast, blastVfxPlanOf({ ...blast, switches }))
+  }
+  for (let at = 0; at < queue.frontCount; at++) throwFront(pools, queue.fronts[at])
+  for (let at = 0; at < queue.fallCount; at++) playFall(pools, queue.falls[at])
+  clearBlastEventQueue(queue)
+}
+
+describe('dynamite-visuals explosion pass is look-only (D8 #868)', () => {
+  it('leaves the events and the log the same with the VFX played in full, reduced, with flashes off or not at all', () => {
+    const plain = fusedBlastEvents(5)
+    const lines = (events: readonly DomainEvent[]) => [
+      ...logLinesOf(events, 'charge_detonated'),
+      ...logLinesOf(events, 'blast'),
+      ...logLinesOf(events, 'blast_resolved'),
+    ]
+    for (const prefs of [
+      { shake: true, flashes: true },
+      { shake: false, flashes: true },
+      { shake: true, flashes: false },
+    ]) {
+      const played = fusedBlastEvents(5)
+      playEventsThroughLayer(played, blastEffectSwitchesOf(prefs))
+      expect(played).toEqual(plain)
+      expect(lines(played)).toEqual(lines(plain))
     }
   })
 })

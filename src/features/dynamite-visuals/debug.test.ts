@@ -42,4 +42,24 @@ describe('dynamite-visuals debug reads', () => {
       problems: ['variant must be plain or showcase, got loud'],
     })
   })
+
+  it('plays an explosion bench row through the real pools and answers its timings (D8 #868)', () => {
+    const screen = { name: 'phone360', shortAxisPixels: 360, cpuSlowdown: 4 }
+    const result = dynamiteVisualsDebugActions.benchBlast(6, 10, screen) as {
+      ok: true
+      line: { row: string; band: number; frames: number; piecesThrown: number; failures: string[] }
+    }
+    expect(result.ok).toBe(true)
+    expect(result.line).toMatchObject({ row: 'vfx.s6.L10.phone360', band: 2 })
+    expect(result.line.frames).toBeGreaterThan(60)
+    expect(result.line.piecesThrown).toBeGreaterThan(0)
+    expect(dynamiteVisualsDebugActions.benchBlast(0, -1, null)).toEqual({
+      ok: false,
+      problems: [
+        'size must be 1 to 12, got 0',
+        'level must be a whole number from 0, got -1',
+        'screen must be {name, shortAxisPixels, cpuSlowdown}',
+      ],
+    })
+  })
 })

@@ -3,8 +3,10 @@
  * hangs at `hull.rear` with a bay per charge type open on the planet and a lit pip per charge
  * carried, in place of the kernel's charge rack; an R24 blast front, played through the real layer
  * by the presentation-only `previewBlast`, stays inside the draw budget the layer declares (#213)
- * and the frame inside #38's 150 calls; and the marks layer (rings, crater decals, fuse sparks)
- * declares its budget and never draws past it. Asserted through `steampunkDebug`, never pixels.
+ * and the frame inside #38's 150 calls; the marks layer (rings, crater decals, fuse sparks)
+ * declares its budget and never draws past it; and the explosion pass (D8 ticket 868) plays the
+ * biggest size's stages inside the same budget, the showcase variant once with its name banner.
+ * Asserted through `steampunkDebug`, never pixels.
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { DebugApi } from '../../src/debug/debugApi'
@@ -35,6 +37,9 @@ const R24_SLICES = 29
 
 interface FrontReading {
   frontsThrown: number
+  blastsPlayed: number
+  showcasesPlayed: number
+  banner: { name: string; sizeLine: string; phase: string } | null
   peak: { drawCalls: number; instances: number }
   budget: { drawCalls: number; instances: number }
 }
@@ -144,6 +149,56 @@ test.describe('dynamite visuals (#215)', () => {
     expect(peak.drawCalls).toBeLessThanOrEqual(budget.drawCalls)
     expect(peak.instances).toBeLessThanOrEqual(budget.instances)
     expect(busiestFrame).toBeLessThanOrEqual(FRAME_DRAW_CALLS_MAX)
+    expect(errors).toEqual([])
+  })
+
+  test("plays the biggest blast's explosion stages inside the front budget and the frame budget (D8 #868)", async ({
+    page,
+  }) => {
+    const errors = await openGame(page)
+    const started = await page.evaluate(() =>
+      window.steampunkDebug!.features['dynamite-visuals'].previewBlast(12),
+    )
+    expect(started).toEqual({ ok: true })
+
+    let busiestFrame = 0
+    await expect
+      .poll(async () => {
+        busiestFrame = Math.max(busiestFrame, await frameDrawCalls(page))
+        return (await frontReading(page)).blastsPlayed
+      })
+      .toBeGreaterThanOrEqual(1)
+
+    const { peak, budget, showcasesPlayed } = await frontReading(page)
+    expect(peak.drawCalls).toBeLessThanOrEqual(budget.drawCalls)
+    expect(peak.instances).toBeLessThanOrEqual(budget.instances)
+    expect(showcasesPlayed).toBe(0)
+    expect(busiestFrame).toBeLessThanOrEqual(FRAME_DRAW_CALLS_MAX)
+    expect(errors).toEqual([])
+  })
+
+  test('plays the showcase variant once, naming the charge on the HUD banner (D8 #868)', async ({
+    page,
+  }) => {
+    const errors = await openGame(page)
+    const started = await page.evaluate(() =>
+      window.steampunkDebug!.features['dynamite-visuals'].previewBlast(6, 'showcase'),
+    )
+    expect(started).toEqual({ ok: true })
+
+    await expect.poll(async () => (await frontReading(page)).showcasesPlayed).toBe(1)
+    expect((await frontReading(page)).banner).toMatchObject({
+      name: 'Deep charge',
+      sizeLine: 'Size 6',
+    })
+    await expect(page.getByTestId('dynamite-visuals-showcase-banner')).toBeVisible()
+
+    // The second blast of the size is ordinary: no second showcase.
+    await page.evaluate(() =>
+      window.steampunkDebug!.features['dynamite-visuals'].previewBlast(6, 'showcase'),
+    )
+    await expect.poll(async () => (await frontReading(page)).blastsPlayed).toBe(2)
+    expect((await frontReading(page)).showcasesPlayed).toBe(1)
     expect(errors).toEqual([])
   })
 

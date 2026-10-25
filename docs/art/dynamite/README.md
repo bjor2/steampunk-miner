@@ -46,6 +46,18 @@ trim colour (`casingGradeLooks.json`) once Blast Casing lines it. The crater edg
 the disc's radius (`DECAL_RIM_SHARE`), so a decal scaled to the ground radius keeps its rim just
 outside the clearing.
 
+## The explosion (D8, ticket 868)
+
+The blast is procedural, not baked: `src/features/dynamite-visuals/systems/render/blastVfxPlan.ts`
+names its stages per size and Blast Radius band, and the front layer plays them from fixed pools
+(the pipeline section lists the stages). The committed golden
+`systems/render/__goldens__/blastVfx.golden.txt` pins every stage at sizes 1, 6 and 12, levels 0,
+10 and 1e6, on 360 px, 1280×800 and 1920×1080; `npm run bench:purchase-levels -- --rows vfx` times
+the same rows a frame at a time. The type's colours come from the look rows above: the fire and
+the fireball from `spark`, the shockwave from `ring`, the fireball's end and the smoke's hint from
+`soot`. No render of the explosion is kept here: it moves, so it is checked by eye in `npm run dev`
+through `steampunkDebug.features['dynamite-visuals'].previewBlast(size, 'showcase')`.
+
 ## Files
 
 | File                                            | What it is                                                                                               |

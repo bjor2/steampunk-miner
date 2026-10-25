@@ -407,9 +407,21 @@ is modelled.
   lamp glass; sizes 11 (a caisson of two bombs) and 12 (a spiked mine) are the biggest.
 - The blast itself is procedural, the slice's front layer: each `BlastFront` slice (K6) throws
   fire and dust across the ring it uncovered and debris out of it, so the ring rides the
-  clearing's edge; each detonation lights the size's flash sprite for two frames while the flash
-  switch is on. Three pooled draw calls (fire and dust points of 256 each, the sprite), the debris
-  in the kernel spray (ticket 348).
+  clearing's edge. The explosion pass (D8, ticket 868) plays each `BlastStarted` as stages from
+  `blastVfxPlan.ts`: the fuse sparks build over the fuse's last three seconds; a white-hot flash
+  of two frames (three from the plunger sizes) on a disc that then burns as the fireball in the
+  type's spark colour darkening to its soot; a shockwave ring (one shader quad) crossing the
+  ground radius in the type's ring colour; chips in the broken band's colours and the kernel's
+  tumbling debris; the dust plume up the planet's radial; embers and smoke that settle last; and,
+  with Blast Casing laid, the crater's rim and trim glowing in the grade tint as the smoke clears.
+  Every count escalates once per size and once per tenfold of the Blast Radius level and is then
+  fitted to its pool, so a wider disc scales only the sprites and the ring. The first blast after
+  a charge's first purchase is the showcase (GD 04:53): two more flash frames and the charge's
+  name on a HUD banner. A collapse a bare blast rolled falls after its 1 s blink as dull dust
+  toward the planet's centre, never fire. Four pooled draw calls (fire and dust points of 256
+  each with a colour per piece, the flash-and-fireball disc, the ring), the debris in the kernel
+  spray (ticket 348). All randomness is seeded from `hash(planetSeed, blastSeq)`; the shake switch
+  off dims the flash, the flash switch off hides it, and nothing here reaches the world or the log.
 - The marks layer (D7) draws what a charge leaves and wears in five pooled calls within what the
   dust pool gave up: the planet's last six craters as decals cut from `prop-blast-crater`, scaled
   to the ground radius and tinted (the type's soot, or with casing laid the grade's plate colour

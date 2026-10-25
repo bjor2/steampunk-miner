@@ -105,6 +105,19 @@ row of the same planet and profile in the same run.
   the strip is populated and the warning shown on every judged frame; and no command is refused. A
   red row goes under #647 as streaming or prefetch work, **never as a speed clamp**.
 
+### Explosion rows (D8, ticket 868)
+
+The same run prints the explosion rows after the purchase rows (`-- --rows vfx` runs only them;
+`--sizes 1,6 --radius-levels 0,10 --screens phone360,desktop1920x1080` picks among them): one blast
+of size 1, 6 or 12 at Blast Radius level 0, 10 or 1e6, on 360 px, 1280×800 or 1920×1080, played
+through the real front pools (`src/features/dynamite-visuals/scene/`) with its stages from the plan
+and its fronts a frame at a time, as the debug preview plays them. Each row times every frame's
+stepping, emitting and uploading on this machine until the pools are empty and the disc and ring
+are out, the phone's time multiplied by the perf:phone slowdown, and prints p50, p95 and max
+against the 16.7 ms frame budget, the pieces the stages threw (capped by pool, never by radius)
+and the ring's and fireball's pixels on that screen. The GPU's fill is not here (`perf:phone`).
+A row over budget is a VFX finding under #647, never a reason to cut a stage.
+
 ## Bench run logs
 
 Any bench run with `-- --log` (`npm run bench:ground -- --log`) also writes its timed series as

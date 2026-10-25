@@ -4,8 +4,10 @@
  * `BlastFront` events it would announce, one a frame, after its detonation. The layer draws them
  * as it draws a real blast, so a browser spec measures the R24 front against its budget. The
  * `showcase` variant buys the size first (a `ChargesRestocked` the feed's ledger hears), so the
- * blast plays as the size's first after its first purchase (D8, ticket 868).
+ * blast plays as the size's first after its first purchase (D8, ticket 868); a `radiusLevel`
+ * widens the detonation's ground radius as the disc rule does, for the explosion bench rows.
  */
+import { MM_PER_METRE } from '../../../../constants/physics'
 import { BLAST_TILES_PER_TICK } from '../../../../constants/terrainBudget'
 import {
   baseR2Of,
@@ -17,6 +19,8 @@ import { blastFrontOf, frontRadiusMm } from '../../../../systems/authority/charg
 import type { DomainEvent } from '../../../../systems/authority/domainEvent'
 import { chargeTypeOf } from '../../../../systems/economy/chargeSizes'
 import type { TilePoint } from '../../../../systems/world/tileGrid'
+
+const HALF_TILE_MM = MM_PER_METRE / 2
 
 /** Each slice's ring from its first tile to its last, in mm from the charge tile's centre. */
 export function solidRockSlicesOf(radiusMm: number): [number, number][] {
@@ -39,11 +43,18 @@ export function isPreviewVariant(value: unknown): value is PreviewVariant {
   return value === 'plain' || value === 'showcase'
 }
 
+/** The ground radius a Blast Radius level widens the rung's to, mm: 500·2L_i·√(1 + L/16). */
+export function widenedRadiusMmOf(radiusMm: number, radiusLevel: number): number {
+  const groundR2 = groundR2Of({ radiusMm, radiusLevel })
+  return Math.round(Math.sqrt(Number(groundR2) / 16) * HALF_TILE_MM)
+}
+
 export function previewBlastFrames(
   at: TilePoint,
   size: number,
   radiusMm: number,
   variant: PreviewVariant = 'plain',
+  radiusLevel: number = UNOWNED_RADIUS_LEVEL,
 ): DomainEvent[][] {
   const bought: DomainEvent[] =
     variant === 'showcase'
@@ -54,7 +65,7 @@ export function previewBlastFrames(
     tick: 0,
     ...at,
     size,
-    radiusMm,
+    radiusMm: widenedRadiusMmOf(radiusMm, radiusLevel),
     by: 'fuse',
   }
   const started: DomainEvent = {
@@ -63,9 +74,9 @@ export function previewBlastFrames(
     ...at,
     size,
     chargeType: chargeTypeOf(size),
-    radiusLevel: UNOWNED_RADIUS_LEVEL,
-    baseR2: String(baseR2Of({ radiusMm, radiusLevel: UNOWNED_RADIUS_LEVEL })),
-    groundR2: String(groundR2Of({ radiusMm, radiusLevel: UNOWNED_RADIUS_LEVEL })),
+    radiusLevel,
+    baseR2: String(baseR2Of({ radiusMm, radiusLevel })),
+    groundR2: String(groundR2Of({ radiusMm, radiusLevel })),
     blastSeq: 0,
     casingLaid: false,
   }

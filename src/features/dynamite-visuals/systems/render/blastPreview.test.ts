@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { baseTilesSqOf } from '../../../../systems/authority/charges/blastDisc'
 import { ticksToClear } from '../../../../systems/authority/charges/blastFront'
-import { previewBlastFrames, solidRockSlicesOf } from './blastPreview'
+import { previewBlastFrames, solidRockSlicesOf, widenedRadiusMmOf } from './blastPreview'
 
 describe('blast preview', () => {
   it('slices an R24 blast as K6 clears it in solid rock: 29 rings, growing out to the radius', () => {
@@ -29,5 +29,19 @@ describe('blast preview', () => {
       }),
     ])
     expect(frames.slice(1).every(([event]) => event.type === 'BlastFront')).toBe(true)
+  })
+
+  it('widens the detonation ground radius with a Blast Radius level as the disc rule does, the rung disc kept (D8 #868)', () => {
+    expect(widenedRadiusMmOf(24000, 0)).toBe(24000)
+    expect(widenedRadiusMmOf(2500, 48)).toBe(5000)
+    const [first] = previewBlastFrames({ tx: 3, ty: 250 }, 10, 24000, 'plain', 48)
+    expect(first[0]).toMatchObject({ type: 'ChargeDetonated', radiusMm: 48000 })
+    expect(first[1]).toMatchObject({ type: 'BlastStarted', radiusLevel: 48 })
+  })
+
+  it('buys the size first in the showcase variant, so the feed plays it as the first blast (D8 #868)', () => {
+    const [first] = previewBlastFrames({ tx: 3, ty: 250 }, 6, 10000, 'showcase')
+    expect(first[0]).toMatchObject({ type: 'ChargesRestocked', size: 6, count: 1 })
+    expect(first[1].type).toBe('ChargeDetonated')
   })
 })

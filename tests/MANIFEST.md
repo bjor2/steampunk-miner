@@ -183,22 +183,29 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dynamite/systems/plunger.test.ts` | 6 | 6 |
 | `src/features/dynamite/systems/rackPanel.test.ts` | 7 | 7 |
 
-### `dynamite-visuals`: 14 files, 88 tests
+### `dynamite-visuals`: 21 files, 131 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/dynamite-visuals/debug.test.ts` | 4 | 4 |
+| `src/features/dynamite-visuals/debug.test.ts` | 6 | 6 |
+| `src/features/dynamite-visuals/scene/blastStages.test.ts` | 7 | 7 |
 | `src/features/dynamite-visuals/sceneBudget.test.ts` | 5 | 5 |
-| `src/features/dynamite-visuals/sliceRemoved.test.ts` | 6 | 6 |
+| `src/features/dynamite-visuals/sliceRemoved.test.ts` | 7 | 7 |
+| `src/features/dynamite-visuals/systems/render/blastCollapseFall.test.ts` | 5 | 5 |
 | `src/features/dynamite-visuals/systems/render/blastCue.test.ts` | 8 | 8 |
 | `src/features/dynamite-visuals/systems/render/blastCueProvider.test.ts` | 5 | 5 |
-| `src/features/dynamite-visuals/systems/render/blastEventQueue.test.ts` | 3 | 3 |
+| `src/features/dynamite-visuals/systems/render/blastEventQueue.test.ts` | 5 | 5 |
 | `src/features/dynamite-visuals/systems/render/blastFrontLook.test.ts` | 14 | 14 |
 | `src/features/dynamite-visuals/systems/render/blastMarks.test.ts` | 6 | 6 |
-| `src/features/dynamite-visuals/systems/render/blastPreview.test.ts` | 2 | 2 |
+| `src/features/dynamite-visuals/systems/render/blastPreview.test.ts` | 4 | 4 |
+| `src/features/dynamite-visuals/systems/render/blastShowcase.test.ts` | 4 | 4 |
+| `src/features/dynamite-visuals/systems/render/blastVfxPlan.test.ts` | 11 | 11 |
+| `src/features/dynamite-visuals/systems/render/blastVfxSeed.test.ts` | 3 | 3 |
 | `src/features/dynamite-visuals/systems/render/chargeTypeLook.test.ts` | 10 | 10 |
+| `src/features/dynamite-visuals/systems/render/craterGlow.test.ts` | 2 | 2 |
 | `src/features/dynamite-visuals/systems/render/dynamiteArt.test.ts` | 5 | 5 |
 | `src/features/dynamite-visuals/systems/render/dynamiteLookTable.test.ts` | 7 | 7 |
+| `src/features/dynamite-visuals/systems/render/fuseBuild.test.ts` | 4 | 4 |
 | `src/features/dynamite-visuals/systems/render/plantedDynamiteLook.test.ts` | 4 | 4 |
 | `src/features/dynamite-visuals/systems/render/rackLook.test.ts` | 9 | 9 |
 
