@@ -418,11 +418,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/rarityTripShare.test.ts` | 3 | 3 |
 | `src/features/ores/systems/slotDraws.test.ts` | 4 | 4 |
 
-### `planet-kit`: 7 files, 68 tests
+### `planet-kit`: 8 files, 75 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/planet-kit/logging.test.ts` | 2 | 2 |
+| `src/features/planet-kit/systems/containerPremium.test.ts` | 7 | 6 |
 | `src/features/planet-kit/systems/containerRules.test.ts` | 11 | 11 |
 | `src/features/planet-kit/systems/containerViews.test.ts` | 4 | 4 |
 | `src/features/planet-kit/systems/kitSockets.test.ts` | 4 | 8 |
@@ -934,6 +935,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/planetCoreBays.test.ts` | 8 | 8 |
 | `src/systems/authority/planetOfState.test.ts` | 4 | 4 |
 | `src/systems/authority/platformCommands.test.ts` | 43 | 43 |
+| `src/systems/authority/premium/premiumLedger.test.ts` | 6 | 6 |
+| `src/systems/authority/premium/premiumLedgerRoutes.test.ts` | 8 | 8 |
+| `src/systems/authority/premium/premiumLedgerSaves.test.ts` | 3 | 3 |
+| `src/systems/authority/premium/premiumSale.test.ts` | 11 | 11 |
 | `src/systems/authority/purchaseChain.test.ts` | 18 | 10 |
 | `src/systems/authority/refinery/refineryDock.test.ts` | 5 | 5 |
 | `src/systems/authority/refinery/refineryFacility.test.ts` | 2 | 2 |
@@ -1051,6 +1056,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/debug/debugMaterialPop.test.ts` | 3 | 3 |
 | `src/debug/debugMemory.test.ts` | 4 | 4 |
 | `src/debug/debugOverlay.test.ts` | 2 | 2 |
+| `src/debug/debugPremiumLedger.test.ts` | 3 | 3 |
 | `src/debug/debugSaves.test.ts` | 5 | 5 |
 | `src/debug/debugScreens.test.ts` | 36 | 35 |
 | `src/debug/debugSheet.test.ts` | 4 | 4 |
@@ -1099,6 +1105,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/planetCharges.test.ts` | 17 | 13 |
 | `src/systems/economy/readEconomy.test.ts` | 28 | 28 |
 | `src/systems/economy/refineryEconomy.test.ts` | 6 | 6 |
+| `src/systems/economy/saleLift.test.ts` | 6 | 6 |
 | `src/systems/economy/systemJump.test.ts` | 6 | 6 |
 | `src/systems/economy/trackKind.test.ts` | 1 | 1 |
 | `src/systems/economy/travelCharge.test.ts` | 7 | 7 |

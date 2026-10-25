@@ -144,7 +144,18 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   session now, harvesting each core and buying each travel, up to 9 planets on, and its commands
   are replayed through `fastForward`, the only debug line, so `debugApplied` stays false; it
   answers `{ planetIndex, tick, commands, isReplayExact }`, or refuses with nothing changed when the
-  bot does not land).
+  bot does not land); for the premium ledger (ticket 844), `setPremiumLedger(counts)` (the
+  `debug.setPremiumLedger` command: counts keyed `tier:s:p:speciesId`, each a decimal count from 1,
+  refused whole when one is malformed or a tier counts more than the hold holds) and the unlogged
+  read `premiumLedger()`.
+  Premium ledger specs (ticket 844) fill the hold with `withVehicle` (cargo has no scenario field
+  yet) and set the counts through `debug.setPremiumLedger`; the premium species and the merchant's
+  premium row are a probe slice inside `withRegistrations`, since no slice registers `orePremium` or
+  a premium `oreSaleLift` row before #821. The kernel goldens are `premium/premiumSale.test.ts`
+  (mixed hold, beacon max, away sale, carry away and home, two origins; g = 1, 6 and 1e6 through
+  `tierSaleOf`), `premiumLedgerRoutes.test.ts` (collect, tow, Refinery, the scenario call) and
+  `premiumLedgerSaves.test.ts`; the crate's are `planet-kit/systems/containerPremium.test.ts`, with
+  `planet-kit`'s own slice registered beside the probe.
   Collapse specs build a weak band-2 tunnel or dig one with `collapse/collapseFixtures.ts`. Bore gun specs (ticket 313) stand the rig in a pocket of band-1 rock with `bore/boreFixtures.ts` and register the gun's numbers through `boreGunSlice` inside `withRegistrations`, as no slice answers `boreGun` yet. Auto mode specs (ticket 317) use `bore/boreAutoFixtures.ts` `searSlice`, which adds the steam sear's numbers and its research, and stand the rig at `AUTO_RIG`, on the east edge of its collapse block, so a level shot east never warns the rig's own block. A slice's self-acting item (ticket 328: the steam shield) is specced with the real press path through `power-up-core`'s `withPowerUpCore([itemSlice, fixture])`, the fixture registering the item's research and a stand-in `autoFire` hook for the combo, in the corridor fight of `combat/combatFixtures.ts`. Collapse brace specs (ticket 331) register the fake `brace-probe` slice of `collapse/braceFixtures.ts` (a section, a command, a clock step and the provider) inside `withRegistrations`, so a brace can end by command, by clock step or by `untilTick`. Hazard strip specs (ticket 341) dig straight down the plain line of `render/hazardStrip/stripFixtures.ts`, fixtures placed in metres below the start, at a steady speed frame by frame; the per-frame cost is the sampler's own cost model (`spentUs`), and the wall clock is `npm run bench:strip`'s. Specs that mine deep (where crawlers live) freeze enemies first
   (`FREEZE_ENEMIES` in `scriptedSession.ts`); combat specs fight in the band-1 corridor of
   `combat/combatFixtures.ts`, where no spawn point is in reach. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.setPref(name, value)`,
