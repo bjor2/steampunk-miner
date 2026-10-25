@@ -2,10 +2,10 @@
   "name": "money-past-1e40",
   "description": "Planet 80 ore sold for more than 1e40, then a hull step bought for more than 1e40 (#5, #11, 553).",
   "generatorVersion": 18,
-  "authorityProtocolVersion": 121,
+  "authorityProtocolVersion": 122,
   "logSchemaVersion": 7,
   "numberFormatVersion": 1,
-  "economyRulesVersion": 4,
+  "economyRulesVersion": 5,
   "sliceSections": {
     "aetheric": 1,
     "aetheric.heat": 1,

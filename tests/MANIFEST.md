@@ -184,7 +184,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dynamite/systems/plunger.test.ts` | 6 | 6 |
 | `src/features/dynamite/systems/rackPanel.test.ts` | 7 | 7 |
 
-### `dynamite-visuals`: 21 files, 131 tests
+### `dynamite-visuals`: 21 files, 129 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -208,7 +208,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dynamite-visuals/systems/render/dynamiteLookTable.test.ts` | 7 | 7 |
 | `src/features/dynamite-visuals/systems/render/fuseBuild.test.ts` | 4 | 4 |
 | `src/features/dynamite-visuals/systems/render/plantedDynamiteLook.test.ts` | 4 | 4 |
-| `src/features/dynamite-visuals/systems/render/rackLook.test.ts` | 9 | 9 |
+| `src/features/dynamite-visuals/systems/render/rackLook.test.ts` | 7 | 7 |
 
 ### `example`: 4 files, 10 tests
 
@@ -318,7 +318,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mineral-skins/systems/signatureMaterial.test.ts` | 4 | 4 |
 | `src/features/mineral-skins/systems/skinTable.test.ts` | 22 | 22 |
 
-### `mining-gates`: 25 files, 153 tests
+### `mining-gates`: 26 files, 163 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -327,10 +327,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-gates/store/gateHintStore.test.ts` | 3 | 3 |
 | `src/features/mining-gates/systems/botExtractorBuys.test.ts` | 3 | 3 |
 | `src/features/mining-gates/systems/botExtractors.test.ts` | 4 | 2 |
-| `src/features/mining-gates/systems/botGates.test.ts` | 6 | 6 |
+| `src/features/mining-gates/systems/botGates.test.ts` | 7 | 7 |
 | `src/features/mining-gates/systems/botShaftJog.test.ts` | 2 | 1 |
-| `src/features/mining-gates/systems/canMine.test.ts` | 18 | 18 |
+| `src/features/mining-gates/systems/canMine.test.ts` | 21 | 21 |
 | `src/features/mining-gates/systems/cellGates.test.ts` | 1 | 1 |
+| `src/features/mining-gates/systems/coreRoute.test.ts` | 5 | 2 |
 | `src/features/mining-gates/systems/dynamiteCells.test.ts` | 3 | 3 |
 | `src/features/mining-gates/systems/extractorRules.test.ts` | 8 | 8 |
 | `src/features/mining-gates/systems/extractorVerbs.test.ts` | 12 | 12 |
@@ -338,7 +339,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-gates/systems/gateLedger.test.ts` | 6 | 6 |
 | `src/features/mining-gates/systems/gateTable.test.ts` | 6 | 6 |
 | `src/features/mining-gates/systems/gatesNearDock.test.ts` | 2 | 2 |
-| `src/features/mining-gates/systems/ledgerLines.test.ts` | 8 | 8 |
+| `src/features/mining-gates/systems/ledgerLines.test.ts` | 9 | 9 |
 | `src/features/mining-gates/systems/pullRarity.test.ts` | 2 | 2 |
 | `src/features/mining-gates/systems/render/cellGateLooks.test.ts` | 11 | 11 |
 | `src/features/mining-gates/systems/render/drawnMarkers.test.ts` | 6 | 6 |
@@ -919,7 +920,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/charges/chargeCollapseRoll.test.ts` | 12 | 12 |
 | `src/systems/authority/charges/chargeDisc.test.ts` | 9 | 9 |
 | `src/systems/authority/charges/chargeLiveBlast.test.ts` | 12 | 12 |
-| `src/systems/authority/charges/chargeShop.test.ts` | 10 | 10 |
+| `src/systems/authority/charges/chargeShop.test.ts` | 11 | 11 |
 | `src/systems/authority/charges/chargeSizeRules.test.ts` | 14 | 14 |
 | `src/systems/authority/clampedCharge.test.ts` | 6 | 6 |
 | `src/systems/authority/collapse/collapseAtSpeed.test.ts` | 5 | 5 |
@@ -1154,7 +1155,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/casingCementGrades.test.ts` | 7 | 7 |
 | `src/systems/economy/casingGrades.test.ts` | 10 | 10 |
 | `src/systems/economy/casingPrices.test.ts` | 18 | 12 |
-| `src/systems/economy/chargeSizes.test.ts` | 31 | 31 |
+| `src/systems/economy/chargeSizes.test.ts` | 32 | 32 |
 | `src/systems/economy/collapseCrush.test.ts` | 2 | 2 |
 | `src/systems/economy/costCurveLookup.test.ts` | 3 | 3 |
 | `src/systems/economy/depthDensityCurve.test.ts` | 7 | 7 |

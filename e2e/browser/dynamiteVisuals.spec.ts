@@ -1,7 +1,7 @@
 /**
  * The dynamite looks in the browser (#215, the wiring of #145; D7 ticket 866): the typed rack
- * hangs at `hull.rear` with a bay per charge type open on the planet and a lit pip per charge
- * carried, in place of the kernel's charge rack; an R24 blast front, played through the real layer
+ * hangs at `hull.rear` with a bay per charge type (every type is sold on every planet since D4
+ * #863) and a lit pip per charge carried, its reel and plunger beside them, in place of the kernel's charge rack; an R24 blast front, played through the real layer
  * by the presentation-only `previewBlast`, stays inside the draw budget the layer declares (#213)
  * and the frame inside #38's 150 calls; the marks layer (rings, crater decals, fuse sparks)
  * declares its budget and never draws past it; and the explosion pass (D8 ticket 868) plays the
@@ -19,9 +19,9 @@ declare global {
 
 /** #38's frame budget, the line the scene layers' 27 calls are carved from (#213). */
 const FRAME_DRAW_CALLS_MAX = 150
-/** Sizes 1 to 5 are open on planet 19 (blastingCharges.sizes: from planet 7, one every 3). */
+/** The planet the rack is bolted on; every size is sold on every planet (D4 #863). */
 const PLANET_WITH_FIVE_SIZES = 19
-/** Types 1 and 2 have a size open on P19; the five size-1 charges carried light five pips. */
+/** A bay per type and the plunger on any planet; the five size-1 charges carried light five pips. */
 const RACK_ON_P19 = [
   'rack-frame',
   'slot-1',
@@ -31,6 +31,9 @@ const RACK_ON_P19 = [
   'pip-1-4',
   'pip-1-5',
   'slot-2',
+  'slot-3',
+  'wire-reel',
+  'plunger',
 ]
 /** An R24 blast clears in 29 slices (K6 #189). */
 const R24_SLICES = 29
@@ -107,7 +110,7 @@ function frameDrawCalls(page: Page): Promise<number> {
 }
 
 test.describe('dynamite visuals (#215)', () => {
-  test('hangs the typed rack at hull.rear with a bay per open type and a pip per charge carried, not the old rack', async ({
+  test('hangs the typed rack at hull.rear with a bay per type and a pip per charge carried, not the old rack', async ({
     page,
   }) => {
     const errors = await openGame(page)

@@ -581,8 +581,16 @@ import type { JsonCount } from '../wholeCount'
  *    times its old metre rate, rounded once; the shoring shot and the foam cure bill on the same
  *    rate. No command, event or save field changes; a save stores no prices, so a loaded one buys
  *    at these rows.
+ * 122: dynamite on price alone, blast-only rock by tier (ticket 863, D4 of #647), economy rules
+ *    5: `PlantCharge` and `RestockCharges` take every size on every planet (`size_locked` and the
+ *    shop's `feature_locked` before P7 are retired), `dynamite.detonate_charge` fires on every
+ *    planet (`dynamite.detonator_locked` retired), a blast breaks every ungated tile but core (no
+ *    band-5 hardness cap) while dense cells and drill-gated signatures stand to it, and a
+ *    dynamite-gated cell carries a gate tier its blast opens only for a type whose `breaksGate[]`
+ *    holds it; its `DrillGated` says `required: type:<t>` and `have: owned` or `price:<money>`.
+ *    A run with no charge and no gated cell moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 121
+export const AUTHORITY_PROTOCOL_VERSION = 122
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
