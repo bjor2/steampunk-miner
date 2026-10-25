@@ -26,6 +26,7 @@ import {
 } from './boreClock'
 import { faceThreats } from './botCombat'
 import type { KitPolicy } from './botCrates'
+import { uncorkOnFiredampEntry } from './botFlask'
 import type { ChargePolicy } from './botCharges'
 import type { RouteDeaths } from './botDeathReplay'
 import { setGunsForEnergy } from './botGuns'
@@ -34,7 +35,7 @@ import type { BotSession } from './botSession'
 import type { GateRouteBlock } from './gateRouteBlocks'
 import { descentLegOf, type DownBoreTally, type DownLeg } from './downBores'
 import type { SidewaysBoreTally } from './sidewaysBores'
-import { botTravelSpeedOf, moveTicks, tileKindAt } from './botWorld'
+import { botMoveSpeedOf, moveTicks, tileKindAt } from './botWorld'
 import type { MineLayout } from './mineLayout'
 
 /** A bore reports at least this often, like the client's 5 Hz pose reports. */
@@ -48,6 +49,8 @@ export interface BotPilot {
   borePolicy?: BorePolicy
   /** What it does with the planet kits (ticket 850, `botCrates.ts`); absent is every field off. */
   kitPolicy?: KitPolicy
+  /** Whether its last report stood it in a drain pocket (ticket 881, `botFlask.ts`); absent is no. */
+  isInDrainPocket?: boolean
   /** The ticks each enemy has held it facing (`faceThreats`, ticket 418); absent is none yet. */
   heldTicksByEnemy?: Map<string, number>
   /** What its last bore left of the tick it ended on (ticket 559); absent is none. */
@@ -114,6 +117,7 @@ function boreChunk(session: BotSession, pilot: BotPilot, tile: TilePoint, chunk:
   faceThreats(session, pilot)
   setGunsForEnergy(session)
   session.submit(reportPoseIntent(pilot.position, facing, NO_TICKS))
+  uncorkOnFiredampEntry(session, pilot, pilot.position)
   waitFiring(session, pilot, chunk.waitTicks)
   if (!isBoreOn(session, tile)) return false
   session.submit({ type: 'drillTile', payload: { ...tile, ticks: chunk.windowTicks } })
@@ -169,7 +173,7 @@ export function moveStraight(session: BotSession, planet: BotPlanet, to: TilePoi
   const { pilot } = planet
   const from = pilot.position
   const tiles = straightPath(from, to)
-  const speed = botTravelSpeedOf(session.state(), session.playerId)
+  const speed = botMoveSpeedOf(session.state(), session.playerId, from, to)
   const facing = facingTowards(from, to)
   const isClimb = to.ty > from.ty
   let reportedTicks = 0
@@ -178,6 +182,7 @@ export function moveStraight(session: BotSession, planet: BotPlanet, to: TilePoi
     const isLast = index === tiles.length - 1
     if (!isLast && ticks - reportedTicks < POSE_REPORT_INTERVAL_TICKS) return
     reportMove(session, tile, facing, ticks - reportedTicks, isClimb)
+    uncorkOnFiredampEntry(session, pilot, tile)
     reportedTicks = ticks
     // #724: the move's speed carries into a bore below only if nothing holds the rig first.
     if (isLast) pilot.downLeg = descentLegOf(from, to, session.tick(), speed)

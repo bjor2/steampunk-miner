@@ -13,6 +13,7 @@ import type { AuthorityReaction } from '../systems/registries/authorityReactions
 import type { BlastEffect } from '../systems/registries/blastEffects'
 import type { BuildingAttachUse } from '../systems/registries/buildingAttach'
 import type { BotCrateProvider } from '../systems/registries/botCrates'
+import type { BotFlaskProvider } from '../systems/registries/botFlasks'
 import type { BotPurchase } from '../systems/registries/botPurchases'
 import type { AutoGunsProvider } from '../systems/registries/autoGuns'
 import type { BoreGunProvider } from '../systems/registries/boreGun'
@@ -273,6 +274,11 @@ export interface SliceRegistrar {
    * picks up under `kitPolicy.crates: 'drop_on_full'` (ticket 850).
    */
   botCrates(provider: BotCrateProvider): void
+  /**
+   * One provider across all slices: the flask the pacing bot uncorks on entering firedamp, only
+   * under `kitPolicy.flask: 'on_firedamp_entry'` (ticket 881).
+   */
+  botFlask(provider: BotFlaskProvider): void
   /**
    * A family of bot spend the #212 guard reports as one row, counted only while its anchor
    * `stats.json` row is owned or unlocked (ticket 370).

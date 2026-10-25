@@ -5,15 +5,17 @@
  * boring a tile in exactly the ticks the #7 drill rule gives. Tiles are 1 m. The travel speed is
  * the drive's, the engine's top speed alone (ticket 723 retired travel parity).
  */
+import { BASIS_POINTS } from '../../constants/balance'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import { planetParamsOf } from '../authority/planetOfState'
 import { scriptedGearCellsOf } from '../authority/scriptedGearCells'
 import { effectiveTravelSpeedOf } from '../authority/travelSpeed'
-import type { AuthorityState } from '../authority/authorityState'
+import { vehicleOf, type AuthorityState } from '../authority/authorityState'
 import { hardnessOfTile, subStepsPerCellAt } from '../authority/groundDrill'
 import { hazardKindAtTile } from '../authority/hazards/hazardCells'
 import { scratchFloorOfCell } from '../authority/signatureCells'
 import type { BigStat } from '../money'
+import { tradeOffScaleBpOn, type TradeOffAxis } from '../registries/toolTradeOffs'
 import { canScratch, type DrillStats } from '../vehicle/drillRule'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { cellDensitySum, YIELD_SUM } from '../world/cellYield'
@@ -162,6 +164,29 @@ export function moveTicks(tiles: number, speedMax: number): number {
  */
 export function botTravelSpeedOf(state: AuthorityState, playerId: string): number {
   return effectiveTravelSpeedOf(state, playerId)
+}
+
+/**
+ * The bot's speed for one straight move from `from` to `to`: its travel speed, slowed by an acting
+ * tool's trade-off on the track the move drives, the engine's lift for a climb and the drive for a
+ * move sideways, never a fall (ticket 881), so a tools-on run feels the plough and the vane as a
+ * player would. With no tool acting it is the travel speed itself.
+ */
+export function botMoveSpeedOf(
+  state: AuthorityState,
+  playerId: string,
+  from: TilePoint,
+  to: TilePoint,
+): number {
+  const speed = botTravelSpeedOf(state, playerId)
+  const axis = moveAxisOf(from, to)
+  const scaleBp = axis === null ? BASIS_POINTS : tradeOffScaleBpOn(vehicleOf(state, playerId), axis)
+  return scaleBp === BASIS_POINTS ? speed : (speed * scaleBp) / BASIS_POINTS
+}
+
+function moveAxisOf(from: TilePoint, to: TilePoint): TradeOffAxis | null {
+  if (to.tx !== from.tx) return 'horizontal'
+  return to.ty > from.ty ? 'thrust' : null
 }
 
 /** The quanta a move costs: driving and falling at the drive rate, climbing at the thrust rate. */

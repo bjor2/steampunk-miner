@@ -18,6 +18,7 @@
  * Every intent is dry-run first (`wouldAccept`); a refused one is not sent.
  */
 import { botCrateProvider, type BotCrate, type BotCrateProvider } from '../registries/botCrates'
+import type { FlaskPolicy } from './botFlask'
 import { cargoUnitsOf, statsOfVehicle } from '../vehicle/vehicleState'
 import { wouldAccept } from './botDryRun'
 import { canAffordMoveTo } from './botEnergy'
@@ -33,13 +34,15 @@ export type CratePolicy = 'never' | 'drop_on_full'
 
 /**
  * What the bot does with the planet kits (the TD's Q4 seam on #850): off by default, mirroring
- * `BorePolicy`. T1 (#881) adds the tool fields beside `crates`.
+ * `BorePolicy`. T1 (ticket 881) adds `flask` (`botFlask.ts`), absent as `never`; the hazard tools
+ * act by context, so a tools-on run only grants them at its start.
  */
 export interface KitPolicy {
   crates: CratePolicy
+  flask?: FlaskPolicy
 }
 
-export const DEFAULT_KIT_POLICY: KitPolicy = { crates: 'never' }
+export const DEFAULT_KIT_POLICY: KitPolicy = { crates: 'never', flask: 'never' }
 
 /** Buys crates at the Sell bay while one is sold here and the wallet pays it. */
 export function restockCrates(session: BotSession, planet: BotPlanet): void {

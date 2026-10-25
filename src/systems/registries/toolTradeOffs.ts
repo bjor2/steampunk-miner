@@ -61,7 +61,12 @@ export function actingTradeOffOn(vehicle: VehicleState, axis: TradeOffAxis): Too
 
 /** The drill's power share while a dig trade-off acts, in bp: the whole without one. */
 export function digScaleBpOf(vehicle: VehicleState): number {
-  const row = actingTradeOffOn(vehicle, 'dig')
+  return tradeOffScaleBpOn(vehicle, 'dig')
+}
+
+/** The share of `axis`'s track an acting trade-off leaves, in bp: the whole without one. */
+export function tradeOffScaleBpOn(vehicle: VehicleState, axis: TradeOffAxis): number {
+  const row = actingTradeOffOn(vehicle, axis)
   return row === null ? BASIS_POINTS : scaleBpOf(row)
 }
 
