@@ -25,9 +25,11 @@ import {
   casingRingAlong,
   casingRingAround,
   lineRingSamples,
+  NO_RING_SWEEP,
   ringSamplesOf,
   type Lining,
 } from '../world/casingLining'
+import type { MmPoint } from '../world/casingRingBand'
 import type { PlanetParams } from '../world/planetParams'
 import type { WeightedSample } from '../world/stampShape'
 import type { CommandPayloads } from './authorityCommand'
@@ -70,7 +72,8 @@ export function layDueCasingAtPose(
 
 /**
  * The swept cut's rings (tickets 330, 335): axis points at fixed spacing along the line to where
- * the step's stamp centre cut, so no step length leaves a gap; the rings due are laid in order.
+ * the step's stamp centre cut, so no step length leaves a gap; the rings due are laid in order,
+ * each measured from the hole this step's cut swept (the GD's (e) ruling on #662).
  */
 export function layCasingAlongCut(
   state: AuthorityState,
@@ -82,7 +85,12 @@ export function layCasingAlongCut(
   const vehicle = vehicleOf(state, playerId)
   if (params === null || !isVehicleActive(vehicle)) return unchanged(state)
   const step = followCasingTrailAlongCut(vehicle.casingTrail, axis, isCutting)
-  return layTrailStep(state, playerId, params, step)
+  return layTrailStep(state, playerId, params, step, sweepOfCut(axis))
+}
+
+/** How far the step's stamp stood from the body's line: the stamp's reach less its body point. */
+function sweepOfCut({ to, stampReach }: CutAxis): MmPoint {
+  return { xMm: stampReach.xMm - to.xMm, yMm: stampReach.yMm - to.yMm }
 }
 
 /** Scripted mining cuts from the last reported pose, which never lifts (`drillTile`, #115). */
@@ -102,27 +110,36 @@ function layCasingAlongTrail(
   const params = planetParamsOf(state.planet)
   const step = trailStepOf(vehicleOf(state, playerId), motion)
   if (params === null || step === null) return unchanged(state)
-  return layTrailStep(state, playerId, params, step)
+  return layTrailStep(state, playerId, params, step, NO_RING_SWEEP)
 }
 
-/** The vehicle keeps the trail's rest and lays the rings now due. */
+/** The vehicle keeps the trail's rest and lays the rings now due, swept by the cut's `sweep`. */
 function layTrailStep(
   state: AuthorityState,
   playerId: string,
   params: PlanetParams,
   step: TrailStep,
+  sweep: MmPoint,
 ): RuleEffect {
   const vehicle = vehicleOf(state, playerId)
   const moved = withVehicle(state, playerId, { ...vehicle, casingTrail: step.trail })
   const lining = { grade: vehicle.casingGrade, liningType: vehicle.lining.active }
-  const rings = step.due.map((point, index) => ({ point, stretchFrom: step.stretchStarts[index] }))
+  const rings = step.due.map((point, index) => ({
+    point,
+    stretchFrom: step.stretchStarts[index],
+    sweep,
+  }))
   return layRings(moved, playerId, params, rings, lining)
 }
 
-/** A due axis point and where its stretch of axis starts, which its ring is measured from. */
+/**
+ * A due axis point, where its stretch of axis starts and the sweep of the cut it fell due in,
+ * which its ring is measured from.
+ */
 interface DueRing {
   point: AxisPoint
   stretchFrom: RingPoint
+  sweep: MmPoint
 }
 
 /** What a vehicle's rings are laid as: its casing grade, in its active lining type. */
@@ -163,14 +180,14 @@ function layPaidCasingRing(
   state: AuthorityState,
   playerId: string,
   params: PlanetParams,
-  { point, stretchFrom }: DueRing,
+  { point, stretchFrom, sweep }: DueRing,
   lining: LaidLining,
 ): RuleEffect {
   const samples = casableRingSamplesOf(
     state,
     playerId,
     params,
-    casingRingAlong(point.xMm, point.yMm, stretchFrom),
+    casingRingAlong(point.xMm, point.yMm, stretchFrom, sweep),
   )
   const ring = lineCasingRing(
     state,

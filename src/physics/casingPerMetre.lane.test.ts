@@ -7,7 +7,7 @@ import { resetGameStore } from '../store/gameStore'
 import { withDriveReaching } from '../systems/authority/driveRigFixtures'
 import { buildIntent } from '../systems/input/buildIntent'
 import type { Vector2 } from '../systems/vehicle/localFrame'
-import { casingAlongPath, type LegCasing } from './casingLegFixtures'
+import { casingAlongPath, casingAroundTurn, type LegCasing } from './casingLegFixtures'
 import { createRig } from './cutFollowFixtures'
 
 // Casing along a dug leg (the TD's release check on #662, Systems' casing row on #661): off planet
@@ -15,8 +15,11 @@ import { createRig } from './cutFollowFixtures'
 // the live loop with the swept cut on, and the bore wall's rock within the casing ring's reach of
 // its path is read (`casingLegFixtures.ts`). Down: no run of unlined wall longer than one sample,
 // and lined samples per metre at least 95% of main's (lining more than main, which leaves its own
-// gaps, is no fault). West: no unlined run longer than main's worst. Main's numbers are this read
-// of origin/main a94d74358 (protocol 109, #36's 1.9 m bore), the same legs.
+// gaps, is no fault). West: no unlined run longer than main's worst. The turn (the TD's L-shaped
+// dig, ruling (e)): within 3 m of the down-to-west corner, at purchases 10 and 20, no unlined run
+// longer than main's. Main's numbers are this read of origin/main a94d74358 (protocol 109, #36's
+// 1.9 m bore), the same legs, read again on 88c7dbed6 (protocol 114) with the same numbers and
+// the turn's.
 
 interface CasingLeg {
   purchase: number
@@ -37,6 +40,8 @@ const BACK_OUT_SECONDS = 1
 /** A drive that keeps up with purchase 10's 10.7 m/s on a sideways cut (Bjor's ruling on #723). */
 const WEST_DRIVE_MPS = 10.7
 const HOLD_NEVER_FULL = 60
+/** How far along each leg from the corner the turn's read reaches. */
+const TURN_REACH_M = 3
 
 /** Main's read of the same legs, by purchase. */
 const MAIN_DOWN: Readonly<Record<number, LegCasing>> = {
@@ -45,6 +50,9 @@ const MAIN_DOWN: Readonly<Record<number, LegCasing>> = {
   20: { lengthM: 17.2, linedPerMetre: 7.54, worstUnlinedRun: 13 },
 }
 const MAIN_WEST_WORST_RUN: Readonly<Record<number, number>> = { 1: 3, 10: 39, 20: 2 }
+/** Main's largest unlined run within `TURN_REACH_M` of the down-to-west corner, by purchase. */
+const MAIN_TURN_WORST_RUN: Readonly<Record<number, number>> = { 10: 22, 20: 11 }
+const TURN_LEGS = LEGS.filter(({ purchase }) => purchase in MAIN_TURN_WORST_RUN)
 
 const LINED_SHARE_OF_MAIN_MIN = 0.95
 const UNLINED_RUN_MAX = 1
@@ -65,10 +73,16 @@ afterEach(() => uninstallRunLog())
 const ticks = (seconds: number) => Math.round(seconds / PHYSICS_TIMESTEP)
 const pathOf = (reads: readonly { position: Vector2 }[]) => reads.map((read) => read.position)
 
-const dug = new Map<CasingLeg, { down: LegCasing; west: LegCasing }>()
+interface DugCasing {
+  down: LegCasing
+  west: LegCasing
+  turn: LegCasing
+}
+
+const dug = new Map<CasingLeg, DugCasing>()
 
 /** The leg dug once, its casing read after it backs out, shared by the rows that judge it. */
-function casingOf(leg: CasingLeg): { down: LegCasing; west: LegCasing } {
+function casingOf(leg: CasingLeg): DugCasing {
   const known = dug.get(leg)
   if (known !== undefined) return known
   const levels = { drill_power: leg.purchase, cargo_hold: HOLD_NEVER_FULL }
@@ -77,7 +91,11 @@ function casingOf(leg: CasingLeg): { down: LegCasing; west: LegCasing } {
   const down = pathOf(rig.hold(buildIntent(['aim_down']), ticks(leg.downSeconds)))
   const west = pathOf(rig.hold(buildIntent(['aim_left']), ticks(leg.westSeconds)))
   rig.hold(buildIntent(['aim_right']), ticks(BACK_OUT_SECONDS))
-  const read = { down: casingAlongPath(down), west: casingAlongPath(west) }
+  const read = {
+    down: casingAlongPath(down),
+    west: casingAlongPath(west),
+    turn: casingAroundTurn(down, west, TURN_REACH_M),
+  }
   dug.set(leg, read)
   return read
 }
@@ -101,6 +119,16 @@ describe('casing along a dug leg (TD release check on #662)', () => {
       const { west } = casingOf(leg)
       console.log(`purchase ${leg.purchase} west`, JSON.stringify(west))
       expect(west.worstUnlinedRun).toBeLessThanOrEqual(MAIN_WEST_WORST_RUN[leg.purchase])
+    },
+    600_000,
+  )
+
+  it.each(TURN_LEGS)(
+    'leaves the turn from down to west at purchase $purchase no unlined run longer than main’s',
+    (leg) => {
+      const { turn } = casingOf(leg)
+      console.log(`purchase ${leg.purchase} turn`, JSON.stringify(turn))
+      expect(turn.worstUnlinedRun).toBeLessThanOrEqual(MAIN_TURN_WORST_RUN[leg.purchase])
     },
     600_000,
   )

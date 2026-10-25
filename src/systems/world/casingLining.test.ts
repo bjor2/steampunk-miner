@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { describe, expect, it } from 'vitest'
 import { CASING_RING_SPACING_MM } from '../../constants/balance'
 import { drillStampRadiusMm } from '../vehicle/drillBore'
@@ -9,6 +10,7 @@ import {
   casingRingAround,
   cellWallSamplesOf,
   lineRing,
+  NO_RING_SWEEP,
   ringSamplesOf,
   type CasingRing,
 } from './casingLining'
@@ -381,7 +383,7 @@ describe('casing lining: a trail ring along its stretch of axis (the TD’s Q1 r
     const shaft = boredShaft()
     const wall = wallRockOf(shaft)
     const along = linedDown(shaft, (y) =>
-      casingRingAlong(SHAFT_X, y, { xMm: SHAFT_X, yMm: y + CASING_RING_SPACING_MM }),
+      casingRingAlong(SHAFT_X, y, { xMm: SHAFT_X, yMm: y + CASING_RING_SPACING_MM }, NO_RING_SWEEP),
     )
     const circles = linedDown(shaft, (y) => casingRingAround(SHAFT_X, y))
     expect(wall).toHaveLength(2 * 9)
@@ -391,8 +393,8 @@ describe('casing lining: a trail ring along its stretch of axis (the TD’s Q1 r
 
   it('leaves the stretch before its own unlined, so the ring laid later there still lines new rock', () => {
     const shaft = boredShaft()
-    const below = casingRingAlong(SHAFT_X, 284_000, { xMm: SHAFT_X, yMm: 284_500 })
-    const above = casingRingAlong(SHAFT_X, 284_500, { xMm: SHAFT_X, yMm: 285_000 })
+    const below = casingRingAlong(SHAFT_X, 284_000, { xMm: SHAFT_X, yMm: 284_500 }, NO_RING_SWEEP)
+    const above = casingRingAlong(SHAFT_X, 284_500, { xMm: SHAFT_X, yMm: 285_000 }, NO_RING_SWEEP)
     const first = lineRing(shaft, params, below, 2)
     const second = lineRing(first.world, params, above, 2)
     expect(first.placed).toBeGreaterThan(0)
@@ -401,7 +403,115 @@ describe('casing lining: a trail ring along its stretch of axis (the TD’s Q1 r
   })
 
   it('is the circle when its stretch has no length', () => {
-    const point = casingRingAlong(SHAFT_X, 284_000, { xMm: SHAFT_X, yMm: 284_000 })
+    const point = casingRingAlong(SHAFT_X, 284_000, { xMm: SHAFT_X, yMm: 284_000 }, NO_RING_SWEEP)
     expect(ringSamplesOf(point)).toEqual(ringSamplesOf(casingRingAround(SHAFT_X, 284_000)))
+  })
+})
+
+describe('casing lining: a trail ring swept by its cut (the GD\u2019s (e) ruling on #662)', () => {
+  /**
+   * The body falls straight down this line while its stamp, 0.8 m ahead down the planet's radial,
+   * runs 45 mm east of it: the slant at planet 1's pad (#879), purchase 20's worst. The east
+   * wall's rock column at 1.25 m stands 880 mm from the body's line, past the band's 850 mm.
+   */
+  const BODY_X = 1250 - 880
+  const SLANT_MM = 45
+  const SWEEP = { xMm: SLANT_MM, yMm: -800 }
+  const RING_YS = [283_000, 283_500, 284_000, 284_500, 285_000]
+
+  /** The hole each tick cut: the bore round the body's line and round the slanted stamp's. */
+  function slantedShaft(): WorldState {
+    let world = EMPTY_WORLD
+    for (let y = 281_000; y <= 286_000; y += 50) {
+      for (const x of [BODY_X, BODY_X + SLANT_MM]) {
+        const disc = { xMm: x, yMm: y, radiusMm: drillStampRadiusMm(), floorRadiusMm: null }
+        world = clearDisc(world, params, { ...disc, edge: 'boreWall' }, 255).world
+      }
+    }
+    return world
+  }
+
+  /**
+   * The east wall's rock where both the rings' stretches and their sweeps pass: from the first
+   * ring's point to the last stretch's start swept 0.8 m ahead.
+   */
+  function eastWallRockOf(world: WorldState): { sx: number; sy: number }[] {
+    const wall = []
+    const firstSy = RING_YS[0] / MM_PER_SAMPLE
+    const lastStart = RING_YS[RING_YS.length - 1] + CASING_RING_SPACING_MM
+    const lastSy = (lastStart + SWEEP.yMm) / MM_PER_SAMPLE
+    for (let sy = firstSy + 1; sy < lastSy; sy++) {
+      for (let sx = 2; sx <= 8; sx++) {
+        const isRock = densityAt(world, sx, sy) > 128 && touchesAir(world, sx, sy)
+        if (isRock) wall.push({ sx, sy })
+      }
+    }
+    return wall
+  }
+
+  function linedDown(world: WorldState, sweep: { xMm: number; yMm: number }): WorldState {
+    return RING_YS.reduce((lined, y) => {
+      const from = { xMm: BODY_X, yMm: y + CASING_RING_SPACING_MM }
+      return lineRing(lined, params, casingRingAlong(BODY_X, y, from, sweep), 2).world
+    }, world)
+  }
+
+  /** Stretch rings in every direction, length and offset, near and far from the planet's centre. */
+  function stretchRings(): CasingRing[] {
+    const rings = []
+    for (const [x, y] of [
+      [415, 284_000],
+      [-15_420, 287_250],
+      [9_876_543, -12_345_678],
+    ]) {
+      for (const [dx, dy] of [
+        [0, 500],
+        [0, -500],
+        [500, 0],
+        [-353, 353],
+        [217, -451],
+        [1, 1000],
+        [0, 0],
+      ]) {
+        rings.push(casingRingAlong(x, y, { xMm: x - dx, yMm: y - dy }, NO_RING_SWEEP))
+      }
+    }
+    return rings
+  }
+
+  function digestOf(rings: readonly CasingRing[]): string {
+    const text = rings
+      .map((ring) =>
+        ringSamplesOf(ring)
+          .map(({ sx, sy }) => `${sx},${sy}`)
+          .join(' '),
+      )
+      .join('\n')
+    return createHash('sha256').update(text, 'utf8').digest('hex')
+  }
+
+  it('lines the wall rock the slanted stamp cut past the body\u2019s line, which its stretch alone leaves', () => {
+    const shaft = slantedShaft()
+    const wall = eastWallRockOf(shaft)
+    const swept = linedDown(shaft, SWEEP)
+    const unswept = linedDown(shaft, NO_RING_SWEEP)
+    expect(wall.length).toBeGreaterThanOrEqual(6)
+    expect(wall.filter(({ sx, sy }) => casingAt(swept, sx, sy) === 0)).toEqual([])
+    expect(wall.some(({ sx, sy }) => casingAt(unswept, sx, sy) === 0)).toBe(true)
+  })
+
+  it('still lines nothing behind its stretch\u2019s start, which the stretch before\u2019s ring bills', () => {
+    const shaft = slantedShaft()
+    const from = { xMm: BODY_X, yMm: 284_500 }
+    const lined = lineRing(shaft, params, casingRingAlong(BODY_X, 284_000, from, SWEEP), 2)
+    expect(lined.placed).toBeGreaterThan(0)
+    expect(lined.linedSamples.every(({ sy }) => sy * MM_PER_SAMPLE < 284_500)).toBe(true)
+  })
+
+  it('is the TD\u2019s Q1 stretch band, sample for sample, when its cut swept nothing', () => {
+    // Pinned on 248d631f7, the stretch band as Q1 built it before any sweep (once #879 lands).
+    expect(digestOf(stretchRings())).toBe(
+      'e901ea6c61155d26e8f9733fc2a1a1daf1a2d57d410e2eac380930b95b0edb0c',
+    )
   })
 })

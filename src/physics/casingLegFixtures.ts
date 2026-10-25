@@ -5,7 +5,8 @@
  * ones touching each other. The extra sample reads a wall that stands past the ring's reach of the
  * body's line, as a cut whose stamp runs beside it leaves one: read only to the ring's reach, that
  * wall's rock never counted, lined or not. The first 2 m and the last 3 m of a leg are left out:
- * the cut starts there, and its last rings wait for the ring lag. Test support only.
+ * the cut starts there, and its last rings wait for the ring lag; a turn's read keeps them
+ * (`casingAroundTurn`). Test support only.
  */
 import { MM_PER_METRE } from '../constants/physics'
 import { readPlanetWorld } from '../store/gameStore'
@@ -44,9 +45,26 @@ const NEIGHBOURS: readonly (readonly [number, number])[] = [
 
 /** The leg's casing as the world stands now, `path` being the body's centre each tick, in metres. */
 export function casingAlongPath(path: readonly Vector2[]): LegCasing {
+  return casingNear(pathWithoutEnds(path))
+}
+
+/**
+ * The casing round a turn from one leg into the next (the TD's L-shaped dig on #662): the path
+ * within `reachM` of the corner on either side, its ends kept, as the corner is what it reads.
+ */
+export function casingAroundTurn(
+  into: readonly Vector2[],
+  outOf: readonly Vector2[],
+  reachM: number,
+): LegCasing {
+  const before = pathEndOf([...into].reverse(), reachM)
+  const after = pathEndOf(outOf, reachM)
+  return casingNear({ points: [...before, ...after], lengthM: 2 * reachM })
+}
+
+function casingNear(kept: { points: readonly Vector2[]; lengthM: number }): LegCasing {
   const { params, world } = readPlanetWorld()
   if (params === null) throw new Error('the leg was dug on no planet')
-  const kept = pathWithoutEnds(path)
   const ground = { world, params }
   const wall = [...samplesNear(kept.points)].filter((key) => isWallSample(ground, key))
   const unlined = new Set(wall.filter((key) => !isLinedSample(ground, key)))
@@ -55,6 +73,12 @@ export function casingAlongPath(path: readonly Vector2[]): LegCasing {
     linedPerMetre: (wall.length - unlined.size) / kept.lengthM,
     worstUnlinedRun: largestRunOf(unlined),
   }
+}
+
+/** The path's points within `reachM` of its start, along it. */
+function pathEndOf(path: readonly Vector2[], reachM: number): Vector2[] {
+  const along = cumulativeLengthsOf(path)
+  return path.filter((_, at) => along[at] <= reachM)
 }
 
 interface Ground {
