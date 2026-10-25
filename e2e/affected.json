@@ -54,6 +54,11 @@
       "specs": ["e2e/browser/kitOutcomes.spec.ts"]
     },
     {
+      "why": "The planet-kit slice's deployed pose (ticket 883): each owned hazard tool idle, acting and through its tail on its socket, and the vented flask, at 360 px and 1920x1080.",
+      "paths": ["src/features/planet-kit/**"],
+      "specs": ["e2e/browser/kitPose.spec.ts"]
+    },
+    {
       "why": "The example slice answers smoke's features read, opens the slice screen, hangs the test piece and shows the shared UI parts (#423).",
       "paths": ["src/features/example/**"],
       "specs": [

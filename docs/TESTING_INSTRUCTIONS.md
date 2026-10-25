@@ -178,6 +178,9 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   the flask's cleared firedamp), the kernel seams with probe slices in
   `authority/hazards/hazardOutcomeSeams.test.ts`, and the overlay tags in
   `planet-kit/systems/render/kitOutcomeTags.test.ts`; the lane above replays with the outcomes on.
+  The deployed pose on the car (ticket 883) is read from the same state by
+  `planet-kit/systems/render/kitSocketShows.test.ts` (idle, acting, the tail, the vented flask, the
+  digest untouched); the posed parts against the rig's bounds stay in `kitSocketLook.test.ts`.
   Collapse specs build a weak band-2 tunnel or dig one with `collapse/collapseFixtures.ts`. Bore gun specs (ticket 313) stand the rig in a pocket of band-1 rock with `bore/boreFixtures.ts` and register the gun's numbers through `boreGunSlice` inside `withRegistrations`, as no slice answers `boreGun` yet. Auto mode specs (ticket 317) use `bore/boreAutoFixtures.ts` `searSlice`, which adds the steam sear's numbers and its research, and stand the rig at `AUTO_RIG`, on the east edge of its collapse block, so a level shot east never warns the rig's own block. A slice's self-acting item (ticket 328: the steam shield) is specced with the real press path through `power-up-core`'s `withPowerUpCore([itemSlice, fixture])`, the fixture registering the item's research and a stand-in `autoFire` hook for the combo, in the corridor fight of `combat/combatFixtures.ts`. Collapse brace specs (ticket 331) register the fake `brace-probe` slice of `collapse/braceFixtures.ts` (a section, a command, a clock step and the provider) inside `withRegistrations`, so a brace can end by command, by clock step or by `untilTick`. Hazard strip specs (ticket 341) dig straight down the plain line of `render/hazardStrip/stripFixtures.ts`, fixtures placed in metres below the start, at a steady speed frame by frame; the per-frame cost is the sampler's own cost model (`spentUs`), and the wall clock is `npm run bench:strip`'s. Specs that mine deep (where crawlers live) freeze enemies first
   (`FREEZE_ENEMIES` in `scriptedSession.ts`); combat specs fight in the band-1 corridor of
   `combat/combatFixtures.ts`, where no spawn point is in reach. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.setPref(name, value)`,
@@ -1809,6 +1812,10 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   `steampunkDebug`, the cut through `fastForward`, and checks its overlay tag
   (`planet-kit-outcome-tag`, `data-outcome` the verb) is drawn, attaching each screen as that size's
   golden for review. Box Tester only.
+  `e2e/browser/kitPose.spec.ts` (ticket 883) grants each hazard tool on the planet 1 start at the
+  same two sizes and reads `kitSockets().owned` idle away from its hazard, deployed by it, still
+  deployed 29 ticks after leaving it (the tail) and idle at 30, and the flask rack vented while a
+  flask is open, each pose's screen attached as that size's golden. Box Tester only.
 - **Sale receipt** (ticket 717, spec #678): the rules are pure in the sell-burst slice. The hold's
   kinds are tallied as units come in (`systems/heldManifest.ts`, read by `heldUnits.ts` as the pickup
   popup reads a species and rarity) and cut back to the authority's hold every batch; the trip's
