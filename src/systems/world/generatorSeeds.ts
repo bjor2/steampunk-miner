@@ -25,6 +25,11 @@ export const SEED_PURPOSE = {
   sliceHook: 10,
   /** Rare-ore cluster sizes, growth and the guaranteed cluster of each rare kind (ticket 737). */
   rareCluster: 11,
+  /**
+   * A bare blast's collapse roll per rim block (D2 #861): drawn on the authority, never changing
+   * what the generator makes.
+   */
+  blastCollapse: 12,
 } as const
 
 export type SeedPurpose = (typeof SEED_PURPOSE)[keyof typeof SEED_PURPOSE]
