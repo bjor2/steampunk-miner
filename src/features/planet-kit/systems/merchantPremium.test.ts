@@ -84,8 +84,8 @@ function collectUnits(state: AuthorityState, ore: MinedOre, units: number) {
 
 function withCommons(state: AuthorityState, tier: number, units: number): AuthorityState {
   const vehicle = vehicleOf(state, 'p1')
-  const held = vehicle.cargo.ore[tier] ?? 0
-  const ore = { ...vehicle.cargo.ore, [tier]: held + units }
+  const held = vehicle.cargo.ore[tier] ?? 0n
+  const ore = { ...vehicle.cargo.ore, [tier]: held + BigInt(units) }
   return withVehicle(state, 'p1', { ...vehicle, cargo: { ...vehicle.cargo, ore } })
 }
 
