@@ -522,8 +522,14 @@ import type { JsonCount } from '../wholeCount'
  *    `BlastStarted` says the record beside `ChargeDetonated`. At level 0 a blast clears the same
  *    tiles in the same ticks, so a run that blasts moves only by the counter and a run that never
  *    blasts moves no digest.
+ * 114: a bare blast's collapse roll (ticket 861, D2 of #647): each rim block a blast checks that is
+ *    not weak, has carved air and no lined wall draws hash(worldSeed, s, p, block, blastSeq) in
+ *    basis points against its size's `collapseBp` (0 for sizes 1-4, 1250 to 5000 for 5-8, 5000 for
+ *    9-12), says so in `BlastCollapseRolled`, and under the chance warns and refills on the shared
+ *    collapse path with the entry's optional `isBlast` bit: no crush, and the rigs' cells and every
+ *    cell a rig could not drill stay open. A run that never blasts a size from 5 moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 113
+export const AUTHORITY_PROTOCOL_VERSION = 114
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
