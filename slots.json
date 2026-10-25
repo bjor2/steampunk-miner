@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25T20:21:04+01:00",
+  "updated_at": "2026-10-25T20:41:00+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -368,6 +368,19 @@
     "mode": "on",
     "parallel": 1,
     "list": [
+      {
+        "number": 893,
+        "key": "308-3B",
+        "map": 308,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "ready",
+        "tickets": [
+          892
+        ],
+        "done": [],
+        "live": 0
+      },
       {
         "number": 891,
         "key": "878-1C",
