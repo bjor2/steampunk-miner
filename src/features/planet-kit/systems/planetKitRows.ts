@@ -3,12 +3,14 @@
  * `planet-kit.economy.json` numbers, read once and refused whole when broken, so a bad row fails
  * at load (and in its unit test) with every problem listed. The rows are data only: PK2 (#821)
  * draws the merchants on the #175 shops, PK4 (#823) builds the items and claims their stats.json
- * rows, PK5 (#824) copies the rows into the #777 generator tables. Nothing here registers.
+ * rows, PK5 (#824) adds the generator rows a planet past the first system draws its kit from. Nothing here registers.
  */
 import { fromCanonical } from '../../../systems/money'
 import { MATERIALS } from '../../materials'
 import { ORE_ROWS } from '../../ores'
 import { ARCHETYPE_PALETTE, FIRST_SYSTEM_BEHAVIOURS } from '../../solar-systems'
+import { familyKitProblems } from './familyKitGuards'
+import { FAMILY_KIT_FILE_FIELDS, familyKitShapeProblems, familyKitsOf } from './familyKitRows'
 import economyFile from '../planet-kit.economy.json'
 import kitsFile from '../planetKits.json'
 import {
@@ -36,7 +38,13 @@ import {
 import { PREMIUM_TAG_SLOT } from './planetKitSales'
 import type { KitEffect, KitItem, MerchantRow, PlanetKits } from './planetKitTypes'
 
-const FILE_FIELDS: readonly string[] = ['source', 'premiumTag', 'merchants', 'items']
+const FILE_FIELDS: readonly string[] = [
+  'source',
+  'premiumTag',
+  'merchants',
+  'items',
+  ...FAMILY_KIT_FILE_FIELDS,
+]
 
 /** The facts of the ores, materials and solar-systems slices the kit rows are judged against. */
 export function planetKitGuardContext(): PlanetKitGuardContext {
@@ -46,6 +54,10 @@ export function planetKitGuardContext(): PlanetKitGuardContext {
     takenBehaviours: [
       ...FIRST_SYSTEM_BEHAVIOURS.map((behaviour) => behaviour.effect),
       ...ARCHETYPE_PALETTE.newContent.families.map((family) => family.behaviour.effect),
+    ],
+    kitFamilyIds: [
+      ...Object.keys(ORE_ROWS.planets.hazards),
+      ...ARCHETYPE_PALETTE.newContent.families.map((family) => family.id),
     ],
   }
 }
@@ -90,7 +102,10 @@ function typedTableProblems(
 ): string[] {
   const merchants = (file.merchants as Raw[]).map((row) => merchantOf(row, context))
   const items = (file.items as Raw[]).map((row) => kitItemOf(row, economy))
-  return kitTableProblems(merchants, items, economy, context)
+  return [
+    ...kitTableProblems(merchants, items, economy, context),
+    ...familyKitProblems(familyKitsOf(file), merchants, items, context.kitFamilyIds),
+  ]
 }
 
 function planetKitsOf(
@@ -105,6 +120,7 @@ function planetKitsOf(
     heldFromSale: economy.heldFromSale,
     merchants: (file.merchants as Raw[]).map((row) => merchantOf(row, context)),
     items: (file.items as Raw[]).map((row) => kitItemOf(row, economy)),
+    familyKits: familyKitsOf(file),
   }
 }
 
@@ -114,6 +130,7 @@ function fileShapeProblems(file: unknown): string[] {
     ...premiumTagProblems(file.premiumTag),
     ...rowListProblems(file.merchants, 'merchants', merchantRowShapeProblems),
     ...rowListProblems(file.items, 'items', kitItemRowShapeProblems),
+    ...familyKitShapeProblems(file),
     ...Object.keys(file)
       .filter((field) => !FILE_FIELDS.includes(field))
       .map((field) => `${field} is not a field of planetKits.json`),
@@ -142,6 +159,7 @@ function merchantOf(row: Raw, context: PlanetKitGuardContext): MerchantRow {
   return {
     planet: row.planet as MerchantRow['planet'],
     name: row.name as string,
+    variant: row.variant as string,
     buysPool: (row.buys as Raw).pool as string,
     premiumOre: { speciesId, epithet: species?.epithet ?? speciesId },
     stock: row.stock as string[],

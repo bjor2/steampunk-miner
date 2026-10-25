@@ -200,6 +200,8 @@ describe('planet kit guards (ticket 820)', () => {
     expect(problemsOf(file)).toEqual([
       'scree_plough: hooks hazard firedamp; its home planet has rockfall',
       "scree_plough: names hazard effect drain; the hazard's is refill",
+      'rockfall: scree_plough hooks firedamp, not this family',
+      'scree_plough: not on the kit row of its hazard firedamp',
     ])
   })
 

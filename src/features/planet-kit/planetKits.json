@@ -1,10 +1,11 @@
 {
-  "source": "Ticket 820 (PK1, spec #647): the five planet kits of the GD's final lock (24 Oct ~15:30), from the Horizontal Scaler's handoff planet-kits-p1-p5.md. One merchant variant per planet on the #175 dock shops, differing in stock and buy list only, and one signature item per planet that turns the planet's #651 hazard (or, on P1, the return leg) into a choice. Names, hover lines and the premium tag are Progression's copy per #680, verbatim; the hover lines are two sentences by that lock, so they are held to the #680 word budget and not to the one-sentence flavour rule. Effect and trade-off are the lock's words as data; their magnitudes are PK4's (#823) to set against the ±5% felt-speed check. Planet ids are (s,p) as #790 keys them; prices key on g (planet-kit.economy.json).",
+  "source": "Ticket 820 (PK1, spec #647): the five planet kits of the GD's final lock (24 Oct ~15:30), from the Horizontal Scaler's handoff planet-kits-p1-p5.md. One merchant variant per planet on the #175 dock shops, differing in stock and buy list only, and one signature item per planet that turns the planet's #651 hazard (or, on P1, the return leg) into a choice. Names, hover lines and the premium tag are Progression's copy per #680, verbatim; the hover lines are two sentences by that lock, so they are held to the #680 word budget and not to the one-sentence flavour rule. Effect and trade-off are the lock's words as data; their magnitudes are PK4's (#823) to set against the ±5% felt-speed check. Planet ids are (s,p) as #790 keys them; prices key on g (planet-kit.economy.json). Ticket 824 (PK5) adds the rows the #777 generator draws a planet past the first system from, keyed by the roster's family or hazard id (TD final on Q1 with the HS conditions 1-5 and VS rows 1-7; GD Q2 = (b); Q3 per Progression and Systems): each merchant's variant noun (its name less any place name), one kit row per family or hazard id the roster can emit ({familyId, merchantVariant, premiumRule, itemId}, itemId null where the family has no authored item: premium only), the premium rule (one species of the planet's own common or mid kinds lying in a band up to reachBand, else the shallowest kind) and the row a planet with no new family draws (variant by seed). The SS1 hazards carry their PK1 items; the SS2-B families carry none until Progression authors one. Variants for the SS2-B families are by theme: vent flares at the Boilerhouse, cinder salts at the Assay, brine leeches at the Gasworks, ferro-sand sinks at the Scree Yard, spall glass at the Lapidary.",
   "premiumTag": "Pays extra for <ore>.",
   "merchants": [
     {
       "planet": { "system": "1", "planet": "1" },
       "name": "Hearthmoor Assay",
+      "variant": "Assay",
       "buys": { "pool": "legacy" },
       "premiumOre": "honey-amber-quartzine",
       "stock": ["cache_crate"]
@@ -12,6 +13,7 @@
     {
       "planet": { "system": "1", "planet": "2" },
       "name": "Scree Yard",
+      "variant": "Scree Yard",
       "buys": { "pool": "foothold-p2" },
       "premiumOre": "p2-u3",
       "stock": ["scree_plough"]
@@ -19,6 +21,7 @@
     {
       "planet": { "system": "1", "planet": "3" },
       "name": "Gasworks",
+      "variant": "Gasworks",
       "buys": { "pool": "foothold-p3" },
       "premiumOre": "green-apatite-quartzine",
       "stock": ["scree_plough", "damp_flask"]
@@ -26,6 +29,7 @@
     {
       "planet": { "system": "1", "planet": "4" },
       "name": "Lapidary",
+      "variant": "Lapidary",
       "buys": { "pool": "foothold-p4" },
       "premiumOre": "rose-quartz-quartzine",
       "stock": ["scree_plough", "shard_tongs"]
@@ -33,6 +37,7 @@
     {
       "planet": { "system": "1", "planet": "5" },
       "name": "Boilerhouse",
+      "variant": "Boilerhouse",
       "buys": { "pool": "foothold-p5" },
       "premiumOre": "chromite-brassvein",
       "stock": ["scree_plough", "shard_tongs", "vent_vane"]
@@ -131,5 +136,71 @@
         "summary": "Horizontal speed is lower while the vane is fitted."
       }
     }
-  ]
+  ],
+  "premiumRules": {
+    "own_pool_reach": {
+      "rarities": ["common", "uncommon"],
+      "reachBand": 1
+    }
+  },
+  "familyKits": [
+    {
+      "familyId": "rockfall",
+      "merchantVariant": "Scree Yard",
+      "premiumRule": "own_pool_reach",
+      "itemId": "scree_plough"
+    },
+    {
+      "familyId": "firedamp",
+      "merchantVariant": "Gasworks",
+      "premiumRule": "own_pool_reach",
+      "itemId": "damp_flask"
+    },
+    {
+      "familyId": "spinecrystal",
+      "merchantVariant": "Lapidary",
+      "premiumRule": "own_pool_reach",
+      "itemId": "shard_tongs"
+    },
+    {
+      "familyId": "steamvent",
+      "merchantVariant": "Boilerhouse",
+      "premiumRule": "own_pool_reach",
+      "itemId": "vent_vane"
+    },
+    {
+      "familyId": "vent_flare",
+      "merchantVariant": "Boilerhouse",
+      "premiumRule": "own_pool_reach",
+      "itemId": null
+    },
+    {
+      "familyId": "cinder_salt",
+      "merchantVariant": "Assay",
+      "premiumRule": "own_pool_reach",
+      "itemId": null
+    },
+    {
+      "familyId": "brine_leech",
+      "merchantVariant": "Gasworks",
+      "premiumRule": "own_pool_reach",
+      "itemId": null
+    },
+    {
+      "familyId": "ferro_sand_sink",
+      "merchantVariant": "Scree Yard",
+      "premiumRule": "own_pool_reach",
+      "itemId": null
+    },
+    {
+      "familyId": "spall_glass",
+      "merchantVariant": "Lapidary",
+      "premiumRule": "own_pool_reach",
+      "itemId": null
+    }
+  ],
+  "noFamilyKit": {
+    "premiumRule": "own_pool_reach",
+    "itemId": null
+  }
 }

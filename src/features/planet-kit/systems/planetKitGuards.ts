@@ -35,6 +35,8 @@ export interface PlanetKitGuardContext {
   species: readonly KitSpeciesFacts[]
   /** Every behaviour effect the first system and the SS2-B families already own. */
   takenBehaviours: readonly string[]
+  /** Every hazard or family id a planet can carry: the first system's hazards, the roster's families. */
+  kitFamilyIds: readonly string[]
 }
 
 const FIRST_SYSTEM = '1'

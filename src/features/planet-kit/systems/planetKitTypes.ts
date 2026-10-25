@@ -25,6 +25,8 @@ export interface MerchantRow {
   planet: PlanetId
   /** Progression's name, at most three words ("Hearthmoor Assay"). */
   name: string
+  /** The variant noun: the name less any place name ("Assay"), what a generated merchant is called by. */
+  variant: string
   /** The planet's own species pool: the ores this merchant buys. */
   buysPool: string
   premiumOre: PremiumOre
@@ -75,4 +77,55 @@ export interface PlanetKits {
   merchants: readonly MerchantRow[]
   /** In home-planet order. */
   items: readonly KitItem[]
+  /** The rows a planet past the first system draws its kit from (ticket 824). */
+  familyKits: FamilyKits
+}
+
+/**
+ * Which ore of a generated planet's pool its merchant pays the premium on: one kind of `rarities`
+ * lying in a band up to `reachBand`, picked by seed; the shallowest kind where none does.
+ */
+export interface PremiumRule {
+  id: string
+  rarities: readonly string[]
+  reachBand: number
+}
+
+/** One family's or hazard's kit (ticket 824): the merchant variant, the premium rule, the item or none. */
+export interface FamilyKitRow {
+  /** A first-system hazard kind or a roster family id. */
+  familyId: string
+  /** A merchant row's `variant`. */
+  merchantVariant: string
+  premiumRule: PremiumRule
+  /** An authored kit item hooked on this family; null where the family has none (premium only). */
+  itemId: string | null
+}
+
+/** The kit a drawn planet with no new family gets: a variant by seed, premium only. */
+export interface NoFamilyKitRow {
+  premiumRule: PremiumRule
+  itemId: null
+}
+
+export interface FamilyKits {
+  rows: readonly FamilyKitRow[]
+  noFamily: NoFamilyKitRow
+}
+
+/**
+ * A planet's kit as composition only (TD final on #824, HS condition 2): who trades there, what it
+ * pays the premium on and which item, if any, it debuts. Nothing in it keys on g; prices are read
+ * at g by `planetKitPrices.ts`.
+ */
+export interface PlanetKit {
+  planet: PlanetId
+  /** Authored rows (#820) win; the generator fills only planets past the first system. */
+  source: 'authored' | 'generated'
+  merchantName: string
+  merchantVariant: string
+  /** The planet's hazard or new family the kit is keyed on; null where it has none. */
+  familyId: string | null
+  premiumOre: PremiumOre
+  itemId: string | null
 }

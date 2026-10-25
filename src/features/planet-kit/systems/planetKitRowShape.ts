@@ -1,6 +1,6 @@
 /**
  * The schema of one `planetKits.json` row (ticket 820, spec #647): a merchant row is
- * `planet, name, buys, premiumOre, stock` and a kit item row is `id, name, hoverLine, kind,
+ * `planet, name, variant, buys, premiumOre, stock` and a kit item row is `id, name, hoverLine, kind,
  * homePlanet, sale, stackLimit (consumables only), effect, tradeOff`, nothing else. The lock keys a
  * kit on the stable planet id (s,p) as canonical text, as #790 does, and on g for prices; a row
  * never carries a price number, which lives in `planet-kit.economy.json`.
@@ -32,6 +32,7 @@ export type TradeOffCost = (typeof TRADE_OFF_COSTS)[number]
 export const MERCHANT_ROW_FIELDS: readonly string[] = [
   'planet',
   'name',
+  'variant',
   'buys',
   'premiumOre',
   'stock',
@@ -64,6 +65,7 @@ export function merchantRowShapeProblems(row: Raw, where: string): string[] {
   return [
     ...planetIdProblems(row.planet, `${where}.planet`),
     ...titleProblems(row.name, `${where}.name`),
+    ...titleProblems(row.variant, `${where}.variant`),
     ...buysProblems(row.buys, `${where}.buys`),
     ...(KEBAB_ID.test(String(row.premiumOre))
       ? []
@@ -171,7 +173,7 @@ function oneOfProblems(value: unknown, allowed: readonly string[], where: string
   return allowed.includes(String(value)) ? [] : [`${where} must be one of ${allowed.join(', ')}`]
 }
 
-function unknownFieldProblems(row: Raw, where: string, fields: readonly string[]): string[] {
+export function unknownFieldProblems(row: Raw, where: string, fields: readonly string[]): string[] {
   return Object.keys(row)
     .filter((field) => !fields.includes(field))
     .map((field) => `${where}.${field} is not a field of this row`)

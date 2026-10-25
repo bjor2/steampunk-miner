@@ -11,3 +11,6 @@ written here.
 - **Kit item**: a planet's signature tool or consumable that turns the planet's hazard into a
   choice with a trade-off; a tool is sold at its home merchant and every later one, a consumable at
   home only. Owned by the `planet-kit` slice; prices key on g.
+- **Family kit**: the kit row a hazard or roster family carries (merchant variant, premium rule,
+  kit item or none), which a planet past the first system draws its kit from by its family. Owned
+  by the `planet-kit` slice; composition only, never keyed on g.
