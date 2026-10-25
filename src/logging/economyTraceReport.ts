@@ -9,7 +9,9 @@
 import { fromCanonical, toFixedText, type Money } from '../systems/money'
 import type { TripSale } from './economyTrace'
 import {
+  bandsOf,
   economyTraceRowsOf,
+  tripsInBand,
   medianMoneyOf,
   TICKS_PER_MINUTE,
   type EconomyTraceRow,
@@ -152,38 +154,44 @@ function comparisonLineOf(off: EconomyTraceMedians, on: EconomyTraceMedians | un
 function bandTablesOf(runs: readonly EconomyTraceRun[]): string {
   return KIT_HANDS.map(
     (hand) =>
-      `kitPolicy ${hand}: the middle trip's sale (trips, rescued)\n\n` +
+      `kitPolicy ${hand}: the middle trip's sale (trips, rescued); core trips carry fragments, not ore\n\n` +
       bandTableOf(runs.filter((run) => run.hand === hand)),
   ).join('\n\n')
 }
 
-/** One row per band, one column per planet, the hand's seeds pooled. */
+/** One row per band of ore trips and one of core trips, a column per planet, seeds pooled. */
 function bandTableOf(runs: readonly EconomyTraceRun[]): string {
   const planets = sortedNumbers(runs.flatMap((run) => [...run.trace.planets.keys()]))
   const tripsByPlanet = planets.map((planet) => tripsOnPlanet(runs, planet))
-  const bands = sortedNumbers(tripsByPlanet.flat().map((trip) => trip.band))
+  const oreByPlanet = tripsByPlanet.map((trips) => trips.filter((trip) => !trip.isCoreTrip))
+  const coreByPlanet = tripsByPlanet.map((trips) => trips.filter((trip) => trip.isCoreTrip))
   const header = [
     `| band | ${planets.map((planet) => `P${planet}`).join(' | ')} |`,
     `| --- | ${planets.map(() => '---').join(' | ')} |`,
   ]
-  const lines = bands.map((band) => bandLineOf(band, tripsByPlanet))
-  return [...header, ...lines].join('\n')
+  const lines = bandsOf(oreByPlanet.flat()).map((band) =>
+    tableLineOf(
+      `${band}`,
+      oreByPlanet.map((trips) => tripsInBand(trips, band)),
+    ),
+  )
+  return [...header, ...lines, tableLineOf('core', coreByPlanet)].join('\n')
 }
 
 function tripsOnPlanet(runs: readonly EconomyTraceRun[], planet: number): TripSale[] {
   return runs.flatMap((run) => run.trace.planets.get(planet)?.trips ?? [])
 }
 
-function bandLineOf(band: number, tripsByPlanet: readonly TripSale[][]): string {
-  return `| ${band} | ${tripsByPlanet.map((trips) => bandCellOf(trips, band)).join(' | ')} |`
+function tableLineOf(label: string, tripsByPlanet: readonly TripSale[][]): string {
+  return `| ${label} | ${tripsByPlanet.map(tripsCellOf).join(' | ')} |`
 }
 
-function bandCellOf(trips: readonly TripSale[], band: number): string {
-  const inBand = trips.filter((trip) => trip.band === band)
-  if (inBand.length === 0) return '-'
-  const rescued = inBand.filter((trip) => trip.isRescued).length
-  const median = medianMoneyOf(inBand.map((trip) => trip.value))
-  return `${moneyText(median)} (${inBand.length}, ${rescued})`
+/** The middle trip's sale, then the trips and the rescued ones; a dash for none. */
+function tripsCellOf(trips: readonly TripSale[]): string {
+  if (trips.length === 0) return '-'
+  const rescued = trips.filter((trip) => trip.isRescued).length
+  const median = medianMoneyOf(trips.map((trip) => trip.value))
+  return `${moneyText(median)} (${trips.length}, ${rescued})`
 }
 
 function seedTableOf(rows: readonly EconomyTraceRow[]): string {

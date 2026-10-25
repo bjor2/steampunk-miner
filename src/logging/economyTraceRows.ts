@@ -27,9 +27,9 @@ export interface ArrivalAskRow {
   isCovered: boolean
 }
 
-/** The trips that reached one band as their deepest, and the middle one's sale. */
+/** The ore trips whose deepest band mined was one band, or the core trips, and the middle sale. */
 export interface BandTripsRow {
-  band: number
+  band: number | 'core'
   trips: number
   rescued: number
   medianSale: string
@@ -97,17 +97,24 @@ function arrivalAskRowOf(ask: UpgradeAsk, lastTick: number): ArrivalAskRow {
   }
 }
 
+/** The ore trips band by band, then the core trips when there were any. */
 function bandTripsRowsOf(trips: readonly TripSale[]): BandTripsRow[] {
-  const bands = [...new Set(trips.map((trip) => trip.band))].sort((a, b) => a - b)
-  return bands.map((band) =>
-    bandTripsRowOf(
-      band,
-      trips.filter((trip) => trip.band === band),
-    ),
-  )
+  const ore = trips.filter((trip) => !trip.isCoreTrip)
+  const core = trips.filter((trip) => trip.isCoreTrip)
+  const rows = bandsOf(ore).map((band) => bandTripsRowOf(band, tripsInBand(ore, band)))
+  return core.length === 0 ? rows : [...rows, bandTripsRowOf('core', core)]
 }
 
-function bandTripsRowOf(band: number, trips: readonly TripSale[]): BandTripsRow {
+/** The distinct bands the trips mined to, shallowest first. */
+export function bandsOf(trips: readonly TripSale[]): number[] {
+  return [...new Set(trips.map((trip) => trip.band))].sort((a, b) => a - b)
+}
+
+export function tripsInBand(trips: readonly TripSale[], band: number): TripSale[] {
+  return trips.filter((trip) => trip.band === band)
+}
+
+function bandTripsRowOf(band: number | 'core', trips: readonly TripSale[]): BandTripsRow {
   return {
     band,
     trips: trips.length,

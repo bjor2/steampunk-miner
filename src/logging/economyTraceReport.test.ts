@@ -33,12 +33,13 @@ describe('economy trace rows (ticket 907)', () => {
     expect(row.uncoveredAsks).toBe(1)
   })
 
-  it('groups the trips by deepest band with the middle sale and the rescues', () => {
+  it('groups the ore trips by deepest band, then the core trips, with the middle sale and rescues', () => {
     const [row] = economyTraceRowsOf([runOf(83921, 'off', [planetOf(2, {})])])
 
     expect(row.tripsByBand).toEqual([
       { band: 2, trips: 3, rescued: 1, medianSale: '3e+1' },
       { band: 4, trips: 1, rescued: 0, medianSale: '2.5e+2' },
+      { band: 'core', trips: 1, rescued: 0, medianSale: '0e+0' },
     ])
   })
 })
@@ -71,6 +72,7 @@ describe('economy trace report (ticket 907)', () => {
 
     expect(markdown).toContain('| 2 | $30 (3, 1) |')
     expect(markdown).toContain('| 4 | $250 (1, 0) |')
+    expect(markdown).toContain('| core | $0 (1, 0) |')
   })
 })
 
@@ -80,7 +82,7 @@ function runOf(worldSeed: number, hand: KitHand, planets: PlanetEconomy[]): Econ
   return { worldSeed, hand, trace, endTick: 0 }
 }
 
-/** Two minutes on `planet`: three buys, two deaths, two asks (one covered), four trips. */
+/** Two minutes on `planet`: three buys, two deaths, two asks (one covered), five trips. */
 function planetOf(planet: number, { income = '0' }: { income?: string }): PlanetEconomy {
   const lastTick = 2 * TICKS_PER_MINUTE
   return {
@@ -113,10 +115,14 @@ function planetOf(planet: number, { income = '0' }: { income?: string }): Planet
       ['hazard.firedamp', 1],
       ['fuel', 1],
     ]),
-    trips: [trip(2, '30'), trip(2, '40'), trip(2, '0', true), trip(4, '250')].reverse(),
+    trips: [trip(2, '30'), trip(2, '40'), trip(2, '0', true), trip(4, '250'), coreTrip()].reverse(),
   }
 }
 
-function trip(band: number, value: string, isRescued = false): TripSale {
-  return { band, value: isRescued ? ZERO_MONEY : fromCanonical(value), isRescued }
+function coreTrip(): TripSale {
+  return trip(5, '0', false, true)
+}
+
+function trip(band: number, value: string, isRescued = false, isCoreTrip = false): TripSale {
+  return { band, value: isRescued ? ZERO_MONEY : fromCanonical(value), isRescued, isCoreTrip }
 }

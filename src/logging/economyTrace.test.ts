@@ -51,6 +51,15 @@ describe('economy trace (ticket 907)', () => {
     expect(trip.isRescued).toBe(false)
   })
 
+  it('keeps a trip that broke a core tile apart as a core trip', () => {
+    const trace = emptyEconomyTrace()
+    step(trace, stateAt(0, 1, 0, '0'), [])
+    step(trace, stateAt(100, 1, 3, '0'), [broke(3), broke(4, 'core')])
+    step(trace, stateAt(200, 1, 0, '0'), [docked()])
+
+    expect(planetOf(trace, 1).trips[0].isCoreTrip).toBe(true)
+  })
+
   it('ends no trip at a bay hop that mined nothing, so its sales stay with the trip before', () => {
     const trace = emptyEconomyTrace()
     step(trace, stateAt(0, 1, 0, '0'), [])
@@ -72,7 +81,9 @@ describe('economy trace (ticket 907)', () => {
     step(trace, stateAt(210, 1, 0, '30'), [sold('30')])
 
     const planet = planetOf(trace, 1)
-    expect(planet.trips).toEqual([{ band: 1, value: ZERO_MONEY, isRescued: true }])
+    expect(planet.trips).toEqual([
+      { band: 1, value: ZERO_MONEY, isRescued: true, isCoreTrip: false },
+    ])
     expect(toFixedText(planet.income, 0)).toBe('30')
   })
 
@@ -218,11 +229,11 @@ function sold(value: string): DomainEventBody {
   return { type: 'ResourceSold', items: [], value, mode: 'all', coinsShown: 0 }
 }
 
-/** The cell `depthTiles` below column 0's surface on planet 1 broke. */
-function broke(depthTiles: number): DomainEventBody {
+/** The `kind` cell `depthTiles` below column 0's surface on planet 1 broke. */
+function broke(depthTiles: number, kind: 'ground' | 'core' = 'ground'): DomainEventBody {
   const { radiusTiles } = freshPlanetParamsFor(SEED, 1)
   const ty = surfaceRowOfColumn(0, radiusTiles) - depthTiles
-  return { type: 'TileDestroyed', tx: 0, ty, kind: 'ground' }
+  return { type: 'TileDestroyed', tx: 0, ty, kind }
 }
 
 function docked(): DomainEventBody {

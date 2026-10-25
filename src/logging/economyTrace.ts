@@ -12,7 +12,8 @@
  * - **deaths**: every rescue by cause (`economyTraceLabels.ts`);
  * - **trips**: each trip from dock to dock, by the deepest band it mined, and what its hold sold
  *   for until the next trip that mined something ended; a rescued trip sells 0. A trip that mined
- *   nothing (a hop from bay to bay: the pads of P3 on sit below the surface line) ends no trip.
+ *   nothing (a hop from bay to bay) ends no trip. A trip that broke a core tile is a core trip:
+ *   its hold carries fragments to the bay, so it sells little or nothing and is kept apart.
  *
  * A step that applied a debug command (a scenario's set-up) is skipped whole (#11 section 4).
  */
@@ -30,6 +31,7 @@ export interface TripSale {
   band: number
   value: Money
   isRescued: boolean
+  isCoreTrip: boolean
 }
 
 const FIRST_BAND = 1
@@ -53,6 +55,7 @@ export interface PlanetEconomy {
 interface OpenTrip {
   /** The deepest band of a cell it broke; null while it broke none. */
   minedBand: number | null
+  hasBrokenCore: boolean
   /** The deepest band the rig stood in, for a rescue that mined nothing. */
   poseBand: number | null
   /** The last hazard that drained the rig's energy on the trip, for a strand's cause. */
@@ -75,7 +78,7 @@ export function emptyEconomyTrace(): EconomyTrace {
 }
 
 function newTrip(): OpenTrip {
-  return { minedBand: null, poseBand: null, drainedBy: null }
+  return { minedBand: null, hasBrokenCore: false, poseBand: null, drainedBy: null }
 }
 
 /** One bot step: the state after it and the events it answered, folded in place. */
@@ -151,7 +154,7 @@ function traceEconomyEvent(
   event: DomainEvent,
 ): void {
   if (event.type === 'ResourceSold') addSale(trace, planet, fromCanonical(event.value))
-  if (event.type === 'TileDestroyed') followMinedBand(trace.trip, state, event.tx, event.ty)
+  if (event.type === 'TileDestroyed') followMinedCell(trace.trip, state, event)
   if (event.type === 'DockEntered') endTripAtDock(trace, planet)
   if (event.type === 'HazardDrained') trace.trip.drainedBy = event.kind
   if (event.type === 'VehicleDestroyed') trace.destroyedBy = event.cause
@@ -159,9 +162,13 @@ function traceEconomyEvent(
   countPurchase(planet, purchaseLabelOf(event))
 }
 
-function followMinedBand(trip: OpenTrip, state: AuthorityState, tx: number, ty: number): void {
+type TileDestroyedEvent = Extract<DomainEvent, { type: 'TileDestroyed' }>
+
+function followMinedCell(trip: OpenTrip, state: AuthorityState, cell: TileDestroyedEvent): void {
   const params = planetParamsOf(state.planet)
-  if (params !== null) trip.minedBand = deeperBandOf(trip.minedBand, bandOfTile(params, tx, ty))
+  if (params === null) return
+  trip.minedBand = deeperBandOf(trip.minedBand, bandOfTile(params, cell.tx, cell.ty))
+  trip.hasBrokenCore ||= cell.kind === 'core'
 }
 
 function deeperBandOf(known: number | null, band: number): number {
@@ -175,10 +182,10 @@ function addSale(trace: EconomyTrace, planet: PlanetEconomy, value: Money): void
 
 /** A dock ends a trip that mined something, whose hold the sales from now on are. */
 function endTripAtDock(trace: EconomyTrace, planet: PlanetEconomy): void {
-  const band = trace.trip.minedBand
+  const { minedBand: band, hasBrokenCore } = trace.trip
   trace.trip = newTrip()
   if (band === null) return
-  const sale: TripSale = { band, value: ZERO_MONEY, isRescued: false }
+  const sale: TripSale = { band, value: ZERO_MONEY, isRescued: false, isCoreTrip: hasBrokenCore }
   planet.trips.push(sale)
   trace.selling = sale
 }
@@ -186,7 +193,8 @@ function endTripAtDock(trace: EconomyTrace, planet: PlanetEconomy): void {
 /** A rescue ends the trip with its hold lost, at the band it mined, else the band it reached. */
 function endTripAtRescue(trace: EconomyTrace, planet: PlanetEconomy): void {
   const band = trace.trip.minedBand ?? trace.trip.poseBand ?? FIRST_BAND
-  planet.trips.push({ band, value: ZERO_MONEY, isRescued: true })
+  const isCoreTrip = trace.trip.hasBrokenCore
+  planet.trips.push({ band, value: ZERO_MONEY, isRescued: true, isCoreTrip })
   trace.trip = newTrip()
   trace.selling = null
 }
