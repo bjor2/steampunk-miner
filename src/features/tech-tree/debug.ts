@@ -5,7 +5,8 @@
  * `shapeProblems()` prints the shape test over the registered tree; `getUnlocked()` reads the
  * local player's researched nodes for specs. `getRig()` reads what the rig draws now (ticket 250):
  * the mounted items, each asset at its point, each cradle's Mark plate with its milestone studs,
- * its pips and its finish band past Mark 9 (ticket 884), and the power-up effects running with their looks (ticket 277); `previewPowerUpFx(itemId, mark?)`
+ * its pips and its finish band past Mark 9 (ticket 884), with what a showing look swap covers left
+ * off as the car leaves it (ticket 892), and the power-up effects running with their looks (ticket 277); `previewPowerUpFx(itemId, mark?)`
  * plays an item's effects at the vehicle through the real layer, at the Mark the item acts at
  * unless `mark` says otherwise, presentation only: no command and no log line. `getForks()` reads
  * every registered fork branch, whether the local player has it active and the parts it hangs on
@@ -16,6 +17,7 @@ import type { DebugResult } from '../../debug/debugScreens'
 import { submitSliceDebugCommand } from '../../debug/sliceDebugCommands'
 import { readAuthorityState } from '../../store/authorityLink'
 import { useGameStore } from '../../store/gameStore'
+import { partMotion } from '../../scene/partMotionPresence'
 import { SHIPPED_ART } from '../../scene/shippedArt'
 import { iconUrlOf } from '../../ui/vectorIcons'
 import { powerUpFxPresence } from './scene/powerUpFxPresence'
@@ -51,7 +53,7 @@ export const techTreeDebugActions: Readonly<Record<string, DebugAction>> = {
 
 function readRig() {
   const rig = readCarriedRig()
-  const sight = rigSightOfCarried(SHIPPED_ART, rig)
+  const sight = rigSightOfCarried(SHIPPED_ART, rig, partMotion.requested.coveredItemIds)
   return {
     ok: true as const,
     items: rig.items,

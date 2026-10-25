@@ -91,6 +91,11 @@ export function rigMountsOf(
   return mergedByAssetAndPoint(mounts).sort(byPointThenAsset)
 }
 
+/** The items a mount draws art for, each once, in quad order: what holds its point (ticket 892). */
+export function mountItemIdsOf(mount: RigMount): string[] {
+  return [...new Set(mount.quads.map((quad) => quad.itemId))]
+}
+
 export function pivotedQuadOf(quad: GearQuad): PivotedQuad {
   const scaleY = quad.mirrorY ? -1 : 1
   const [pivotX, pivotY] = quad.pivot

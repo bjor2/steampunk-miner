@@ -3,23 +3,29 @@
  * the loadout mounts at its attach point, posed and mirrored where the art says (an extractor
  * unfolds while it works, from mining-gates' `extractorWorkOf`, ticket 297), with a brass Mark plate under each cradle that holds a Mark-bearing
  * item, at the Mark the item acts at. It changes only when the loadout or a Mark does, so it renders through React; each asset shows in
- * `steampunkDebug.vehicleParts().mounted` while it is on the car. With no items, it draws nothing.
+ * `steampunkDebug.vehicleParts().mounted` while it is on the car. While a look swap covers an item
+ * (ticket 892), that item's mounts step aside; each mount names its items, so a covering look can
+ * take the point they held. With no items, it draws nothing.
  */
 import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo } from 'react'
 import { PartQuadMesh } from '../../../scene/PartQuadMesh'
 import { showMountedParts } from '../../../scene/mountedPartsPresence'
 import { SHIPPED_ART } from '../../../scene/shippedArt'
+import { useSwappedParts } from '../../../scene/useSwappedParts'
 import { useGameStore } from '../../../store/gameStore'
 import { atlasMapsOf, type AtlasMaps } from '../../../systems/art/assetLook'
 import {
   carriedRigOfKey,
+  coveredItemIdsOfKey,
+  coveredKeyOf,
+  isBareRigKey,
   readCarriedRigKey,
   readDeployFractionOf,
   readRigTick,
   rigSightOfCarried,
 } from '../store/rigReads'
-import { pivotedQuadOf, type RigMount } from '../systems/render/rigGear'
+import { mountItemIdsOf, pivotedQuadOf, type RigMount } from '../systems/render/rigGear'
 import type { GearQuad } from '../systems/render/techGearQuads'
 import {
   createExtractorDeploy,
@@ -37,7 +43,19 @@ const RIG_Z = 0.1
 
 export function RigGearPiece() {
   const rigKey = useGameStore(readCarriedRigKey)
-  const sight = useMemo(() => rigSightOfCarried(SHIPPED_ART, carriedRigOfKey(rigKey)), [rigKey])
+  return isBareRigKey(rigKey) ? null : <CarriedRigGear rigKey={rigKey} />
+}
+
+/**
+ * The carried items' gear, but for what a showing look covers; mounted only while the rig
+ * carries an item, so a bare rig watches no swaps.
+ */
+function CarriedRigGear({ rigKey }: { rigKey: string }) {
+  const coveredKey = coveredKeyOf(useSwappedParts().coveredItemIds)
+  const sight = useMemo(
+    () => rigSightOfCarried(SHIPPED_ART, carriedRigOfKey(rigKey), coveredItemIdsOfKey(coveredKey)),
+    [rigKey, coveredKey],
+  )
   const deploy = useMemo(createExtractorDeploy, [])
   const isDeploying = useMemo(() => isAnyExtractorDeploying(sight.mounts), [sight])
   useEffect(() => showRigMounts(sight.mounts), [sight])
@@ -103,8 +121,12 @@ function PosedGearQuad({ quad, maps, deploy }: PosedGearQuadProps) {
 
 /** Lists every mount on the car; returns the call that takes them all back. */
 function showRigMounts(mounts: readonly RigMount[]): () => void {
-  const hides = mounts.map(({ assetId, attachId, quads }) =>
-    showMountedParts({ assetId, attachId }, quads),
+  const hides = mounts.map((mount) =>
+    showMountedParts(
+      { assetId: mount.assetId, attachId: mount.attachId },
+      mount.quads,
+      mountItemIdsOf(mount),
+    ),
   )
   return () => hides.forEach((hide) => hide())
 }

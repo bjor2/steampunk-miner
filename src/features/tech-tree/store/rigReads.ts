@@ -2,7 +2,8 @@
  * The rig as the local player's replica holds it now (ticket 250): the mounted items, with each
  * active fork branch's piece (ticket 270), that the vehicle piece draws and the debug read
  * reports, each at the Mark it acts at (#249), from the same rule on the same state, and how far
- * each extractor stands deployed from its work (ticket 297).
+ * each extractor stands deployed from its work (ticket 297). An item a showing look swap covers
+ * (ticket 892) is carried, but its art is not drawn.
  */
 import { readAuthorityState } from '../../../store/authorityLink'
 import { useGameStore } from '../../../store/gameStore'
@@ -11,6 +12,7 @@ import type { ArtCatalogue } from '../../../systems/art/artCatalogue'
 import { extractorWorkOf } from '../../mining-gates'
 import { deployFractionOf } from '../systems/render/extractorPose'
 import { actingMarksOf, BOUGHT_MARK } from '../systems/render/markPlate'
+import { uncoveredItemsOf } from '../systems/render/rigCovers'
 import { rigItemsWithForksOf } from '../systems/render/rigGear'
 import { rigSightOf, type RigSight } from '../systems/render/rigSight'
 import type { MountedItem } from '../systems/render/techGearQuads'
@@ -44,10 +46,32 @@ export function carriedRigOfKey(rigKey: string): CarriedRig {
   return JSON.parse(rigKey) as CarriedRig
 }
 
-/** What the rig shows: the gear at its points and every plate at the Mark its item acts at. */
-export function rigSightOfCarried(art: ArtCatalogue, rig: CarriedRig): RigSight {
+/** Whether the rig the key names carries no item, so it draws nothing. */
+export function isBareRigKey(rigKey: string): boolean {
+  return carriedRigOfKey(rigKey).items.length === 0
+}
+
+/**
+ * What the rig shows: the gear at its points and every plate at the Mark its item acts at, but
+ * for the items `coveredItemIds` names, whose looks stand in for their art.
+ */
+export function rigSightOfCarried(
+  art: ArtCatalogue,
+  rig: CarriedRig,
+  coveredItemIds: readonly string[],
+): RigSight {
   const markOf = (itemId: string) => rig.marks[itemId] ?? BOUGHT_MARK
-  return rigSightOf(art, rig.items, registeredTechTree(), markOf)
+  const drawn = uncoveredItemsOf(rig.items, coveredItemIds)
+  return rigSightOf(art, drawn, registeredTechTree(), markOf)
+}
+
+/** The covered item ids as one string, so the piece renders again only when they change. */
+export function coveredKeyOf(coveredItemIds: readonly string[]): string {
+  return coveredItemIds.join(' ')
+}
+
+export function coveredItemIdsOfKey(coveredKey: string): string[] {
+  return coveredKey === '' ? [] : coveredKey.split(' ')
 }
 
 /** The fold-flat fraction of the item's extractor, from the work mining-gates reads (#237 Q2). */
