@@ -1,9 +1,11 @@
 /**
  * What `casingPerMetre.lane.test.ts` reads of a dug leg (the TD's release check on #662): the bore
- * wall's rock samples (solid, beside air) within the casing ring's reach of the path the body
- * took, how many of them are lined per metre of that path, and the largest run of unlined ones
- * touching each other. The first 2 m and the last 3 m of a leg are left out: the cut starts there,
- * and its last rings wait for the ring lag. Test support only.
+ * wall's rock samples (solid, beside air) within a sample past the casing ring's reach of the path
+ * the body took, how many of them are lined per metre of that path, and the largest run of unlined
+ * ones touching each other. The extra sample reads a wall that stands past the ring's reach of the
+ * body's line, as a cut whose stamp runs beside it leaves one: read only to the ring's reach, that
+ * wall's rock never counted, lined or not. The first 2 m and the last 3 m of a leg are left out:
+ * the cut starts there, and its last rings wait for the ring lag. Test support only.
  */
 import { MM_PER_METRE } from '../constants/physics'
 import { readPlanetWorld } from '../store/gameStore'
@@ -79,10 +81,10 @@ function cumulativeLengthsOf(path: readonly Vector2[]): number[] {
   return lengths
 }
 
-/** Every sample within the ring's outer radius of a point of the path, as `sx,sy` keys. */
+/** Every sample within a sample past the ring's outer radius of a point of the path, as keys. */
 function samplesNear(points: readonly Vector2[]): Set<string> {
   const ring = casingRingAround(0, 0)
-  const reachMm = ring.clearMm + ring.widthMm
+  const reachMm = ring.clearMm + ring.widthMm + MM_PER_SAMPLE
   const span = Math.ceil(reachMm / MM_PER_SAMPLE)
   const near = new Set<string>()
   for (const point of points) {

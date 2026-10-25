@@ -16,7 +16,7 @@ import { createRig } from './cutFollowFixtures'
 // its path is read (`casingLegFixtures.ts`). Down: no run of unlined wall longer than one sample,
 // and lined samples per metre at least 95% of main's (lining more than main, which leaves its own
 // gaps, is no fault). West: no unlined run longer than main's worst. Main's numbers are this read
-// of origin/main 7cc90ad31 (protocol 107, #36's 1.9 m bore), the same legs.
+// of origin/main a94d74358 (protocol 109, #36's 1.9 m bore), the same legs.
 
 interface CasingLeg {
   purchase: number
@@ -40,11 +40,11 @@ const HOLD_NEVER_FULL = 60
 
 /** Main's read of the same legs, by purchase. */
 const MAIN_DOWN: Readonly<Record<number, LegCasing>> = {
-  1: { lengthM: 4.9, linedPerMetre: 7.95, worstUnlinedRun: 1 },
-  10: { lengthM: 20.4, linedPerMetre: 8.05, worstUnlinedRun: 0 },
-  20: { lengthM: 17.2, linedPerMetre: 7.42, worstUnlinedRun: 11 },
+  1: { lengthM: 4.9, linedPerMetre: 9.17, worstUnlinedRun: 2 },
+  10: { lengthM: 20.4, linedPerMetre: 8.59, worstUnlinedRun: 0 },
+  20: { lengthM: 17.2, linedPerMetre: 7.54, worstUnlinedRun: 13 },
 }
-const MAIN_WEST_WORST_RUN: Readonly<Record<number, number>> = { 1: 2, 10: 36, 20: 0 }
+const MAIN_WEST_WORST_RUN: Readonly<Record<number, number>> = { 1: 3, 10: 39, 20: 2 }
 
 const LINED_SHARE_OF_MAIN_MIN = 0.95
 const UNLINED_RUN_MAX = 1
