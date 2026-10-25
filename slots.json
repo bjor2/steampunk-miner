@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25T12:15:45+01:00",
+  "updated_at": "2026-10-25T12:23:21+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -29,11 +29,11 @@
         {
           "slot": "C2",
           "state": "busy",
-          "ticket": 872,
+          "ticket": 824,
           "grok_slot": 3,
           "kind": "dev",
-          "since": "2026-10-25T11:45:00+01:00",
-          "wave": "647-7Z"
+          "since": "2026-10-25T12:23:00+01:00",
+          "wave": "647-7U"
         },
         {
           "slot": "C3",
@@ -72,7 +72,7 @@
       "size": 6,
       "used": 3,
       "free": 3,
-      "claims_last_hour": 2,
+      "claims_last_hour": 3,
       "name": "Claude Max 1"
     },
     {
@@ -197,10 +197,10 @@
     {
       "slot": 3,
       "state": "dev",
-      "ticket": 872,
-      "since": "2026-10-25T11:45:00+01:00",
+      "ticket": 824,
+      "since": "2026-10-25T12:23:00+01:00",
       "claude_slot": 2,
-      "wave": "647-7Z"
+      "wave": "647-7U"
     },
     {
       "slot": 4,
@@ -274,11 +274,11 @@
     {
       "slot": 2,
       "state": "busy",
-      "ticket": 872,
+      "ticket": 824,
       "grok_slot": 3,
-      "since": "2026-10-25T11:45:00+01:00",
+      "since": "2026-10-25T12:23:00+01:00",
       "account": 1,
-      "wave": "647-7Z"
+      "wave": "647-7U"
     },
     {
       "slot": 3,
@@ -349,11 +349,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-25 11:45 CET",
+    "at": "2026-10-25 12:23 CET",
     "mode": "refill-dev",
-    "triggers": "#850",
-    "started": "#872->C2/A1 #873->C3/A1 #881->C8/A2",
-    "note": "spawned 3 worker(s)"
+    "triggers": "#872",
+    "started": "#824->C2/A1",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
@@ -406,9 +406,10 @@
           874
         ],
         "done": [
-          871
+          871,
+          872
         ],
-        "live": 2
+        "live": 1
       },
       {
         "number": 870,
@@ -482,7 +483,7 @@
           821,
           825
         ],
-        "live": 0
+        "live": 1
       },
       {
         "number": 846,
