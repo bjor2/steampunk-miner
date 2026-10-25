@@ -26,6 +26,7 @@ import type { AheadLatch } from './aheadBearingLatch'
 import type { SideLatch } from './facedSide'
 import type { GatedBite } from './gatedBite'
 import type { MotionGlide } from './motionGlide'
+import type { ToolSeenAt } from './actingTools'
 import type { SweptCut } from './sweptCut'
 
 /** The #7 state machine; `docked` is entered by the rescue tow here and by docking in #23. */
@@ -121,6 +122,11 @@ export interface VehicleState {
    * and its hazard factor apply only while it is listed. Absent while none acts.
    */
   actingTools?: readonly string[]
+  /**
+   * The tick each tool acting by context last saw its context at the rig (ticket 881,
+   * `actingTools.ts`), in tool id order, so it acts on through its tail. Absent while none does.
+   */
+  toolsSeenAt?: readonly ToolSeenAt[]
   /**
    * A steam vent's shove (ticket 848, `authority/hazards/hazardShove.ts`): the glide the vent
    * pushes the rig along, which the fixed step drives as any glide. Absent until a vent blows,

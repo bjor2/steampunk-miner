@@ -19,6 +19,8 @@
  *   enemy its nose met along the body's walked path, from the last accepted position to the step,
  *   in walk order; while an enemy tougher than the rig rides the nose, the step cuts nothing
  *   (`combat/noseHold.ts`).
+ * - Before it cuts, the tools that act by context are settled at the step's position (ticket 881,
+ *   `hazards/toolContexts.ts`), so the cut meets their factors and trade-offs that tick.
  * - The collapse watch does not run after it (`applyCommand.ts`): it stays on `reportPose`, so it
  *   lags a step by at most one report interval, well inside a block's 60-tick warning.
  */
@@ -45,6 +47,7 @@ import {
 } from './commandRule'
 import { noPlanetRejection, planetParamsOf } from './planetOfState'
 import { noteRigCut } from './rigStillness'
+import { settleToolContexts } from './hazards/toolContexts'
 import { cutGateLeftAt, stepBoundsAt, stepReachMmOf } from './stepBoundRead'
 import { drillAlongStep } from './drillStepCut'
 import { withBurrowersCut } from './reportedDrill'
@@ -76,6 +79,7 @@ export const DRILL_STEP_RULES: { readonly drillStep: CommandRule<'drillStep'> } 
       ]),
     apply: (state, command) =>
       chainEffects(state, [
+        (current) => settleToolContexts(current, command.playerId, command.payload, command.tick),
         (current) => cutStep(current, command),
         (current) => unchanged(noteRigCut(current, command.playerId, command.tick)),
         (current) => followEnergyChange(current, command.playerId, command.tick),

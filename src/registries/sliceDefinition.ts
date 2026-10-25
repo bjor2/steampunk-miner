@@ -48,6 +48,7 @@ import type { IncomeRate, TripCapSource } from '../systems/registries/incomeRate
 import type { SlotHoldCueSource } from '../systems/registries/slotHoldCues'
 import type { HullDamageIntercept } from '../systems/registries/hullDamageIntercepts'
 import type { ToolTradeOff } from '../systems/registries/toolTradeOffs'
+import type { PreCutContext } from '../systems/registries/preCutContexts'
 import type { ItemDescriberProvider } from '../systems/registries/itemDescriber'
 import type { ItemDescriptionEntry } from '../systems/registries/itemDescriptionEntries'
 import type { OreLookProvider } from '../systems/registries/oreLook'
@@ -310,6 +311,11 @@ export interface SliceRegistrar {
   contactEffect(row: ContactEffectRow): void
   /** A tool's or a consumable's factor on one hazard kind's contacts, smallest first (848). */
   contactFactor(factor: ContactFactor): void
+  /**
+   * The owned tools that act by context and whether each one's context is at the rig, read before
+   * the drill cuts (ticket 881); the kernel keeps the acting flag and the hook's tail.
+   */
+  preCutContext(hook: PreCutContext): void
   /**
    * A planet class's tag, arrival line and values on the kernel's planet card (ticket 343): shown
    * once its `featureId` row is open, the hazard and gate kind only, never an unlock id.

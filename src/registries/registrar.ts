@@ -73,6 +73,7 @@ import {
 } from '../systems/registries/incomeRates'
 import { HULL_DAMAGE_INTERCEPT_REGISTRY } from '../systems/registries/hullDamageIntercepts'
 import { TOOL_TRADE_OFF_REGISTRY } from '../systems/registries/toolTradeOffs'
+import { PRE_CUT_CONTEXT_REGISTRY } from '../systems/registries/preCutContexts'
 import { MAGNETIC_GROUND_REGISTRY } from '../systems/registries/magneticGround'
 import { PLANET_CARD_LINE_REGISTRY } from '../systems/registries/planetCardLines'
 import { PLANET_ROW_REGISTRY } from '../systems/registries/planetRow'
@@ -221,6 +222,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     hazardPockets: (provider) => add(HAZARD_POCKETS_REGISTRY, provider),
     contactEffect: (row) => addPrefixed(CONTACT_EFFECT_REGISTRY, sliceId, row),
     contactFactor: (factor) => addPrefixed(CONTACT_FACTOR_REGISTRY, sliceId, factor),
+    preCutContext: (hook) => addPrefixed(PRE_CUT_CONTEXT_REGISTRY, sliceId, hook),
     planetCardLine: (source) => addPrefixed(PLANET_CARD_LINE_REGISTRY, sliceId, source),
     boreGun: (provider) => add(BORE_GUN_REGISTRY, provider),
     boreLineListener: (listener) => add(BORE_LINE_LISTENER_REGISTRY, listener),

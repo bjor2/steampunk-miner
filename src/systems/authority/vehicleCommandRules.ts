@@ -8,13 +8,16 @@
  *   for the band (#41), and logs the guns' hits since the last report (#107), then settles the heat gauge
  *   on a heat planet and burns a vehicle touching lava (#113). A report that drives the vehicle
  *   into a magnetic field says so (spec #258, ticket 290). A rig that stood in a cut drain pocket
- *   since its last charged command loses that time's drain first (ticket 848, `hazardDrain.ts`). While a slice provides turret shapes,
+ *   since its last charged command loses that time's drain first (ticket 848, `hazardDrain.ts`). Before
+ *   it drills, the tools that act by context are settled at the reported pose (ticket 881,
+ *   `hazards/toolContexts.ts`), so a drive-only report also ends one. While a slice provides turret shapes,
  *   a report notes whether the rig moved or drilled, for the sentry cam (ticket 382). A stranded
  *   or destroyed vehicle still reports its pose (gravity and hits apply) but its action ticks are
  *   ignored.
  * - `drillTile`: scripted mining of one tile within reach: the same drilling path, carving that
  *   cell's own samples, and the same casing rings behind the drill from the last reported pose
- *   (#115), so a scripted dig pays the lining a player's dig pays. Its `ticks` name the window
+ *   (#115), so a scripted dig pays the lining a player's dig pays. The tools that act by context are
+ *   settled at the last reported pose before it cuts (ticket 881). Its `ticks` name the window
  *   it may cut in, counted on the swept cut's sub-steps in the rig's drill quantum, and it is
  *   charged and heated on the law work it removed (ticket 559), so a cell can clear in part of a
  *   tick and several `drillTile`s at one tick each pay only their own cell. It settles a drain
@@ -60,6 +63,7 @@ import { layCasingAfterScriptedDrill, layCasingAtPose, layDueCasingAtPose } from
 import { followCasingSupport } from './casingSupport'
 import { flushGunHits } from './combat/gunHits'
 import { drainInHazardPocket } from './hazards/hazardDrain'
+import { settleToolContexts } from './hazards/toolContexts'
 import { noteReportForCombat } from './combat/poseReportCombat'
 import { drillCell } from './groundDrill'
 import { touchLavaAtPose } from './lava/lavaRules'
@@ -116,6 +120,7 @@ export const VEHICLE_COMMAND_RULES: {
             noteReportedStillness(current, command.playerId, command.payload, command.tick),
           ),
         (current) => recordPose(current, command),
+        (current) => settleToolContexts(current, command.playerId, command.payload, command.tick),
         (current) =>
           enterMagneticField(
             current,
@@ -153,6 +158,13 @@ export const VEHICLE_COMMAND_RULES: {
       ]),
     apply: (state, command) =>
       chainEffects(state, [
+        (current) =>
+          settleToolContexts(
+            current,
+            command.playerId,
+            vehicleOf(current, command.playerId).pose,
+            command.tick,
+          ),
         (current) => drillScriptedTile(current, command),
         (current) => unchanged(noteRigCut(current, command.playerId, command.tick)),
         (current) => followCarriedHeat(current, command.playerId, command.tick, false),
