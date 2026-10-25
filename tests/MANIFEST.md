@@ -1960,7 +1960,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/world/carvePhase.test.ts` | 3 | 3 |
 | `src/systems/world/casingBand.test.ts` | 2 | 2 |
 | `src/systems/world/casingBreach.test.ts` | 15 | 15 |
-| `src/systems/world/casingLining.test.ts` | 23 | 23 |
+| `src/systems/world/casingLining.test.ts` | 24 | 24 |
 | `src/systems/world/chunkCache.test.ts` | 8 | 6 |
 | `src/systems/world/chunkDelta.test.ts` | 9 | 9 |
 | `src/systems/world/chunkRepair.test.ts` | 4 | 4 |
