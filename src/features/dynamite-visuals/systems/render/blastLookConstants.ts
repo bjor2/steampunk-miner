@@ -4,6 +4,7 @@
  * radius ladder in the slice).
  */
 import { TICKS_PER_SECOND } from '../../../../constants/physics'
+import { SPARK_CAPACITY } from '../../../../constants/scene'
 import { SPRAY_CAPACITY } from '../../../../constants/spray'
 
 // --- the detonation-tick cue (#153 Game Director look 1, "Outside the radius") ---------------
@@ -33,6 +34,12 @@ export const RING_WIDTH_MAX_M = 3
 export const FIRE_PER_RIM_TILE = 3
 /** Dust motes per tile of rim, from the kernel collapse-dust pool (#154). */
 export const DUST_PER_RIM_TILE = 4
+/**
+ * The dust pool's size: the fire pool's since D7 (ticket 866), which carved the marks layer's
+ * instances (rings, crater decals, fuse sparks) out of the dust's 64 over the fire, keeping the
+ * slice inside the scene-layer line (#213). The cap binds only past about a 10-tile rim.
+ */
+export const FRONT_DUST_CAPACITY = SPARK_CAPACITY
 /** Debris pieces per tile of rim, from the kernel spray pool (ticket 348). */
 export const DEBRIS_PER_RIM_TILE = 1
 /**
@@ -54,3 +61,18 @@ export const FLASH_SPRITE_COLOUR = '#fff1d6'
 export const BLAST_FRONT_SEED = 0xb1a5
 /** Front and detonation events waiting for the next frame; more in one batch are dropped. */
 export const QUEUED_BLAST_EVENTS = 32
+
+// --- the marks a charge leaves and wears (D7, ticket 866) -------------------------------------
+/** Craters kept per planet, latest last; the kernel scorch keeps 16, these are the typed decals. */
+export const CRATER_MARKS = 6
+/** A cased crater draws its rim and its trim: at most two decal quads per crater. */
+export const DECALS_PER_CRATER = 2
+/** Fuse sparks alive per type pool, each type its own colour. */
+export const FUSE_SPARKS_PER_TYPE = 14
+/** Sparks leave the lamp in a cone this wide about the planet's radial up. */
+export const FUSE_SPARK_SPREAD_RADIANS = 0.9
+/** The danger ring is dashed this many times round. */
+export const RING_DASHES = 24
+export const RING_OPACITY = 0.85
+/** The decal greys are authored around mid grey; the tint is lifted so a plate reads as its metal. */
+export const DECAL_TINT_GAIN = 1.6

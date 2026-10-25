@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { COLLAPSE_DUST_CAPACITY, SPARK_CAPACITY } from '../../../../constants/scene'
+import { SPARK_CAPACITY } from '../../../../constants/scene'
 import {
   blastFrontLookOf,
   blastRingOf,
@@ -13,7 +13,12 @@ import {
   rimTilesOf,
   type FrontSpray,
 } from './blastFrontLook'
-import { BLAST_DEBRIS_CAPACITY, FLASH_FRAMES, FLASH_SPRITE_MAX_OPACITY } from './blastLookConstants'
+import {
+  BLAST_DEBRIS_CAPACITY,
+  FLASH_FRAMES,
+  FLASH_SPRITE_MAX_OPACITY,
+  FRONT_DUST_CAPACITY,
+} from './blastLookConstants'
 import { solidRockSlicesOf } from './blastPreview'
 
 // The #143 ladder's radii for sizes 1, 5 and 10 (2.5, 8 and 24 tiles), fixtures only.
@@ -50,11 +55,11 @@ describe('blast front look', () => {
 
   it('never asks a pool for more than it holds, even at the R24 cap', () => {
     expect(fireCountOf(SIZE_10_MM)).toBe(SPARK_CAPACITY)
-    expect(dustCountOf(SIZE_10_MM)).toBe(COLLAPSE_DUST_CAPACITY)
+    expect(dustCountOf(SIZE_10_MM)).toBe(FRONT_DUST_CAPACITY)
     expect(debrisCountOf(SIZE_10_MM)).toBe(BLAST_DEBRIS_CAPACITY)
     for (const radiusMm of [SIZE_1_MM, SIZE_5_MM, SIZE_10_MM, 100000]) {
       expect(fireCountOf(radiusMm)).toBeLessThanOrEqual(SPARK_CAPACITY)
-      expect(dustCountOf(radiusMm)).toBeLessThanOrEqual(COLLAPSE_DUST_CAPACITY)
+      expect(dustCountOf(radiusMm)).toBeLessThanOrEqual(FRONT_DUST_CAPACITY)
       expect(debrisCountOf(radiusMm)).toBeLessThanOrEqual(BLAST_DEBRIS_CAPACITY)
     }
   })
@@ -106,7 +111,7 @@ describe('blast front spray', () => {
     expect(solidRockSlicesOf(SIZE_10_MM)).toHaveLength(29)
     const spray = sprayOfWholeBlast(SIZE_10_MM)
     expect(spray.fire).toBeLessThanOrEqual(SPARK_CAPACITY)
-    expect(spray.dust).toBeLessThanOrEqual(COLLAPSE_DUST_CAPACITY)
+    expect(spray.dust).toBeLessThanOrEqual(FRONT_DUST_CAPACITY)
     expect(spray.debris).toBeLessThanOrEqual(BLAST_DEBRIS_CAPACITY)
     expect(spray.debris).toBeGreaterThan(debrisCountOf(SIZE_5_MM))
   })

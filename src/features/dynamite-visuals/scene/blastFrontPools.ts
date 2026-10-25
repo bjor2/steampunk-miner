@@ -16,7 +16,6 @@ import {
 } from 'three'
 import { MM_PER_METRE } from '../../../constants/physics'
 import {
-  COLLAPSE_DUST_CAPACITY,
   COLLAPSE_DUST_COLOUR,
   COLLAPSE_DUST_LIFE_SECONDS,
   COLLAPSE_DUST_SIZE_PIXELS,
@@ -49,6 +48,7 @@ import {
 import {
   BLAST_FRONT_SEED,
   FLASH_SPRITE_COLOUR,
+  FRONT_DUST_CAPACITY,
   RING_DUST_SPREAD_RADIANS,
   RING_FIRE_SPREAD_RADIANS,
 } from '../systems/render/blastLookConstants'
@@ -65,7 +65,7 @@ const FULL_TURN = Math.PI * 2
  */
 export const BLAST_FRONT_BUDGET = {
   drawCalls: 3,
-  instances: SPARK_CAPACITY + COLLAPSE_DUST_CAPACITY + 1,
+  instances: SPARK_CAPACITY + FRONT_DUST_CAPACITY + 1,
 }
 
 /** How one kind of piece leaves the front. */
@@ -97,7 +97,7 @@ export function createBlastFrontPools(): BlastFrontPools {
   return {
     fire: ringThrowOf(SPARK_CAPACITY, SPARK_SPEED, RING_FIRE_SPREAD_RADIANS, SPARK_LIFE_SECONDS),
     dust: ringThrowOf(
-      COLLAPSE_DUST_CAPACITY,
+      FRONT_DUST_CAPACITY,
       COLLAPSE_DUST_FALL_SPEED,
       RING_DUST_SPREAD_RADIANS,
       COLLAPSE_DUST_LIFE_SECONDS,
@@ -108,7 +108,7 @@ export function createBlastFrontPools(): BlastFrontPools {
     debris: { kind: 'debris', x: 0, y: 0, dirX: 0, dirY: 1, count: 1, priority: 'high' },
     counts: { fire: 0, dust: 0, isFlashShown: false },
     fireGeometry: createPointGeometry(SPARK_CAPACITY),
-    dustGeometry: createPointGeometry(COLLAPSE_DUST_CAPACITY),
+    dustGeometry: createPointGeometry(FRONT_DUST_CAPACITY),
     fireMaterial: createFireMaterial(),
     dustMaterial: createDustMaterial(),
     flashMesh: createFlashMesh(),

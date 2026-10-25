@@ -9,6 +9,7 @@ import { UPGRADE_IDS, type UpgradeId } from '../../../systems/economy/economyDef
 import { isPerPurchaseTrack, minorsPerMajor } from '../../../systems/economy/upgradeSteps'
 import { buyUpgradeCommand } from '../../../systems/platform/platformCommands'
 import { FUEL_TENDER_TABLE, fuelTenderLookOf } from '../../../systems/render/fuelTenderLook'
+import { chargeTypes, DYNAMITE_LOOKS, dynamiteLookTableProblemsOf } from '../../dynamite-visuals'
 import { grantMoneyCommand } from '../../../systems/startScenarioCommands'
 import { setUpgradeCommand } from '../../../systems/vehicle/vehicleCommands'
 import { slice } from '../register'
@@ -19,8 +20,9 @@ import { rigLookPlaqueFactOf, SHIPPED_RIG_LOOKS, trackLookFramesOf } from './rig
 import { createRigLookSources } from './rigLookSource'
 import { RIG_LOOK_TABLE } from './rigLookTable'
 
-// Every purchasable line's look (ticket 809, LK1): the six upgrade tracks of rigLook.json and the
-// fuel tank's coal tender. Each has a look row whose bands follow the VS rule from its own ratio,
+// Every purchasable line's look (ticket 809, LK1): the six upgrade tracks of rigLook.json, the
+// fuel tank's coal tender and, since D7 (ticket 866), the blasting_charges line's three charge
+// types in the dynamite-visuals slice's look rows. Each has a look row whose bands follow the VS rule from its own ratio,
 // never renders a band invisible, and wears the committed look at the golden counts (0, 1, 10,
 // 99, 9999, 1e6, each authored edge and one either side, the first finish band); a band the art
 // has not drawn yet is a todo until its LK art ticket lands (#785's pattern). Looks are look-only:
@@ -106,6 +108,11 @@ describe('rig look lines (ticket 809)', () => {
     const tracks = RIG_LOOK_TABLE.tracks.map((rows) => rows.track)
     expect(UPGRADE_IDS.filter((track) => !tracks.includes(track))).toEqual([])
     expect(FUEL_TENDER_TABLE.steps.length).toBeGreaterThan(0)
+  })
+
+  it('has a look row for every dynamite charge type of the blasting_charges line (D7, #866)', () => {
+    expect(DYNAMITE_LOOKS.types.map((row) => row.type)).toEqual(chargeTypes())
+    expect(dynamiteLookTableProblemsOf(DYNAMITE_LOOKS, chargeTypes().length)).toEqual([])
   })
 
   it.each([...UPGRADE_IDS])(

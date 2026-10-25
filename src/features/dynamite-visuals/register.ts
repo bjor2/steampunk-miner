@@ -1,13 +1,15 @@
 /**
  * The dynamite-visuals slice's registration (#215, the wiring of #145; it replaces the kernel's
  * charge rack and planted charge): the two Blender assets, the rack at its `hull.rear` attach use
- * as a vehicle piece, the planted sizes and the blast front (ring and flash; its debris goes
- * through the kernel spray since ticket 348) as scene layers, and the blast cue that sizes each detonation's shake, flash and thump. No side effects at
- * import; the loader calls `register`.
+ * as a vehicle piece, the planted sizes, the blast front (ring and flash; its debris goes through
+ * the kernel spray since ticket 348) and the marks (crater decals, live rings, fuse sparks; D7
+ * ticket 866) as scene layers, and the blast cue that sizes each detonation's shake, flash and
+ * thump. No side effects at import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { dynamiteVisualsDebugActions } from './debug'
 import { BLAST_FRONT_LAYER_ID, BlastFrontLayer } from './scene/BlastFrontLayer'
+import { BLAST_MARKS_BUDGET, BLAST_MARKS_LAYER_ID, BlastMarksLayer } from './scene/BlastMarksLayer'
 import { BLAST_FRONT_BUDGET } from './scene/blastFrontPools'
 import { DYNAMITE_RACK_PIECE_ID, DynamiteRackPiece } from './scene/DynamiteRackPiece'
 import {
@@ -22,7 +24,7 @@ import { RACK_ATTACH_USE } from './systems/render/rackLook'
 export const slice: SliceDefinition = {
   id: 'dynamite-visuals',
   register(r) {
-    // The rack and the planted prop, under public/assets/vehicle/ and public/assets/prop/ (#214).
+    // The rack, the planted prop and the crater decals, under public/assets/ (#214, ticket 866).
     r.artAssets(dynamiteArtAssets())
     r.attachUse(RACK_ATTACH_USE)
     r.vehiclePiece({ id: DYNAMITE_RACK_PIECE_ID, Piece: DynamiteRackPiece })
@@ -33,6 +35,8 @@ export const slice: SliceDefinition = {
     })
     // The ring and flash of every blast, following its BlastFront slices (K6); debris is sprayed.
     r.sceneLayer({ id: BLAST_FRONT_LAYER_ID, Layer: BlastFrontLayer, budget: BLAST_FRONT_BUDGET })
+    // Each type's crater decal, the rings round a live charge and its fuse sparks (D7, #866).
+    r.sceneLayer({ id: BLAST_MARKS_LAYER_ID, Layer: BlastMarksLayer, budget: BLAST_MARKS_BUDGET })
     r.chargeBlastCue(DYNAMITE_BLAST_CUE)
     // steampunkDebug.features['dynamite-visuals'].getRack()
     r.debugActions(dynamiteVisualsDebugActions)

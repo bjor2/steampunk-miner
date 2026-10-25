@@ -3,7 +3,8 @@
  * without reading pixels: `getRack` answers which rack parts the car shows now (frame, a stick per
  * open size, the wire reel once the plunger is), from the same rule the rack piece draws;
  * `getFront` answers the slices the blast front layer has thrown and the most it drew in a frame,
- * beside the budget it declares (#213). `previewBlast(size)` plays a size's solid-rock blast at
+ * beside the budget it declares (#213); `getMarks` the craters, rings and sparks the marks layer
+ * holds and its peak (D7, ticket 866). `previewBlast(size)` plays a size's solid-rock blast at
  * the vehicle through the real layer, presentation only: no command and no log line, as the
  * example slice's test piece (3.18).
  */
@@ -11,6 +12,8 @@ import type { DebugAction } from '../../debug/debugActionRegistry'
 import type { DebugResult } from '../../debug/debugScreens'
 import { chargeSizeCount, isChargeSize } from '../../systems/economy/chargeSizes'
 import { blastFrontPresence } from './scene/blastFrontPresence'
+import { BLAST_MARKS_BUDGET } from './scene/BlastMarksLayer'
+import { blastMarksPresence } from './scene/blastMarksPresence'
 import { BLAST_FRONT_BUDGET } from './scene/blastFrontPools'
 import { previewBlastAtVehicle } from './store/blastFeed'
 import { readRackPartIds } from './store/rackSightReads'
@@ -23,6 +26,15 @@ export const dynamiteVisualsDebugActions: Readonly<Record<string, DebugAction>> 
     flashesLit: blastFrontPresence.flashesLit,
     peak: { ...blastFrontPresence.peak },
     budget: BLAST_FRONT_BUDGET,
+  }),
+  getMarks: () => ({
+    ok: true,
+    craters: blastMarksPresence.craters,
+    decals: blastMarksPresence.decals,
+    rings: blastMarksPresence.rings,
+    sparks: blastMarksPresence.sparks,
+    peak: { ...blastMarksPresence.peak },
+    budget: BLAST_MARKS_BUDGET,
   }),
   previewBlast: (size) => previewBlastOfSize(size),
 }

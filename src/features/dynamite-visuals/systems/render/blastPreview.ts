@@ -5,9 +5,15 @@
  * as it draws a real blast, so a browser spec measures the R24 front against its budget.
  */
 import { BLAST_TILES_PER_TICK } from '../../../../constants/terrainBudget'
-import { baseTilesSqOf } from '../../../../systems/authority/charges/blastDisc'
+import {
+  baseR2Of,
+  baseTilesSqOf,
+  groundR2Of,
+  UNOWNED_RADIUS_LEVEL,
+} from '../../../../systems/authority/charges/blastDisc'
 import { blastFrontOf, frontRadiusMm } from '../../../../systems/authority/charges/blastFront'
 import type { DomainEvent } from '../../../../systems/authority/domainEvent'
+import { chargeTypeOf } from '../../../../systems/economy/chargeSizes'
 import type { TilePoint } from '../../../../systems/world/tileGrid'
 
 /** Each slice's ring from its first tile to its last, in mm from the charge tile's centre. */
@@ -21,7 +27,10 @@ export function solidRockSlicesOf(radiusMm: number): [number, number][] {
   return slices
 }
 
-/** The detonation, then one `BlastFront` per slice, each on its own frame. */
+/**
+ * The detonation with its disc record (so the marks layer leaves the size's crater, D7 #866),
+ * then one `BlastFront` per slice, each on its own frame.
+ */
 export function previewBlastFrames(at: TilePoint, size: number, radiusMm: number): DomainEvent[][] {
   const detonated: DomainEvent = {
     type: 'ChargeDetonated',
@@ -31,6 +40,18 @@ export function previewBlastFrames(at: TilePoint, size: number, radiusMm: number
     radiusMm,
     by: 'fuse',
   }
+  const started: DomainEvent = {
+    type: 'BlastStarted',
+    tick: 0,
+    ...at,
+    size,
+    chargeType: chargeTypeOf(size),
+    radiusLevel: UNOWNED_RADIUS_LEVEL,
+    baseR2: String(baseR2Of({ radiusMm, radiusLevel: UNOWNED_RADIUS_LEVEL })),
+    groundR2: String(groundR2Of({ radiusMm, radiusLevel: UNOWNED_RADIUS_LEVEL })),
+    blastSeq: 0,
+    casingLaid: false,
+  }
   const fronts = solidRockSlicesOf(radiusMm).map(([rInnerMm, rOuterMm], slice): DomainEvent => ({
     type: 'BlastFront',
     tick: slice,
@@ -38,5 +59,5 @@ export function previewBlastFrames(at: TilePoint, size: number, radiusMm: number
     rInnerMm,
     rOuterMm,
   }))
-  return [[detonated], ...fronts.map((front) => [front])]
+  return [[detonated, started], ...fronts.map((front) => [front])]
 }

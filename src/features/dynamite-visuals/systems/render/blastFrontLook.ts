@@ -2,12 +2,12 @@
  * The look of a blast's front (#153 Game Director looks 2 and 3): a ring of fire and dust riding
  * the edge of the clearing, and debris thrown outward from that front, never from the centre.
  * Everything keys on the rim, so a bigger blast is a longer ring, not a denser one, and every
- * count stays inside its pool (#154: the kernel spark and collapse-dust pools, plus the kernel
- * spray pool for the debris, ticket 348). The ring and debris follow K6's `BlastFront` tick by
+ * count stays inside its pool (#154: the kernel spark pool's size for the fire and, since D7,
+ * for the dust too, plus the kernel spray pool for the debris, ticket 348). The ring and debris follow K6's `BlastFront` tick by
  * tick in the wiring (#215); this is the look at a given radius.
  */
 import { MM_PER_METRE } from '../../../../constants/physics'
-import { COLLAPSE_DUST_CAPACITY, SPARK_CAPACITY } from '../../../../constants/scene'
+import { SPARK_CAPACITY } from '../../../../constants/scene'
 import {
   BLAST_DEBRIS_CAPACITY,
   DEBRIS_PER_RIM_TILE,
@@ -15,6 +15,7 @@ import {
   FIRE_PER_RIM_TILE,
   FLASH_FRAMES,
   FLASH_SPRITE_MAX_OPACITY,
+  FRONT_DUST_CAPACITY,
   RING_WIDTH_MAX_M,
   RING_WIDTH_MIN_M,
   RING_WIDTH_SHARE,
@@ -106,7 +107,7 @@ export function fireCountOf(radiusMm: number): number {
 }
 
 export function dustCountOf(radiusMm: number): number {
-  return countOnRim(radiusMm, DUST_PER_RIM_TILE, COLLAPSE_DUST_CAPACITY)
+  return countOnRim(radiusMm, DUST_PER_RIM_TILE, FRONT_DUST_CAPACITY)
 }
 
 export function debrisCountOf(radiusMm: number): number {

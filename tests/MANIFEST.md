@@ -183,21 +183,24 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dynamite/systems/plunger.test.ts` | 6 | 6 |
 | `src/features/dynamite/systems/rackPanel.test.ts` | 7 | 7 |
 
-### `dynamite-visuals`: 11 files, 58 tests
+### `dynamite-visuals`: 14 files, 88 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/dynamite-visuals/debug.test.ts` | 3 | 3 |
-| `src/features/dynamite-visuals/sceneBudget.test.ts` | 3 | 3 |
+| `src/features/dynamite-visuals/debug.test.ts` | 4 | 4 |
+| `src/features/dynamite-visuals/sceneBudget.test.ts` | 5 | 5 |
 | `src/features/dynamite-visuals/sliceRemoved.test.ts` | 6 | 6 |
 | `src/features/dynamite-visuals/systems/render/blastCue.test.ts` | 8 | 8 |
 | `src/features/dynamite-visuals/systems/render/blastCueProvider.test.ts` | 5 | 5 |
 | `src/features/dynamite-visuals/systems/render/blastEventQueue.test.ts` | 3 | 3 |
 | `src/features/dynamite-visuals/systems/render/blastFrontLook.test.ts` | 14 | 14 |
+| `src/features/dynamite-visuals/systems/render/blastMarks.test.ts` | 6 | 6 |
 | `src/features/dynamite-visuals/systems/render/blastPreview.test.ts` | 2 | 2 |
-| `src/features/dynamite-visuals/systems/render/dynamiteArt.test.ts` | 4 | 4 |
+| `src/features/dynamite-visuals/systems/render/chargeTypeLook.test.ts` | 10 | 10 |
+| `src/features/dynamite-visuals/systems/render/dynamiteArt.test.ts` | 5 | 5 |
+| `src/features/dynamite-visuals/systems/render/dynamiteLookTable.test.ts` | 7 | 7 |
 | `src/features/dynamite-visuals/systems/render/plantedDynamiteLook.test.ts` | 4 | 4 |
-| `src/features/dynamite-visuals/systems/render/rackLook.test.ts` | 6 | 6 |
+| `src/features/dynamite-visuals/systems/render/rackLook.test.ts` | 9 | 9 |
 
 ### `example`: 4 files, 10 tests
 
@@ -530,7 +533,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/rig-look/systems/rigLookBoiler.test.ts` | 15 | 8 |
 | `src/features/rig-look/systems/rigLookGlint.test.ts` | 6 | 6 |
 | `src/features/rig-look/systems/rigLookHull.test.ts` | 31 | 11 |
-| `src/features/rig-look/systems/rigLookLines.test.ts` | 11 | 7 |
+| `src/features/rig-look/systems/rigLookLines.test.ts` | 12 | 8 |
 | `src/features/rig-look/systems/rigLookPlanets.test.ts` | 4 | 4 |
 | `src/features/rig-look/systems/rigLookPlaque.test.ts` | 28 | 12 |
 | `src/features/rig-look/systems/rigLookReadability.test.ts` | 2 | 2 |

@@ -9,8 +9,17 @@ describe('dynamite-visuals debug reads', () => {
   it('reports the front budget it declares beside what it drew', () => {
     expect(dynamiteVisualsDebugActions.getFront()).toMatchObject({
       ok: true,
-      budget: { drawCalls: 3, instances: 577 },
+      budget: { drawCalls: 3, instances: 513 },
       peak: { drawCalls: 0, instances: 0 },
+    })
+  })
+
+  it('reports the marks budget it declares beside what it holds and drew', () => {
+    expect(dynamiteVisualsDebugActions.getMarks()).toMatchObject({
+      ok: true,
+      craters: 0,
+      rings: 0,
+      budget: { drawCalls: 5, instances: 58 },
     })
   })
 

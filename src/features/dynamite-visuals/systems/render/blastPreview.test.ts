@@ -14,11 +14,19 @@ describe('blast preview', () => {
     expect(slices.every(([inner], at) => at === 0 || inner >= slices[at - 1][1])).toBe(true)
   })
 
-  it('plays the detonation on its own frame, then one front a frame at the given tile', () => {
+  it('plays the detonation and its disc record on one frame, then one front a frame at the given tile', () => {
     const frames = previewBlastFrames({ tx: 3, ty: 250 }, 10, 24000)
     expect(frames).toHaveLength(30)
     expect(frames[0]).toEqual([
       expect.objectContaining({ type: 'ChargeDetonated', tx: 3, ty: 250, size: 10 }),
+      expect.objectContaining({
+        type: 'BlastStarted',
+        tx: 3,
+        ty: 250,
+        size: 10,
+        chargeType: 3,
+        casingLaid: false,
+      }),
     ])
     expect(frames.slice(1).every(([event]) => event.type === 'BlastFront')).toBe(true)
   })
