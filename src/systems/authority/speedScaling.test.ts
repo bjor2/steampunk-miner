@@ -212,6 +212,8 @@ describe.each(SPEEDS_M_PER_S)('the speed-scaling slab at %i m/s (ticket 560)', (
 interface TrailTick {
   tick: number
   cursorYMm: number
+  /** Where the body stood at the tick's drill step: the line the trail records (#662 Q2 (b)). */
+  bodyYMm: number
   waitingYMm: number[]
 }
 
@@ -222,7 +224,9 @@ describe('casing at 84 m/s (ticket 560)', () => {
     const onTick = (state: AuthorityState, tick: number) => {
       const vehicle = vehicleOf(state, CUTTING_PLAYER)
       const cursorYMm = vehicle.sweptCut?.yMm ?? Number.NaN
-      trail.push({ tick, cursorYMm, waitingYMm: vehicle.casingTrail.unlined.map((p) => p.yMm) })
+      const bodyYMm = vehicle.sweptCut?.poseYMm ?? Number.NaN
+      const waitingYMm = vehicle.casingTrail.unlined.map((p) => p.yMm)
+      trail.push({ tick, cursorYMm, bodyYMm, waitingYMm })
     }
     // No gate: the trail resuming after a hold is the gate's business, not the speed's.
     run = withRegistrations([], () => cutSpeedSlab(slabRigOf(strideOfSpeed(84)), { onTick }))
@@ -246,10 +250,13 @@ describe('casing at 84 m/s (ticket 560)', () => {
     })
   })
 
+  // Since the GD and TD rulings on #662 Q2 (b) the trail records the body's line, not the stamp's
+  // cursor, so its rings are counted against the body's path: 27.0 m here, where the cursor cut
+  // 26.6 m (the body starts behind the stamp's first disc, by the stride's lead).
   it('lays a ring for every 500 mm of its cut, and never cuts its own lining', () => {
     const rings = run.events.filter((event) => event.type === 'CasingPlaced').length
     const waiting = vehicleOf(run.end, CUTTING_PLAYER).casingTrail.unlined.length
-    const cutMm = trail[0].cursorYMm - run.cutFootYMm
+    const cutMm = trail[0].bodyYMm - (trail.at(-1)?.bodyYMm ?? Number.NaN)
     expect(Math.abs(rings + waiting - cutMm / CASING_RING_SPACING_MM)).toBeLessThanOrEqual(1)
     expect(run.events.filter((event) => event.type === 'CasingDrilled')).toEqual([])
   })
