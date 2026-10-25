@@ -160,7 +160,7 @@ export function poolDraftOf(
   { rules, oreRulesVersion }: PoolCut,
 ): PoolDraft {
   const mix = poolMixOf(worldSeed, system, roster, oreRulesVersion)
-  const runs = splitRunsOf(paintedRunsOf(mix), rules.kindsTarget)
+  const runs = splitRunsOf(paintedRunsOf(mix, rules.kindTripCaps), rules.kindsTarget)
   const gemTiers = gemSaleTiersByKindOf(runs, rules.gemCount, mix.planetIndex)
   const kinds = kindsOfRuns(poolIdOf(roster.id), runs, gemTiers, newOreFamilyOf(roster.slot))
   return { roster, kinds, gemValueShareBp: gemValueShareBpOf(mix, runSalesOf(runs, kinds)) }

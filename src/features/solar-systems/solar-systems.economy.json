@@ -35,6 +35,9 @@
   },
   "materialPool": {
     "source": "Ticket 777 (spec #774), the generated material pool under the GD lock of 23 Oct 2026 on Campaign Scaling: about 15 kinds per planet (Bjor's ask of 15 Oct on #647), never past the ores slice's 17-kind roster cap (the 8-bit slot). The pool is drawn from the ore mix a planet is generated with at its campaign index, one kind per family and rarity the mix paints, the heaviest split until the target; the gems are the ores slice's three per pool, the rares and gems live only from band 3 (d >= 0.35) in the kernel's 1-3 cell clusters, and the gem share of the pool value stays under the economy rows' gemShareCapBp. Numbers only: no price, hardness or drill law is set here.",
-    "kindsTarget": 15
+    "kindsTarget": 15,
+    "kindTripCapSource": "Ticket 888: the VS's per-kind bounds of a band trip from ticket 446's family-first guard (6226198316), the roster slice's perCommonKindMaxOfBandTrip and perNonCommonKindMax, which a roster test holds these equal to: a run holds at least the kinds its cell's weight and value share of each band ask for under them.",
+    "commonKindTripCapBp": 5000,
+    "kindTripCapBp": 1500
   }
 }

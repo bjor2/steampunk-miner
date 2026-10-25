@@ -61,6 +61,7 @@ describe('generated material pool', () => {
       kindsTarget: KINDS_ABOUT,
       kindsCap: KINDS_CAP,
       gemCount: 3,
+      kindTripCaps: { commonBp: 5000, otherBp: 1500 },
     })
     for (const seed of [SEED, OTHER_SEED]) {
       for (const system of [...SYSTEMS_2_TO_40, 1_000_000n]) {
@@ -180,9 +181,9 @@ describe('generated material pool guards', () => {
   const gem = first.kinds.findIndex((kind) => kind.gemSaleTier !== null)
 
   it('refuses a planet with too few kinds', () => {
-    expect(materialPoolProblemsOf(withKinds(first, first.kinds.slice(1)))).toContain(
-      'system2-p1 holds 14 kinds, not 15 to 17',
-    )
+    expect(
+      materialPoolProblemsOf(withKinds(first, first.kinds.slice(0, KINDS_ABOUT - 1))),
+    ).toContain('system2-p1 holds 14 kinds, not 15 to 17')
   })
 
   it('refuses a rare kind in band 1, and a band 1 with no uncommon', () => {
@@ -252,13 +253,20 @@ describe('generated material pool guards', () => {
 })
 
 describe('material pool rules', () => {
-  it('refuses a target that is no whole number and one past the roster cap', () => {
-    expect(materialPoolRuleProblems({ kindsTarget: 0 }, KINDS_CAP)).toEqual([
+  it('refuses a target that is no whole number or past the roster cap, and a cap outside 1 to 10000 bp', () => {
+    const caps = { commonKindTripCapBp: 5000, kindTripCapBp: 1500 }
+    expect(materialPoolRuleProblems({ ...caps, kindsTarget: 0 }, KINDS_CAP)).toEqual([
       'materialPool.kindsTarget must be a whole number from 1',
     ])
-    expect(materialPoolRuleProblems({ kindsTarget: 18 }, KINDS_CAP)).toEqual([
+    expect(materialPoolRuleProblems({ ...caps, kindsTarget: 18 }, KINDS_CAP)).toEqual([
       'materialPool.kindsTarget 18 is over the 17-kind roster cap',
     ])
-    expect(materialPoolRuleProblems({ kindsTarget: KINDS_ABOUT }, KINDS_CAP)).toEqual([])
+    expect(materialPoolRuleProblems({ ...caps, kindsTarget: KINDS_ABOUT }, KINDS_CAP)).toEqual([])
+    expect(
+      materialPoolRuleProblems({ kindsTarget: KINDS_ABOUT, kindTripCapBp: 0 }, KINDS_CAP),
+    ).toEqual([
+      'materialPool.commonKindTripCapBp must be a whole number of basis points from 1 to 10000',
+      'materialPool.kindTripCapBp must be a whole number of basis points from 1 to 10000',
+    ])
   })
 })
