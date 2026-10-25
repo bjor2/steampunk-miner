@@ -1,0 +1,46 @@
+{
+  "$comment": "The dynamite look rows (D7, ticket 866; the GD lock of 25 Oct on #647: types are verbs with their own stick colour, fuse sparks and crater decal; HS: a rack socket with a slot per type and stock pips). One row per charge type of economy.json's blastingCharges.sizes.type, keyed by the type number alone, never a size, a price or a planet. `stick` is the body colour of every size of the type, on the planted prop and in the rack's slot, and the Blender author script reads it from here so the art and the rows never drift. `spark` is the fuse's spark and the lamp glass, `ring` the placed ring's line round a live charge, `soot` the tint the type's crater decal is drawn in, `crater` its decal part in the prop-blast-crater asset. The three stick colours stand at least 0.1 apart in luma (the CG2 colour-blind rule of ticket 830: tell them apart in grey at 360 px), and the names are band names of 3 words or fewer (Progression on #647). `fuse` is the sparks a burning fuse throws from its lamp: a rate, a life and a speed in metres a second, tuned by eye. `casing` is the Blast Casing look row (Bjor 04:51 via Grok Bot, #862 D3): the nozzle part the rack shows once the node is owned, and the lined crater's rim and trim parts, drawn neutral and tinted at run time in the laid grade's plate colour and its lining's trim colour (casingGradeLooks.json), so the rows never copy a casing colour. `radiusBands` is the Blast Radius look row (#869 D9, the #868 HS rule: escalation once per tenfold of the level): the rack's sticks and the placed ring's stroke grow by `growPerBand` for every decade of the owned level, to `growMax`; level 0 is band 0 and the shipped look. Look-only: nothing here reaches the authority.",
+  "types": [
+    {
+      "type": 1,
+      "name": "Breaking charge",
+      "stick": "#b83a2a",
+      "spark": "#ffb347",
+      "ring": "#e8573f",
+      "soot": "#2a1a12",
+      "crater": "crater-1"
+    },
+    {
+      "type": 2,
+      "name": "Deep charge",
+      "stick": "#e8a93a",
+      "spark": "#fff1b0",
+      "ring": "#f5c05a",
+      "soot": "#1e1a2a",
+      "crater": "crater-2"
+    },
+    {
+      "type": 3,
+      "name": "Biggest charge",
+      "stick": "#24405e",
+      "spark": "#bfe8ff",
+      "ring": "#6fb4e8",
+      "soot": "#0f1a24",
+      "crater": "crater-3"
+    }
+  ],
+  "fuse": {
+    "sparksPerSecond": 9,
+    "lifeSeconds": 0.36,
+    "speedMetresPerSecond": 0.55
+  },
+  "casing": {
+    "nozzlePart": "casing-nozzle",
+    "rimPart": "crater-cased-rim",
+    "trimPart": "crater-cased-trim"
+  },
+  "radiusBands": {
+    "growPerBand": 0.09,
+    "growMax": 1.45
+  }
+}

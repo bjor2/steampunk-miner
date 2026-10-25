@@ -1,0 +1,16 @@
+size 1 @ phone360: type 1 Breaking charge stick #b83a2a spark #ffb347 ring #e8573f 2.7px crater crater-1 #2a1a12 178.6px
+size 1 @ desktop1280x800: type 1 Breaking charge stick #b83a2a spark #ffb347 ring #e8573f 6.0px crater crater-1 #2a1a12 396.8px
+size 1 @ desktop1920x1080: type 1 Breaking charge stick #b83a2a spark #ffb347 ring #e8573f 8.1px crater crater-1 #2a1a12 535.7px
+size 6 @ phone360: type 2 Deep charge stick #e8a93a spark #fff1b0 ring #f5c05a 2.7px crater crater-2 #1e1a2a 714.3px
+size 6 @ desktop1280x800: type 2 Deep charge stick #e8a93a spark #fff1b0 ring #f5c05a 6.0px crater crater-2 #1e1a2a 1587.3px
+size 6 @ desktop1920x1080: type 2 Deep charge stick #e8a93a spark #fff1b0 ring #f5c05a 8.1px crater crater-2 #1e1a2a 2142.9px
+size 12 @ phone360: type 3 Biggest charge stick #24405e spark #bfe8ff ring #6fb4e8 2.7px crater crater-3 #0f1a24 2642.9px
+size 12 @ desktop1280x800: type 3 Biggest charge stick #24405e spark #bfe8ff ring #6fb4e8 6.0px crater crater-3 #0f1a24 5873.0px
+size 12 @ desktop1920x1080: type 3 Biggest charge stick #24405e spark #bfe8ff ring #6fb4e8 8.1px crater crater-3 #0f1a24 7928.6px
+
+level 0: band 0 growth 1.00 stroke 0.090 m
+level 1: band 1 growth 1.09 stroke 0.098 m
+level 10: band 2 growth 1.18 stroke 0.106 m
+level 99: band 2 growth 1.18 stroke 0.106 m
+level 9999: band 4 growth 1.36 stroke 0.122 m
+level 1000000: band 7 growth 1.45 stroke 0.131 m
