@@ -101,7 +101,7 @@ describe('HUD: blasting charges (#109)', () => {
 })
 
 describe('upgrade bay model: the charge rows (#109)', () => {
-  it('shows no charge rows before blasting_charges opens on planet 7 (#90: nothing before)', () => {
+  it('shows no charge rows before charges are sold on planet 7 (#90: nothing before)', () => {
     expect(upgradeBayOf(atUpgradeBayOn(6)).charges).toBeNull()
   })
 

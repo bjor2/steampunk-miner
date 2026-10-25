@@ -1,8 +1,8 @@
 /**
  * The Upgrade bay's blasting charge commands (spec #109 "Supply", sizes K8 #218):
  *
- * - `RestockCharges {size, count}`: at the Upgrade bay only, once `blasting_charges` is open
- *   (planet 7, #80) and the size is open on this planet, buys `count` charges of that size if their
+ * - `RestockCharges {size, count}`: at the Upgrade bay only, once charges are sold here (below)
+ *   and the size is open on this planet, buys `count` charges of that size if their
  *   rack slots fit the rack's free slots, at `count` times the size's price rounded once; the first
  *   buy bolts the rack on. Charges that do not fit are refused `rack_full`, never trimmed (Vertical
  *   and TD on #149). Logs `charges_restocked`.
@@ -11,10 +11,19 @@
  *
  * A buy the wallet cannot pay is refused with `money_short`, never trimmed (#8). A refused command
  * changes nothing.
+ *
+ * Charges are sold where `blasting_charges` is open and the size ladder has opened its first size
+ * (`unlockFrom`, planet 7). Ticket 900 re-pinned the row to planet 1 as a price-band anchor only, so
+ * the ladder keeps charges on planet 7 until #863 makes them money-only and drops `unlockFrom`.
  */
 import { BLASTING_CHARGES_ROW_ID } from '../../art/moduleRowIds'
 import { rackMaxSlotLevel, rackSlotPrice } from '../../economy/blastingCharges'
-import { chargePrice, rackSlotsOf } from '../../economy/chargeSizes'
+import {
+  chargePrice,
+  largestSizeOn,
+  rackSlotsOf,
+  sizeUnlockPlanet,
+} from '../../economy/chargeSizes'
 import { sub, toCanonical, type Money } from '../../money'
 import {
   carriedOf,
@@ -101,11 +110,14 @@ export function rackSlotPriceOf(state: AuthorityState, playerId: string): Money 
   return rackSlotPrice(chargesOf(state, playerId).slotLevel, state.planet.index)
 }
 
-/** Whether the Upgrade bay shows the charge rows: open here, or the rack already bolted on. */
+/** Whether the Upgrade bay shows the charge rows: sold here, or the rack already bolted on. */
 export function areChargesOffered(state: AuthorityState, playerId: string): boolean {
-  return (
-    isFeatureUnlocked(state, BLASTING_CHARGES_ROW_ID) || chargesOf(state, playerId).isRackMounted
-  )
+  return areChargesSoldHere(state) || chargesOf(state, playerId).isRackMounted
+}
+
+/** The `blasting_charges` row open on this planet and at least one size open on it. */
+function areChargesSoldHere(state: AuthorityState): boolean {
+  return isFeatureUnlocked(state, BLASTING_CHARGES_ROW_ID) && largestSizeOn(state.planet.index) > 0
 }
 
 function walletOf(state: AuthorityState, playerId: string): Money {
@@ -113,8 +125,8 @@ function walletOf(state: AuthorityState, playerId: string): Money {
 }
 
 function lockedChargesRejection(state: AuthorityState): Rejection | null {
-  if (isFeatureUnlocked(state, BLASTING_CHARGES_ROW_ID)) return null
-  return rejectionOf('feature_locked', `${BLASTING_CHARGES_ROW_ID} opens on planet 7`)
+  if (areChargesSoldHere(state)) return null
+  return rejectionOf('feature_locked', `charges are sold from planet ${sizeUnlockPlanet(1)}`)
 }
 
 function noCountRejection(count: number): Rejection | null {

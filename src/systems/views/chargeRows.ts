@@ -1,6 +1,6 @@
 /**
  * The Upgrade bay's blasting charge rows (#109 design "Supply", sizes K8 #218): shown once
- * `blasting_charges` is open on this planet (planet 7) or the rack is already bolted on, and
+ * charges are sold on this planet (planet 7, `areChargesOffered`) or the rack is already bolted on, and
  * nothing before (#90). One Charges row per size open here, smallest first, buys as many of that
  * size as the rack's free slots hold at the size's price (the first buy bolts the rack on); the
  * Rack row adds one slot, "3 → 4", up to the top, where it says so and its Buy carries

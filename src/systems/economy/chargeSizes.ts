@@ -108,7 +108,7 @@ export function largestSizeOn(planetIndex: number): number {
 
 /**
  * Whether size `size` is still closed on planet `planetIndex`. Size 1 never is: it is the shipped
- * charge, closed where it is sold (`blasting_charges` opens on planet 7), so a rack carries and
+ * charge, closed where it is sold (from `unlockFrom`, planet 7), so a rack carries and
  * plants it anywhere as before.
  */
 export function isSizeLockedOn(size: number, planetIndex: number): boolean {
