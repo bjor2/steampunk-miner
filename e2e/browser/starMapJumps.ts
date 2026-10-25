@@ -61,6 +61,20 @@ export async function showPlanetOnTheStrip(page: Page, place: number, press: Pre
 export async function buyFuelAndJumpTo(page: Page, place: number, press: Press): Promise<number> {
   await showPlanetOnTheStrip(page, place, press)
   await press(page.getByTestId(starMapBuyFuelIdOf(place)))
+  return confirmJumpTo(page, place, press)
+}
+
+/**
+ * Shows the destination and jumps there on the fuel the tank already carries, buying none, so
+ * the wallet is untouched (ticket 857's trip back).
+ */
+export async function jumpOnCarriedFuelTo(page: Page, place: number, press: Press): Promise<void> {
+  await showPlanetOnTheStrip(page, place, press)
+  await confirmJumpTo(page, place, press)
+}
+
+/** The shown planet's Jump pressed twice; the milliseconds from the confirm to control there. */
+async function confirmJumpTo(page: Page, place: number, press: Press): Promise<number> {
   const jump = page.getByTestId(starMapJumpIdOf(place))
   await expect(jump).not.toHaveAttribute('data-reason', /.+/)
   await press(jump)

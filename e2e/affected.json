@@ -977,6 +977,27 @@
       "specs": ["e2e/browser/ui/starMapJump.spec.ts", "e2e/browser/mobile/starMapJump.spec.ts"]
     },
     {
+      "why": "Mid-campaign save, reload and trip back (ticket 857): progress on P1-P3 (core bay, Cache Crate with premium counts, lined shaft), a save at P3 exported, reloaded and imported, then P3 to P4, P5 and P1 on carried fuel with every planet's bay, crates and ledger byte for byte, on desktop and phone.",
+      "paths": [
+        "src/store/checkpoint.ts",
+        "src/store/saveKeepingSlice.ts",
+        "src/debug/debugSaves.ts",
+        "src/systems/save/**",
+        "src/systems/authority/planetCoreBays.ts",
+        "src/systems/authority/planetEntry.ts",
+        "src/systems/authority/sessionSnapshot.ts",
+        "src/systems/authority/premium/**",
+        "src/systems/authority/starMap/**",
+        "src/features/planet-kit/systems/**",
+        "e2e/browser/starMapJumps.ts",
+        "e2e/browser/campaignSave*.ts"
+      ],
+      "specs": [
+        "e2e/browser/ui/campaignSaveTrip.spec.ts",
+        "e2e/browser/mobile/campaignSaveTrip.spec.ts"
+      ]
+    },
+    {
       "why": "The star map carousel (ticket 796): one planet at a time with Next, Previous, a swipe, the arrow keys at a bay and a click or tap on the system strip, the strip panning toward the shown planet (a cut under reduced motion), Jump on a shown planet after the confirm, an unaffordable planet dimmed and never skipped, and the goldens at P1, P3 and P5 on the four reference phones and desktop.",
       "paths": [
         "src/systems/views/starMapCarousel.ts",
