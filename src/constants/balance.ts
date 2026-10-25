@@ -51,6 +51,7 @@ export const DRILL_REACH_MM = 1600
 /** The drill bore's data row (`DRILL_BORE_ROWS`). */
 export interface DrillBoreRows {
   readonly sideClearanceMm: number
+  readonly bodyWidthPerLevelMm: number
 }
 
 /**
@@ -62,8 +63,12 @@ export interface DrillBoreRows {
  * stamp's radius, its lift and the casing ring's lag derive from this row (`vehicle/drillBore.ts`).
  * The Gameplay & Vehicle Designer owns it as data. Rules read it at call time, never at import, so
  * a spec may set it (`withDrillSideClearance`).
+ *
+ * The body is a square that grows `bodyWidthPerLevelMm` a width level (GD lock on #662 Part B, Q2:
+ * 0.9, 1.9, 2.9, 3.9 m and on, an uncapped linear row priced only by its Marks), and the stamp
+ * follows it at the same clearance (ticket 749, `vehicle/drillBore.ts`).
  */
-export const DRILL_BORE_ROWS: DrillBoreRows = { sideClearanceMm: 150 }
+export const DRILL_BORE_ROWS: DrillBoreRows = { sideClearanceMm: 150, bodyWidthPerLevelMm: 1000 }
 
 /** The range the GD lock on #661 lets the side clearance be tuned in, in mm. */
 export const DRILL_SIDE_CLEARANCE_RANGE_MM = { min: 100, max: 200 } as const

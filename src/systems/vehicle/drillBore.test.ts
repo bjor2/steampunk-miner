@@ -9,7 +9,13 @@ import { AIM_STEPS_PER_TURN, VEHICLE_COLLIDER_SIZE } from '../../constants/physi
 import { casingRingAround } from '../world/casingLining'
 import { AIM, aimDirectionOf } from './aim'
 import {
+  BARE_WIDTH_LEVEL,
+  bodyWidthMmAt,
+  boreCellsPerMetreAt,
+  boreRadiusMmAlongAt,
+  boreRadiusMmAt,
   casingRingLagMm,
+  casingRingLagMmAt,
   drillStampLiftMm,
   drillStampRadiusMm,
   drillStampRadiusMmAlong,
@@ -84,5 +90,53 @@ describe('drill bore', () => {
 
   it('lays a ring once the stamp is its radius plus the ring’s outer radius past it', () => {
     withDrillSideClearance(150, () => expect(casingRingLagMm()).toBe(600 + 600 + 250))
+  })
+})
+
+describe('drill bore width levels (ticket 749)', () => {
+  // Goldens at width levels 0, 1, 10 and 1e6 (VS on #662 Part B): body, R and cells a metre.
+  it.each([
+    { level: 0, bodyMm: 900, radiusMm: 600, cellsPerMetre: 2 },
+    { level: 1, bodyMm: 1_900, radiusMm: 1_100, cellsPerMetre: 3 },
+    { level: 10, bodyMm: 10_900, radiusMm: 5_600, cellsPerMetre: 12 },
+    { level: 1e6, bodyMm: 1_000_000_900, radiusMm: 500_000_600, cellsPerMetre: 1_000_002 },
+  ])(
+    'grows the body to $bodyMm mm, the stamp to $radiusMm mm and the cut to $cellsPerMetre cells a metre at level $level',
+    ({ level, bodyMm, radiusMm, cellsPerMetre }) => {
+      expect(bodyWidthMmAt(level)).toBe(bodyMm)
+      expect(boreRadiusMmAt(level)).toBe(radiusMm)
+      expect(boreCellsPerMetreAt(level)).toBe(cellsPerMetre)
+    },
+  )
+
+  it('cuts the bare bore at the bare level, so every rule without a width reads as before', () => {
+    expect(boreRadiusMmAt(BARE_WIDTH_LEVEL)).toBe(drillStampRadiusMm())
+    expect(casingRingLagMmAt(BARE_WIDTH_LEVEL)).toBe(casingRingLagMm())
+    for (let aim = 0; aim < AIM_STEPS_PER_TURN; aim++) {
+      expect(boreRadiusMmAlongAt(aim, BARE_WIDTH_LEVEL)).toBe(drillStampRadiusMmAlong(aim))
+    }
+  })
+
+  it('keeps the side clearance round the wider body at every aim and level', () => {
+    for (const level of [1, 10, 1e6]) {
+      const halfMm = bodyWidthMmAt(level) / 2
+      for (let aim = 0; aim < AIM_STEPS_PER_TURN; aim++) {
+        const { along, up } = aimDirectionOf(aim)
+        const halfAcrossMm = (halfMm * (Math.abs(along) + Math.abs(up))) / 1024
+        const clearMm = boreRadiusMmAlongAt(aim, level) - halfAcrossMm
+        expect(clearMm).toBeGreaterThanOrEqual(DRILL_BORE_ROWS.sideClearanceMm)
+        expect(clearMm).toBeLessThan(DRILL_BORE_ROWS.sideClearanceMm + 1)
+      }
+    }
+  })
+
+  it('widens the bore by the row’s step a level, with no cap', () => {
+    const step = DRILL_BORE_ROWS.bodyWidthPerLevelMm
+    expect(boreRadiusMmAt(2) - boreRadiusMmAt(1)).toBe(step / 2)
+    expect(boreRadiusMmAt(1e6 + 1) - boreRadiusMmAt(1e6)).toBe(step / 2)
+  })
+
+  it('lays the ring a level’s widening further behind the stamp', () => {
+    expect(casingRingLagMmAt(1)).toBe(1_100 + 1_100 + CASING_LINING_WIDTH_MM)
   })
 })
