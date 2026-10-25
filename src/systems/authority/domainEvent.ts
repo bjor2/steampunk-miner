@@ -355,6 +355,43 @@ export interface KernelDomainEventBodies {
     hullBp: number
     withBit: boolean
   }
+  /**
+   * The drill cut a rockfall cell `tx, ty` of hazard `kind` (ticket 848): `samples` of its cut
+   * filled again, and the falling rubble crushed the rig for `hullBp` of the planet's on-curve hull
+   * from the `arc` the cell lies in.
+   */
+  HazardRefilled: {
+    kind: string
+    tx: number
+    ty: number
+    samples: number
+    hullBp: number
+    arc: HitArc
+  }
+  /** The drill cut a cell `tx, ty` of hazard `kind` that bit the hull for `hullBp` (ticket 848). */
+  HazardBit: { kind: string; tx: number; ty: number; hullBp: number; arc: HitArc }
+  /**
+   * The drill cut a vent `tx, ty` of hazard `kind` (ticket 848): it scalded the hull for `hullBp`
+   * and shoves the rig `tiles` along its normal, to rest in `toTx, toTy` by `untilTick`.
+   */
+  HazardShoved: {
+    kind: string
+    tx: number
+    ty: number
+    hullBp: number
+    arc: HitArc
+    tiles: number
+    toTx: number
+    toTy: number
+    untilTick: number
+  }
+  /**
+   * The rig stood `ticks` inside the cut pocket `tx, ty` of hazard `kind` and it drained `quanta` of
+   * its energy (ticket 848).
+   */
+  HazardDrained: { kind: string; tx: number; ty: number; ticks: number; quanta: number }
+  /** A tool started or stopped acting on the rig (ticket 848, `tool_acting`). */
+  ToolActingChanged: { toolId: string; on: boolean }
   /** The gauge rose past `throttleAt`: the drill is throttled until it falls back below (#113). */
   OverheatStarted: Record<never, never>
   OverheatEnded: Record<never, never>

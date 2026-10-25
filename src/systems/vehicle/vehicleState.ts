@@ -25,6 +25,7 @@ import { dockedPoseAt, type VehiclePose } from './vehiclePose'
 import type { AheadLatch } from './aheadBearingLatch'
 import type { SideLatch } from './facedSide'
 import type { GatedBite } from './gatedBite'
+import type { MotionGlide } from './motionGlide'
 import type { SweptCut } from './sweptCut'
 
 /** The #7 state machine; `docked` is entered by the rescue tow here and by docking in #23. */
@@ -105,6 +106,23 @@ export interface VehicleState {
    * so off the magnetic planets the state and its digest are unchanged.
    */
   shockHullBp?: number
+  /**
+   * The on-curve hull share, in basis points, that hazard contacts took this dive (ticket 848,
+   * `authority/hazards/hazardHits.ts`), held to the hazard caps' dive cap. Absent until the first
+   * hit and again from the dock, so a rig that never met a hazard digests as before.
+   */
+  hazardHullBp?: number
+  /**
+   * The tools acting now (ticket 848, `actingTools.ts`), in code-unit order: a tool's trade-off
+   * and its hazard factor apply only while it is listed. Absent while none acts.
+   */
+  actingTools?: readonly string[]
+  /**
+   * A steam vent's shove (ticket 848, `authority/hazards/hazardShove.ts`): the glide the vent
+   * pushes the rig along, which the fixed step drives as any glide. Absent until a vent blows,
+   * dropped at the dock, by the tow and on another planet.
+   */
+  hazardShove?: MotionGlide
   /**
    * The swept cut's cursor (ticket 330, `drill.sweptCut`). Absent until the first `drillStep`, so
    * with the flag off the state and its digest are unchanged.

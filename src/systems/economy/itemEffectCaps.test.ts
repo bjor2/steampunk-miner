@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { ECONOMY } from './economy'
 import { createFieldReader } from './economyFieldReader'
-import { cappedBoostBp, flooredScaleBp, readItemEffectCaps } from './itemEffectCaps'
+import {
+  boostWithPenaltiesBp,
+  cappedBoostBp,
+  flooredScaleBp,
+  readItemEffectCaps,
+} from './itemEffectCaps'
 
 // The kernel's vertical caps on slice items (GD lock on #204, ticket 233).
 
@@ -24,6 +29,13 @@ describe('item effect caps', () => {
     expect(cappedBoostBp([-3000, 1000], motionBoostCapBp)).toBe(0)
   })
 
+  it('adds a trade-off penalty after the capped boosts, never below its floor (ticket 848)', () => {
+    expect(boostWithPenaltiesBp([800], [], motionBoostCapBp, 9000)).toBe(800)
+    expect(boostWithPenaltiesBp([], [-1000], motionBoostCapBp, 9000)).toBe(-1000)
+    expect(boostWithPenaltiesBp([3000], [-3000], motionBoostCapBp, 7000)).toBe(-1000)
+    expect(boostWithPenaltiesBp([], [-4000], motionBoostCapBp, 7500)).toBe(-2500)
+  })
+
   it('multiplies damage scales and never goes below half the base', () => {
     expect(flooredScaleBp([], damageFloorBp)).toBe(10000)
     expect(flooredScaleBp([8000], damageFloorBp)).toBe(8000)
@@ -43,6 +55,7 @@ describe('item effect caps', () => {
       damageFloorBp: 12000,
       detectionFloorBp: -1,
       heatFloorBp: 5000,
+      toolFloorMinBp: 7000,
     })
     expect(reader.problems).toEqual([
       'itemEffectCaps.damageFloorBp must be 0 to 10000 basis points',

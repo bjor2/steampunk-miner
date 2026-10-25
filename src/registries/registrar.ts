@@ -71,6 +71,7 @@ import {
   type IncomeRate,
 } from '../systems/registries/incomeRates'
 import { HULL_DAMAGE_INTERCEPT_REGISTRY } from '../systems/registries/hullDamageIntercepts'
+import { TOOL_TRADE_OFF_REGISTRY } from '../systems/registries/toolTradeOffs'
 import { MAGNETIC_GROUND_REGISTRY } from '../systems/registries/magneticGround'
 import { PLANET_CARD_LINE_REGISTRY } from '../systems/registries/planetCardLines'
 import { PLANET_ROW_REGISTRY } from '../systems/registries/planetRow'
@@ -154,6 +155,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     itemHook: (hook) => add(ITEM_HOOK_REGISTRY, hook),
     liveBeacon: (provider) => add(LIVE_BEACON_REGISTRY, provider),
     hullDamageIntercept: (intercept) => add(HULL_DAMAGE_INTERCEPT_REGISTRY, intercept),
+    toolTradeOff: (row) => addPrefixed(TOOL_TRADE_OFF_REGISTRY, sliceId, row),
     enemyDetectionModifier: (modifier) => add(ENEMY_DETECTION_MODIFIER_REGISTRY, modifier),
     enemyLure: (source) => add(ENEMY_LURE_REGISTRY, source),
     enemyStepModifier: (modifier) => add(ENEMY_STEP_MODIFIER_REGISTRY, modifier),

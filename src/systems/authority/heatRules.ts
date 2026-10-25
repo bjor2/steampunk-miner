@@ -22,6 +22,7 @@
  */
 import type { AuthorityDevFlags } from '../../constants/devFlags'
 import { flagsOf } from './devFlagState'
+import { BASIS_POINTS } from '../../constants/balance'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { HazardArchetype } from '../economy/economyDefinition'
 import {
@@ -43,6 +44,7 @@ import {
   type BigStat,
 } from '../money'
 import { heatStepsWithPauses } from '../registries/heatPauses'
+import { digScaleBpOf } from '../registries/toolTradeOffs'
 import type { DrillStats } from '../vehicle/drillRule'
 import { liningTypeIndexOf } from '../vehicle/liningType'
 import { tileOfPose } from '../vehicle/vehiclePose'
@@ -134,13 +136,30 @@ export function settleDockedHeat(
 }
 
 /** The drill as the gauge leaves it: its power throttled above `throttleAt` (#113). */
+/**
+ * The drill as it cuts: throttled while the gauge is over its line (#113), and slowed by an acting
+ * tool's dig trade-off (ticket 848, `toolTradeOffs.ts`), never sped up. With neither it is the
+ * vehicle's own drill.
+ */
 export function heatThrottledDrill(planetIndex: number, vehicle: VehicleState): DrillStats {
+  return slowedByDigTradeOff(throttledByHeat(planetIndex, vehicle), vehicle)
+}
+
+function throttledByHeat(planetIndex: number, vehicle: VehicleState): DrillStats {
   const stats = statsOfVehicle(vehicle)
   const archetype = hazardArchetypeOn(planetIndex)
   if (archetype === null) return stats
   const factor = throttleFactor(archetype, heatPointsOf(vehicle.heat.level))
   const { drillTip, gateTip } = stats
   return { drillPower: mul(stats.drillPower, factor), drillTip, gateTip }
+}
+
+function slowedByDigTradeOff(drill: DrillStats, vehicle: VehicleState): DrillStats {
+  const scaleBp = digScaleBpOf(vehicle)
+  if (scaleBp === BASIS_POINTS) return drill
+  const share = div(fromSafeInteger(scaleBp), fromSafeInteger(BASIS_POINTS))
+  const { drillTip, gateTip } = drill
+  return { drillPower: mul(drill.drillPower, share), drillTip, gateTip }
 }
 
 /** Whether the gauge is above the throttle line: the HUD and the vehicle's shimmer. */

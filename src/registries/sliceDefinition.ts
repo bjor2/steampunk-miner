@@ -46,6 +46,7 @@ import type { SpendFamily } from '../systems/registries/spendFamilies'
 import type { IncomeRate, TripCapSource } from '../systems/registries/incomeRates'
 import type { SlotHoldCueSource } from '../systems/registries/slotHoldCues'
 import type { HullDamageIntercept } from '../systems/registries/hullDamageIntercepts'
+import type { ToolTradeOff } from '../systems/registries/toolTradeOffs'
 import type { ItemDescriberProvider } from '../systems/registries/itemDescriber'
 import type { ItemDescriptionEntry } from '../systems/registries/itemDescriptionEntries'
 import type { OreLookProvider } from '../systems/registries/oreLook'
@@ -126,6 +127,11 @@ export interface SliceRegistrar {
    * it below half (ticket 233).
    */
   hullDamageIntercept(intercept: HullDamageIntercept): void
+  /**
+   * A tool's trade-off on one owned track, only while it acts (ticket 848): `thrust`, `horizontal`
+   * or `dig`, floored at the row's `floorBp`, never below the kernel's 7000 bp; one per axis.
+   */
+  toolTradeOff(row: ToolTradeOff): void
   /** Shrinks how far a hunting enemy notices the vehicle, never below half (ticket 233). */
   enemyDetectionModifier(modifier: EnemyDetectionModifier): void
   /**

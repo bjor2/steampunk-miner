@@ -33,6 +33,7 @@ import {
   portableLoadoutProblems,
   type PortableSection,
 } from './loadoutSection'
+import { hazardVehicleFieldProblems } from './hazards/hazardVehicleFields'
 import { isJsonObject, isWholeNumber } from './payloadFields'
 
 export type PortableVehicle = Omit<
@@ -148,6 +149,7 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(vehicle.shockHullBp === undefined || isWholeNumber(vehicle.shockHullBp)
       ? []
       : [`${path}.shockHullBp must be a whole number of basis points, or be left out`]),
+    ...hazardVehicleFieldProblems(vehicle, path),
     ...(vehicle.stillSinceTick === undefined || isWholeNumber(vehicle.stillSinceTick)
       ? []
       : [`${path}.stillSinceTick must be a whole tick, or be left out`]),

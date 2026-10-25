@@ -34,6 +34,7 @@ import { endTrip } from './combat/enemyRoster'
 import { disarmOnModeChange } from './charges/chargeDisarm'
 import { bankCoreFragments } from './coreBay'
 import type { Attacker, DomainEvent, DomainEventBody, RescueCause } from './domainEvent'
+import { endHazardDiveOnDock } from './hazards/hazardDive'
 import { endShockDiveOnDock } from './magnetic/shockDive'
 import { dockSiteOfPlanet } from './planetOfState'
 import { debitWholeLedger } from './premium/premiumLedgerState'
@@ -178,6 +179,7 @@ export function changeMode(
     (current) => recordModeChange(current, playerId, to, reason, tick),
     (current) => disarmOnModeChange(current, playerId, to),
     (current) => endShockDiveOnDock(current, playerId, to),
+    (current) => endHazardDiveOnDock(current, playerId, to),
     (current) => endGatedBite(current, playerId),
   ])
 }

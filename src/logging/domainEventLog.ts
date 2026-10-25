@@ -35,6 +35,10 @@ const CARRY_STOPS: { readonly [K in DomainEvent['type']]?: DrillSpanStop } = {
   LavaTouched: 'hazard',
   LavaBlocked: 'hazard',
   ElectrifiedCellShocked: 'hazard',
+  HazardRefilled: 'hazard',
+  HazardBit: 'hazard',
+  HazardShoved: 'hazard',
+  HazardDrained: 'hazard',
   StorageFull: 'hold_full',
   EnergyDepleted: 'tank_empty',
 }

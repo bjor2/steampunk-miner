@@ -595,6 +595,52 @@ export const RUN_EVENT_REGISTRY = {
     level: 'core',
     payload: { ticks: 'integer', hullBp: 'integer', withBit: 'flag' },
   },
+  // Ticket 848 (the contact-effect registry for #651's hazards): the drill cut a hazard cell and
+  // its effect played, each hull share in basis points of the planet's on-curve hull from the arc
+  // the cell lies in; the rig stood in a cut drain pocket for `ticks` and lost `quanta`; a tool
+  // started or stopped acting, the only time its trade-off and its hazard factor apply.
+  hazard_refill: {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: {
+      kind: 'text',
+      tx: 'integer',
+      ty: 'integer',
+      samples: 'integer',
+      hullBp: 'integer',
+      arc: HIT_ARC,
+    },
+  },
+  hazard_bite: {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { kind: 'text', tx: 'integer', ty: 'integer', hullBp: 'integer', arc: HIT_ARC },
+  },
+  hazard_shove: {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: {
+      kind: 'text',
+      tx: 'integer',
+      ty: 'integer',
+      hullBp: 'integer',
+      arc: HIT_ARC,
+      tiles: 'integer',
+      toTx: 'integer',
+      toTy: 'integer',
+      untilTick: 'integer',
+    },
+  },
+  hazard_drain: {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { kind: 'text', tx: 'integer', ty: 'integer', ticks: 'integer', quanta: 'integer' },
+  },
+  tool_acting: {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { toolId: 'text', on: 'flag' },
+  },
   energy_low: { group: 'mining', level: 'core', payload: { threshold: 'integer' } },
   rare_resource_discovered: { group: 'mining', level: 'core', payload: 'unspecified' },
   tile_drilled: { group: 'mining', level: 'detail', payload: 'unspecified' },

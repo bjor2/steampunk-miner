@@ -5,6 +5,9 @@
  * - `liftBp` and `driveBp` add to the engine track's thrust-to-weight, and to its top speed and
  *   acceleration, in basis points. All effects sum, capped at `itemEffectCaps.motionBoostCapBp`
  *   (+2000) on each. A lighter vehicle (a ballast drop) states the lift and drive it gains.
+ * - An effect that names a `floorBp` is a tool's trade-off (ticket 848): its negative `liftBp` or
+ *   `driveBp` is a penalty added after the capped boosts, and the axis never falls below the
+ *   floor, nor below `itemEffectCaps.toolFloorMinBp`. Any other negative value stays held to 0.
  * - A `burst` drives the body along its direction until `untilTick`, and a `reelTo` pulls it to a
  *   tile's centre; neither moves faster than the engine's top speed plus the cap. Bursts add up
  *   as velocities; the first reel in id order wins.
@@ -22,7 +25,7 @@
 import { BASIS_POINTS } from '../../constants/balance'
 import { MM_PER_METRE } from '../../constants/physics'
 import { ECONOMY } from '../economy/economy'
-import { cappedBoostBp } from '../economy/itemEffectCaps'
+import { boostWithPenaltiesBp } from '../economy/itemEffectCaps'
 import type { EngineStats } from '../economy/vehicleStats'
 import type { TilePoint } from '../world/tileGrid'
 import { dot, type Vector2 } from './localFrame'
@@ -40,6 +43,8 @@ export interface MotionBurst {
 export interface VehicleMotionEffect {
   liftBp?: number
   driveBp?: number
+  /** The least share of the track a trade-off's negative lift or drive leaves, in bp. */
+  floorBp?: number
   burst?: MotionBurst
   reelTo?: TilePoint
   cling?: boolean
@@ -80,14 +85,8 @@ export function foldMotionEffects(
 ): VehicleMotion {
   if (effects.length === 0) return PLAIN_MOTION
   return {
-    liftBoostBp: cappedBoostBp(
-      effects.map((effect) => effect.liftBp ?? 0),
-      capBp,
-    ),
-    driveBoostBp: cappedBoostBp(
-      effects.map((effect) => effect.driveBp ?? 0),
-      capBp,
-    ),
+    liftBoostBp: axisBoostBp(effects, (effect) => effect.liftBp ?? 0, capBp),
+    driveBoostBp: axisBoostBp(effects, (effect) => effect.driveBp ?? 0, capBp),
     burst: summedBurstOf(effects, tick),
     reelTo: firstReelOf(effects),
     isClinging: effects.some((effect) => effect.cling === true),
@@ -141,6 +140,31 @@ export function steeredVelocityOf(
 /** Whether the body is held against gravity: hovering, or clinging with a side on the ground. */
 export function isHeldAgainstGravity(motion: VehicleMotion, isTouchingSurface: boolean): boolean {
   return motion.isHovering || (motion.isClinging && isTouchingSurface)
+}
+
+/**
+ * One axis: the boosts capped, then any trade-off's penalty, above the highest floor named and
+ * never below the kernel's minimum.
+ */
+function axisBoostBp(
+  effects: readonly VehicleMotionEffect[],
+  valueOf: (effect: VehicleMotionEffect) => number,
+  capBp: number,
+): number {
+  const tradeOffs = effects.filter((effect) => isPenaltyOf(effect, valueOf))
+  const boosts = effects.filter((effect) => !isPenaltyOf(effect, valueOf)).map(valueOf)
+  const floorBp = Math.max(
+    ECONOMY.itemEffectCaps.toolFloorMinBp,
+    ...tradeOffs.map((effect) => effect.floorBp ?? 0),
+  )
+  return boostWithPenaltiesBp(boosts, tradeOffs.map(valueOf), capBp, floorBp)
+}
+
+function isPenaltyOf(
+  effect: VehicleMotionEffect,
+  valueOf: (effect: VehicleMotionEffect) => number,
+): boolean {
+  return effect.floorBp !== undefined && valueOf(effect) < 0
 }
 
 function shareWith(boostBp: number): number {

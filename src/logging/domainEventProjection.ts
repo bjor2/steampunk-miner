@@ -153,6 +153,23 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'electrified_cell_shocked',
     data: { ticks, hullBp, withBit },
   }),
+  HazardRefilled: ({ kind, tx, ty, samples, hullBp, arc }) => ({
+    event: 'hazard_refill',
+    data: { kind, tx, ty, samples, hullBp, arc },
+  }),
+  HazardBit: ({ kind, tx, ty, hullBp, arc }) => ({
+    event: 'hazard_bite',
+    data: { kind, tx, ty, hullBp, arc },
+  }),
+  HazardShoved: ({ kind, tx, ty, hullBp, arc, tiles, toTx, toTy, untilTick }) => ({
+    event: 'hazard_shove',
+    data: { kind, tx, ty, hullBp, arc, tiles, toTx, toTy, untilTick },
+  }),
+  HazardDrained: ({ kind, tx, ty, ticks, quanta }) => ({
+    event: 'hazard_drain',
+    data: { kind, tx, ty, ticks, quanta },
+  }),
+  ToolActingChanged: ({ toolId, on }) => ({ event: 'tool_acting', data: { toolId, on } }),
   LavaBlocked: ({ ring }) => ({ event: 'lava_blocked', data: { ring } }),
   VehicleModeChanged: ({ from, to, reason }) => ({
     event: 'vehicle_state_changed',
