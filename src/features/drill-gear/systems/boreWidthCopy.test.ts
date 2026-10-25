@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { BARE_BORE_CELLS_PER_METRE } from '../../../constants/balance'
+import { drillStampRadiusMm } from '../../../systems/vehicle/drillBore'
 import { createAuthorityState } from '../../../systems/authority/authorityState'
 import { describeItem } from '../../../systems/registries/itemDescriber'
 import { itemSnapshotViewOf } from '../../../systems/registries/itemSnapshotView'
@@ -14,11 +16,13 @@ import { gearValueOf } from './drillGearItems'
 import { SIDE_CUTTERS_MARK_2_ID, sideCellsOfMark, sideCutterMarkOf } from './sideCutterMarks'
 import { TWIN_BIT_ID } from './twinBit'
 
-// The width cards' copy (GD lock on #308, ticket 621): the bore is 2 + s cells a metre, a cell a
-// metre wide, so the side cutters read 3 m, their Mark 2 4 m and Wide 5 m with Mark 2 on; each
-// shows the ore a side cell adds (600 bp a side cell, over the bore's 2) and no card claims speed.
+// The width cards' copy (GD lock on #308, ticket 621), re-baselined on the 1.2 m bore (ticket 663):
+// each card reads its real bore's width from data, the stamp's diameter (the body plus the bore
+// row's clearance a side) plus a metre a side cell on each flank, so the side cutters read 3.2 m,
+// their Mark 2 5.2 m and Wide 7.2 m with Mark 2 on; each shows the ore a side cell adds (600 bp a
+// side cell, over the bare bore's 1 cell a metre, #316's b) and no card claims speed.
 
-const BARE_BORE_CELLS = 2
+const BARE_BORE_M = (2 * drillStampRadiusMm()) / 1000
 const WIDER_NOT_FASTER =
   'Note: a wider bore, not a faster one: each side cell costs its full energy and heat'
 const SIDEGRADE = 'Note: a one-off sidegrade: no level track, and drill speed is unchanged'
@@ -39,34 +43,42 @@ function branchNotesOf(branch: string): string[] {
 const MARK_2_CELLS = sideCellsOfMark(sideCutterMarkOf(SIDE_CUTTERS_MARK_2_ID)!)
 const WIDE_CELLS = forkValueOf(GALLERY_REAMERS_ID, 'sideCells') + MARK_2_CELLS
 
+/** The real bore's width with `sideCells` a flank, as the card prints it. */
+const widthTextOf = (sideCells: number) => `${(BARE_BORE_M + 2 * sideCells).toFixed(1)}`
+
 describe('drill-gear: the width cards (ticket 621)', () => {
-  it('reads the side cutters as a 3 m bore taking 3% more ore a metre', () => {
-    expect(BARE_BORE_CELLS + gearValueOf(SIDE_CUTTERS_ID, 'sideCells')).toBe(3)
+  it("reads the bare bore off the bore row: the 0.9 m body and 0.15 m a side, #316's b of 1", () => {
+    expect(BARE_BORE_M).toBe(1.2)
+    expect(BARE_BORE_CELLS_PER_METRE).toBe(1)
+  })
+
+  it('reads the side cutters as a 3.2 m bore taking 6% more ore a metre', () => {
+    expect(widthTextOf(gearValueOf(SIDE_CUTTERS_ID, 'sideCells'))).toBe('3.2')
     const lines = cardLinesOf(SIDE_CUTTERS_ID)
-    expect(lines).toContain('Bore width (m): 3')
-    expect(lines).toContain('Ore a metre (+%): 3')
+    expect(lines).toContain('Bore width (m): 3.2')
+    expect(lines).toContain('Ore a metre (+%): 6')
     expect(lines).toContain(WIDER_NOT_FASTER)
   })
 
-  it('reads the double side cutters as a 4 m bore taking 6% more ore a metre', () => {
-    expect(BARE_BORE_CELLS + MARK_2_CELLS).toBe(4)
+  it('reads the double side cutters as a 5.2 m bore taking 12% more ore a metre', () => {
+    expect(widthTextOf(MARK_2_CELLS)).toBe('5.2')
     expect(cardLinesOf(SIDE_CUTTERS_MARK_2_ID).slice(0, 4)).toEqual([
       'Side cells (cells): 2',
-      'Bore width (m): 4',
-      'Ore a metre (+%): 6',
+      'Bore width (m): 5.2',
+      'Ore a metre (+%): 12',
       WIDER_NOT_FASTER,
     ])
   })
 
   it('keeps the bore width the same at every research Mark of the cutters', () => {
-    expect(cardLinesOf(SIDE_CUTTERS_ID, 5)).toContain('Bore width (m): 3')
+    expect(cardLinesOf(SIDE_CUTTERS_ID, 5)).toContain('Bore width (m): 3.2')
   })
 
-  it('gives Wide 3 m on its reamers alone and 5 m with the widest cutters on, +9% ore', () => {
-    expect(BARE_BORE_CELLS + WIDE_CELLS).toBe(5)
+  it('gives Wide 3.2 m on its reamers alone and 7.2 m with the widest cutters on, +18% ore', () => {
+    expect(widthTextOf(WIDE_CELLS)).toBe('7.2')
     expect(branchNotesOf(WIDE_BRANCH)).toEqual([
-      'Note: bore width 3 m, 5 m with the widest flank cutters on',
-      'Note: side cells pay 6% of their ore: up to +9% ore a metre',
+      'Note: bore width 3.2 m, 7.2 m with the widest flank cutters on',
+      'Note: side cells pay 6% of their ore: up to +18% ore a metre',
       SIDEGRADE,
     ])
   })

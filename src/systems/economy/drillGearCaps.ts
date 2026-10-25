@@ -8,9 +8,10 @@
  *   energy for that cell, so side drilling adds reach, not free throughput. The twin bit's
  *   diagonal ahead cell carries the same floor (GD lock on #257, ticket 279).
  * - `sideOreShareBp` (600): the share of its ore a side cell pays (Systems' price rows on #308,
- *   ticket 620), so width is yield and clearing at about +3% income a side cell, not the +50% a
- *   flank paying whole would be. Fixed: no slice asks it and it never scales with depth (the VS on
- *   #308), so width keeps one ratio to the planet's own income.
+ *   ticket 620), so width is yield and clearing, not the +100% a flank paying whole would be: +6%
+ *   ore a metre a side cell over the 1.2 m bore's 1 cell a metre (+3% over #36's 2, ticket 663).
+ *   Fixed: no slice asks it and it never scales with depth (the VS on #308), so width keeps one
+ *   ratio to the planet's own income.
  *
  * A slice states the gear it wants; the kernel folds every answer through these caps, so no stack
  * of gear passes them.

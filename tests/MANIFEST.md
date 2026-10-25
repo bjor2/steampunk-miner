@@ -129,7 +129,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dock-buildings/systems/render/worksSteam.test.ts` | 4 | 4 |
 | `src/features/dock-buildings/systems/render/workshopStaging.test.ts` | 6 | 6 |
 
-### `drill-gear`: 31 files, 258 tests
+### `drill-gear`: 31 files, 259 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -142,7 +142,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/drill-gear/shippedRows.test.ts` | 10 | 10 |
 | `src/features/drill-gear/systems/aheadCutNotes.test.ts` | 2 | 2 |
 | `src/features/drill-gear/systems/backfillRow.test.ts` | 4 | 4 |
-| `src/features/drill-gear/systems/boreWidthCopy.test.ts` | 6 | 6 |
+| `src/features/drill-gear/systems/boreWidthCopy.test.ts` | 7 | 7 |
 | `src/features/drill-gear/systems/cardLines.test.ts` | 7 | 7 |
 | `src/features/drill-gear/systems/cuttersAndBoom.test.ts` | 7 | 6 |
 | `src/features/drill-gear/systems/deepParity.test.ts` | 60 | 3 |
@@ -1056,6 +1056,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/botBoiler.test.ts` | 4 | 4 |
 | `src/systems/bot/botBore.test.ts` | 10 | 10 |
 | `src/systems/bot/botBoreSpeed.test.ts` | 2 | 2 |
+| `src/systems/bot/botBoreYield.test.ts` | 2 | 2 |
 | `src/systems/bot/botChains.test.ts` | 4 | 4 |
 | `src/systems/bot/botChargeNeed.test.ts` | 2 | 2 |
 | `src/systems/bot/botCharges.test.ts` | 9 | 9 |

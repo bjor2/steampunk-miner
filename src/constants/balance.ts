@@ -69,6 +69,15 @@ export const DRILL_BORE_ROWS: DrillBoreRows = { sideClearanceMm: 150 }
 export const DRILL_SIDE_CLEARANCE_RANGE_MM = { min: 100, max: 200 } as const
 
 /**
+ * The bare bore's cells a metre, b (the #316 width bench, `sideCellsPerMetre.test.ts`): a level cut
+ * with `s` side cells opens b + s cells a metre, each side cell one roof row more. #316 measured 2 on
+ * #36's 1.9 m bore, raised a quarter metre; the 1.2 m bore on the body's centre opens the body's row
+ * alone, 1 at every start phase (ticket 662), which ticket 663 re-baselines the bench and the width
+ * cards' ore a metre on. A cell is a metre, so a down bore's column opens the same 1 a metre.
+ */
+export const BARE_BORE_CELLS_PER_METRE = 1
+
+/**
  * The drill's cells to m/s mapping, descent over cut speed (the VS on #551, 6254671302: "the 83.9
  * m/s is 94.1 x 0.891"): a rig descends at this share of its band-1 cut speed in cells/s. The one
  * copy of it; `vehicle/cutSpeed.ts` applies it. Re-derived once for the 1.2 m bore (ticket 663,

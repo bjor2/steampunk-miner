@@ -1,21 +1,24 @@
 /**
- * The width cards' copy (GD lock on #308, ticket 621): the side cutters read "Bore width 3 m",
- * their width Mark 2 "4 m", and Wide's reamers "5 m" on top of the widest Mark. Width is yield
- * and clearing, never speed, so the cards show the ore a metre it adds and say the drill is no
- * faster. The drill types (Wide, Deep, the twin bit, the reach boom) read as one-off sidegrades:
- * the drill's own cut formula, no level track (the VS on #308).
+ * The width cards' copy (GD lock on #308, ticket 621): the side cutters, their width Mark 2 and
+ * Wide's reamers on top of the widest Mark each read their bore's width. Width is yield and
+ * clearing, never speed, so the cards show the ore a metre it adds and say the drill is no faster.
+ * The drill types (Wide, Deep, the twin bit, the reach boom) read as one-off sidegrades: the drill's
+ * own cut formula, no level track (the VS on #308).
  *
- * The bore is `2 + s` cells a metre with `s` side cells (the #316 width bench, ticket 620's
- * `sideCellsPerMetre` spec); a cell is a metre, so that is its width in metres. Each side cell
- * pays the kernel's `sideOreShareBp` of its ore, so the ore a metre grows by `s * share / 2`.
+ * The width is the real bore's, from data (ticket 663, re-baselining #621 on the 1.2 m bore): the
+ * stamp's diameter (the body plus the bore row's clearance a side, `drillBore.ts`) plus `s` side
+ * cells of a metre on each flank (`drillGearCells.ts`), so 1.2 m bare, 3.2 m with one side cell.
+ * The ore a metre follows the #316 width bench: a level metre opens b + s cells (b the bare bore's
+ * `BARE_BORE_CELLS_PER_METRE`), each side cell paying the kernel's `sideOreShareBp` of its ore, so
+ * the ore a metre grows by `s * share / b`.
  */
+import { BARE_BORE_CELLS_PER_METRE } from '../../../constants/balance'
+import { MM_PER_METRE } from '../../../constants/physics'
 import { formatAmount } from '../../../systems/displayAmount'
 import { ECONOMY } from '../../../systems/economy/economy'
 import { div, fromSafeInteger, type Money } from '../../../systems/money'
+import { drillStampRadiusMm } from '../../../systems/vehicle/drillBore'
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
-
-/** The bare bore's cells a metre: the bit's own stamp, before any side cell (#316). */
-export const BARE_BORE_CELLS_PER_METRE = 2
 
 const PERCENT_OF_BASIS_POINTS = 100
 
@@ -23,9 +26,10 @@ export const WIDER_NOT_FASTER_NOTE =
   'a wider bore, not a faster one: each side cell costs its full energy and heat'
 export const SIDEGRADE_NOTE = 'a one-off sidegrade: no level track, and drill speed is unchanged'
 
-/** The bore's width in metres with `sideCells` side cells. */
-export function boreWidthMOf(sideCells: number): number {
-  return BARE_BORE_CELLS_PER_METRE + sideCells
+/** The bore's width in metres with `sideCells` side cells on each flank. */
+export function boreWidthMOf(sideCells: number): Money {
+  const widthMm = 2 * (drillStampRadiusMm() + sideCells * MM_PER_METRE)
+  return div(fromSafeInteger(widthMm), fromSafeInteger(MM_PER_METRE))
 }
 
 /** The side cells' ore share as a percent of a whole cell's ore. */
@@ -42,7 +46,7 @@ export function oreGainPercentOf(sideCells: number): Money {
 /** A width part's card lines at `sideCells`: its bore width, its ore gain and the speed note. */
 export function widthLineSpecsOf(sideCells: number): DescribedStatLineSpec[] {
   return [
-    fixedLineSpecOf('Bore width (m)', fromSafeInteger(boreWidthMOf(sideCells))),
+    fixedLineSpecOf('Bore width (m)', boreWidthMOf(sideCells)),
     fixedLineSpecOf('Ore a metre (+%)', oreGainPercentOf(sideCells)),
     noteLineSpecOf(WIDER_NOT_FASTER_NOTE),
   ]
@@ -59,8 +63,9 @@ export function wideBranchNotesOf(reamerCells: number, widestCutterCells: number
 }
 
 function wideWidthNoteOf(reamerCells: number, widestCells: number): string {
-  const bare = boreWidthMOf(reamerCells)
-  return `bore width ${bare} m, ${boreWidthMOf(widestCells)} m with the widest flank cutters on`
+  const reamed = formatAmount(boreWidthMOf(reamerCells))
+  const widest = formatAmount(boreWidthMOf(widestCells))
+  return `bore width ${reamed} m, ${widest} m with the widest flank cutters on`
 }
 
 function wideOreNoteOf(widestCells: number): string {

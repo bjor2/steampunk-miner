@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { BARE_BORE_CELLS_PER_METRE } from '../../constants/balance'
 import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { NO_DRIVE } from '../vehicle/driveSigns'
@@ -27,12 +28,8 @@ const STRIDE_MM = 100
 const RUN_TIMEOUT_MS = 120_000
 /** The metres the stamp enters and leaves the run on, left out of the count. */
 const EDGE_METRES = 2
-/**
- * The bare bore's cells a metre, b. #316 measured 2 at #36's 1.9 m bore, raised a quarter metre;
- * ticket 662's 1.2 m bore on the body's centre opens the body's row alone, measured 1 at every
- * phase, each side cell still adding its one roof cell. Ticket #663 re-baselines the bench rows.
- */
-const BARE_BORE_CELLS = 1
+/** The bare bore's cells a metre, b, re-baselined on the 1.2 m bore by ticket 663. */
+const BARE_BORE_CELLS = BARE_BORE_CELLS_PER_METRE
 
 /** A spec-only drill-gear source: `sideCells` cells on each side of the bore. */
 function sideCellsSlice(sideCells: number): SliceDefinition {
