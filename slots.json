@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-26T00:12:16+01:00",
+  "updated_at": "2026-10-26T00:16:08+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -19,11 +19,12 @@
       "slots": [
         {
           "slot": "C1",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 623,
+          "grok_slot": 1,
+          "kind": "dev",
+          "since": "2026-10-26T00:14:00+01:00",
+          "wave": "308-3A"
         },
         {
           "slot": "C2",
@@ -70,9 +71,9 @@
         }
       ],
       "size": 6,
-      "used": 3,
-      "free": 3,
-      "claims_last_hour": 4,
+      "used": 4,
+      "free": 2,
+      "claims_last_hour": 5,
       "name": "Claude Max 1"
     },
     {
@@ -126,7 +127,7 @@
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 2,
     "max": 3
   },
   "tester": {
@@ -190,9 +191,11 @@
   "grok": [
     {
       "slot": 1,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 623,
+      "since": "2026-10-26T00:14:00+01:00",
+      "claude_slot": 1,
+      "wave": "308-3A"
     },
     {
       "slot": 2,
@@ -276,11 +279,12 @@
   "claude": [
     {
       "slot": 1,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "account": 1
+      "state": "busy",
+      "ticket": 623,
+      "grok_slot": 1,
+      "since": "2026-10-26T00:14:00+01:00",
+      "account": 1,
+      "wave": "308-3A"
     },
     {
       "slot": 2,
@@ -371,8 +375,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 6,
-      "dev": 6,
+      "used": 7,
+      "dev": 7,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -380,8 +384,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 6,
-      "free": 4,
+      "used": 7,
+      "free": 3,
       "external": 0
     }
   },
@@ -613,7 +617,7 @@
           663,
           733
         ],
-        "live": 0
+        "live": 1
       },
       {
         "number": 495,
