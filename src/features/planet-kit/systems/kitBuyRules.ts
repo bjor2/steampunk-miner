@@ -15,7 +15,9 @@
  * It is answered by `planet-kit.KitItemBought`.
  *
  * `debug.planet-kit.grantKitItem {itemId}` holds the item as if bought here, spending nothing; it
- * is refused for an unknown item or one the player may not hold one more of, never trimmed.
+ * is refused for an unknown item or one the player may not hold one more of, never trimmed. It
+ * answers `planet-kit.KitItemGranted` with the item's price at its home planet's g, the debit a
+ * tools-on run's ledger carries (ticket 881, the VS's condition on #850).
  */
 import { withWallet, type AuthorityState } from '../../../systems/authority/authorityState'
 import {
@@ -29,7 +31,7 @@ import { moneyShortRejection } from '../../../systems/authority/platformServices
 import { sub } from '../../../systems/money'
 import type { SliceCommandRules } from '../../../systems/registries/commandRules'
 import type { PlanetId } from '../../solar-systems'
-import { kitItemBoughtOf } from './kitBuyEvents'
+import { kitItemBoughtOf, kitItemGrantedOf } from './kitBuyEvents'
 import {
   kitBuyRefusalOf,
   unitsHeldOf,
@@ -58,10 +60,8 @@ export const KIT_BUY_RULES: SliceCommandRules = {
         () => unknownItemRejection(payload.itemId),
         () => holdingRejection(state, playerId, kitItemOf(PLANET_KITS, payload.itemId) as KitItem),
       ]),
-    apply: (state, { playerId, payload }) => ({
-      state: withItemHeld(state, playerId, kitItemOf(PLANET_KITS, payload.itemId) as KitItem),
-      events: [],
-    }),
+    apply: (state, { playerId, payload }) =>
+      grantKitItem(state, playerId, kitItemOf(PLANET_KITS, payload.itemId) as KitItem),
   },
 }
 
@@ -109,6 +109,14 @@ function buyKitItem(state: AuthorityState, playerId: string, item: KitItem): Rul
         held: unitsHeldOf(kitHoldingsOf(held, playerId), item),
       }),
     ],
+  }
+}
+
+/** Held as if bought here, debiting the run's ledger at the home price (`KitItemGranted`). */
+function grantKitItem(state: AuthorityState, playerId: string, item: KitItem): RuleEffect {
+  return {
+    state: withItemHeld(state, playerId, item),
+    events: [kitItemGrantedOf(playerId, item, kitItemPriceAt(item, item.homePlanet))],
   }
 }
 

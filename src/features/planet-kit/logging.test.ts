@@ -9,10 +9,14 @@ import { oreSalePrice } from '../../systems/economy/oreEconomy'
 import { add, fromSafeInteger, mul, toCanonical } from '../../systems/money'
 import { tileOfPose, type VehiclePose } from '../../systems/vehicle/vehiclePose'
 import { dropContainerIntent, pickupContainerIntent } from './systems/containerRules'
+import { UNCORK_FLASK_INTENT } from './systems/flaskRules'
 import { buyKitItemIntent } from './systems/kitBuyRules'
+import { kitItemPriceAt } from './systems/planetKitPrices'
+import { PLANET_KITS } from './systems/planetKitRows'
+import { kitItemOf } from './systems/planetKitSales'
 
 // The planet kits' log lines, each checked against its registered schema: a kit item bought
-// (ticket 850), and the Cache Crate's drop and pickup (ticket 823, the TD's final ruling on #823,
+// (ticket 850), a grant's ledger debit and an uncorked flask (ticket 881), and the Cache Crate's drop and pickup (ticket 823, the TD's final ruling on #823,
 // point 8).
 
 function linesOf(events: readonly DomainEvent[]) {
@@ -59,10 +63,36 @@ describe('kit item log lines (ticket 850)', () => {
   })
 })
 
+describe('kit tool log lines (ticket 881)', () => {
+  it('logs a grant’s ledger debit: the item, its home g and its price there', () => {
+    const session = createScriptedSession()
+    session.submit(1, { type: 'debug.planet-kit.grantKitItem', payload: { itemId: 'vent_vane' } })
+    const lines = linesOf(session.events())
+    const vane = kitItemOf(PLANET_KITS, 'vent_vane')!
+    const price = toCanonical(kitItemPriceAt(vane, vane.homePlanet))
+    expect(lines.map(({ event, data }) => ({ event, data }))).toContainEqual({
+      event: 'planet-kit.kit_item_granted',
+      data: { itemId: 'vent_vane', g: '5', price },
+    })
+    lines.forEach((line) => expect(runEventProblems(line)).toEqual([]))
+  })
+
+  it('logs an uncorked flask with its g, the tick it closes at and the flasks left', () => {
+    const session = createScriptedSession()
+    session.submit(1, { type: 'debug.planet-kit.grantKitItem', payload: { itemId: 'damp_flask' } })
+    session.submit(2, UNCORK_FLASK_INTENT)
+    const [line] = linesOf(session.events()).filter((line) =>
+      line.event.startsWith('planet-kit.flask_'),
+    )
+    expect(line.data).toEqual({ itemId: 'damp_flask', g: '1', untilTick: 3602, left: '0' })
+    expect(runEventProblems(line)).toEqual([])
+  })
+})
+
 describe('cache crate log lines (ticket 823)', () => {
   it('logs a drop and a pickup with the planet’s (s,p), cell, kind, owner, id, units and value', () => {
     const { events, cell } = droppedAndPickedUp()
-    const lines = linesOf(events).filter((line) => line.event.startsWith('planet-kit.'))
+    const lines = linesOf(events).filter((line) => line.event.startsWith('planet-kit.container_'))
     const value = toCanonical(
       add(mul(oreSalePrice(1), fromSafeInteger(3)), mul(oreSalePrice(4), fromSafeInteger(2))),
     )

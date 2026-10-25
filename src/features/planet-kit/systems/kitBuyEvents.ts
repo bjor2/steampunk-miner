@@ -3,10 +3,12 @@
  * 3.15, ticket 850), by augmentation, never by editing the kernel's lists; and the event body its
  * rule builds. The event names the planet bought on by its stable id (s, p), the g its price and a
  * consumable's pin were read at, the price paid and how many of the item the player now holds.
+ * A debug grant (ticket 881) answers with the price the item has at its home planet's g.
  */
 import { toCanonical, type Money } from '../../../systems/money'
 import { toIndexText } from '../../../systems/starMap/planetAddress'
 import type { PlanetId } from '../../solar-systems'
+import { campaignIndexOf } from './planetKitSales'
 import type { KitItem } from './planetKitTypes'
 
 declare module '../../../systems/authority/authorityCommand' {
@@ -35,6 +37,18 @@ declare module '../../../systems/authority/domainEvent' {
       price: string
       /** The units of the item held now, as decimal text: 1 for a tool. */
       held: string
+    }
+    /**
+     * A scenario's grant, with the price it debits in the run's ledger (ticket 881, the VS's
+     * condition on #850): the item's price at its home planet's g, so a tools-on run's payback
+     * divides by what the tool would have cost.
+     */
+    'planet-kit.KitItemGranted': {
+      playerId: string
+      itemId: string
+      /** The home planet's g the price was read at, as index text. */
+      g: string
+      price: string
     }
   }
   interface RejectionReasons {
@@ -68,5 +82,15 @@ export function kitItemBoughtOf(purchase: KitPurchase) {
     g: toIndexText(purchase.g),
     price: toCanonical(purchase.price),
     held: purchase.held.toString(),
+  }
+}
+
+export function kitItemGrantedOf(playerId: string, item: KitItem, price: Money) {
+  return {
+    type: 'planet-kit.KitItemGranted' as const,
+    playerId,
+    itemId: item.id,
+    g: toIndexText(campaignIndexOf(item.homePlanet)),
+    price: toCanonical(price),
   }
 }
