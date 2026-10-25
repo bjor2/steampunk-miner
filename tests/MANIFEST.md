@@ -910,7 +910,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/builtFacilities.test.ts` | 6 | 6 |
 | `src/systems/authority/carryRelease.test.ts` | 22 | 13 |
 | `src/systems/authority/carveGeometryKnownRed.test.ts` | 5 | 5 |
-| `src/systems/authority/casingAlongAim.test.ts` | 11 | 6 |
+| `src/systems/authority/casingAlongAim.test.ts` | 13 | 7 |
 | `src/systems/authority/casingCadence.test.ts` | 7 | 3 |
 | `src/systems/authority/casingDrill.test.ts` | 5 | 5 |
 | `src/systems/authority/casingGates.test.ts` | 3 | 3 |

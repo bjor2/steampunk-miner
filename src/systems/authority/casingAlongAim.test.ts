@@ -82,12 +82,12 @@ function refill(session: ScriptedSession, tick: number) {
 }
 
 /** A strong drill and a strong casing grade reported at START, aimed at `aim`. */
-function strongSessionAt(aim: Aim): ScriptedSession {
+function strongSessionAt(aim: Aim, grade = CASING_GRADE): ScriptedSession {
   const session = createScriptedSession()
   session.submit(0, FREEZE_ENEMIES)
   session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 12 } })
   session.submit(0, { type: 'debug.setMoney', payload: { amount: '1000' } })
-  session.submit(0, { type: 'debug.setCasingGrade', payload: { grade: CASING_GRADE } })
+  session.submit(0, { type: 'debug.setCasingGrade', payload: { grade } })
   refill(session, 0)
   session.submit(0, poseAt(pointAlong(aim, 0), aim, 0))
   return session
@@ -105,8 +105,11 @@ function backOut(session: ScriptedSession, aim: Aim, firstTick: number): number 
 }
 
 /** A swept cut a drill step a tick along `aim` for the leg; `end` is its last tick. */
-function cutSweptLegAlong(aim: Aim): { session: ScriptedSession; end: number } {
-  const session = strongSessionAt(aim)
+function cutSweptLegAlong(
+  aim: Aim,
+  grade = CASING_GRADE,
+): { session: ScriptedSession; end: number } {
+  const session = strongSessionAt(aim, grade)
   const stepMm = Math.min(STEP_MM, stepBoundsAt(session.state(), 'p1').cuttingMm)
   const end = Math.ceil(LEG_MM / stepMm)
   for (let tick = 1; tick <= end; tick++) {
@@ -119,8 +122,8 @@ function cutSweptLegAlong(aim: Aim): { session: ScriptedSession; end: number } {
 }
 
 /** The swept leg along `aim`, then backing out. */
-function sweptLegAlong(aim: Aim): ScriptedSession {
-  const { session, end } = cutSweptLegAlong(aim)
+function sweptLegAlong(aim: Aim, grade = CASING_GRADE): ScriptedSession {
+  const { session, end } = cutSweptLegAlong(aim, grade)
   backOut(session, aim, end)
   return session
 }
@@ -309,4 +312,20 @@ describe('casing along the cut’s aim (ticket 833)', () => {
       expect.stringContaining('casingTrail must hold'),
     ])
   })
+
+  // The same rule as #829: a ring holds where its grade is at least what every cell it touches
+  // requires, as each lined sample is judged at its own cell's band (`wallWeakness.ts`), so a
+  // diagonal leg crossing into band 2 needs band 2's grade and never dodges it at an angle.
+  it.each([
+    ['band 1’s grade', 1, [2]],
+    ['band 2’s grade', 2, []],
+  ])(
+    'warns of a collapse along a 45 degree leg into band 2 lined at %s only where it falls short',
+    (_, grade, warnedBands) => {
+      const warned = sweptLegAlong(DOWN_RIGHT, grade)
+        .events()
+        .flatMap((event) => (event.type === 'CollapseWarned' ? [event.band] : []))
+      expect([...new Set(warned)]).toEqual(warnedBands)
+    },
+  )
 })
