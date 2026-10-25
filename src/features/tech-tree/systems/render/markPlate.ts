@@ -6,6 +6,8 @@
  * place comes from the sidecar point and the housing's own quads, never an offset of its own.
  * Each Mark milestone the item has reached (the GD lock on #256, ticket 277) is a gilt stud over
  * that Mark's rivet, so the plate steps visibly at Marks 3, 6 and 9, not only by one more rivet.
+ * The rivets stop at Mark 9; a row of pips under them counts the Marks since the last step, and
+ * past Mark 9 the plate wears a finish band that steps every 3 Marks (ticket 884, `markPips.ts`).
  * Render-only.
  */
 import { attachPointOf, type Pair, type PartsSidecar } from '../../../../systems/art/partsSidecar'
@@ -13,8 +15,10 @@ import { slotAttachPointOf } from '../../../../systems/registries/vehicleAttach'
 import type { LoadoutSlotId } from '../../../../systems/registries/vehicleLoadout'
 import { isMasteredAt } from '../markLadder'
 import { reachedMilestonesOf } from '../markMilestones'
+import type { RigLookFinish } from '../../../rig-look'
 import type { ItemUnlock } from '../techNode'
 import { markBearerOfItem, type TechTree } from '../techTree'
+import { bandFinishOf, LAST_MILESTONE_MARK, markPipStepOf } from './markPips'
 import type { RigMount } from './rigGear'
 import type { GearQuad, MountedItem } from './techGearQuads'
 
@@ -33,6 +37,8 @@ const PLATE_WIDTH_M = 0.1
 const ROW_HEIGHT_M = 0.022
 const RIVETS_PER_ROW = 5
 const RIVET_PITCH_M = 0.018
+/** The pips' own row under the rivets, there from Mark 0 so the plate never jumps a row for them. */
+const PIP_ROWS = 1
 
 /** A Mark-bearing item in a cradle, at the Mark it acts at. */
 export interface CradleMark {
@@ -48,10 +54,16 @@ export interface MarkPlate extends CradleMark {
   /** The plate's centre in the vehicle's frame, metres. */
   centre: Pair
   size: Pair
-  /** One per Mark, from the plate's centre, the top row first. */
+  /** One per Mark up to Mark 9, from the plate's centre, the top row first. */
   rivets: Pair[]
   /** One per reached milestone, over that Mark's rivet. */
   studs: Pair[]
+  /** One per Mark since the plate last stepped, at most 2, centred in the bottom row. */
+  pips: Pair[]
+  /** The finish band past Mark 9: 0 below Mark 12, one more every 3 Marks. */
+  band: number
+  /** The band's finish over the plate's brass; null for band 0. */
+  finish: RigLookFinish | null
 }
 
 /** The Mark each item acts at: the highest researched, and Mark 1 for an item researched none of. */
@@ -114,19 +126,24 @@ function bottomMiddleOf(quads: readonly GearQuad[]): Pair {
 }
 
 function plateOf(cradleMark: CradleMark, [x, top]: Pair): MarkPlate {
-  const height = rowsOf(cradleMark.mark) * ROW_HEIGHT_M
-  const rivets = rivetsOf(cradleMark.mark, height)
+  const riveted = Math.min(cradleMark.mark, LAST_MILESTONE_MARK)
+  const height = (rivetRowsOf(riveted) + PIP_ROWS) * ROW_HEIGHT_M
+  const rivets = rivetsOf(riveted, height)
+  const { band, pips } = markPipStepOf(cradleMark.mark)
   return {
     ...cradleMark,
     centre: [x, top - height / 2],
     size: [PLATE_WIDTH_M, height],
     rivets,
     studs: studsOf(cradleMark.milestoneMarks, rivets),
+    pips: pipsOf(pips, height),
+    band,
+    finish: bandFinishOf(band),
   }
 }
 
-function rowsOf(mark: number): number {
-  return Math.max(1, Math.ceil(mark / RIVETS_PER_ROW))
+function rivetRowsOf(riveted: number): number {
+  return Math.max(1, Math.ceil(riveted / RIVETS_PER_ROW))
 }
 
 function rivetsOf(mark: number, height: number): Pair[] {
@@ -144,4 +161,10 @@ function studsOf(milestoneMarks: readonly number[], rivets: readonly Pair[]): Pa
     const rivet = rivets[mark - 1]
     return rivet === undefined ? [] : [rivet]
   })
+}
+
+/** `count` pips centred in the plate's bottom row, a rivet pitch apart. */
+function pipsOf(count: number, height: number): Pair[] {
+  const y = -height / 2 + ROW_HEIGHT_M / 2
+  return Array.from({ length: count }, (_, at) => [(at - (count - 1) / 2) * RIVET_PITCH_M, y])
 }

@@ -1,0 +1,6 @@
+M0: rivets 0 studs 0 pips 0 band 0 finish brass height 0.044
+M1: rivets 1 studs 0 pips 1 band 0 finish brass height 0.044
+M3: rivets 3 studs 1 pips 0 band 0 finish brass height 0.044
+M10: rivets 9 studs 3 pips 1 band 0 finish brass height 0.066
+M18: rivets 9 studs 3 pips 0 band 3 finish Verdigris height 0.066 gilded
+M1000000: rivets 9 studs 3 pips 1 band 333330 finish Rose bronze height 0.066 gilded

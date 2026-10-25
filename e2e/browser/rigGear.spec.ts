@@ -52,7 +52,15 @@ const ART_SETTLE_MS = 3000
 
 interface RigRead {
   ok: boolean
-  plates?: { slot: string; mark: number; isGilded: boolean; studs: number }[]
+  plates?: {
+    slot: string
+    mark: number
+    isGilded: boolean
+    studs: number
+    pips: number
+    band: number
+    finish: string | null
+  }[]
   fx?: {
     isDrawn: boolean
     started: number
@@ -146,7 +154,12 @@ test.describe('the rig gear (ticket 250)', () => {
     await expect
       .poll(async () => (await readRig(page)).plates?.map(({ studs }) => studs))
       .toEqual([3, 3])
-    expect((await readRig(page)).plates?.every(({ isGilded }) => isGilded)).toBe(true)
+    const mastered = (await readRig(page)).plates ?? []
+    expect(mastered.every(({ isGilded }) => isGilded)).toBe(true)
+    // Past its milestones each plate counts pips and wears a finish band by its Mark (ticket 884).
+    expect(mastered.map(({ pips, band }) => ({ pips, band }))).toEqual(
+      mastered.map(({ mark }) => pipStepOf(mark)),
+    )
 
     expect(
       await page.evaluate(
@@ -164,3 +177,8 @@ test.describe('the rig gear (ticket 250)', () => {
     expect(errors).toEqual([])
   })
 })
+
+/** The ticket 884 rule, restated so the spec loads no slice module: pips since the last 3-Mark step, a band every 3 Marks past 9. */
+function pipStepOf(mark: number): { pips: number; band: number } {
+  return { pips: mark % 3, band: Math.max(0, Math.floor((mark - 9) / 3)) }
+}

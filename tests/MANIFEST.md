@@ -641,7 +641,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/solar-systems/systems/systemRoster.golden.test.ts` | 2 | 2 |
 | `src/features/solar-systems/systems/systemRoster.test.ts` | 11 | 11 |
 
-### `tech-tree`: 60 files, 423 tests
+### `tech-tree`: 61 files, 432 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -687,7 +687,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/priceOnly.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/render/extractorPose.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/render/forkPieces.test.ts` | 5 | 5 |
-| `src/features/tech-tree/systems/render/markPlate.test.ts` | 8 | 8 |
+| `src/features/tech-tree/systems/render/markPips.test.ts` | 5 | 5 |
+| `src/features/tech-tree/systems/render/markPlate.test.ts` | 12 | 12 |
 | `src/features/tech-tree/systems/render/milestoneLook.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/render/powerUpFx.test.ts` | 9 | 9 |
 | `src/features/tech-tree/systems/render/powerUpFxFeed.test.ts` | 13 | 13 |

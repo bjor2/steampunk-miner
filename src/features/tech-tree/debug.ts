@@ -5,7 +5,7 @@
  * `shapeProblems()` prints the shape test over the registered tree; `getUnlocked()` reads the
  * local player's researched nodes for specs. `getRig()` reads what the rig draws now (ticket 250):
  * the mounted items, each asset at its point, each cradle's Mark plate with its milestone studs,
- * and the power-up effects running with their looks (ticket 277); `previewPowerUpFx(itemId, mark?)`
+ * its pips and its finish band past Mark 9 (ticket 884), and the power-up effects running with their looks (ticket 277); `previewPowerUpFx(itemId, mark?)`
  * plays an item's effects at the vehicle through the real layer, at the Mark the item acts at
  * unless `mark` says otherwise, presentation only: no command and no log line. `getForks()` reads
  * every registered fork branch, whether the local player has it active and the parts it hangs on
@@ -73,8 +73,19 @@ function listedMount(mount: RigMount) {
 }
 
 function listedPlate(plate: MarkPlate) {
-  const { slot, itemId, mark, isGilded } = plate
-  return { slot, itemId, mark, isGilded, rivets: plate.rivets.length, studs: plate.studs.length }
+  const { slot, itemId, mark, isGilded, band } = plate
+  const [rivets, studs, pips] = [plate.rivets.length, plate.studs.length, plate.pips.length]
+  return {
+    slot,
+    itemId,
+    mark,
+    isGilded,
+    rivets,
+    studs,
+    pips,
+    band,
+    finish: plate.finish?.name ?? null,
+  }
 }
 
 function readFx() {

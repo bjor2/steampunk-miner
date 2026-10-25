@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { lastMarkOf } from '../markLadder'
 import { markBearerOfItem, registeredTechTree } from '../techTree'
 import { GEAR_ART, GEAR_PART_SIDE_M, vehicleWithPoints } from './gearArtFixture'
-import { actingMarksOf, cradleMarksOf, markPlatesOf, type CradleMark } from './markPlate'
+import {
+  actingMarksOf,
+  cradleMarksOf,
+  markPlatesOf,
+  type CradleMark,
+  type MarkPlate,
+} from './markPlate'
 import { rigMountsOf } from './rigGear'
 import type { MountedItem } from './techGearQuads'
 
@@ -48,11 +54,13 @@ describe('mark plate', () => {
   })
 
   it('steps up a rivet every Mark and a row every fifth Mark', () => {
+    const [atOne] = platesAt([SHIELD], 1)
     const [atFive] = platesAt([SHIELD], 5)
     const [atSix] = platesAt([SHIELD], 6)
     expect(atFive?.rivets).toHaveLength(5)
     expect(atSix?.rivets).toHaveLength(6)
-    expect(atSix?.size[1]).toBeCloseTo(2 * (atFive?.size[1] ?? 0))
+    expect(atFive?.size[1]).toBeCloseTo(atOne?.size[1] ?? 0)
+    expect(atSix?.size[1]).toBeGreaterThan(atFive?.size[1] ?? 0)
   })
 
   it('gilds the plate once the item is Mastered, and not a Mark before', () => {
@@ -106,5 +114,61 @@ describe('mark plate: milestone studs (ticket 277)', () => {
     const [plate] = markPlatesOf(vehicle, [], [unreached])
     expect(plate?.rivets).toHaveLength(9)
     expect(plate?.studs).toEqual([])
+  })
+})
+
+describe('mark plate: pips and finish bands past the milestones (ticket 884)', () => {
+  const ECHO: MountedItem = { itemId: 'power.echo_sounder', slot: 'powerup.1' }
+  /** The marks the GD lock pins the Echo Sounder plate at. */
+  const GOLDEN_MARKS = [0, 1, 3, 10, 18, 1_000_000]
+
+  /** Everything a plate draws that a Mark can change, as one line. */
+  function plateLineOf(plate: MarkPlate | undefined): string {
+    if (plate === undefined) return 'no plate'
+    const { mark, isGilded, rivets, studs, pips, band, finish, size } = plate
+    const gilded = isGilded ? ' gilded' : ''
+    return `M${mark}: rivets ${rivets.length} studs ${studs.length} pips ${pips.length} band ${band} finish ${finish?.name ?? 'brass'} height ${size[1].toFixed(3)}${gilded}`
+  }
+
+  const echoLineAt = (mark: number) => plateLineOf(platesAt([ECHO], mark)[0])
+
+  it('keeps the stud over each milestone rivet and stops the rivets at Mark 9', () => {
+    const [atEighteen] = platesAt([SHIELD], 18)
+    expect(atEighteen?.rivets).toHaveLength(9)
+    expect(atEighteen?.studs).toEqual([
+      atEighteen?.rivets[2],
+      atEighteen?.rivets[5],
+      atEighteen?.rivets[8],
+    ])
+    expect(platesAt([SHIELD], 1_000_000)[0]?.size).toEqual(atEighteen?.size)
+  })
+
+  it('draws the pips centred in their own row under the rivets, inside the plate', () => {
+    const [plate] = platesAt([SHIELD], 11)
+    const bottom = -(plate?.size[1] ?? 0) / 2
+    const lowestRivet = Math.min(...(plate?.rivets ?? []).map(([, y]) => y))
+    expect(plate?.pips).toHaveLength(2)
+    for (const [x, y] of plate?.pips ?? []) {
+      expect(y).toBeLessThan(lowestRivet)
+      expect(y).toBeGreaterThan(bottom)
+      expect(Math.abs(x)).toBeLessThan((plate?.size[0] ?? 0) / 2)
+    }
+    expect((plate?.pips[0]?.[0] ?? 0) + (plate?.pips[1]?.[0] ?? 0)).toBeCloseTo(0)
+  })
+
+  it('wears the committed Echo Sounder plate at Marks 0, 1, 3, 10, 18 and a million', async () => {
+    const golden = `${GOLDEN_MARKS.map(echoLineAt).join('\n')}\n`
+    await expect(golden).toMatchFileSnapshot('./__goldens__/markPlateEchoSounder.golden.txt')
+  })
+
+  it('never draws two neighbouring Marks of the Echo Sounder alike, to Mark 60 and around a million', () => {
+    const runs = [
+      Array.from({ length: 61 }, (_, at) => at),
+      Array.from({ length: 30 }, (_, at) => 999_985 + at),
+    ]
+    const alike = runs.flatMap((marks) =>
+      marks.slice(1).filter((mark) => echoLineAt(mark - 1) === echoLineAt(mark)),
+    )
+    expect(alike).toEqual([])
   })
 })

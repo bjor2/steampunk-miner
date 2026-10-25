@@ -1,8 +1,9 @@
 /**
  * The brass Mark plate under a cradle (#161 Systems, ticket 250): a plate, a gilded rim once the
  * item is Mastered, one rivet per Mark and a gilt stud over each reached milestone's rivet (ticket
- * 277) from `markPlatesOf`. Not a Blender asset: flat shapes lit like the placeholders (#48 lit
- * brass), the rivets one instanced draw and the studs another.
+ * 277), the pips since the last step and the finish band past Mark 9 (ticket 884) from
+ * `markPlatesOf`. Not a Blender asset: flat shapes lit like the placeholders (#48 lit
+ * brass), the rivets, the studs and the pips one instanced draw each.
  */
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import { Object3D, type InstancedMesh } from 'three'
@@ -21,22 +22,36 @@ const RIM_M = 0.012
 const RIVET_RADIUS_M = 0.005
 /** A stud covers its rivet and most of the pitch between rivets, so a milestone reads at a glance. */
 const STUD_RADIUS_M = 0.008
+/** A pip is a rivet's size in the studs' gilt: a step on the way, smaller than a milestone's. */
+const PIP_RADIUS_M = RIVET_RADIUS_M
 const PLATE_ROUGHNESS = 0.45
+/** three's default, the brass plate's before a finish band dresses it. */
+const PLATE_METALNESS = 0
 const RIVET_SEGMENTS = 8
 
 export function MarkPlateMesh({ plate }: { plate: MarkPlate }) {
   const [width, height] = plate.size
+  const { colour, metalness, roughness } = plateFinishOf(plate)
   return (
     <group position={[plate.centre[0], plate.centre[1], PLATE_Z]}>
       {plate.isGilded && <GiltRim width={width} height={height} />}
       <mesh>
         <planeGeometry args={[width, height]} />
-        <meshStandardMaterial color={BRASS} roughness={PLATE_ROUGHNESS} />
+        <meshStandardMaterial color={colour} metalness={metalness} roughness={roughness} />
       </mesh>
       <Dots at={plate.rivets} radius={RIVET_RADIUS_M} colour={RIVET_COLOUR} z={RIVET_Z} />
       <Dots at={plate.studs} radius={STUD_RADIUS_M} colour={GILT_COLOUR} z={STUD_Z} />
+      <Dots at={plate.pips} radius={PIP_RADIUS_M} colour={GILT_COLOUR} z={RIVET_Z} />
     </group>
   )
+}
+
+/** The band's finish, or the plate's own brass below the first band. */
+function plateFinishOf(plate: MarkPlate) {
+  if (plate.finish === null) {
+    return { colour: BRASS, metalness: PLATE_METALNESS, roughness: PLATE_ROUGHNESS }
+  }
+  return plate.finish
 }
 
 function GiltRim({ width, height }: { width: number; height: number }) {

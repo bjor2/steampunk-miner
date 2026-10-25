@@ -82,6 +82,9 @@ describe('tech tree: the rig debug read (ticket 250)', () => {
         isGilded: false,
         rivets: 1,
         studs: 0,
+        pips: 1,
+        band: 0,
+        finish: null,
       },
       {
         slot: 'powerup.2',
@@ -90,6 +93,9 @@ describe('tech tree: the rig debug read (ticket 250)', () => {
         isGilded: false,
         rivets: 1,
         studs: 0,
+        pips: 1,
+        band: 0,
+        finish: null,
       },
     ])
   })
