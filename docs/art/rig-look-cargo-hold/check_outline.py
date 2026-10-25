@@ -1,5 +1,5 @@
 """
-The outline check of the cargo_hold rig-look parts (ticket 580, #576 rules: cargo stays inside the
+The outline check of the cargo_hold rig-look parts (tickets 580, 812 and 872, #576 rules: cargo stays inside the
 rig's outline and a look never changes collision or the hitbox). It rasterises the silhouette in
 the game's front view (X right, Z up) of the rig at rest, at tiers 1 and 3, on a 4 mm grid, and of
 each look standing on the `hull.cargo` slot, and writes outline.json: the cells of each look
@@ -9,7 +9,7 @@ below the first step the rig is as it is). It exits 1 on either.
 
     blender -b --factory-startup --python-exit-code 1 -P docs/art/rig-look-cargo-hold/check_outline.py
 
-The hatch is a tier-1 part with no tier-2 or tier-3 successor, so the same four looks stand on
+The hatch is a tier-1 part with no tier-2 or tier-3 successor, so the same looks stand on
 every rig; tier 3 is checked because its second tank (`t3-boiler-2`) sits just over the hatch.
 Collision needs no check here: the collider is a code constant (`COLLIDER_M` in
 author_casing_driller.py mirrors it) and vehicle.blend is untouched, so nothing a look does can

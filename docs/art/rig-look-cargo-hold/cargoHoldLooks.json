@@ -1,5 +1,5 @@
 {
-  "about": "The cargo_hold track's rig-look parts (ticket 580, wave 576-1A of the rig look ladder #576; the LK4 steps of ticket 812, wave 647-7K of the P1-P5 map #647): one asset at the track's attach slot, one part per look step. The thresholds are the band edges LK1 (#809) froze for the hold, step 11, and the names the data strings of 3 words or fewer the hover line shows (the first three Progression's, comment 6300549964); the wiring (#581) reads them from the rig-look registry (#577), not from here. lookBoxM is the box in the vehicle frame every look fits inside: the hatch, the pod's flank under it where the LK4 racks and panniers hang, and the stay up to the slot behind the ram; what the readability sheet measures a step over.",
+  "about": "The cargo_hold track's rig-look parts (ticket 580, wave 576-1A of the rig look ladder #576; the LK4 steps of ticket 812, wave 647-7K of the P1-P5 map #647; the LK9 steps of ticket 872, wave 647-7Z): one asset at the track's attach slot, one part per look step. The thresholds are the band edges LK1 (#809) froze for the hold, step 11, authored to about P40 (231), and the names the data strings of 3 words or fewer the hover line shows (the first three Progression's, comment 6300549964); the wiring (#581) reads them from the rig-look registry (#577), not from here. The LK9 parts, 66 to 231, are each the pannier bin with one more part fitted on the racks and panniers or on the bin: securing gear first (nets, a tarp, a lock bar, a bumper), then the bin's fittings (a lantern, clamps, a lock plate, a gauge, a handrail), then heavier gear (plates, copper lines, a hoist), then the aetheric glows. lookBoxM is the box in the vehicle frame every look fits inside: the hatch, the pod's flank under it where the racks and panniers hang, and the stay up to the slot behind the ram; what the readability sheet measures a step over.",
   "assetId": "vehicle-look-cargo-hold",
   "track": "cargo_hold",
   "attach": "hull.cargo",
@@ -37,6 +37,86 @@
       "part": "pannier-bin",
       "name": "Strapped panniers",
       "purchases": 55
+    },
+    {
+      "part": "netted-bin",
+      "name": "Cargo nets",
+      "purchases": 66
+    },
+    {
+      "part": "tarped-bin",
+      "name": "Oiled tarp",
+      "purchases": 77
+    },
+    {
+      "part": "barred-bin",
+      "name": "Lock bar",
+      "purchases": 88
+    },
+    {
+      "part": "bumpered-bin",
+      "name": "Brass bumper",
+      "purchases": 99
+    },
+    {
+      "part": "lamped-bin",
+      "name": "Cargo lantern",
+      "purchases": 110
+    },
+    {
+      "part": "clamped-bin",
+      "name": "Lid clamps",
+      "purchases": 121
+    },
+    {
+      "part": "locked-bin",
+      "name": "Lock plate",
+      "purchases": 132
+    },
+    {
+      "part": "gauged-bin",
+      "name": "Load gauge",
+      "purchases": 143
+    },
+    {
+      "part": "railed-bin",
+      "name": "Lid handrail",
+      "purchases": 154
+    },
+    {
+      "part": "plated-bin",
+      "name": "Pannier plates",
+      "purchases": 165
+    },
+    {
+      "part": "piped-bin",
+      "name": "Copper lines",
+      "purchases": 176
+    },
+    {
+      "part": "hoisted-bin",
+      "name": "Hoist tackle",
+      "purchases": 187
+    },
+    {
+      "part": "sealed-bin",
+      "name": "Aether seals",
+      "purchases": 198
+    },
+    {
+      "part": "field-bin",
+      "name": "Stasis field",
+      "purchases": 209
+    },
+    {
+      "part": "haloed-bin",
+      "name": "Aether halos",
+      "purchases": 220
+    },
+    {
+      "part": "aether-bin",
+      "name": "Aether hold",
+      "purchases": 231
     }
   ]
 }

@@ -48,6 +48,134 @@
         "tier-3": 0
       },
       "changesRigOutline": 13
+    },
+    "netted-bin": {
+      "cells": 1687,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 13
+    },
+    "tarped-bin": {
+      "cells": 1697,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 13
+    },
+    "barred-bin": {
+      "cells": 1733,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 13
+    },
+    "bumpered-bin": {
+      "cells": 1737,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 13
+    },
+    "lamped-bin": {
+      "cells": 1737,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 13
+    },
+    "clamped-bin": {
+      "cells": 1737,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 13
+    },
+    "locked-bin": {
+      "cells": 1737,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 13
+    },
+    "gauged-bin": {
+      "cells": 1737,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 13
+    },
+    "railed-bin": {
+      "cells": 1737,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 13
+    },
+    "plated-bin": {
+      "cells": 1737,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 13
+    },
+    "piped-bin": {
+      "cells": 1745,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 13
+    },
+    "hoisted-bin": {
+      "cells": 1747,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 13
+    },
+    "sealed-bin": {
+      "cells": 1747,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 13
+    },
+    "field-bin": {
+      "cells": 1747,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 13
+    },
+    "haloed-bin": {
+      "cells": 1755,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 13
+    },
+    "aether-bin": {
+      "cells": 1755,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 13
     }
   }
 }

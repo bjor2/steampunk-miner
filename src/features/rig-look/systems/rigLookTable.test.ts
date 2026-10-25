@@ -89,7 +89,8 @@ describe('rig look table', () => {
   it('puts every authored step on its band edge, the art kept in order', () => {
     expect(fromsOf('drill_tip')).toEqual(bandOf('drill_tip').edges)
     expect(fromsOf('drill_tip')).toHaveLength(20)
-    expect(fromsOf('cargo_hold')).toEqual([11, 22, 33, 44, 55])
+    expect(fromsOf('cargo_hold')).toEqual(bandOf('cargo_hold').edges)
+    expect(fromsOf('cargo_hold')).toHaveLength(21)
     expect(fromsOf('engine')).toEqual(bandOf('engine').edges)
     expect(fromsOf('engine')).toHaveLength(20)
     expect(fromsOf('boiler')).toEqual([5, 10, 15, 20, 25, 30])
@@ -179,6 +180,22 @@ describe('rig look table', () => {
       'Riveted bin',
       'Side racks',
       'Strapped panniers',
+      'Cargo nets',
+      'Oiled tarp',
+      'Lock bar',
+      'Brass bumper',
+      'Cargo lantern',
+      'Lid clamps',
+      'Lock plate',
+      'Load gauge',
+      'Lid handrail',
+      'Pannier plates',
+      'Copper lines',
+      'Hoist tackle',
+      'Aether seals',
+      'Stasis field',
+      'Aether halos',
+      'Aether hold',
     ])
     expect(cardsOf('boiler')).toEqual([
       'Twin-drum boiler',
@@ -375,12 +392,28 @@ describe('rig look table', () => {
         'whistle-boiler',
       ],
       'vehicle-look-cargo-hold': [
+        'aether-bin',
+        'barred-bin',
+        'bumpered-bin',
+        'clamped-bin',
+        'field-bin',
+        'gauged-bin',
+        'haloed-bin',
+        'hoisted-bin',
+        'lamped-bin',
+        'locked-bin',
+        'netted-bin',
         'ore-hatch',
         'ore-hopper',
         'pannier-bin',
+        'piped-bin',
         'plank-crate',
+        'plated-bin',
         'racked-bin',
+        'railed-bin',
         'riveted-bin',
+        'sealed-bin',
+        'tarped-bin',
       ],
       'vehicle-look-drill-tip': [
         'aether-cut-crown',

@@ -214,10 +214,57 @@ cargo_hold
 54: band 4 step 4 tail 0 pips 0 part racked-bin finish null tint #8c9aa6 | Fitting: Side racks
 55: band 5 step 5 tail 0 pips 0 part pannier-bin finish null tint #d2a96a | Fitting: Strapped panniers
 56: band 5 step 5 tail 0 pips 0 part pannier-bin finish null tint #d2a96a | Fitting: Strapped panniers
-66: band 6 step 5 tail 1 pips 2 part pannier-bin finish burnished-iron tint #6e5a48 | Fitting: Burnished iron · L66
-99: band 9 step 5 tail 4 pips 3 part pannier-bin finish verdigris tint #5fae94 | Fitting: Verdigris · L99
-9999: band 909 step 5 tail 904 pips 399 part pannier-bin finish verdigris tint #5fae94 | Fitting: Verdigris · L9,999
-1000000: band 90909 step 5 tail 90904 pips 39999 part pannier-bin finish verdigris tint #5fae94 | Fitting: Verdigris · L1,000,000
+65: band 5 step 5 tail 0 pips 0 part pannier-bin finish null tint #d2a96a | Fitting: Strapped panniers
+66: band 6 step 6 tail 0 pips 0 part netted-bin finish null tint #6b5a42 | Fitting: Cargo nets
+67: band 6 step 6 tail 0 pips 0 part netted-bin finish null tint #6b5a42 | Fitting: Cargo nets
+76: band 6 step 6 tail 0 pips 0 part netted-bin finish null tint #6b5a42 | Fitting: Cargo nets
+77: band 7 step 7 tail 0 pips 0 part tarped-bin finish null tint #9aa860 | Fitting: Oiled tarp
+78: band 7 step 7 tail 0 pips 0 part tarped-bin finish null tint #9aa860 | Fitting: Oiled tarp
+87: band 7 step 7 tail 0 pips 0 part tarped-bin finish null tint #9aa860 | Fitting: Oiled tarp
+88: band 8 step 8 tail 0 pips 0 part barred-bin finish null tint #d8dde2 | Fitting: Lock bar
+89: band 8 step 8 tail 0 pips 0 part barred-bin finish null tint #d8dde2 | Fitting: Lock bar
+98: band 8 step 8 tail 0 pips 0 part barred-bin finish null tint #d8dde2 | Fitting: Lock bar
+99: band 9 step 9 tail 0 pips 0 part bumpered-bin finish null tint #e0b060 | Fitting: Brass bumper
+100: band 9 step 9 tail 0 pips 0 part bumpered-bin finish null tint #e0b060 | Fitting: Brass bumper
+109: band 9 step 9 tail 0 pips 0 part bumpered-bin finish null tint #e0b060 | Fitting: Brass bumper
+110: band 10 step 10 tail 0 pips 0 part lamped-bin finish null tint #ffc060 | Fitting: Cargo lantern
+111: band 10 step 10 tail 0 pips 0 part lamped-bin finish null tint #ffc060 | Fitting: Cargo lantern
+120: band 10 step 10 tail 0 pips 0 part lamped-bin finish null tint #ffc060 | Fitting: Cargo lantern
+121: band 11 step 11 tail 0 pips 0 part clamped-bin finish null tint #b8c0c8 | Fitting: Lid clamps
+122: band 11 step 11 tail 0 pips 0 part clamped-bin finish null tint #b8c0c8 | Fitting: Lid clamps
+131: band 11 step 11 tail 0 pips 0 part clamped-bin finish null tint #b8c0c8 | Fitting: Lid clamps
+132: band 12 step 12 tail 0 pips 0 part locked-bin finish null tint #7a8088 | Fitting: Lock plate
+133: band 12 step 12 tail 0 pips 0 part locked-bin finish null tint #7a8088 | Fitting: Lock plate
+142: band 12 step 12 tail 0 pips 0 part locked-bin finish null tint #7a8088 | Fitting: Lock plate
+143: band 13 step 13 tail 0 pips 0 part gauged-bin finish null tint #e8c870 | Fitting: Load gauge
+144: band 13 step 13 tail 0 pips 0 part gauged-bin finish null tint #e8c870 | Fitting: Load gauge
+153: band 13 step 13 tail 0 pips 0 part gauged-bin finish null tint #e8c870 | Fitting: Load gauge
+154: band 14 step 14 tail 0 pips 0 part railed-bin finish null tint #8c9aa6 | Fitting: Lid handrail
+155: band 14 step 14 tail 0 pips 0 part railed-bin finish null tint #8c9aa6 | Fitting: Lid handrail
+164: band 14 step 14 tail 0 pips 0 part railed-bin finish null tint #8c9aa6 | Fitting: Lid handrail
+165: band 15 step 15 tail 0 pips 0 part plated-bin finish null tint #dde2e8 | Fitting: Pannier plates
+166: band 15 step 15 tail 0 pips 0 part plated-bin finish null tint #dde2e8 | Fitting: Pannier plates
+175: band 15 step 15 tail 0 pips 0 part plated-bin finish null tint #dde2e8 | Fitting: Pannier plates
+176: band 16 step 16 tail 0 pips 0 part piped-bin finish null tint #d08050 | Fitting: Copper lines
+177: band 16 step 16 tail 0 pips 0 part piped-bin finish null tint #d08050 | Fitting: Copper lines
+186: band 16 step 16 tail 0 pips 0 part piped-bin finish null tint #d08050 | Fitting: Copper lines
+187: band 17 step 17 tail 0 pips 0 part hoisted-bin finish null tint #9aa0a8 | Fitting: Hoist tackle
+188: band 17 step 17 tail 0 pips 0 part hoisted-bin finish null tint #9aa0a8 | Fitting: Hoist tackle
+197: band 17 step 17 tail 0 pips 0 part hoisted-bin finish null tint #9aa0a8 | Fitting: Hoist tackle
+198: band 18 step 18 tail 0 pips 0 part sealed-bin finish null tint #7fe8d8 | Fitting: Aether seals
+199: band 18 step 18 tail 0 pips 0 part sealed-bin finish null tint #7fe8d8 | Fitting: Aether seals
+208: band 18 step 18 tail 0 pips 0 part sealed-bin finish null tint #7fe8d8 | Fitting: Aether seals
+209: band 19 step 19 tail 0 pips 0 part field-bin finish null tint #60e0d0 | Fitting: Stasis field
+210: band 19 step 19 tail 0 pips 0 part field-bin finish null tint #60e0d0 | Fitting: Stasis field
+219: band 19 step 19 tail 0 pips 0 part field-bin finish null tint #60e0d0 | Fitting: Stasis field
+220: band 20 step 20 tail 0 pips 0 part haloed-bin finish null tint #80f0e0 | Fitting: Aether halos
+221: band 20 step 20 tail 0 pips 0 part haloed-bin finish null tint #80f0e0 | Fitting: Aether halos
+230: band 20 step 20 tail 0 pips 0 part haloed-bin finish null tint #80f0e0 | Fitting: Aether halos
+231: band 21 step 21 tail 0 pips 0 part aether-bin finish null tint #70ffe8 | Fitting: Aether hold
+232: band 21 step 21 tail 0 pips 0 part aether-bin finish null tint #70ffe8 | Fitting: Aether hold
+242: band 22 step 21 tail 1 pips 9 part aether-bin finish burnished-iron tint #6e5a48 | Fitting: Burnished iron · L242
+9999: band 909 step 21 tail 888 pips 399 part aether-bin finish verdigris tint #5fae94 | Fitting: Verdigris · L9,999
+1000000: band 90909 step 21 tail 90888 pips 39999 part aether-bin finish verdigris tint #5fae94 | Fitting: Verdigris · L1,000,000
 
 hull
 0: band 0 step 0 tail 0 pips 0 part null finish null tint null | null

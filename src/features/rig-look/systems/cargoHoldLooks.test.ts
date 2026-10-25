@@ -18,16 +18,40 @@ const HOLD = trackLookFramesOf(SHIPPED_RIG_LOOKS, 'cargo_hold')!
 /**
  * The hold's authored steps on its band edges of 11 (ticket 809): Progression's three looks of
  * #580 (6300549964), then each LK4 part fitted in its socket in the ticket's order (ticket 812):
- * side racks, then strapped panniers. Past the top step the finish bands keep the top part.
+ * side racks, then strapped panniers; then the sixteen LK9 parts to about P40 (ticket 872), each
+ * the pannier bin with one more part fitted on the racks and panniers or the bin: securing gear,
+ * the bin's fittings, heavier gear, then the aetheric glows. Past the top step the finish bands
+ * keep the top part.
  */
 const BAND = 11
-const STEPS = [
+const FIRST_STEPS = [
   { from: 11, card: 'Plank crate', part: 'plank-crate' },
   { from: 22, card: 'Ore hopper', part: 'ore-hopper' },
   { from: 33, card: 'Riveted bin', part: 'riveted-bin' },
   { from: 44, card: 'Side racks', part: 'racked-bin' },
   { from: 55, card: 'Strapped panniers', part: 'pannier-bin' },
 ]
+const LK9_STEPS = [
+  { from: 66, card: 'Cargo nets', part: 'netted-bin' },
+  { from: 77, card: 'Oiled tarp', part: 'tarped-bin' },
+  { from: 88, card: 'Lock bar', part: 'barred-bin' },
+  { from: 99, card: 'Brass bumper', part: 'bumpered-bin' },
+  { from: 110, card: 'Cargo lantern', part: 'lamped-bin' },
+  { from: 121, card: 'Lid clamps', part: 'clamped-bin' },
+  { from: 132, card: 'Lock plate', part: 'locked-bin' },
+  { from: 143, card: 'Load gauge', part: 'gauged-bin' },
+  { from: 154, card: 'Lid handrail', part: 'railed-bin' },
+  { from: 165, card: 'Pannier plates', part: 'plated-bin' },
+  { from: 176, card: 'Copper lines', part: 'piped-bin' },
+  { from: 187, card: 'Hoist tackle', part: 'hoisted-bin' },
+  { from: 198, card: 'Aether seals', part: 'sealed-bin' },
+  { from: 209, card: 'Stasis field', part: 'field-bin' },
+  { from: 220, card: 'Aether halos', part: 'haloed-bin' },
+  { from: 231, card: 'Aether hold', part: 'aether-bin' },
+]
+const STEPS = [...FIRST_STEPS, ...LK9_STEPS]
+/** Systems' sizing row on ticket 872: the median bot never goes 3 planets without a step to P40. */
+const LEAST_STEPS = 13
 const FIRST_STEP = STEPS[0].from
 const TOP = STEPS[STEPS.length - 1]
 const TAIL_POINTS = [TOP.from + BAND, TOP.from + 2 * BAND, 1_000, 10_000]
@@ -46,18 +70,24 @@ function withHoldLevel(state: AuthorityState, level: number): AuthorityState {
 const shownOf = (frame: RigLookFrame): string =>
   JSON.stringify([frame.partId, frame.assetId, frame.tint, frame.glows, frame.finish])
 
-describe('cargo hold look (tickets 581 and 812)', () => {
-  it('reads its steps from the table, one on each of the first band edges of 11', () => {
+describe('cargo hold look (tickets 581, 812 and 872)', () => {
+  it('reads its steps from the table, one on each band edge of 11 to about P40', () => {
     expect(HOLD.rows.steps.map(({ from, card, part }) => ({ from, card, part }))).toEqual(STEPS)
     expect(HOLD.rows.steps.every((step) => step.asset === ASSET_ID)).toBe(true)
+    expect(STEPS.map((step) => step.from)).toEqual(HOLD.rows.band.edges)
   })
 
-  it('has at least 5 authored steps, each on its edge', () => {
-    expect(STEPS.length).toBeGreaterThanOrEqual(5)
+  it('has at least 13 authored steps, the LK4 five first, each on its edge', () => {
+    expect(STEPS.length).toBeGreaterThanOrEqual(LEAST_STEPS)
+    expect(STEPS.slice(0, FIRST_STEPS.length)).toEqual(FIRST_STEPS)
     STEPS.forEach((step, at) => {
       expect(step.from).toBe((at + 1) * BAND)
       expect(holdAt(step.from).step).toBe(at + 1)
     })
+  })
+
+  it('names every band with 3 words or fewer, from data', () => {
+    for (const step of STEPS) expect(step.card.split(' ').length).toBeLessThanOrEqual(3)
   })
 
   it('swaps no part below 11 purchases, so the rig keeps its own ore hatch', () => {
@@ -101,7 +131,7 @@ describe('cargo hold look (tickets 581 and 812)', () => {
     },
   )
 
-  it('keeps the strapped panniers on every finish band above the top step', () => {
+  it('keeps the aether hold on every finish band above the top step', () => {
     for (const n of TAIL_POINTS) expect(holdAt(n).partId).toBe(TOP.part)
     for (let n = TOP.from; n < TOP.from + 50 * BAND; n += BAND) {
       expect(holdAt(n + BAND).partId).toBe(TOP.part)

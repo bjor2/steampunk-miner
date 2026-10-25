@@ -1,11 +1,11 @@
 """
-The review sheets cut from render_cargo_hold_looks.py's renders (tickets 580 and 812): the six looks
-alone, the rig at tiers 1 and 3 with each look on the slot, each row resampled to a 1080p screen's
+The review sheets cut from render_cargo_hold_looks.py's renders (tickets 580, 812 and 872): the
+twenty-two looks alone, the rig at tiers 1 and 3 with each look on the slot, each row resampled to a 1080p screen's
 90 px/m at the default 12 m zoom (#39) and to a 360 px wide phone's 30 px/m over the same zoom
 (the width the #576 ladder is judged at), the phone copy enlarged 8x with no smoothing so each
 phone pixel shows. It also measures what the eye is asked to judge and writes readability.json:
 how many phone pixels of the hold's look box (cargoHoldLooks.json `lookBoxM`: the hatch and the
-pod's flank under it, where the LK4 racks and panniers hang) change between each look and the next
+pod's flank under it, where the LK4 racks and panniers and the LK9 parts hang) change between each look and the next
 (the ladder's neighbours), at the default zoom and at the closest, where the rig-look sweep spec
 judges a step; and the brightest pixel of the drill nose against the look box and the rest of the
 rig for each look, lit and by glow alone (the emission-only render, what the glow cap of #576 is
@@ -48,6 +48,8 @@ RIG_TIERS = (1, 3)
 GLOW_TIER = 1
 # A phone pixel counts as changed when a channel moves by more than this (of 255).
 CHANGED_THRESHOLD = 24
+# Looks to a sheet row (LK8's sheets have seven).
+PER_ROW = 8
 
 
 def main():
@@ -94,13 +96,15 @@ def labelled(tile, label):
 
 
 def laid_out(tiles):
-    """Every tile in a cell the size of the largest: the LK4 looks reach down the flank, so their
-    renders alone are taller than the hatch-high ones."""
+    """Every tile in a cell the size of the largest, PER_ROW to a row (twenty-two looks since LK9):
+    the LK4 and LK9 looks reach down the flank, so their renders alone are taller than the
+    hatch-high ones."""
     width = max(tile.width for tile in tiles)
     height = max(tile.height for tile in tiles)
-    sheet = Image.new('RGB', (len(tiles) * width, height), BACKGROUND)
+    rows = (len(tiles) + PER_ROW - 1) // PER_ROW
+    sheet = Image.new('RGB', (min(len(tiles), PER_ROW) * width, rows * height), BACKGROUND)
     for index, tile in enumerate(tiles):
-        sheet.paste(tile, (index * width, 0))
+        sheet.paste(tile, ((index % PER_ROW) * width, (index // PER_ROW) * height))
     return sheet
 
 
@@ -225,7 +229,7 @@ def part_bounds(part):
 
 def report_about(table, lit, glow):
     return {
-        'about': 'Tickets 580 and 812: at a 360 px wide phone (%g px/m over the 12 m zoom, and %g px/m over the '
+        'about': 'Tickets 580, 812 and 872: at a 360 px wide phone (%g px/m over the 12 m zoom, and %g px/m over the '
                  'closest %g m zoom the sweep spec judges at), the pixels of the hold\'s look box (lookBoxM %s: the '
                  'hatch, the flank under it and the stay) that change between each look on %s and the next (a '
                  'channel moving more than %d of 255), and the brightest pixel (Rec. 709 luminance, 0-255) of the '

@@ -15,12 +15,28 @@
       "whistle-boiler"
     ],
     "vehicle-look-cargo-hold": [
+      "aether-bin",
+      "barred-bin",
+      "bumpered-bin",
+      "clamped-bin",
+      "field-bin",
+      "gauged-bin",
+      "haloed-bin",
+      "hoisted-bin",
+      "lamped-bin",
+      "locked-bin",
+      "netted-bin",
       "ore-hatch",
       "ore-hopper",
       "pannier-bin",
+      "piped-bin",
       "plank-crate",
+      "plated-bin",
       "racked-bin",
-      "riveted-bin"
+      "railed-bin",
+      "riveted-bin",
+      "sealed-bin",
+      "tarped-bin"
     ],
     "vehicle-look-drill-tip": [
       "aether-cut-crown",
@@ -795,7 +811,30 @@
         "tail": "Fitting: {bandName} · L{level}"
       },
       "glowSlots": [
-        ["hopper", "plank-crate", "ore-hopper", "riveted-bin", "racked-bin", "pannier-bin"]
+        [
+          "hopper",
+          "plank-crate",
+          "ore-hopper",
+          "riveted-bin",
+          "racked-bin",
+          "pannier-bin",
+          "netted-bin",
+          "tarped-bin",
+          "barred-bin",
+          "bumpered-bin",
+          "lamped-bin",
+          "clamped-bin",
+          "locked-bin",
+          "gauged-bin",
+          "railed-bin",
+          "plated-bin",
+          "piped-bin",
+          "hoisted-bin",
+          "sealed-bin",
+          "field-bin",
+          "haloed-bin",
+          "aether-bin"
+        ]
       ],
       "glowCap": "rigBody",
       "steps": [
@@ -837,6 +876,134 @@
           "asset": "vehicle-look-cargo-hold",
           "card": "Strapped panniers",
           "colour": "#d2a96a",
+          "glows": [0.74]
+        },
+        {
+          "from": 66,
+          "part": "netted-bin",
+          "asset": "vehicle-look-cargo-hold",
+          "card": "Cargo nets",
+          "colour": "#6b5a42",
+          "glows": [0.74]
+        },
+        {
+          "from": 77,
+          "part": "tarped-bin",
+          "asset": "vehicle-look-cargo-hold",
+          "card": "Oiled tarp",
+          "colour": "#9aa860",
+          "glows": [0.74]
+        },
+        {
+          "from": 88,
+          "part": "barred-bin",
+          "asset": "vehicle-look-cargo-hold",
+          "card": "Lock bar",
+          "colour": "#d8dde2",
+          "glows": [0.74]
+        },
+        {
+          "from": 99,
+          "part": "bumpered-bin",
+          "asset": "vehicle-look-cargo-hold",
+          "card": "Brass bumper",
+          "colour": "#e0b060",
+          "glows": [0.74]
+        },
+        {
+          "from": 110,
+          "part": "lamped-bin",
+          "asset": "vehicle-look-cargo-hold",
+          "card": "Cargo lantern",
+          "colour": "#ffc060",
+          "glows": [0.74]
+        },
+        {
+          "from": 121,
+          "part": "clamped-bin",
+          "asset": "vehicle-look-cargo-hold",
+          "card": "Lid clamps",
+          "colour": "#b8c0c8",
+          "glows": [0.74]
+        },
+        {
+          "from": 132,
+          "part": "locked-bin",
+          "asset": "vehicle-look-cargo-hold",
+          "card": "Lock plate",
+          "colour": "#7a8088",
+          "glows": [0.74]
+        },
+        {
+          "from": 143,
+          "part": "gauged-bin",
+          "asset": "vehicle-look-cargo-hold",
+          "card": "Load gauge",
+          "colour": "#e8c870",
+          "glows": [0.74]
+        },
+        {
+          "from": 154,
+          "part": "railed-bin",
+          "asset": "vehicle-look-cargo-hold",
+          "card": "Lid handrail",
+          "colour": "#8c9aa6",
+          "glows": [0.74]
+        },
+        {
+          "from": 165,
+          "part": "plated-bin",
+          "asset": "vehicle-look-cargo-hold",
+          "card": "Pannier plates",
+          "colour": "#dde2e8",
+          "glows": [0.74]
+        },
+        {
+          "from": 176,
+          "part": "piped-bin",
+          "asset": "vehicle-look-cargo-hold",
+          "card": "Copper lines",
+          "colour": "#d08050",
+          "glows": [0.74]
+        },
+        {
+          "from": 187,
+          "part": "hoisted-bin",
+          "asset": "vehicle-look-cargo-hold",
+          "card": "Hoist tackle",
+          "colour": "#9aa0a8",
+          "glows": [0.74]
+        },
+        {
+          "from": 198,
+          "part": "sealed-bin",
+          "asset": "vehicle-look-cargo-hold",
+          "card": "Aether seals",
+          "colour": "#7fe8d8",
+          "glows": [0.74]
+        },
+        {
+          "from": 209,
+          "part": "field-bin",
+          "asset": "vehicle-look-cargo-hold",
+          "card": "Stasis field",
+          "colour": "#60e0d0",
+          "glows": [0.74]
+        },
+        {
+          "from": 220,
+          "part": "haloed-bin",
+          "asset": "vehicle-look-cargo-hold",
+          "card": "Aether halos",
+          "colour": "#80f0e0",
+          "glows": [0.74]
+        },
+        {
+          "from": 231,
+          "part": "aether-bin",
+          "asset": "vehicle-look-cargo-hold",
+          "card": "Aether hold",
+          "colour": "#70ffe8",
           "glows": [0.74]
         }
       ],

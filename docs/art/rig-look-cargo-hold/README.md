@@ -3,14 +3,18 @@
 The Blender source and review renders of
 [Rig look art: cargo_hold Blender parts (4 parts) (#580)](https://github.com/bjor2/steampunk-miner/issues/580),
 wave 576-1A of [Rig look ladder and mineral skins (#576)](https://github.com/bjor2/steampunk-miner/issues/576),
-and of its LK4 steps,
+of its LK4 steps,
 [LK4: cargo_hold look steps to 5+ (#812)](https://github.com/bjor2/steampunk-miner/issues/812),
-wave 647-7K of the P1-P5 map (#647): every purchase on the `cargo_hold` track visibly changes the
-rig. Since LK1 (#809) the track's look steps sit on the band edges of 11 purchases: Progression's
-Plank crate, Ore hopper and Riveted bin (6300549964) on 11, 22 and 33, then the LK4 parts fitted on
-the bin in the ticket's order, Side racks on 44 and Strapped panniers on 55; the base rig's ore
-hatch is the unnamed default, and the finish tail above the top step keeps every later band
-visible.
+wave 647-7K of the P1-P5 map (#647), and of its LK9 steps to about P40,
+[LK9: cargo_hold look steps to P40 (#872)](https://github.com/bjor2/steampunk-miner/issues/872),
+wave 647-7Z: every purchase on the `cargo_hold` track visibly changes the rig. Since LK1 (#809)
+the track's look steps sit on the band edges of 11 purchases: Progression's Plank crate, Ore hopper
+and Riveted bin (6300549964) on 11, 22 and 33, then the LK4 parts fitted on the bin in the ticket's
+order, Side racks on 44 and Strapped panniers on 55, then the sixteen LK9 parts from 66 to 231,
+each the pannier bin with one more part fitted on the racks and panniers or on the bin (the GD
+lock of 25 Oct 06:48 on #872, the LK6 to LK8 pattern); the base rig's ore hatch is the unnamed
+default, and the finish tail above the top step keeps every later band visible. See "The LK9
+steps" and "Checks (25 Oct 2026, LK9)" below.
 
 **Wired by #581.** The rig-look slice registers and exports the asset and swaps each step's part
 onto the slot from the registry's rows (`src/features/rig-look/rigLook.json`, #577). `cargoHoldLooks.json` here is the one table this folder's scripts share;
@@ -51,6 +55,48 @@ out and the look's part stands on the slot. The ore hatch reproduces the hatch e
 wiring may draw the base look either way (the rig's part, or the ore hatch in its place) and the
 rig is the same below the first step.
 
+### The LK9 steps (#872)
+
+Each step from 66 to 231 is the pannier bin with one more part fitted, in this order:
+
+| Part           | Step                | Adds                                                                                                                        |
+| -------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `netted-bin`   | 66, Cargo nets      | a knotted tarred-rope cargo net over each pannier (three ropes down, two across), in front of its straps and buckles        |
+| `tarped-bin`   | 77, Oiled tarp      | an olive oilcloth tarp over both panniers' tops, their flaps and the top rail, a scalloped hem hanging over the nets        |
+| `barred-bin`   | 88, Lock bar        | a bright steel lock bar across both racks at mid-height on dark-iron hangers, a brass padlock at the centre ringing the bar |
+| `bumpered-bin` | 99, Brass bumper    | a brass bumper tube along the racks' foot with dark-iron end caps, on two hangers down from the bottom rail                 |
+| `lamped-bin`   | 110, Cargo lantern  | a brass cargo lantern with a lit amber lens and a brass rim, hung from the top rail at the right end over the tarp          |
+| `clamped-bin`  | 121, Lid clamps     | four dark-iron toggle clamps with bright steel levers under the lid's edge on the bin's face                                |
+| `locked-bin`   | 132, Lock plate     | a dark-iron lock plate with a brass escutcheon and four steel bolts at the bin's centre between the bands                   |
+| `gauged-bin`   | 143, Load gauge     | a brass load gauge with a dark face and a bright steel needle on the bin's face, mirroring the sight glass                  |
+| `railed-bin`   | 154, Lid handrail   | a dark-iron grab rail on three brass stanchions along the lid's front                                                       |
+| `plated-bin`   | 165, Pannier plates | a bright steel plate with three dark-iron rivets over each pannier's belly, under the lock bar                              |
+| `piped-bin`    | 176, Copper lines   | a copper line down from the gauge to the deck's edge and along it over the tarp's top, brass unions at the elbow and ends   |
+| `hoisted-bin`  | 187, Hoist tackle   | a dark-iron hoist block strapped under the deck at the centre, a brass sheave, a bright steel hook ringing the lock bar     |
+| `sealed-bin`   | 198, Aether seals   | a glowing teal seal on each pannier plate and over the lock plate's escutcheon                                              |
+| `field-bin`    | 209, Stasis field   | glowing teal strips along the lock bar's upper edge and the bumper's underside                                              |
+| `haloed-bin`   | 220, Aether halos   | glowing teal halos round the sight glass, the gauge, the lantern's lens and the hoist block                                 |
+| `aether-bin`   | 231, Aether hold    | glow strips along the bin's two bands and the pannier plates' top edges                                                     |
+
+Why those sockets: the hold cannot grow (the LK4 finding below: the dome's plate, the steam ram
+and open sky box the hatch in), and the one socket under it is the flank LK4 hung its racks and
+panniers on, so every LK9 part is fitted onto those two or onto the bin's own face inside the
+hatch's outline. Over the panniers, front to back in depth: the nets just in front of the straps,
+the tarp over their tops and flaps (its hem over the nets), the lock bar across the racks at
+mid-height (vehicle z 0.05), the plates under the bar, the bumper along the racks' foot with its
+underside at vehicle z 0.011, just over the hull looks' armour line (0.01). Hung from the top
+rail: the lantern at the right end (x 0.29) and the hoist block at the centre, both in front of
+the tarp. On the bin's face, between the corner plates and clear of the sight glass: the clamps
+on the upper band under the lid's edge, the lock plate at the centre between the bands, the gauge
+at x 0.172 mirroring the glass at 0.265, the handrail along the lid, and the copper line along the
+deck's edge between the bin's foot and the tarp's top. Every part stays inside `lookBoxM`
+(`author_cargo_hold_p40_steps.py` refuses one that does not), the outline check finds no cell
+outside the rig at tiers 1 and 3, and nothing is drawn where the drill head is. Rings have 16
+facets so none takes a bevel or clamps the part's bevel (the sight glass's #580 finding: a first
+cut with 10-facet rings squared the lid's right corner off, one cell outside the rig from the lock
+bar on). The lantern's lens and the aether parts glow at 0.3 (LK8's values), under the sight
+glass's 0.4 and a fifth of the nose seams' 1.6, so the drill nose stays the brightest part.
+
 **The LK4 sockets (#812).** The hatch is boxed in: the dome's plate against its left end, the
 steam ram against its right, open sky over its lid, so the hold itself cannot grow, and above the
 deck the rig outline the steps may not leave (#789) is the hatch's own. The one socket inside the
@@ -74,25 +120,27 @@ drill nose stays the brightest part of the rig with every look.
 
 ## Files
 
-| File                         | What it is                                                                                                                                                 |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `parts.png`                  | each part alone in the game's front view at 768 px/m                                                                                                       |
-| `tier-1.png`, `tier-3.png`   | the rig at that tier with each look on the slot, 512 px/m, the nose lit as while drilling                                                                  |
-| `tier-<n>.ingame.png`        | the same at 90 px/m, about what a 1080p screen shows at the default 12 m zoom                                                                              |
-| `tier-<n>.phone.png`         | the same at a 360 px wide phone's 30 px/m over the 12 m zoom, enlarged 8x with no smoothing                                                                |
-| `glow.png`                   | the tier-1 rig with each look by its emission alone: what the emissive map carries                                                                         |
-| `outline.json`               | each look's silhouette cells outside the rig at tiers 1 and 3, and the base look's against the rig                                                         |
-| `readability.json`           | the look-box pixels each step changes from the one before at both phone zooms, and the nose's brightest pixel against the look box and the rest of the rig |
-| `cargoHoldLooks.json`        | the asset, its slot, its look box, its parts with their step names and thresholds                                                                          |
-| `author_cargo_hold_looks.py` | wrote the first version of the source (Blender)                                                                                                            |
-| `author_cargo_hold_steps.py` | fitted the LK4 racks and panniers into the source (Blender, re-runnable: rewrites those two objects)                                                       |
-| `render_cargo_hold_looks.py` | the renders above (Blender), on the casing driller review's frame and stage                                                                                |
-| `check_outline.py`           | writes `outline.json` (Blender); exits 1 when a look leaves the rig outline                                                                                |
-| `sheet_cargo_hold_looks.py`  | lays the renders out into the sheets and writes `readability.json` (Pillow, numpy)                                                                         |
+| File                             | What it is                                                                                                                                                 |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `parts.png`                      | each part alone in the game's front view at 768 px/m                                                                                                       |
+| `tier-1.png`, `tier-3.png`       | the rig at that tier with each look on the slot, 512 px/m, the nose lit as while drilling                                                                  |
+| `tier-<n>.ingame.png`            | the same at 90 px/m, about what a 1080p screen shows at the default 12 m zoom                                                                              |
+| `tier-<n>.phone.png`             | the same at a 360 px wide phone's 30 px/m over the 12 m zoom, enlarged 8x with no smoothing                                                                |
+| `glow.png`                       | the tier-1 rig with each look by its emission alone: what the emissive map carries                                                                         |
+| `outline.json`                   | each look's silhouette cells outside the rig at tiers 1 and 3, and the base look's against the rig                                                         |
+| `readability.json`               | the look-box pixels each step changes from the one before at both phone zooms, and the nose's brightest pixel against the look box and the rest of the rig |
+| `cargoHoldLooks.json`            | the asset, its slot, its look box, its parts with their step names and thresholds                                                                          |
+| `author_cargo_hold_looks.py`     | wrote the first version of the source (Blender)                                                                                                            |
+| `author_cargo_hold_steps.py`     | fitted the LK4 racks and panniers into the source (Blender, re-runnable: rewrites those two objects)                                                       |
+| `author_cargo_hold_p40_steps.py` | fitted the sixteen LK9 parts, 66 to 231, into the source (Blender, re-runnable: rewrites those sixteen objects)                                            |
+| `render_cargo_hold_looks.py`     | the renders above (Blender), on the casing driller review's frame and stage                                                                                |
+| `check_outline.py`               | writes `outline.json` (Blender); exits 1 when a look leaves the rig outline                                                                                |
+| `sheet_cargo_hold_looks.py`      | lays the renders out into the sheets and writes `readability.json` (Pillow, numpy)                                                                         |
 
 ```
 blender -b --factory-startup --python-exit-code 1 -P docs/art/rig-look-cargo-hold/author_cargo_hold_looks.py
 blender -b --factory-startup --python-exit-code 1 -P docs/art/rig-look-cargo-hold/author_cargo_hold_steps.py
+blender -b --factory-startup --python-exit-code 1 -P docs/art/rig-look-cargo-hold/author_cargo_hold_p40_steps.py
 blender -b --factory-startup --python-exit-code 1 -P docs/art/rig-look-cargo-hold/check_outline.py
 blender -b --factory-startup --python-exit-code 1 -P docs/art/rig-look-cargo-hold/render_cargo_hold_looks.py [-- alone|rig|glow]
 python3 docs/art/rig-look-cargo-hold/sheet_cargo_hold_looks.py
@@ -195,6 +243,12 @@ Against #812's acceptance, with the numbers the scripts wrote after `author_carg
   its 30 mm stroke, or be drawn behind the hold, the stay would show as a dark bar above the lid.
 - Below the first step the wiring can draw the rig's own `t1-hopper` or the ore hatch; the ore
   hatch exists so the swap is one rule for every step, not so the base rig changes.
-- The tail above 55 (the finish bands of LK1) is the wiring's, on the pannier bin.
-- The LK4 parts hang over the pod's flank at `z` 3; a mounted item at `hull.powerup.5` or
-  `hull.nose` (`z` 6) draws over them as it draws over the hull's own hoops.
+- The tail above 231 (the finish bands of LK1) is the wiring's, on the aether hold.
+- The LK4 and LK9 parts hang over the pod's flank at `z` 3; a mounted item at `hull.powerup.5` or
+  `hull.nose` (`z` 6) draws over them as it draws over the hull's own hoops, and at tier 3 the
+  reamer collar (`t3-drill-bit-2`, `z` 7) covers the hatch's right end, the lantern with it.
+- The bin's own fittings (the clamps, the lock plate, the gauge, the handrail, the hoist, the
+  seals and halos) are small by the bin's nature: 8 to 30 mm pieces on a 170 by 72 mm face, under
+  a phone pixel each at 45 px/m. They read at 90 px/m and on `parts.png`; on a phone those bands
+  change mostly by the tint and glow `rigLook.json` gives each band, which the renders here leave
+  out (see Checks, LK9).

@@ -1,5 +1,5 @@
 """
-Review renders of the cargo_hold rig-look parts (ticket 580): each part alone in the game's front
+Review renders of the cargo_hold rig-look parts (tickets 580, 812 and 872): each part alone in the game's front
 view, the rig at tiers 1 and 3 with each look swapped onto the `hull.cargo` slot, the drill nose
 lit as while drilling, and the tier-1 rig's glow alone (no lamp, no sky: what the emissive map
 carries), since the drill nose must stay the brightest part and a look's glow under its cap
