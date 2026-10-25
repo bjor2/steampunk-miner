@@ -563,8 +563,14 @@ import type { JsonCount } from '../wholeCount'
  *    that tick cut, `casingRingBand.ts`). A level floor's ramp lays its contour on its circle
  *    (`stampShape.ts`), where the straight ramp left it up to 21 mm off. Ground already cut stays
  *    as it is.
+ * 119: a cut past a cell a tick steps through each cell at its own time (ticket 733,
+ *    `lineCutStep.ts`): where the law's step through the leading slab's slowest cell is over a
+ *    metre, the front's step and `vCut` are walked along the front's line instead, each cell's
+ *    gated drill time paying the mm crossed in it, up to the cutting bound, so a 3600 m/s tick
+ *    spends its work where one hard cell ahead held it a quarter short. A rig at most a cell a
+ *    tick steps as before, so no golden digest moves.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 118
+export const AUTHORITY_PROTOCOL_VERSION = 119
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
