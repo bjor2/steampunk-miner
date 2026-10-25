@@ -1,18 +1,23 @@
 {
-  "source": "G&V on ticket 823 (sockets for the PK4 kit items, the last open part of needs-planner): each kit item that shows on the rig names one vehicle-attach point outside those #809-#816 own and outside MODULE_ATTACH_POINTS. The Cache Crate has none: it is a placed world object drawn at its cell, held crates only a HUD count. Ticket 825 replaced the flat placeholders with Blender art: each socket names its asset (the kernel's slotItemAssetIdOf rule, vehicle-item-<id>), its parts and each part's draw order over the rig's. A part that moves carries a resting and an acting pose (a turn in radians about its pivot, counter-clockwise on screen, and a shift in metres); #850 sets the acting pose while the tool acts. A flask part shows from a held count (G&V: one flask per held flask up to the stack limit of 3); the shard shows only while the tongs act. Every part keeps inside the rig's bounds at every pose and behind the drawn drill tip (#789), which kitSocketLook.test.ts holds against the vehicle sidecar. Ticket 881 (G&V's re-pick on #850: no sharing) moves the three tools onto the kit-only points kit.blade, kit.grab and kit.mast, which no gear item takes (drill.hood, hull.arm.left and hull.roof.mid hold the containment, acid etcher and aether tether rigs); the flask stays on cab.gauge, the gauge cluster many items extend. The kit points stand where the tools hung until G&V's Blender pass (#883) moves them.",
+  "source": "G&V on ticket 823 (sockets for the PK4 kit items, the last open part of needs-planner): each kit item that shows on the rig names one vehicle-attach point outside those #809-#816 own and outside MODULE_ATTACH_POINTS. The Cache Crate has none: it is a placed world object drawn at its cell, held crates only a HUD count. Ticket 825 replaced the flat placeholders with Blender art: each socket names its asset (the kernel's slotItemAssetIdOf rule, vehicle-item-<id>), its parts and each part's draw order over the rig's. A part that moves carries a resting and an acting pose (a turn in radians about its pivot, counter-clockwise on screen, and a shift in metres); #850 sets the acting pose while the tool acts. A flask part shows from a held count (G&V: one flask per held flask up to the stack limit of 3); the shard shows only while the tongs act. Every part keeps inside the rig's bounds at every pose and behind the drawn drill tip (#789), which kitSocketLook.test.ts holds against the vehicle sidecar. Ticket 881 (G&V's re-pick on #850: no sharing) moves the three tools onto the kit-only points kit.blade, kit.grab and kit.mast, which no gear item takes (drill.hood, hull.arm.left and hull.roof.mid hold the containment, acid etcher and aether tether rigs); the flask stays on cab.gauge, the gauge cluster many items extend. The kit points stand where the tools hung until G&V's Blender pass moves them. Ticket 883 (PK4c look) draws each owned tool deployed while tool_acting holds it on, its 30-tick tail included, with no new art: the plough's cowl and blade lower 4 cm and the blade flexes, the tongs' jaw closes on the shard, the vane fans open, and while a flask is open the rack holds it vented, flask-1 tilted and lifted out of its cradle.",
   "sockets": [
     {
       "itemId": "scree_plough",
       "attach": "kit.blade",
       "assetId": "vehicle-item-scree-plough",
-      "shows": "A scree cowl over the drill collar, blades swept back; they flex outward when it shoves rubble.",
+      "shows": "A scree cowl over the drill collar, blades swept back; the cowl lowers and they flex outward when it shoves rubble.",
       "parts": [
-        { "id": "plough-cowl", "z": 9 },
+        {
+          "id": "plough-cowl",
+          "z": 9,
+          "resting": { "turn": 0, "shift": [0, 0] },
+          "acting": { "turn": 0, "shift": [0, -0.04] }
+        },
         {
           "id": "plough-blade",
           "z": 10,
           "resting": { "turn": 0, "shift": [0, 0] },
-          "acting": { "turn": -0.5, "shift": [0, 0] }
+          "acting": { "turn": -0.5, "shift": [0, -0.04] }
         }
       ]
     },
@@ -20,10 +25,16 @@
       "itemId": "damp_flask",
       "attach": "cab.gauge",
       "assetId": "vehicle-item-damp-flask",
-      "shows": "A small rack by the cab with one flask per held flask, up to the stack limit of 3; a bottled flask glows faintly.",
+      "shows": "A small rack by the cab with one flask per held flask, up to the stack limit of 3; a bottled flask glows faintly, and the uncorked one stands vented in the rack while it is open.",
       "parts": [
         { "id": "flask-rack", "z": 6 },
-        { "id": "flask-1", "z": 7, "shownFromHeld": 1 },
+        {
+          "id": "flask-1",
+          "z": 7,
+          "shownFromHeld": 1,
+          "resting": { "turn": 0, "shift": [0, 0] },
+          "acting": { "turn": 0.35, "shift": [0, 0.012] }
+        },
         { "id": "flask-2", "z": 7, "shownFromHeld": 2 },
         { "id": "flask-3", "z": 7, "shownFromHeld": 3 }
       ]

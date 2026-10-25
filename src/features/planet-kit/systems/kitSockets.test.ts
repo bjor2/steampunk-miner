@@ -132,8 +132,9 @@ describe('kit socket art (ticket 825)', () => {
   })
 
   it('poses a moving part acting or resting and never moves a standing one', () => {
-    const [cowl, blade] = kitSocketOf(KIT_SOCKETS, 'scree_plough')!.parts
-    expect(kitSocketPoseOf(cowl, true)).toEqual({ turn: 0, shift: [0, 0] })
+    const [, blade] = kitSocketOf(KIT_SOCKETS, 'scree_plough')!.parts
+    const [rack] = kitSocketOf(KIT_SOCKETS, 'damp_flask')!.parts
+    expect(kitSocketPoseOf(rack, true)).toEqual({ turn: 0, shift: [0, 0] })
     expect(kitSocketPoseOf(blade, false)).toEqual({ turn: 0, shift: [0, 0] })
     expect(kitSocketPoseOf(blade, true).turn).toBeLessThan(0)
   })

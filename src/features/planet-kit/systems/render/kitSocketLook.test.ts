@@ -79,6 +79,26 @@ describe('kit socket look', () => {
     expect(turns.every((turn) => turn < 0)).toBe(true)
   })
 
+  it('lowers the plough’s cowl and blade while it acts (ticket 883)', () => {
+    const lowOf = (show: KitSocketShow, partId: string) =>
+      kitSocketQuadsOf(SHIPPED_ART, socket('scree_plough'), show).find(
+        (quad) => quad.partId === partId,
+      )!.centre[1]
+    for (const partId of ['plough-cowl', 'plough-blade']) {
+      expect(lowOf(KIT_SOCKET_ALL_SHOWN, partId)).toBeLessThan(lowOf(KIT_SOCKET_AT_REST, partId))
+    }
+  })
+
+  it('stands the first flask vented, tilted and lifted, while one is open (ticket 883)', () => {
+    const flaskOf = (isActing: boolean) =>
+      kitSocketQuadsOf(SHIPPED_ART, socket('damp_flask'), { heldFlasks: 1, isActing }).find(
+        (quad) => quad.partId === 'flask-1',
+      )!
+    expect(flaskOf(false).turn).toBe(0)
+    expect(flaskOf(true).turn).not.toBe(0)
+    expect(flaskOf(true).centre[1]).toBeGreaterThan(flaskOf(false).centre[1])
+  })
+
   it('turns a quad’s box about its pivot', () => {
     const box = kitSocketQuadBoxOf({
       partId: 'probe',
