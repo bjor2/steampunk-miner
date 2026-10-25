@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { COLLAPSE_FILL_TICKS, COLLAPSE_WARN_TICKS } from '../../../constants/balance'
 import { projectDomainEvent } from '../../../logging/domainEventProjection'
 import { chargeRadiusMm } from '../../economy/chargeSizes'
+import { fromCanonical } from '../../money'
 import { blockOfId, samplesOfBlock, type CollapseBlock } from '../../world/collapseBlock'
 import { cellDensitySum } from '../../world/cellYield'
 import { freshPlanetParamsFor, type PlanetParams } from '../../world/planetParams'
@@ -201,13 +202,15 @@ describe('bare blast collapse roll (ticket 861)', () => {
       ({ block }) => block === firstCollapse,
     ) as DomainEvent
     session.advanceTo(warning.tick)
+    session.submit(warning.tick + 1, { type: 'debug.setMoney', payload: { amount: '5000' } })
     session.submit(warning.tick + 1, poseAt(...nearCornerOf(rigCell)))
     expect(session.state().players.p1.vehicle.pose).toMatchObject({
       x: nearCornerOf(rigCell)[0],
       y: nearCornerOf(rigCell)[1],
     })
     const { hull } = session.state().players.p1.vehicle
-    const { money } = session.state().players.p1
+    const { wallet } = session.state().players.p1
+    expect(wallet).toEqual(fromCanonical('5000'))
     session.advanceTo(SETTLED_TICK)
     const started = ofType(session.events(), 'CollapseStarted').find(
       ({ block }) => block === firstCollapse,
@@ -215,7 +218,7 @@ describe('bare blast collapse roll (ticket 861)', () => {
     expect(started?.vehiclesHit).toBe(0)
     expect(ofType(session.events(), 'VehicleDamaged')).toEqual([])
     expect(session.state().players.p1.vehicle.hull).toEqual(hull)
-    expect(session.state().players.p1.money).toEqual(money)
+    expect(session.state().players.p1.wallet).toEqual(wallet)
     expect(densityOf(session.state().world, rigCell)).toBe(0)
   })
 
