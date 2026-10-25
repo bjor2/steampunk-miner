@@ -557,7 +557,8 @@ import type { JsonCount } from '../wholeCount'
  *    disc carries a floor band across the wheels' width; a pose report cuts its stamp run on 0.55 m
  *    along the facing. The casing ring lines `stampR - 0.25 m <= d < stampR + 0.25 m` round the
  *    wall and the floor box under a level tunnel, never a cell a gate keeps standing against the
- *    rig's drill. A level floor's ramp lays its contour on its circle (`stampShape.ts`), where the
+ *    rig's drill; a drill trail's ring measures `d` from its own stretch of axis, the half metre
+ *    behind its point, rounded ahead of it, and the swept cut's trail runs on the body's line. A level floor's ramp lays its contour on its circle (`stampShape.ts`), where the
  *    straight ramp left it up to 21 mm off. Ground already cut stays as it is.
  */
 export const AUTHORITY_PROTOCOL_VERSION = 118

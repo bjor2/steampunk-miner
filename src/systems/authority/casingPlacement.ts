@@ -22,6 +22,7 @@ import { drillStampOf } from '../vehicle/drillStamp'
 import { liningTypeIndexOf } from '../vehicle/liningType'
 import { isVehicleActive, type VehicleState } from '../vehicle/vehicleState'
 import {
+  casingRingAlong,
   casingRingAround,
   lineRingSamples,
   ringSamplesOf,
@@ -114,7 +115,14 @@ function layTrailStep(
   const vehicle = vehicleOf(state, playerId)
   const moved = withVehicle(state, playerId, { ...vehicle, casingTrail: step.trail })
   const lining = { grade: vehicle.casingGrade, liningType: vehicle.lining.active }
-  return layRings(moved, playerId, params, step.due, lining)
+  const rings = step.due.map((point, index) => ({ point, stretchFrom: step.stretchStarts[index] }))
+  return layRings(moved, playerId, params, rings, lining)
+}
+
+/** A due axis point and where its stretch of axis starts, which its ring is measured from. */
+interface DueRing {
+  point: AxisPoint
+  stretchFrom: RingPoint
 }
 
 /** What a vehicle's rings are laid as: its casing grade, in its active lining type. */
@@ -134,20 +142,20 @@ function layRings(
   state: AuthorityState,
   playerId: string,
   params: PlanetParams,
-  points: readonly AxisPoint[],
+  rings: readonly DueRing[],
   lining: LaidLining,
 ): RuleEffect {
   return chainEffects(
     state,
-    points.map(
-      (point) => (current: AuthorityState) =>
-        layPaidCasingRing(current, playerId, params, point, lining),
+    rings.map(
+      (ring) => (current: AuthorityState) =>
+        layPaidCasingRing(current, playerId, params, ring, lining),
     ),
   )
 }
 
 /**
- * A ring laid by drilling: lined as `debug.lineCasing` lines it, then its new lining charged for
+ * A ring laid by drilling: lined as `debug.lineCasing` lines it but along its stretch of axis, then its new lining charged for
  * the stretch of axis the ring stands for (per metre, not per ring: #76, #115), and it joins the
  * vehicle's route where tunnel wreckers live (#111).
  */
@@ -155,14 +163,14 @@ function layPaidCasingRing(
   state: AuthorityState,
   playerId: string,
   params: PlanetParams,
-  point: AxisPoint,
+  { point, stretchFrom }: DueRing,
   lining: LaidLining,
 ): RuleEffect {
   const samples = casableRingSamplesOf(
     state,
     playerId,
     params,
-    casingRingAround(point.xMm, point.yMm),
+    casingRingAlong(point.xMm, point.yMm, stretchFrom),
   )
   const ring = lineCasingRing(
     state,

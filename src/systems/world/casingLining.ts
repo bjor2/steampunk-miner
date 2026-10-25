@@ -1,7 +1,8 @@
 /**
  * One ring of casing lining (decision #41 Placement rule "Where", amended twice on #56, 5 Oct, and
  * held round the 1.2 m bore's wall by the GD lock on #662), integer arithmetic only: the samples whose position
- * in mm lies in the annulus `clearR <= d < clearR + width` round a centre on the tunnel axis,
+ * in mm lies in the annulus `clearR <= d < clearR + width` round a centre on the tunnel axis, or
+ * for a drill trail's ring the band that far from its stretch of axis (`casingRingAlong`),
  * chosen against the ground as it stood before the ring. Lining marks the **rock side** of the
  * bore's wall, so the bore never narrows:
  *
@@ -56,12 +57,17 @@ import { FULL_WEIGHT, type WeightedSample } from './stampShape'
 import { chunkOfTile, type TilePoint } from './tileGrid'
 import { currentCasingOfChunk, currentDensityOfChunk, type WorldState } from './worldState'
 
-/** A ring of lining round `(xMm, yMm)`: inner radius `clearMm`, `widthMm` thick. */
+/**
+ * A ring of lining round `(xMm, yMm)`: inner radius `clearMm`, `widthMm` thick. A drill trail's
+ * ring also names where its stretch of axis starts (`stretchFromMm`), and its band is measured
+ * from that stretch, not from its point (the TD's Q1 ruling on #662).
+ */
 export interface CasingRing {
   xMm: number
   yMm: number
   clearMm: number
   widthMm: number
+  stretchFromMm?: { xMm: number; yMm: number }
 }
 
 export interface Lining extends GroundEdit {
@@ -95,6 +101,23 @@ export function casingRingAround(xMm: number, yMm: number): CasingRing {
     clearMm: drillStampRadiusMm() - CASING_LINING_WIDTH_MM,
     widthMm: 2 * CASING_LINING_WIDTH_MM,
   }
+}
+
+/**
+ * The drill trail's ring for the stretch of axis from `stretchFromMm` to `(xMm, yMm)` (the TD's Q1
+ * ruling on #662): the same band as `casingRingAround`, measured perpendicular to the stretch, so
+ * between two points the band holds the wall's rock at `stampR + 0.25 m` where the circles round
+ * them pulled in to 0.81 m (the scallop on the 1.2 m bore). Ahead of its point it is rounded as the
+ * circle was; it stops square at its stretch's start, so it never lines the stretch before, whose
+ * own ring lines and bills it (#76, #115: backing out lays the newest ring first). Debug, gnaw and
+ * breach rings stay circles.
+ */
+export function casingRingAlong(
+  xMm: number,
+  yMm: number,
+  stretchFromMm: { xMm: number; yMm: number },
+): CasingRing {
+  return { ...casingRingAround(xMm, yMm), stretchFromMm }
 }
 
 /** Lines one ring at the player's `grade`, in the lining type `typeIndex` (the standard one by default). */
@@ -165,19 +188,20 @@ export function lineRingSamples(
   }
 }
 
-/** The samples of the annulus and its floor box in row order, as full-weight stamp samples. */
+/** The samples of the band and its floor box in row order, as full-weight stamp samples. */
 export function ringSamplesOf(ring: CasingRing): WeightedSample[] {
   const outer = Math.max(ring.clearMm + ring.widthMm, floorBoxDepthMm() + MM_PER_SAMPLE)
+  const from = stretchFromOf(ring)
   const isInRing = ringTestOf(ring)
   const samples: WeightedSample[] = []
   for (
-    let sy = Math.ceil((ring.yMm - outer) / MM_PER_SAMPLE);
-    sy * MM_PER_SAMPLE < ring.yMm + outer;
+    let sy = Math.ceil((Math.min(ring.yMm, from.yMm) - outer) / MM_PER_SAMPLE);
+    sy * MM_PER_SAMPLE < Math.max(ring.yMm, from.yMm) + outer;
     sy++
   ) {
     for (
-      let sx = Math.ceil((ring.xMm - outer) / MM_PER_SAMPLE);
-      sx * MM_PER_SAMPLE < ring.xMm + outer;
+      let sx = Math.ceil((Math.min(ring.xMm, from.xMm) - outer) / MM_PER_SAMPLE);
+      sx * MM_PER_SAMPLE < Math.max(ring.xMm, from.xMm) + outer;
       sx++
     ) {
       if (isInRing(sx, sy)) samples.push({ sx, sy, weight: FULL_WEIGHT, floor: 0 })
@@ -189,18 +213,57 @@ export function ringSamplesOf(ring: CasingRing): WeightedSample[] {
 /** Upright, for a ring at the planet's centre itself. */
 const UPRIGHT: PlanetUp = { upx: 0, upy: UP_VECTOR_SCALE }
 
-/** Whether a sample is the ring's: in its annulus, or in its floor box. */
-function ringTestOf(ring: CasingRing): (sx: number, sy: number) => boolean {
-  const up = planetUpAt(ring.xMm, ring.yMm, UPRIGHT)
-  return (sx, sy) => isInAnnulus(ring, sx, sy) || isInFloorBox(ring, up, sx, sy)
+/** Where the ring's stretch of axis starts: its own point for a circle. */
+function stretchFromOf(ring: CasingRing): { xMm: number; yMm: number } {
+  return ring.stretchFromMm ?? { xMm: ring.xMm, yMm: ring.yMm }
 }
 
-function isInAnnulus(ring: CasingRing, sx: number, sy: number): boolean {
+/** Whether a sample is the ring's: in its band, or in its floor box. */
+function ringTestOf(ring: CasingRing): (sx: number, sy: number) => boolean {
+  const up = planetUpAt(ring.xMm, ring.yMm, UPRIGHT)
+  return (sx, sy) => isInBand(ring, sx, sy) || isInFloorBox(ring, up, sx, sy)
+}
+
+/**
+ * `clearMm <= d < clearMm + widthMm`, `d` the sample's distance from the ring's stretch; a sample
+ * behind the stretch's start is the stretch before's, its own ring's to line and bill.
+ */
+function isInBand(ring: CasingRing, sx: number, sy: number): boolean {
+  const outer = ring.clearMm + ring.widthMm
+  const reach = scaledDistanceSqToStretch(ring, sx, sy)
+  if (reach === null) return false
+  const { distanceSq, scale } = reach
+  return distanceSq >= ring.clearMm * ring.clearMm * scale && distanceSq < outer * outer * scale
+}
+
+/**
+ * The sample's squared distance from the stretch, times `scale`, in integers: to the ring's point
+ * past it, else the perpendicular's, its cross product squared over the stretch's squared length
+ * kept as `scale`; null behind the stretch's start. A stretch of no length is the ring's point: a
+ * circle.
+ */
+function scaledDistanceSqToStretch(
+  ring: CasingRing,
+  sx: number,
+  sy: number,
+): { distanceSq: number; scale: number } | null {
+  const from = stretchFromOf(ring)
+  const ax = ring.xMm - from.xMm
+  const ay = ring.yMm - from.yMm
+  const px = sx * MM_PER_SAMPLE - from.xMm
+  const py = sy * MM_PER_SAMPLE - from.yMm
+  const lengthSq = ax * ax + ay * ay
+  const along = px * ax + py * ay
+  if (along >= lengthSq) return { distanceSq: squaredFrom(ring, sx, sy), scale: 1 }
+  if (along <= 0) return null
+  const cross = px * ay - py * ax
+  return { distanceSq: cross * cross, scale: lengthSq }
+}
+
+function squaredFrom(ring: CasingRing, sx: number, sy: number): number {
   const dx = sx * MM_PER_SAMPLE - ring.xMm
   const dy = sy * MM_PER_SAMPLE - ring.yMm
-  const distanceSq = dx * dx + dy * dy
-  const outer = ring.clearMm + ring.widthMm
-  return distanceSq >= ring.clearMm * ring.clearMm && distanceSq < outer * outer
+  return dx * dx + dy * dy
 }
 
 /** Under the ring's centre, no deeper than a level floor may lie and within the wheels' half width. */

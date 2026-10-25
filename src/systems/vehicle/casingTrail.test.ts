@@ -47,6 +47,38 @@ describe('casing trail', () => {
     expect(followAlongX(stepsTo(21500, 100)).due.slice(1)).toHaveLength(40)
   })
 
+  it('starts each due ring’s stretch half a metre behind its point, the way the dig ran (#662 Q1)', () => {
+    let trail: CasingTrail = EMPTY_CASING_TRAIL
+    const rings: { xMm: number; fromMm: number }[] = []
+    for (const x of stepsTo(5000, 100)) {
+      const step = followCasingTrail(trail, { xMm: x, yMm: 0 }, true)
+      trail = step.trail
+      step.due.forEach((point, index) => {
+        expect(step.stretchStarts[index].yMm).toBe(0)
+        rings.push({ xMm: point.xMm, fromMm: step.stretchStarts[index].xMm })
+      })
+    }
+    expect(rings.map(({ xMm }) => xMm)).toEqual([0, 500, 1000, 1500, 2000, 2500, 3000, 3500])
+    for (const ring of rings) expect(ring.fromMm).toBe(ring.xMm - CASING_RING_SPACING_MM)
+  })
+
+  it('keeps the newest point’s stretch behind it when backing out lays it first (#662 Q1)', () => {
+    let trail = followAlongX(stepsTo(1000, 100)).trail
+    const rings: { xMm: number; fromMm: number }[] = []
+    for (const x of [-500, -2200]) {
+      const step = followCasingTrail(trail, { xMm: x, yMm: 0 }, false)
+      trail = step.trail
+      step.due.forEach((point, index) =>
+        rings.push({ xMm: point.xMm, fromMm: step.stretchStarts[index].xMm }),
+      )
+    }
+    expect(rings).toEqual([
+      { xMm: 1000, fromMm: 500 },
+      { xMm: 0, fromMm: -500 },
+      { xMm: 500, fromMm: 0 },
+    ])
+  })
+
   it('records nothing while the drill is not cutting', () => {
     const { trail, due } = followAlongX(stepsTo(5000, 100), false)
     expect(trail).toEqual(EMPTY_CASING_TRAIL)

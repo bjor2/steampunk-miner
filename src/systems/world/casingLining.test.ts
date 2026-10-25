@@ -1,9 +1,17 @@
 import { describe, expect, it } from 'vitest'
+import { CASING_RING_SPACING_MM } from '../../constants/balance'
 import { drillStampRadiusMm } from '../vehicle/drillBore'
 import { drillStampOf, stampSweptFrom } from '../vehicle/drillStamp'
 import { FACING, type VehiclePose } from '../vehicle/vehiclePose'
 import { cellDensitySum } from './cellYield'
-import { casingRingAround, cellWallSamplesOf, lineRing } from './casingLining'
+import {
+  casingRingAlong,
+  casingRingAround,
+  cellWallSamplesOf,
+  lineRing,
+  ringSamplesOf,
+  type CasingRing,
+} from './casingLining'
 import { carveDisc, clearDisc, type CellDrillTicks } from './groundEdit'
 import { planetParamsFor } from './planetParams'
 import { MM_PER_SAMPLE, chunkOfSample, localSampleOf, sampleIndexOf } from './sampleGrid'
@@ -331,5 +339,69 @@ describe("casing lining: an opened cell's walls (ticket 377)", () => {
         (inCell(sx, 8) && (sy === -13 || sy === -8)) || (inCell(sy, -12) && (sx === 7 || sx === 12))
       expect(isBesideSide).toBe(true)
     }
+  })
+})
+
+describe('casing lining: a trail ring along its stretch of axis (the TD’s Q1 ruling on #662)', () => {
+  /** A shaft's axis whose east wall rock lies 835 mm out, the sample column the scallop missed. */
+  const SHAFT_X = 1250 - 835
+  const RING_YS = [283_000, 283_500, 284_000, 284_500, 285_000]
+
+  function boredShaft(): WorldState {
+    let world = EMPTY_WORLD
+    for (let y = 282_000; y <= 286_000; y += 50) {
+      const disc = { xMm: SHAFT_X, yMm: y, radiusMm: drillStampRadiusMm(), floorRadiusMm: null }
+      world = clearDisc(world, params, { ...disc, edge: 'boreWall' }, 255).world
+    }
+    return world
+  }
+
+  /** The shaft's wall rock between its first and last ring: solid, beside air, within the band. */
+  function wallRockOf(world: WorldState): { sx: number; sy: number }[] {
+    const wall = []
+    for (
+      let sy = RING_YS[0] / MM_PER_SAMPLE;
+      sy <= RING_YS[RING_YS.length - 1] / MM_PER_SAMPLE;
+      sy++
+    ) {
+      for (let sx = -2; sx <= 6; sx++) {
+        const isRock = densityAt(world, sx, sy) > 128 && touchesAir(world, sx, sy)
+        if (isRock) wall.push({ sx, sy })
+      }
+    }
+    return wall
+  }
+
+  /** Rings at each point, each standing for the half metre above it, as a dig down lays them. */
+  function linedDown(world: WorldState, ringAt: (y: number) => CasingRing): WorldState {
+    return RING_YS.reduce((lined, y) => lineRing(lined, params, ringAt(y), 2).world, world)
+  }
+
+  it('lines all the wall rock between its points, which the circles round them leave', () => {
+    const shaft = boredShaft()
+    const wall = wallRockOf(shaft)
+    const along = linedDown(shaft, (y) =>
+      casingRingAlong(SHAFT_X, y, { xMm: SHAFT_X, yMm: y + CASING_RING_SPACING_MM }),
+    )
+    const circles = linedDown(shaft, (y) => casingRingAround(SHAFT_X, y))
+    expect(wall).toHaveLength(2 * 9)
+    expect(wall.filter(({ sx, sy }) => casingAt(along, sx, sy) === 0)).toEqual([])
+    expect(wall.some(({ sx, sy }) => casingAt(circles, sx, sy) === 0)).toBe(true)
+  })
+
+  it('leaves the stretch before its own unlined, so the ring laid later there still lines new rock', () => {
+    const shaft = boredShaft()
+    const below = casingRingAlong(SHAFT_X, 284_000, { xMm: SHAFT_X, yMm: 284_500 })
+    const above = casingRingAlong(SHAFT_X, 284_500, { xMm: SHAFT_X, yMm: 285_000 })
+    const first = lineRing(shaft, params, below, 2)
+    const second = lineRing(first.world, params, above, 2)
+    expect(first.placed).toBeGreaterThan(0)
+    expect(first.linedSamples.every(({ sy }) => sy * MM_PER_SAMPLE <= 284_500)).toBe(true)
+    expect(second.placed).toBeGreaterThan(0)
+  })
+
+  it('is the circle when its stretch has no length', () => {
+    const point = casingRingAlong(SHAFT_X, 284_000, { xMm: SHAFT_X, yMm: 284_000 })
+    expect(ringSamplesOf(point)).toEqual(ringSamplesOf(casingRingAround(SHAFT_X, 284_000)))
   })
 })

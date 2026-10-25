@@ -64,6 +64,8 @@ export interface TrailStep {
   trail: CasingTrail
   /** Axis points whose ring is due now, oldest first. */
   due: AxisPoint[]
+  /** Where each due point's stretch of axis starts, in `due`'s order (`stretchStartOf`). */
+  stretchStarts: RingPoint[]
 }
 
 export const EMPTY_CASING_TRAIL: CasingTrail = { lastAxisPoint: null, unlined: [] }
@@ -179,10 +181,53 @@ function stretchSince(last: RingPoint | null, stampCentre: RingPoint): number {
 function splitDuePoints(trail: CasingTrail, stampCentre: RingPoint): TrailStep {
   const isDue = (point: AxisPoint) => isPastLag(point, stampCentre)
   const waiting = trail.unlined.filter((point) => !isDue(point))
+  const dueIndices = trail.unlined.flatMap((point, index) => (isDue(point) ? [index] : []))
   return {
     trail: { ...trail, unlined: waiting.slice(0, MAX_CASING_TRAIL_POINTS) },
-    due: trail.unlined.filter(isDue),
+    due: dueIndices.map((index) => trail.unlined[index]),
+    stretchStarts: dueIndices.map((index) => stretchStartOf(trail.unlined, index, stampCentre)),
   }
+}
+
+/**
+ * Where a waiting point's stretch of axis starts (the TD's Q1 ruling on #662): `lengthMm` behind
+ * it, along the way the trail ran into it (`trailHeadingAt`). A point with no way to read stands
+ * for no stretch: its ring is a circle.
+ */
+function stretchStartOf(
+  unlined: readonly AxisPoint[],
+  index: number,
+  stampCentre: RingPoint,
+): RingPoint {
+  const point = unlined[index]
+  const heading = trailHeadingAt(unlined, index, stampCentre)
+  const length = Math.floor(Math.sqrt(squaredDistance(heading, { xMm: 0, yMm: 0 })))
+  if (length === 0) return pointOnly(point)
+  return {
+    xMm: point.xMm - Math.floor((heading.xMm * point.lengthMm) / length),
+    yMm: point.yMm - Math.floor((heading.yMm * point.lengthMm) / length),
+  }
+}
+
+/**
+ * The way the trail runs at a waiting point, as a vector: from the waiting point before it, the
+ * way it came; else toward the next one; else, for a lone point, toward where the stamp reached. A
+ * dig lays its rings oldest first, so the point before one due is mostly laid already; backing
+ * out, the newest falls due first, its stamp now behind it, and the point before it reads the way.
+ */
+function trailHeadingAt(
+  unlined: readonly AxisPoint[],
+  index: number,
+  stampCentre: RingPoint,
+): RingPoint {
+  const point = unlined[index]
+  const before = unlined[index - 1]
+  if (before !== undefined) return differenceOf(point, before)
+  return differenceOf(unlined[index + 1] ?? stampCentre, point)
+}
+
+function differenceOf(to: RingPoint, from: RingPoint): RingPoint {
+  return { xMm: to.xMm - from.xMm, yMm: to.yMm - from.yMm }
 }
 
 function isPastLag(point: RingPoint, stampCentre: RingPoint): boolean {
