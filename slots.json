@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25T05:58:28+01:00",
+  "updated_at": "2026-10-25T06:04:00+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -47,11 +47,11 @@
         {
           "slot": "C4",
           "state": "busy",
-          "ticket": 662,
+          "ticket": 860,
           "grok_slot": 4,
           "kind": "dev",
-          "since": "2026-10-25T04:39:00+01:00",
-          "wave": "308-3A"
+          "since": "2026-10-25T06:04:00+01:00",
+          "wave": "647-7Y"
         },
         {
           "slot": "C5",
@@ -73,7 +73,7 @@
       "size": 6,
       "used": 4,
       "free": 2,
-      "claims_last_hour": 2,
+      "claims_last_hour": 3,
       "name": "Claude Max 1"
     },
     {
@@ -126,7 +126,7 @@
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 2,
     "max": 3
   },
   "tester": {
@@ -206,10 +206,10 @@
     {
       "slot": 4,
       "state": "dev",
-      "ticket": 662,
-      "since": "2026-10-25T04:39:00+01:00",
+      "ticket": 860,
+      "since": "2026-10-25T06:04:00+01:00",
       "claude_slot": 4,
-      "wave": "308-3A"
+      "wave": "647-7Y"
     },
     {
       "slot": 5,
@@ -295,11 +295,11 @@
     {
       "slot": 4,
       "state": "busy",
-      "ticket": 662,
+      "ticket": 860,
       "grok_slot": 4,
-      "since": "2026-10-25T04:39:00+01:00",
+      "since": "2026-10-25T06:04:00+01:00",
       "account": 1,
-      "wave": "308-3A"
+      "wave": "647-7Y"
     },
     {
       "slot": 5,
@@ -353,11 +353,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-25 05:58 CET",
+    "at": "2026-10-25 06:04 CET",
     "mode": "refill-dev",
-    "triggers": "#848",
-    "started": "#821->C2/A1 #849->C8/A2",
-    "note": "spawned 2 worker(s)"
+    "triggers": "#662",
+    "started": "#860->C4/A1",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
@@ -381,22 +381,22 @@
     "parallel": 1,
     "list": [
       {
-        "number": 867,
-        "key": "647-8B",
+        "number": 870,
+        "key": "647-7W",
         "map": 647,
         "lane": "remote",
         "mode": "solo",
-        "state": "blocked",
+        "state": "ready",
         "tickets": [
-          866,
-          862,
-          865
+          630,
+          631,
+          635
         ],
         "done": [],
         "live": 0
       },
       {
-        "number": 859,
+        "number": 867,
         "key": "647-8A",
         "map": 647,
         "lane": "remote",
@@ -404,13 +404,27 @@
         "state": "blocked",
         "tickets": [
           850,
-          860,
-          861,
-          863,
-          864
+          865,
+          869
         ],
         "done": [],
         "live": 0
+      },
+      {
+        "number": 859,
+        "key": "647-7Y",
+        "map": 647,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "running",
+        "tickets": [
+          860,
+          861,
+          866,
+          868
+        ],
+        "done": [],
+        "live": 1
       },
       {
         "number": 856,
@@ -473,12 +487,12 @@
         "mode": "solo",
         "state": "paused",
         "tickets": [
-          630,
-          631,
           633,
           634,
-          635,
-          565
+          565,
+          862,
+          863,
+          864
         ],
         "done": [],
         "live": 0
@@ -509,7 +523,7 @@
       },
       {
         "number": 766,
-        "key": "647-7X",
+        "key": "647-7Z",
         "map": 647,
         "lane": "hitl",
         "mode": "bench",
@@ -523,7 +537,7 @@
       },
       {
         "number": 751,
-        "key": "647-7W",
+        "key": "647-7X",
         "map": 647,
         "lane": "remote",
         "mode": "solo",
@@ -556,7 +570,7 @@
         "map": 308,
         "lane": "remote",
         "mode": "solo",
-        "state": "running",
+        "state": "paused",
         "tickets": [
           662,
           663,
@@ -565,7 +579,7 @@
           733
         ],
         "done": [],
-        "live": 1
+        "live": 0
       },
       {
         "number": 495,
