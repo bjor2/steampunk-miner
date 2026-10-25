@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25T04:45:03+01:00",
+  "updated_at": "2026-10-25T05:11:15+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -381,6 +381,21 @@
     "parallel": 1,
     "list": [
       {
+        "number": 867,
+        "key": "647-8B",
+        "map": 647,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "blocked",
+        "tickets": [
+          866,
+          862,
+          865
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
         "number": 859,
         "key": "647-8A",
         "map": 647,
@@ -388,7 +403,11 @@
         "mode": "solo",
         "state": "blocked",
         "tickets": [
-          850
+          850,
+          860,
+          861,
+          863,
+          864
         ],
         "done": [],
         "live": 0
@@ -502,7 +521,7 @@
       },
       {
         "number": 766,
-        "key": "647-7W",
+        "key": "647-7X",
         "map": 647,
         "lane": "hitl",
         "mode": "bench",
@@ -516,7 +535,7 @@
       },
       {
         "number": 751,
-        "key": "647-7P",
+        "key": "647-7W",
         "map": 647,
         "lane": "remote",
         "mode": "solo",
