@@ -59,10 +59,26 @@ export function systemKindLooksOf(
   kindCounts: readonly number[],
   catalogue: PoolLookCatalogue = POOL_LOOK_CATALOGUE,
 ): KindLook[][] {
+  const places = kindCounts.map((_, at) => at + 1)
+  return placedKindLooksOf(worldSeed, system, places, kindCounts, catalogue)
+}
+
+/**
+ * The looks of the pools of one look group, `kindCounts[at]` kinds on place `places[at]`: no pair
+ * repeats within the group. A later system's group is the whole system; system 1's is an act's run
+ * of planets from P6 (ticket 888, `firstSystemPools.ts`).
+ */
+export function placedKindLooksOf(
+  worldSeed: number,
+  system: bigint,
+  places: readonly number[],
+  kindCounts: readonly number[],
+  catalogue: PoolLookCatalogue = POOL_LOOK_CATALOGUE,
+): KindLook[][] {
   const takenPairs = new Set(catalogue.firstSystemPairs)
   return kindCounts.map((count, at) =>
     planetKindLooksOf(
-      { worldSeed, system, planet: at + 1, index: 0 },
+      { worldSeed, system, planet: places[at], index: 0 },
       count,
       catalogue,
       takenPairs,

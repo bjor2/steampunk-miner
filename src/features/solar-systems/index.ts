@@ -3,8 +3,8 @@
  * archetype palette every system past the first is drawn from, and the roster it draws for a system
  * by seed, the art of its looks (ticket 778), the SS2-B families' behaviour ledger and copy
  * (ticket 780), each drawn planet's economy row (ticket 776) and its generated material pool
- * (ticket 777), and the money a player reads on each planet through the #681 formatter (ticket
- * 779). Types, pure selectors and constants only; never React, zustand or a store.
+ * (ticket 777) with system 1's from P6 (ticket 888), and the money a player reads on each planet
+ * through the #681 formatter (ticket 779). Types, pure selectors and constants only; never React, zustand or a store.
  * Horizontal content with no stats.json row (HS input on #775): only the jump drive has one.
  */
 export const SOLAR_SYSTEMS_SLICE_ID = 'solar-systems'
@@ -38,6 +38,12 @@ export { economyRowTextOf, planetEconomyRowOf, systemEconomyRowsOf } from './sys
 export { economyRowProblemsOf } from './systems/economyRowGuards'
 export type { MaterialPool, PoolKind } from './systems/materialPool'
 export { planetMaterialPoolOf, systemMaterialPoolsOf } from './systems/materialPool'
+export {
+  firstSystemPoolOf,
+  lookGroupOf,
+  lookGroupPoolsOf,
+  materialPoolAt,
+} from './systems/firstSystemPools'
 export { materialPoolProblemsOf } from './systems/materialPoolGuards'
 export type { MaterialPoolRules } from './systems/materialPoolRules'
 export { MATERIAL_POOL_RULES } from './systems/materialPoolRules'

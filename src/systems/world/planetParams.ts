@@ -190,6 +190,12 @@ export const P2_TO_P5_GEMS_ORE_RULES = 13
 const P2_TO_P5_GEMS_FIRST_PLANET = 2
 
 /**
+ * The first planet of system 1 that draws a generated material pool (ticket 888, GD lock M1 on the
+ * Materials Expansion): P1 to P5 keep their authored species byte for byte.
+ */
+export const GENERATED_POOLS_FIRST_PLANET = 6
+
+/**
  * The first planet each ore rules version changes, version 1 first: the rarity rows from P3 (the
  * `ores` slice's `mixedRowsFromPlanet`), the roster from P1 (TD ruling on ticket 446, section 4),
  * the depth curve from its `fromPlanet` (GD on ticket 448: P1 and P2 keep the step bands), the

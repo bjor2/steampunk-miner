@@ -23,7 +23,12 @@
  *
  * Prices stay V(t) at the kind's tier (a gem's at its sale tier); no hardness, price or drill law is
  * set here. Pure and finite at any system the campaign index keeps a safe planet index for; system 1
- * is refused, as the roster refuses it.
+ * is refused here, as the roster refuses it: its planets from P6 draw through `firstSystemPools.ts`
+ * (ticket 888), the same generator over the act's run of planets instead of a drawn roster.
+ *
+ * A pool is cut from the mix the planet is generated with under its ore rules stamp, so a planet a
+ * save holds keeps the kinds its cells were drawn from; with no stamp named it is the stamp a planet
+ * entered now takes.
  */
 import { gemSaleTiersOfPlanet } from '../../../systems/registries/planetRow'
 import { planetIndexOfCampaign } from '../../../systems/starMap/campaignIndex'
@@ -83,9 +88,12 @@ export interface MaterialPool {
   gemValueShareBp: number
 }
 
+/** What a pool reads of its planet: its address, campaign index, act and new-content slot. */
+export type PoolPlanet = Pick<RosterPlanet, 'id' | 'campaignIndex' | 'act' | 'slot'>
+
 /** A planet's pool before its looks: its kinds' ore facts and its gem share. */
-interface PoolDraft {
-  roster: RosterPlanet
+export interface PoolDraft {
+  roster: PoolPlanet
   kinds: readonly Omit<PoolKind, keyof KindLook | 'epithet' | 'name'>[]
   gemValueShareBp: number
 }
@@ -93,14 +101,15 @@ interface PoolDraft {
 const NEW_ORE_FAMILY_LEAD = 1
 const SURFACE_BAND = 1
 
-/** The pools of system `system` (from 2), in place order. */
+/** The pools of system `system` (from 2), in place order, under ore rules `oreRulesVersion`. */
 export function systemMaterialPoolsOf(
   worldSeed: number,
   system: bigint,
   rules: MaterialPoolRules = MATERIAL_POOL_RULES,
+  oreRulesVersion?: number,
 ): MaterialPool[] {
   const drafts = systemRosterOf(worldSeed, system).map((roster) =>
-    poolDraftOf(worldSeed, system, roster, rules),
+    poolDraftOf(worldSeed, system, roster, { rules, oreRulesVersion }),
   )
   const looks = systemKindLooksOf(
     worldSeed,
@@ -115,34 +124,49 @@ export function planetMaterialPoolOf(
   worldSeed: number,
   system: bigint,
   planet: bigint,
+  oreRulesVersion?: number,
 ): MaterialPool {
-  const pools = systemMaterialPoolsOf(worldSeed, system)
+  const pools = systemMaterialPoolsOf(worldSeed, system, MATERIAL_POOL_RULES, oreRulesVersion)
   const found = pools.find((pool) => pool.planet.planet === toIndexText(planet))
   if (found === undefined) throw new RangeError(`system ${system} holds no planet ${planet}`)
   return found
 }
 
-/** The ore mix the planet is generated with: its campaign index's, under its address seed. */
-export function poolMixOf(worldSeed: number, system: bigint, roster: RosterPlanet): OreMix {
-  const planetIndex = planetIndexOfCampaign(readIndexText(roster.campaignIndex) ?? 0n)
-  const params = planetParamsAt(worldSeed, system, planetIndex, oreRulesVersionOnEntry(planetIndex))
-  return oreMixOf(params)
-}
-
-function poolDraftOf(
+/**
+ * The ore mix the planet is generated with: its campaign index's, under its address seed and its
+ * ore rules stamp (the stamp a planet entered now takes when none is named).
+ */
+export function poolMixOf(
   worldSeed: number,
   system: bigint,
-  roster: RosterPlanet,
-  rules: MaterialPoolRules,
+  roster: PoolPlanet,
+  oreRulesVersion?: number,
+): OreMix {
+  const planetIndex = planetIndexOfCampaign(readIndexText(roster.campaignIndex) ?? 0n)
+  const stamp = oreRulesVersion ?? oreRulesVersionOnEntry(planetIndex)
+  return oreMixOf(planetParamsAt(worldSeed, system, planetIndex, stamp))
+}
+
+/** The Systems numbers a pool is cut by and the ore rules its planet's cells were drawn under. */
+export interface PoolCut {
+  rules: MaterialPoolRules
+  oreRulesVersion: number | undefined
+}
+
+export function poolDraftOf(
+  worldSeed: number,
+  system: bigint,
+  roster: PoolPlanet,
+  { rules, oreRulesVersion }: PoolCut,
 ): PoolDraft {
-  const mix = poolMixOf(worldSeed, system, roster)
+  const mix = poolMixOf(worldSeed, system, roster, oreRulesVersion)
   const runs = splitRunsOf(paintedRunsOf(mix), rules.kindsTarget)
   const gemTiers = gemSaleTiersByKindOf(runs, rules.gemCount, mix.planetIndex)
   const kinds = kindsOfRuns(poolIdOf(roster.id), runs, gemTiers, newOreFamilyOf(roster.slot))
   return { roster, kinds, gemValueShareBp: gemValueShareBpOf(mix, runSalesOf(runs, kinds)) }
 }
 
-function poolOf(draft: PoolDraft, looks: readonly KindLook[]): MaterialPool {
+export function poolOf(draft: PoolDraft, looks: readonly KindLook[]): MaterialPool {
   const { roster } = draft
   return {
     id: poolIdOf(roster.id),
