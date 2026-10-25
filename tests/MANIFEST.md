@@ -23,7 +23,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | Every buyable has a description | #159 | `src/systems/registries/buyableRefs.test.ts`, `src/features/descriptions/systems/descriptionCoverage.test.ts` | 10 |
 | Every ore family has a gateClass row | #141, #142 | `src/features/planet-mix/systems/themeRows.test.ts`, `src/features/mining-gates/systems/rigs.test.ts`, `src/features/mining-gates/systems/gateTable.test.ts` | 19 |
 | Endless signature coverage, planets 41-65 | #148 | `src/features/mining-gates/systems/rigs.test.ts` | 8 |
-| Locked unlock schedule and one home per stats.json row (stay in the kernel) | #184, #191 | `src/systems/unlocks/unlockSchedule.test.ts`, `src/systems/registries/scheduleRows.test.ts` | 44 |
+| Locked unlock schedule and one home per stats.json row (stay in the kernel) | #184, #191 | `src/systems/unlocks/unlockSchedule.test.ts`, `src/systems/registries/scheduleRows.test.ts` | 51 |
 
 ## Slices
 
@@ -1439,7 +1439,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/planetRowLooks.test.ts` | 7 | 7 |
 | `src/systems/registries/planetSkyBand.test.ts` | 5 | 5 |
 | `src/systems/registries/saveSections.test.ts` | 3 | 3 |
-| `src/systems/registries/scheduleRows.test.ts` | 4 | 4 |
+| `src/systems/registries/scheduleRows.test.ts` | 9 | 9 |
 | `src/systems/registries/seal.test.ts` | 12 | 12 |
 | `src/systems/registries/soundCues.test.ts` | 2 | 2 |
 | `src/systems/registries/spendFamilies.test.ts` | 11 | 11 |
@@ -1835,7 +1835,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/unlocks/readUnlockSchedule.test.ts` | 10 | 10 |
 | `src/systems/unlocks/scheduleCadence.test.ts` | 5 | 5 |
 | `src/systems/unlocks/travelUnlocks.test.ts` | 7 | 7 |
-| `src/systems/unlocks/unlockSchedule.test.ts` | 40 | 37 |
+| `src/systems/unlocks/unlockSchedule.test.ts` | 42 | 39 |
 
 ### `vehicle`
 
