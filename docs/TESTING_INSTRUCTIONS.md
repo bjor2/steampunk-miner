@@ -781,7 +781,11 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   casing through the player's placement code, one ring per metre, and the lining bill is settled per
   Sell bay visit (#115, #128); the pacing specs fail a drill dive that lays no ring (a span's
   `casing_lined` rings or a `casing_placed`) and a slice that
-  forgives more than a tenth of the lining it charged. `src/logging/pacingGate.test.ts` fails on a
+  forgives more than a tenth of the lining it charged. The casing price bars of ticket 894 (grades
+  and lining paid 12-20% of everything bought on each of P1-P5, travel excluded; the next grade at
+  most 25% of the money held on each jump in; collapses printed) are the lane
+  `src/logging/casingPrice.lane.test.ts`, its tally and bars unit-specced in `casingSpend.test.ts`
+  and `casingPriceBars.test.ts`. `src/logging/pacingGate.test.ts` fails on a
   missed pacing target (`src/constants/pacingTargets.ts`), an unregistered event or field, a broken
   #2 sequence or core events and commands in the first hour over 1.3x the bytes ticket 420
   measured with drill spans folded (about 2.4 MB, never above #11 am. 2's 4 MB; it prints the bytes
