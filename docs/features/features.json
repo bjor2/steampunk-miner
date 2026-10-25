@@ -944,11 +944,18 @@
           "children": [
             {
               "title": "Specialist merchants",
-              "description": "A merchant in the shops of each of planets 1 to 5 with its own stock and a premium on one home ore, selling that planet's kit item: the Cache Crate on planet 1, the Scree Plough, Damp Flask, Shard Tongs and Vent Vane on planets 2 to 5. The Sell bay shows the planet's merchant, the ore it pays extra for and its stock with prices; that ore mined there sells for a quarter more at its merchant, never on top of the assay beacon. Each merchant's frontage dresses the Assay & Exchange in its planet's colour with its trade on a shingle, and each tool has its part on the rig. Each line has a Buy: a tool is owned for good, a consumable is carried up to 3, and a line says Owned or Carrying the most once you can buy no more. The four hazard tools are listed but not on sale yet: they come on sale with their verbs on the hazards, which are not built.",
+              "description": "A merchant in the shops of each of planets 1 to 5 with its own stock and a premium on one home ore, selling that planet's kit item: the Cache Crate on planet 1, the Scree Plough, Damp Flask, Shard Tongs and Vent Vane on planets 2 to 5. The Sell bay shows the planet's merchant, the ore it pays extra for and its stock with prices; that ore mined there sells for a quarter more at its merchant, never on top of the assay beacon. Each merchant's frontage dresses the Assay & Exchange in its planet's colour with its trade on a shingle, and each tool has its part on the rig. Each line has a Buy: a tool is owned for good, a consumable is carried up to 3, and a line says Owned or Carrying the most once you can buy no more. The four hazard tools are on sale since each does one visible thing on its hazard (see Hazard tools).",
               "status": "partial",
-              "issues": [80, 647, 821, 850],
+              "issues": [80, 647, 821, 850, 882],
               "planet": 1,
               "children": [
+                {
+                  "title": "Hazard tools",
+                  "description": "The Scree Plough, Shard Tongs and Vent Vane act on their own while their hazard is within the drill's reach, and the Damp Flask is uncorked on purpose. While acting each does one visible thing, tagged on screen where it happens: the plough shoves the scree ahead of the drill one tile aside into an open cell, the tongs lift a spinecrystal cluster as loot instead of letting it shatter, the vane turns a vent's blast outward from the core without making it any longer, and an open flask clears firedamp within 2 tiles for a minute. Each softens its hazard and slows one part of the rig while it acts. The deployed pose of each tool on the rig is not built yet.",
+                  "status": "partial",
+                  "issues": [881, 882, 883],
+                  "planet": 2
+                },
                 {
                   "title": "Cache Crate containers",
                   "description": "Drop your whole hold as a crate at your cell and pick it up later, only you; at most 3 per planet. Crates stay through saves and jumps, show as markers on the map and in the Cache Crates list on the base sheet. A crate is bought at the Hearthmoor merchant and carried, up to 3, counted on the HUD; the list's first card drops your hold as one, spending it. The pacing bot carries crates only under its crate policy, in the paired crates on/off replay.",
