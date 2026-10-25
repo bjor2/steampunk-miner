@@ -56,6 +56,142 @@
         "tier-3": 0
       },
       "differsFromSlotPart": 719
+    },
+    "jacketed-boiler": {
+      "cells": 5246,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 669
+    },
+    "sight-glass-boiler": {
+      "cells": 5246,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 669
+    },
+    "pumped-boiler": {
+      "cells": 5256,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 659
+    },
+    "cocked-boiler": {
+      "cells": 5256,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 659
+    },
+    "finned-boiler": {
+      "cells": 5315,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 600
+    },
+    "radiator-boiler": {
+      "cells": 5315,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 600
+    },
+    "blower-boiler": {
+      "cells": 5315,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 600
+    },
+    "feed-tank-boiler": {
+      "cells": 5331,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 584
+    },
+    "condenser-boiler": {
+      "cells": 5331,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 584
+    },
+    "thermometer-boiler": {
+      "cells": 5331,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 584
+    },
+    "hooped-boiler": {
+      "cells": 5448,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 467
+    },
+    "rimed-boiler": {
+      "cells": 5448,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 467
+    },
+    "cryo-coil-boiler": {
+      "cells": 5448,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 467
+    },
+    "chill-lens-boiler": {
+      "cells": 5448,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 467
+    },
+    "chiller-boiler": {
+      "cells": 5448,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 467
+    },
+    "frost-line-boiler": {
+      "cells": 5458,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 457
+    },
+    "aether-frost-boiler": {
+      "cells": 5458,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 457
     }
   }
 }

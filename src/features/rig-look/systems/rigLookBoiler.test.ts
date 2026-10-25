@@ -13,10 +13,13 @@ import { everyLookFrameOf } from './render/rigLookFrames'
 
 /**
  * The boiler's authored steps on its band edges of 5 (ticket 809): the twin-drum boiler (ticket
- * 583), then each LK2 part fitted in its socket in G&V's order (ticket 810). Past the top step the
- * finish bands keep the top part.
+ * 583), then each LK2 part fitted in its socket in G&V's order (ticket 810), then the seventeen
+ * LK10 cooling fittings to about P40 (ticket 873), one on every edge the line has. Past the top
+ * step the finish bands keep the top part.
  */
 const BAND = 5
+const LK2_STEPS = 6
+const SIZING_ROW_STEPS = 13
 const STEPS: readonly { from: number; part: string }[] = [
   { from: 5, part: 'twin-drum-boiler' },
   { from: 10, part: 'gauged-boiler' },
@@ -24,6 +27,23 @@ const STEPS: readonly { from: number; part: string }[] = [
   { from: 20, part: 'manifold-boiler' },
   { from: 25, part: 'steam-drum-boiler' },
   { from: 30, part: 'firebox-boiler' },
+  { from: 35, part: 'jacketed-boiler' },
+  { from: 40, part: 'sight-glass-boiler' },
+  { from: 45, part: 'pumped-boiler' },
+  { from: 50, part: 'cocked-boiler' },
+  { from: 55, part: 'finned-boiler' },
+  { from: 60, part: 'radiator-boiler' },
+  { from: 65, part: 'blower-boiler' },
+  { from: 70, part: 'feed-tank-boiler' },
+  { from: 75, part: 'condenser-boiler' },
+  { from: 80, part: 'thermometer-boiler' },
+  { from: 85, part: 'hooped-boiler' },
+  { from: 90, part: 'rimed-boiler' },
+  { from: 95, part: 'cryo-coil-boiler' },
+  { from: 100, part: 'chill-lens-boiler' },
+  { from: 105, part: 'chiller-boiler' },
+  { from: 110, part: 'frost-line-boiler' },
+  { from: 115, part: 'aether-frost-boiler' },
 ]
 const FIRST_STEP = STEPS[0].from
 const TOP = STEPS[STEPS.length - 1]
@@ -46,18 +66,40 @@ function withBoilerLevel(state: AuthorityState, level: number): AuthorityState {
   return { ...state, players: { ...state.players, p1: { ...player, vehicle } } }
 }
 
-describe('boiler rig look (tickets 583 and 810)', () => {
+describe('boiler rig look (tickets 583, 810 and 873)', () => {
   it('keeps the rig boiler below 5 purchases', () => {
     expect(swapsAt(FIRST_STEP - 1)).toEqual([])
     expect(drawnSlotsAt(FIRST_STEP - 1, 1)).toContain('boiler')
   })
 
-  it('has at least 5 authored steps, one on each of the first band edges', () => {
-    expect(STEPS.length).toBeGreaterThanOrEqual(5)
+  it('has at least 13 authored steps, one on each band edge to about P40 (the sizing row)', () => {
+    expect(STEPS.length).toBeGreaterThanOrEqual(SIZING_ROW_STEPS)
+    expect(STEPS.map((step) => step.from)).toEqual(
+      trackLookFramesOf(SHIPPED_RIG_LOOKS, 'boiler')!.rows.band.edges,
+    )
     STEPS.forEach((step, at) => {
       expect(step.from).toBe((at + 1) * BAND)
       expect(rigLookOf('boiler', step.from)?.step).toBe(at + 1)
     })
+  })
+
+  it("keeps the twin-drum boiler and LK2's five fittings as the first six steps", () => {
+    expect(STEPS.slice(0, LK2_STEPS).map((step) => step.part)).toEqual([
+      'twin-drum-boiler',
+      'gauged-boiler',
+      'whistle-boiler',
+      'manifold-boiler',
+      'steam-drum-boiler',
+      'firebox-boiler',
+    ])
+  })
+
+  it('names every band in a data string of 3 words or fewer', () => {
+    const frames = trackLookFramesOf(SHIPPED_RIG_LOOKS, 'boiler')!
+    for (const step of frames.rows.steps) {
+      expect(step.card).not.toBeNull()
+      expect(step.card!.split(' ').length).toBeLessThanOrEqual(3)
+    }
   })
 
   it.each(STEPS)(
@@ -78,7 +120,7 @@ describe('boiler rig look (tickets 583 and 810)', () => {
     }
   })
 
-  it('keeps the firebox door boiler on every finish band above the top step', () => {
+  it('keeps the aether frost boiler on every finish band above the top step', () => {
     for (const n of TAIL_POINTS) {
       expect(lookPartIdsOf(SHIPPED_ART, swapsAt(n))).toEqual([lookIdOf(TOP.part)])
     }

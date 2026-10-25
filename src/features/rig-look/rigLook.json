@@ -6,11 +6,28 @@
   },
   "lookAssets": {
     "vehicle-look-boiler": [
+      "aether-frost-boiler",
+      "blower-boiler",
+      "chill-lens-boiler",
+      "chiller-boiler",
+      "cocked-boiler",
+      "condenser-boiler",
+      "cryo-coil-boiler",
+      "feed-tank-boiler",
+      "finned-boiler",
       "firebox-boiler",
+      "frost-line-boiler",
       "gauged-boiler",
+      "hooped-boiler",
+      "jacketed-boiler",
       "kettle-boiler",
       "manifold-boiler",
+      "pumped-boiler",
+      "radiator-boiler",
+      "rimed-boiler",
+      "sight-glass-boiler",
       "steam-drum-boiler",
+      "thermometer-boiler",
       "twin-drum-boiler",
       "whistle-boiler"
     ],
@@ -730,7 +747,24 @@
           "whistle-boiler",
           "manifold-boiler",
           "steam-drum-boiler",
-          "firebox-boiler"
+          "firebox-boiler",
+          "jacketed-boiler",
+          "sight-glass-boiler",
+          "pumped-boiler",
+          "cocked-boiler",
+          "finned-boiler",
+          "radiator-boiler",
+          "blower-boiler",
+          "feed-tank-boiler",
+          "condenser-boiler",
+          "thermometer-boiler",
+          "hooped-boiler",
+          "rimed-boiler",
+          "cryo-coil-boiler",
+          "chill-lens-boiler",
+          "chiller-boiler",
+          "frost-line-boiler",
+          "aether-frost-boiler"
         ]
       ],
       "glowCap": "rigBody",
@@ -782,6 +816,142 @@
           "card": "Firebox door",
           "colour": "#fff6b0",
           "glows": [0.7]
+        },
+        {
+          "from": 35,
+          "part": "jacketed-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Water jackets",
+          "colour": "#f4f0c0",
+          "glows": [0.74]
+        },
+        {
+          "from": 40,
+          "part": "sight-glass-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Sight glasses",
+          "colour": "#e4e8ec",
+          "glows": [0.74]
+        },
+        {
+          "from": 45,
+          "part": "pumped-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Feed pump",
+          "colour": "#f0c070",
+          "glows": [0.74]
+        },
+        {
+          "from": 50,
+          "part": "cocked-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Blow-down cocks",
+          "colour": "#d8dde2",
+          "glows": [0.74]
+        },
+        {
+          "from": 55,
+          "part": "finned-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Cooling fins",
+          "colour": "#dbe6ee",
+          "glows": [0.74]
+        },
+        {
+          "from": 60,
+          "part": "radiator-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Radiator grille",
+          "colour": "#cfd6dc",
+          "glows": [0.74]
+        },
+        {
+          "from": 65,
+          "part": "blower-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Blower fan",
+          "colour": "#c8d8e4",
+          "glows": [0.74]
+        },
+        {
+          "from": 70,
+          "part": "feed-tank-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Feedwater tank",
+          "colour": "#d89a6a",
+          "glows": [0.74]
+        },
+        {
+          "from": 75,
+          "part": "condenser-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Condenser coils",
+          "colour": "#c87a48",
+          "glows": [0.74]
+        },
+        {
+          "from": 80,
+          "part": "thermometer-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Thermometer dial",
+          "colour": "#bfe0f4",
+          "glows": [0.74]
+        },
+        {
+          "from": 85,
+          "part": "hooped-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Brass hoop",
+          "colour": "#e0c060",
+          "glows": [0.74]
+        },
+        {
+          "from": 90,
+          "part": "rimed-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Frost rime",
+          "colour": "#e8f4fc",
+          "glows": [0.74]
+        },
+        {
+          "from": 95,
+          "part": "cryo-coil-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Cryo coils",
+          "colour": "#8fdcff",
+          "glows": [0.74]
+        },
+        {
+          "from": 100,
+          "part": "chill-lens-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Chill lenses",
+          "colour": "#a8e8ff",
+          "glows": [0.74]
+        },
+        {
+          "from": 105,
+          "part": "chiller-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Aether chiller",
+          "colour": "#7fe0ff",
+          "glows": [0.74]
+        },
+        {
+          "from": 110,
+          "part": "frost-line-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Frost lines",
+          "colour": "#b8f0ff",
+          "glows": [0.74]
+        },
+        {
+          "from": 115,
+          "part": "aether-frost-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Aether frost",
+          "colour": "#9ff0ff",
+          "glows": [0.74]
         }
       ],
       "band": {

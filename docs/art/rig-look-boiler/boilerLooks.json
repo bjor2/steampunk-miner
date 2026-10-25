@@ -1,5 +1,5 @@
 {
-  "about": "The boiler track's rig-look parts (ticket 582, wave 576-1B of the rig look ladder #576; the LK2 steps of ticket 810, wave 647-7K): one asset at the track's attach slot, one part per look step. The thresholds are the band edges LK1 (#809) froze for the boiler, step 5, and the names the data strings of 3 words or fewer the hover line shows; the wiring reads them from rigLook.json (#577), not from here.",
+  "about": "The boiler track's rig-look parts (ticket 582, wave 576-1B of the rig look ladder #576; the LK2 steps of ticket 810, wave 647-7K, and the LK10 steps of ticket 873, wave 647-7Z): one asset at the track's attach slot, one part per look step. The thresholds are the band edges LK1 (#809) froze for the boiler, step 5, authored to about P40 (115), and the names the data strings of 3 words or fewer the hover line shows; the wiring reads them from rigLook.json (#577), not from here. The boiler is the cooling line (heatEconomy.ts), so the LK10 parts are cooling fittings: water-side fittings first, then condensing gear, then the ice-blue aether chill glows.",
   "assetId": "vehicle-look-boiler",
   "track": "boiler",
   "attach": "hull.boiler",
@@ -41,6 +41,91 @@
       "part": "firebox-boiler",
       "name": "Firebox door",
       "purchases": 30
+    },
+    {
+      "part": "jacketed-boiler",
+      "name": "Water jackets",
+      "purchases": 35
+    },
+    {
+      "part": "sight-glass-boiler",
+      "name": "Sight glasses",
+      "purchases": 40
+    },
+    {
+      "part": "pumped-boiler",
+      "name": "Feed pump",
+      "purchases": 45
+    },
+    {
+      "part": "cocked-boiler",
+      "name": "Blow-down cocks",
+      "purchases": 50
+    },
+    {
+      "part": "finned-boiler",
+      "name": "Cooling fins",
+      "purchases": 55
+    },
+    {
+      "part": "radiator-boiler",
+      "name": "Radiator grille",
+      "purchases": 60
+    },
+    {
+      "part": "blower-boiler",
+      "name": "Blower fan",
+      "purchases": 65
+    },
+    {
+      "part": "feed-tank-boiler",
+      "name": "Feedwater tank",
+      "purchases": 70
+    },
+    {
+      "part": "condenser-boiler",
+      "name": "Condenser coils",
+      "purchases": 75
+    },
+    {
+      "part": "thermometer-boiler",
+      "name": "Thermometer dial",
+      "purchases": 80
+    },
+    {
+      "part": "hooped-boiler",
+      "name": "Brass hoop",
+      "purchases": 85
+    },
+    {
+      "part": "rimed-boiler",
+      "name": "Frost rime",
+      "purchases": 90
+    },
+    {
+      "part": "cryo-coil-boiler",
+      "name": "Cryo coils",
+      "purchases": 95
+    },
+    {
+      "part": "chill-lens-boiler",
+      "name": "Chill lenses",
+      "purchases": 100
+    },
+    {
+      "part": "chiller-boiler",
+      "name": "Aether chiller",
+      "purchases": 105
+    },
+    {
+      "part": "frost-line-boiler",
+      "name": "Frost lines",
+      "purchases": 110
+    },
+    {
+      "part": "aether-frost-boiler",
+      "name": "Aether frost",
+      "purchases": 115
     }
   ]
 }

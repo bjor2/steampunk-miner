@@ -2,8 +2,8 @@
  * The rig look ladder in the browser (#577): each upgrade track's look steps up at its first
  * band edge of `rigLook.json` and keeps changing on every band above its top step (ticket 809: a
  * finish a band, named on the card with the exact level), painted as
- * glows on the car's own parts, so the frame stays inside #38's 150 draw calls; the boiler's step
- * swaps in its twin-drum look part (ticket 583), and each hull step lays its armour over the pod,
+ * glows on the car's own parts, so the frame stays inside #38's 150 draw calls; the boiler's steps
+ * swap in their look parts (tickets 583, 810 and 873), and each hull step lays its armour over the pod,
  * hiding no rig part, while the hull card names the owned band (tickets 585, 809).
  * Asserted through `steampunkDebug` and test ids, never pixels; the boiler's and the hull's
  * screenshots are attached for review.
@@ -104,8 +104,8 @@ test.describe('rig look ladder (#577)', () => {
 
 /**
  * The purchase before the boiler's first edge, each authored step on its band edge of 5 (tickets
- * 809 and 810: the twin-drum boiler, then a part fitted per step), and two finish bands above the
- * top step, which keep the top part.
+ * 809 and 810: the twin-drum boiler, then a part fitted per step; ticket 873: the seventeen LK10
+ * cooling fittings to about P40), and two finish bands above the top step, which keep the top part.
  */
 const BOILER_COUNTS: readonly { purchases: number; part: string | null }[] = [
   { purchases: 4, part: null },
@@ -115,8 +115,25 @@ const BOILER_COUNTS: readonly { purchases: number; part: string | null }[] = [
   { purchases: 20, part: 'manifold-boiler' },
   { purchases: 25, part: 'steam-drum-boiler' },
   { purchases: 30, part: 'firebox-boiler' },
-  { purchases: 35, part: 'firebox-boiler' },
-  { purchases: 40, part: 'firebox-boiler' },
+  { purchases: 35, part: 'jacketed-boiler' },
+  { purchases: 40, part: 'sight-glass-boiler' },
+  { purchases: 45, part: 'pumped-boiler' },
+  { purchases: 50, part: 'cocked-boiler' },
+  { purchases: 55, part: 'finned-boiler' },
+  { purchases: 60, part: 'radiator-boiler' },
+  { purchases: 65, part: 'blower-boiler' },
+  { purchases: 70, part: 'feed-tank-boiler' },
+  { purchases: 75, part: 'condenser-boiler' },
+  { purchases: 80, part: 'thermometer-boiler' },
+  { purchases: 85, part: 'hooped-boiler' },
+  { purchases: 90, part: 'rimed-boiler' },
+  { purchases: 95, part: 'cryo-coil-boiler' },
+  { purchases: 100, part: 'chill-lens-boiler' },
+  { purchases: 105, part: 'chiller-boiler' },
+  { purchases: 110, part: 'frost-line-boiler' },
+  { purchases: 115, part: 'aether-frost-boiler' },
+  { purchases: 120, part: 'aether-frost-boiler' },
+  { purchases: 125, part: 'aether-frost-boiler' },
 ]
 const boilerLookIdOf = (part: string) => `vehicle-look-boiler/${part}`
 const VIEWPORTS = [

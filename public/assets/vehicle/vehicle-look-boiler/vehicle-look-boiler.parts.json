@@ -3,13 +3,13 @@
   "schema": 1,
   "source": {
     "blend": "art/blender/vehicle-look-boiler/vehicle-look-boiler.blend",
-    "sha256": "91977a6e373cec01b1c5ef592ab55720f9ef61b5d9c0823d514ea665b63bb817",
+    "sha256": "62413b5225e7fcd11d0826ce930d82f2ef0c424d9ccb85e9611c052dc97636e9",
     "blender": "4.2.9 LTS"
   },
   "pxPerMetre": 512,
   "atlasPx": [
-    2048,
-    256
+    1024,
+    2048
   ],
   "maps": {
     "albedo": "vehicle-look-boiler.albedo.ktx2",
@@ -18,7 +18,7 @@
   },
   "parts": [
     {
-      "id": "firebox-boiler",
+      "id": "aether-frost-boiler",
       "tier": 1,
       "rect": [
         8,
@@ -41,7 +41,7 @@
       "z": 3
     },
     {
-      "id": "gauged-boiler",
+      "id": "blower-boiler",
       "tier": 1,
       "rect": [
         280,
@@ -64,7 +64,7 @@
       "z": 3
     },
     {
-      "id": "kettle-boiler",
+      "id": "chill-lens-boiler",
       "tier": 1,
       "rect": [
         552,
@@ -87,11 +87,379 @@
       "z": 3
     },
     {
+      "id": "chiller-boiler",
+      "tier": 1,
+      "rect": [
+        8,
+        188,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "cocked-boiler",
+      "tier": 1,
+      "rect": [
+        280,
+        188,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "condenser-boiler",
+      "tier": 1,
+      "rect": [
+        552,
+        188,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "cryo-coil-boiler",
+      "tier": 1,
+      "rect": [
+        8,
+        368,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "feed-tank-boiler",
+      "tier": 1,
+      "rect": [
+        280,
+        368,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "finned-boiler",
+      "tier": 1,
+      "rect": [
+        552,
+        368,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "firebox-boiler",
+      "tier": 1,
+      "rect": [
+        8,
+        548,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "frost-line-boiler",
+      "tier": 1,
+      "rect": [
+        280,
+        548,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "gauged-boiler",
+      "tier": 1,
+      "rect": [
+        552,
+        548,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "hooped-boiler",
+      "tier": 1,
+      "rect": [
+        8,
+        728,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "jacketed-boiler",
+      "tier": 1,
+      "rect": [
+        280,
+        728,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "kettle-boiler",
+      "tier": 1,
+      "rect": [
+        552,
+        728,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
       "id": "manifold-boiler",
       "tier": 1,
       "rect": [
-        824,
         8,
+        908,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "pumped-boiler",
+      "tier": 1,
+      "rect": [
+        280,
+        908,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "radiator-boiler",
+      "tier": 1,
+      "rect": [
+        552,
+        908,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "rimed-boiler",
+      "tier": 1,
+      "rect": [
+        8,
+        1088,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "sight-glass-boiler",
+      "tier": 1,
+      "rect": [
+        280,
+        1088,
         256,
         164
       ],
@@ -113,8 +481,31 @@
       "id": "steam-drum-boiler",
       "tier": 1,
       "rect": [
-        1096,
+        552,
+        1088,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "thermometer-boiler",
+      "tier": 1,
+      "rect": [
         8,
+        1268,
         256,
         164
       ],
@@ -136,8 +527,8 @@
       "id": "twin-drum-boiler",
       "tier": 1,
       "rect": [
-        1368,
-        8,
+        280,
+        1268,
         256,
         164
       ],
@@ -159,8 +550,8 @@
       "id": "whistle-boiler",
       "tier": 1,
       "rect": [
-        1640,
-        8,
+        552,
+        1268,
         256,
         164
       ],

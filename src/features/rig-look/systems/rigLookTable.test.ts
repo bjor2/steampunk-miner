@@ -93,7 +93,8 @@ describe('rig look table', () => {
     expect(fromsOf('cargo_hold')).toHaveLength(21)
     expect(fromsOf('engine')).toEqual(bandOf('engine').edges)
     expect(fromsOf('engine')).toHaveLength(20)
-    expect(fromsOf('boiler')).toEqual([5, 10, 15, 20, 25, 30])
+    expect(fromsOf('boiler')).toEqual(bandOf('boiler').edges)
+    expect(fromsOf('boiler')).toHaveLength(23)
     expect(fromsOf('hull')).toEqual(bandOf('hull').edges)
     expect(fromsOf('hull')).toHaveLength(19)
   })
@@ -204,6 +205,23 @@ describe('rig look table', () => {
       'Pipe manifold',
       'Steam drum',
       'Firebox door',
+      'Water jackets',
+      'Sight glasses',
+      'Feed pump',
+      'Blow-down cocks',
+      'Cooling fins',
+      'Radiator grille',
+      'Blower fan',
+      'Feedwater tank',
+      'Condenser coils',
+      'Thermometer dial',
+      'Brass hoop',
+      'Frost rime',
+      'Cryo coils',
+      'Chill lenses',
+      'Aether chiller',
+      'Frost lines',
+      'Aether frost',
     ])
     expect(cardsOf('hull')).toEqual([
       'Riveted plate',
@@ -383,11 +401,28 @@ describe('rig look table', () => {
   it('names each shipped look asset with the parts its Blender file has', () => {
     expect(RIG_LOOK_TABLE.lookAssets).toEqual({
       'vehicle-look-boiler': [
+        'aether-frost-boiler',
+        'blower-boiler',
+        'chill-lens-boiler',
+        'chiller-boiler',
+        'cocked-boiler',
+        'condenser-boiler',
+        'cryo-coil-boiler',
+        'feed-tank-boiler',
+        'finned-boiler',
         'firebox-boiler',
+        'frost-line-boiler',
         'gauged-boiler',
+        'hooped-boiler',
+        'jacketed-boiler',
         'kettle-boiler',
         'manifold-boiler',
+        'pumped-boiler',
+        'radiator-boiler',
+        'rimed-boiler',
+        'sight-glass-boiler',
         'steam-drum-boiler',
+        'thermometer-boiler',
         'twin-drum-boiler',
         'whistle-boiler',
       ],
