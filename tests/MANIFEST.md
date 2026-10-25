@@ -1449,7 +1449,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/enemyPlaceholder.test.ts` | 7 | 3 |
 | `src/systems/render/enemyTint.test.ts` | 5 | 5 |
 | `src/systems/render/frameWindow.test.ts` | 4 | 4 |
-| `src/systems/render/fuelTenderLook.test.ts` | 22 | 17 |
+| `src/systems/render/fuelTenderLook.test.ts` | 33 | 18 |
 | `src/systems/render/fuelTenderLookSource.test.ts` | 4 | 4 |
 | `src/systems/render/gatePatterns.test.ts` | 10 | 10 |
 | `src/systems/render/gemGlint.test.ts` | 15 | 15 |

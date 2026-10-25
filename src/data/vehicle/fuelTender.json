@@ -1,5 +1,5 @@
 {
-  "$comment": "The coal tender on the rig (ticket 758; the GD lock on #650, comment 6361556890: the fuel tank 'shows on the rig as a coal tender wagon on the #576 ladder'). The tank track (ticket 756) is its own price-only, uncapped track outside UPGRADE_IDS, so its look lives here rather than in the rig-look slice's rigLook.json, keyed by the tank's level (vehicleFuel.ts fuelTankLevelOf, 1 before the first purchase) the way a rig look keys by owned count (HS on #576: a pure function of the level, never saved). The wagon hangs at the wagon hitch, hull.hitch (TD after the Horizontal Scaler review on #162), the point a rig-look part never takes, so a wagon's own visual wins it (HS on #577). Steps are tank levels: the starting tank is the coal cart, and the first purchase already changes the wagon (VS on #576: no step before the first purchase, each step visibly different at 360 px). Systems' per-planet thresholds table (#157 comment 6300543785) has no tank column, since the on-curve bot buys no tank level (the starting tank holds the next hop, #756), so the levels here are the art pass's own choice: 2, 3 and 5, one step per purchase at first, then one past the third. LK5 (ticket 813, wave 647-7K of the P1-P5 map #647; the GD lock of 24 Oct 14:54: at least 5 authored steps on every line, each an added part in a socket, never a recolour, and the tender exempt from the decade rule, one step per purchase) adds three steps after them at levels 6, 7 and 8, each the guild tender with one more part fitted, in the ticket's order: a second tank, then a coal hopper, then a third tank with a sight glass. The cards are the hover line's band names (data strings of 3 words or fewer). Above the top step the log tail (ticket 809, LK1; the tender is exempt from the band rule and keeps one step per purchase, delta 1) wears the next finish of `tail.finishes` per purchase, a material named in 3 words or fewer painted through the kernel's vehicle look, and pips counting decades of tank capacity, floor((level - 1) / decadeStep): `decadeStep` 9 is ceil(ln 10 / ln 1.3) of economy.json's tank capacityRatio, and the cycle holds at least that many finishes so no finish and pip count repeat. Its glow stays under the rig body's cap (rigLook.json glowCaps.rigBody 1) so the drill nose stays the brightest part. assetId and attach repeat the code's derivations (fuelTenderArt.ts) for the Blender scripts under docs/art/fuel-tender/, which read this file; a spec pins them equal. Cosmetic only: never in state, a save or a digest.",
+  "$comment": "The coal tender on the rig (ticket 758; the GD lock on #650, comment 6361556890: the fuel tank 'shows on the rig as a coal tender wagon on the #576 ladder'). The tank track (ticket 756) is its own price-only, uncapped track outside UPGRADE_IDS, so its look lives here rather than in the rig-look slice's rigLook.json, keyed by the tank's level (vehicleFuel.ts fuelTankLevelOf, 1 before the first purchase) the way a rig look keys by owned count (HS on #576: a pure function of the level, never saved). The wagon hangs at the wagon hitch, hull.hitch (TD after the Horizontal Scaler review on #162), the point a rig-look part never takes, so a wagon's own visual wins it (HS on #577). Steps are tank levels: the starting tank is the coal cart, and the first purchase already changes the wagon (VS on #576: no step before the first purchase, each step visibly different at 360 px). Systems' per-planet thresholds table (#157 comment 6300543785) has no tank column, since the on-curve bot buys no tank level (the starting tank holds the next hop, #756), so the levels here are the art pass's own choice: 2, 3 and 5, one step per purchase at first, then one past the third. LK5 (ticket 813, wave 647-7K of the P1-P5 map #647; the GD lock of 24 Oct 14:54: at least 5 authored steps on every line, each an added part in a socket, never a recolour, and the tender exempt from the decade rule, one step per purchase) adds three steps after them at levels 6, 7 and 8, each the guild tender with one more part fitted, in the ticket's order: a second tank, then a coal hopper, then a third tank with a sight glass. LK11 (ticket 874, wave 647-7Z; the GD lock of 25 Oct 06:48 and Systems' sizing row of 06:53: at least 13 steps, parts added in sockets, a fixed footprint, look-only) adds ten more after them at levels 9 to 18, still one step per purchase (the tender has no band edges to re-space: LK1 #809 posts it as exempt, and the median bot buys no tank level, so the count is the sizing row's floor plus the second decade of tank capacity, levels 10 to 18, so the finish tail starts with the third decade's pips): each the sight-glass tender with one more fitting in a socket of its own, a stoker's tool rack, a works plate, a head lamp, feed pipes, a water gauge, leaf springs, wheel guards, a coal screen, an aether tank and aether coils. The cards are the hover line's band names (data strings of 3 words or fewer). Above the top step the log tail (ticket 809, LK1; the tender is exempt from the band rule and keeps one step per purchase, delta 1) wears the next finish of `tail.finishes` per purchase, a material named in 3 words or fewer painted through the kernel's vehicle look, and pips counting decades of tank capacity, floor((level - 1) / decadeStep): `decadeStep` 9 is ceil(ln 10 / ln 1.3) of economy.json's tank capacityRatio, and the cycle holds at least that many finishes so no finish and pip count repeat. Its glow stays under the rig body's cap (rigLook.json glowCaps.rigBody 1) so the drill nose stays the brightest part. assetId and attach repeat the code's derivations (fuelTenderArt.ts) for the Blender scripts under docs/art/fuel-tender/, which read this file; a spec pins them equal. Cosmetic only: never in state, a save or a digest.",
   "assetId": "vehicle-fuel-tank",
   "attach": "hull.hitch",
   "z": 0,
@@ -38,6 +38,56 @@
       "fromLevel": 8,
       "part": "glass-tank-tender",
       "card": "Sight glass tank"
+    },
+    {
+      "fromLevel": 9,
+      "part": "tooled-tender",
+      "card": "Stoker's tools"
+    },
+    {
+      "fromLevel": 10,
+      "part": "plated-tender",
+      "card": "Works plate"
+    },
+    {
+      "fromLevel": 11,
+      "part": "lamped-tender",
+      "card": "Head lamp"
+    },
+    {
+      "fromLevel": 12,
+      "part": "piped-tender",
+      "card": "Feed pipes"
+    },
+    {
+      "fromLevel": 13,
+      "part": "gauged-tender",
+      "card": "Water gauge"
+    },
+    {
+      "fromLevel": 14,
+      "part": "sprung-tender",
+      "card": "Leaf springs"
+    },
+    {
+      "fromLevel": 15,
+      "part": "guarded-tender",
+      "card": "Wheel guards"
+    },
+    {
+      "fromLevel": 16,
+      "part": "screened-tender",
+      "card": "Coal screen"
+    },
+    {
+      "fromLevel": 17,
+      "part": "aether-tank-tender",
+      "card": "Aether tank"
+    },
+    {
+      "fromLevel": 18,
+      "part": "aether-coil-tender",
+      "card": "Aether coils"
     }
   ],
   "tail": {

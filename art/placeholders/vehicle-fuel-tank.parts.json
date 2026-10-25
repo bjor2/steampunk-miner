@@ -7,7 +7,7 @@
     "blender": null
   },
   "pxPerMetre": 512,
-  "atlasPx": [512, 2048],
+  "atlasPx": [1024, 2048],
   "maps": {
     "albedo": "vehicle-fuel-tank.albedo.ktx2",
     "normal": "vehicle-fuel-tank.normal.ktx2",
@@ -15,25 +15,7 @@
   },
   "parts": [
     {
-      "id": "bunker-tender",
-      "tier": 1,
-      "rect": [8, 794, 308, 236],
-      "sizeM": [0.6, 0.46],
-      "pivotM": [0.58, 0.22],
-      "atM": [0.0, 0.0],
-      "z": 0
-    },
-    {
-      "id": "coal-cart",
-      "tier": 1,
-      "rect": [8, 1046, 308, 236],
-      "sizeM": [0.6, 0.46],
-      "pivotM": [0.58, 0.22],
-      "atM": [0.0, 0.0],
-      "z": 0
-    },
-    {
-      "id": "glass-tank-tender",
+      "id": "aether-coil-tender",
       "tier": 1,
       "rect": [8, 8, 308, 246],
       "sizeM": [0.6, 0.48],
@@ -42,16 +24,43 @@
       "z": 0
     },
     {
-      "id": "guild-tender",
+      "id": "aether-tank-tender",
       "tier": 1,
-      "rect": [8, 1298, 308, 236],
+      "rect": [332, 8, 308, 246],
+      "sizeM": [0.6, 0.48],
+      "pivotM": [0.57, 0.18],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "bunker-tender",
+      "tier": 1,
+      "rect": [332, 1056, 308, 236],
       "sizeM": [0.6, 0.46],
       "pivotM": [0.58, 0.22],
       "atM": [0.0, 0.0],
       "z": 0
     },
     {
-      "id": "hopper-tender",
+      "id": "coal-cart",
+      "tier": 1,
+      "rect": [656, 1056, 308, 236],
+      "sizeM": [0.6, 0.46],
+      "pivotM": [0.58, 0.22],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "gauged-tender",
+      "tier": 1,
+      "rect": [656, 8, 308, 246],
+      "sizeM": [0.6, 0.48],
+      "pivotM": [0.57, 0.18],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "glass-tank-tender",
       "tier": 1,
       "rect": [8, 270, 308, 246],
       "sizeM": [0.6, 0.48],
@@ -60,18 +69,99 @@
       "z": 0
     },
     {
-      "id": "riveted-tender",
+      "id": "guarded-tender",
       "tier": 1,
-      "rect": [8, 1550, 308, 236],
+      "rect": [332, 270, 308, 246],
+      "sizeM": [0.6, 0.48],
+      "pivotM": [0.57, 0.18],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "guild-tender",
+      "tier": 1,
+      "rect": [8, 1318, 308, 236],
       "sizeM": [0.6, 0.46],
       "pivotM": [0.58, 0.22],
       "atM": [0.0, 0.0],
       "z": 0
     },
     {
-      "id": "twin-tank-tender",
+      "id": "hopper-tender",
+      "tier": 1,
+      "rect": [656, 270, 308, 246],
+      "sizeM": [0.6, 0.48],
+      "pivotM": [0.57, 0.18],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "lamped-tender",
       "tier": 1,
       "rect": [8, 532, 308, 246],
+      "sizeM": [0.6, 0.48],
+      "pivotM": [0.57, 0.18],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "piped-tender",
+      "tier": 1,
+      "rect": [332, 532, 308, 246],
+      "sizeM": [0.6, 0.48],
+      "pivotM": [0.57, 0.18],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "plated-tender",
+      "tier": 1,
+      "rect": [656, 532, 308, 246],
+      "sizeM": [0.6, 0.48],
+      "pivotM": [0.57, 0.18],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "riveted-tender",
+      "tier": 1,
+      "rect": [332, 1318, 308, 236],
+      "sizeM": [0.6, 0.46],
+      "pivotM": [0.58, 0.22],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "screened-tender",
+      "tier": 1,
+      "rect": [8, 794, 308, 246],
+      "sizeM": [0.6, 0.48],
+      "pivotM": [0.57, 0.18],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "sprung-tender",
+      "tier": 1,
+      "rect": [332, 794, 308, 246],
+      "sizeM": [0.6, 0.48],
+      "pivotM": [0.57, 0.18],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "tooled-tender",
+      "tier": 1,
+      "rect": [656, 794, 308, 246],
+      "sizeM": [0.6, 0.48],
+      "pivotM": [0.57, 0.18],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "twin-tank-tender",
+      "tier": 1,
+      "rect": [8, 1056, 308, 246],
       "sizeM": [0.6, 0.48],
       "pivotM": [0.57, 0.18],
       "atM": [0.0, 0.0],

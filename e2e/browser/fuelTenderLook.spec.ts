@@ -1,9 +1,10 @@
 /**
- * The coal tender's look steps in the browser (ticket 813, LK5 of spec #647; the ladder of ticket
- * 758): the kernel piece hangs one `vehicle-fuel-tank` wagon at `hull.hitch` for the tank's level,
- * the #758 wagons at levels 1, 2, 3 and 5 and the LK5 parts fitted on the guild tender at 6, 7 and
- * 8, one step a purchase (the tender is exempt from the decade rule); past the top step the finish
- * tail keeps the top wagon, and the look leaves the physics world as it was. The tank is bought
+ * The coal tender's look steps in the browser (tickets 813 and 874, LK5 and LK11 of spec #647; the
+ * ladder of ticket 758): the kernel piece hangs one `vehicle-fuel-tank` wagon at `hull.hitch` for
+ * the tank's level, the #758 wagons at levels 1, 2, 3 and 5, the LK5 parts fitted on the guild
+ * tender at 6, 7 and 8 and the LK11 fittings at 9 to 18, one step a purchase (the tender is exempt
+ * from the decade rule); past the top step the finish tail keeps the top wagon, and the look leaves
+ * the physics world as it was. The tank is bought
  * level by level at the Sell bay through the authority, so the spec plays what a player does.
  * Asserted through `steampunkDebug`, never pixels; the shots at every level and two finish bands,
  * desktop and 360 px, by the rig's tier 1 and tier 3 shape, are written to the test's output
@@ -32,8 +33,18 @@ const LOOKS = [
   { level: 6, part: 'twin-tank-tender' },
   { level: 7, part: 'hopper-tender' },
   { level: 8, part: 'glass-tank-tender' },
-  { level: 9, part: 'glass-tank-tender' },
-  { level: 10, part: 'glass-tank-tender' },
+  { level: 9, part: 'tooled-tender' },
+  { level: 10, part: 'plated-tender' },
+  { level: 11, part: 'lamped-tender' },
+  { level: 12, part: 'piped-tender' },
+  { level: 13, part: 'gauged-tender' },
+  { level: 14, part: 'sprung-tender' },
+  { level: 15, part: 'guarded-tender' },
+  { level: 16, part: 'screened-tender' },
+  { level: 17, part: 'aether-tank-tender' },
+  { level: 18, part: 'aether-coil-tender' },
+  { level: 19, part: 'aether-coil-tender' },
+  { level: 20, part: 'aether-coil-tender' },
 ]
 const TOP_LEVEL = LOOKS[LOOKS.length - 1].level
 const VIEWPORTS = [
@@ -127,8 +138,8 @@ async function climbTheLadder(
   }
 }
 
-test.describe('coal tender look (ticket 813)', () => {
-  test('hangs one wagon a tank level, the LK5 parts one purchase apart, the top wagon past the art', async ({
+test.describe('coal tender look (tickets 813, 874)', () => {
+  test('hangs one wagon a tank level, the LK5 and LK11 parts one purchase apart, the top wagon past the art', async ({
     page,
   }) => {
     const errors = await openGame(page)

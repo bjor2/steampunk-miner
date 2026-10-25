@@ -21,7 +21,7 @@ describe('fuel tender art', () => {
     expect(FUEL_TENDER_TABLE.assetId).toBe(FUEL_TENDER_ASSET_ID)
   })
 
-  it('takes one part per ladder step and no other: the #758 wagons and the LK5 steps (ticket 813)', () => {
+  it('takes one part per ladder step and no other: the #758 wagons, the LK5 steps and the LK11 fittings (tickets 813, 874)', () => {
     expect(fuelTenderArtPartIds()).toEqual(FUEL_TENDER_TABLE.steps.map((step) => step.part))
     expect(fuelTenderArtPartIds()).toEqual([
       'coal-cart',
@@ -31,6 +31,16 @@ describe('fuel tender art', () => {
       'twin-tank-tender',
       'hopper-tender',
       'glass-tank-tender',
+      'tooled-tender',
+      'plated-tender',
+      'lamped-tender',
+      'piped-tender',
+      'gauged-tender',
+      'sprung-tender',
+      'guarded-tender',
+      'screened-tender',
+      'aether-tank-tender',
+      'aether-coil-tender',
     ])
     for (const partId of fuelTenderArtPartIds()) {
       expect(registryPartIds()).toContain(partId)

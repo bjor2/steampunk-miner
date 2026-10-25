@@ -1,15 +1,15 @@
 """
-The outline check of the coal tender's LK5 steps (ticket 813; the GD lock of 24 Oct 14:54: no part
-pushes the drawn outline past the current rig bounds or moves the drill tip, and the footprint and
-collider are unchanged). The wagon trails the rig behind the stern, so for the tender the rule
-reads: a new part fills the room inside the wagons' own footprint and never reaches the rig. It
-rasterises the silhouette in the game's front view (X right, Z up) of the rig at rest, at tiers 1
-and 3, on a 4 mm grid, and of each wagon hung at `hull.hitch`, and writes outline.json: the cells
-each LK5 wagon adds over the guild tender (its base) that lie inside the rig's silhouette (must be
-none at either tier), the cells of every wagon inside the rig (the hitch ring and drawbar are the
-#758 wagons' own, so a new wagon may have no more than the guild tender), and each wagon's box
-against the union of the #758 wagons' (the footprint the game lays out; must not grow). It exits 1
-on any.
+The outline check of the coal tender's added steps, LK5 (ticket 813) and LK11 (ticket 874; the GD
+locks of 24 and 25 Oct: no part pushes the drawn outline past the current rig bounds or moves the
+drill tip, and the footprint and collider are unchanged). The wagon trails the rig behind the
+stern, so for the tender the rule reads: a new part fills the room inside the wagons' own footprint
+and never reaches the rig. It rasterises the silhouette in the game's front view (X right, Z up) of
+the rig at rest, at tiers 1 and 3, on a 4 mm grid, and of each wagon hung at `hull.hitch`, and
+writes outline.json: the cells each added wagon (every step after the guild tender) adds over the
+guild tender that lie inside the rig's silhouette (must be none at either tier), the cells of every
+wagon inside the rig (the guild tender's stern end already stands under the rig's casing arms, so
+an added wagon may have no more than it), and each wagon's box against the union of the #758
+wagons' (the footprint the game lays out; must not grow). It exits 1 on any.
 
     blender -b --factory-startup --python-exit-code 1 -P docs/art/fuel-tender/check_outline.py
 
@@ -40,8 +40,7 @@ import render_tech_gear as rig  # noqa: E402
 LADDER_TABLE = os.path.join(REPO_ROOT, 'src', 'data', 'vehicle', 'fuelTender.json')
 REPORT = os.path.join(HERE, 'outline.json')
 RIG_TIERS = (1, 3)
-# The LK5 steps and the wagon they are built on (ticket 813).
-LK5_PARTS = ('twin-tank-tender', 'hopper-tender', 'glass-tank-tender')
+# The wagon every added step (LK5, LK11) is built on: the last of the #758 wagons.
 BASE_WAGON = 'guild-tender'
 # The grid's window, widened to the left of the aetheric check's so the whole wagon fits.
 WINDOW_M = (-1.3, -0.7, 1.2, 1.0)
@@ -51,13 +50,14 @@ def main():
     widen_grid()
     table = read_table()
     hitch = attach_point(table['attach'])['atM']
+    added = added_parts_of(table)
     rigs = {tier: rig_silhouette(tier) for tier in RIG_TIERS}
     wagons = {step['part']: wagon_silhouette(table, step['part'], hitch) for step in table['steps']}
-    footprint = footprint_of(wagons, [step['part'] for step in table['steps'] if step['part'] not in LK5_PARTS])
-    report = {part: outline_of(part, mask, wagons[BASE_WAGON], rigs, footprint) for part, mask in wagons.items()}
+    footprint = footprint_of(wagons, [step['part'] for step in table['steps'] if step['part'] not in added])
+    report = {part: outline_of(part, mask, wagons[BASE_WAGON], rigs, footprint, added) for part, mask in wagons.items()}
     with open(REPORT, 'w', encoding='utf8') as file:
         json.dump(report_about(table, footprint, report), file, indent=2)
-    problems = problems_in(report)
+    problems = problems_in(report, added)
     for problem in problems:
         print('outline check failed: ' + problem, file=sys.stderr)
     if problems:
@@ -78,8 +78,14 @@ def read_table():
         return json.load(file)
 
 
-def outline_of(part, mask, base_mask, rigs, footprint):
-    added = mask & ~base_mask if part in LK5_PARTS else np.zeros_like(mask)
+def added_parts_of(table):
+    """Every step after the base wagon: the LK5 and LK11 fittings."""
+    parts = [step['part'] for step in table['steps']]
+    return tuple(parts[parts.index(BASE_WAGON) + 1:])
+
+
+def outline_of(part, mask, base_mask, rigs, footprint, added_parts):
+    added = mask & ~base_mask if part in added_parts else np.zeros_like(mask)
     return {
         'cells': int(mask.sum()),
         'insideRig': {'tier-%d' % tier: int((mask & rig_mask).sum()) for tier, rig_mask in rigs.items()},
@@ -126,10 +132,10 @@ def is_inside(box, footprint):
             and box[2] <= footprint[2] and box[3] <= footprint[3])
 
 
-def problems_in(report):
+def problems_in(report, added_parts):
     problems = []
     base_inside = report[BASE_WAGON]['insideRig']
-    for part in LK5_PARTS:
+    for part in added_parts:
         entry = report[part]
         problems += ['%s adds %d cells inside the %s rig' % (part, cells, tier)
                      for tier, cells in entry['addedInsideRig'].items() if cells]
@@ -142,11 +148,12 @@ def problems_in(report):
 
 def report_about(table, footprint, report):
     return {
-        'about': 'Ticket 813: silhouette cells of each %s wagon hung at %s, on a %g mm grid, inside the rig at rest at '
-                 'tiers %s (`insideRig`, the hitch ring and drawbar of every wagon; an LK5 wagon may have no more than '
-                 'the guild tender), the cells an LK5 wagon adds over the guild tender that lie inside the rig '
-                 '(`addedInsideRig`, must be all zero), and each wagon\'s box against the #758 wagons\' union '
-                 '(`footprintM`; every LK5 wagon must fit inside). Written by check_outline.py.'
+        'about': 'Tickets 813 and 874: silhouette cells of each %s wagon hung at %s, on a %g mm grid, inside the rig at '
+                 'rest at tiers %s (`insideRig`, the wagon\'s stern end under the rig\'s casing arms; an added wagon may '
+                 'have no more than the guild tender), the cells an added wagon (every step after the guild tender) adds '
+                 'over the guild tender that lie inside the rig (`addedInsideRig`, must be all zero), and each wagon\'s '
+                 'box against the #758 wagons\' union (`footprintM`; every added wagon must fit inside). Written by '
+                 'check_outline.py.'
                  % (table['assetId'], table['attach'], grid.CELL_M * 1000, ', '.join(str(tier) for tier in RIG_TIERS)),
         'footprintM': footprint,
         'wagons': report,

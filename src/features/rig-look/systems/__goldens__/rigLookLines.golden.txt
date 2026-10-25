@@ -391,8 +391,17 @@ fuel_tank
 6: step 4 tail 0 pips 0 part twin-tank-tender finish null
 7: step 5 tail 0 pips 0 part hopper-tender finish null
 8: step 6 tail 0 pips 0 part glass-tank-tender finish null
-9: step 6 tail 1 pips 0 part glass-tank-tender finish Bright brass
-10: step 6 tail 2 pips 1 part glass-tank-tender finish Blued steel
-99: step 6 tail 91 pips 10 part glass-tank-tender finish Bright brass
-9999: step 6 tail 9991 pips 1110 part glass-tank-tender finish Bright brass
-1000000: step 6 tail 999992 pips 111111 part glass-tank-tender finish Blued steel
+9: step 7 tail 0 pips 0 part tooled-tender finish null
+10: step 8 tail 0 pips 0 part plated-tender finish null
+11: step 9 tail 0 pips 0 part lamped-tender finish null
+12: step 10 tail 0 pips 0 part piped-tender finish null
+13: step 11 tail 0 pips 0 part gauged-tender finish null
+14: step 12 tail 0 pips 0 part sprung-tender finish null
+15: step 13 tail 0 pips 0 part guarded-tender finish null
+16: step 14 tail 0 pips 0 part screened-tender finish null
+17: step 15 tail 0 pips 0 part aether-tank-tender finish null
+18: step 16 tail 0 pips 0 part aether-coil-tender finish null
+19: step 16 tail 1 pips 2 part aether-coil-tender finish Bright brass
+99: step 16 tail 81 pips 10 part aether-coil-tender finish Bright brass
+9999: step 16 tail 9981 pips 1110 part aether-coil-tender finish Bright brass
+1000000: step 16 tail 999982 pips 111111 part aether-coil-tender finish Blued steel

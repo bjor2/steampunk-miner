@@ -1,6 +1,11 @@
 {
-  "about": "Ticket 813: silhouette cells of each vehicle-fuel-tank wagon hung at hull.hitch, on a 4 mm grid, inside the rig at rest at tiers 1, 3 (`insideRig`, the hitch ring and drawbar of every wagon; an LK5 wagon may have no more than the guild tender), the cells an LK5 wagon adds over the guild tender that lie inside the rig (`addedInsideRig`, must be all zero), and each wagon's box against the #758 wagons' union (`footprintM`; every LK5 wagon must fit inside). Written by check_outline.py.",
-  "footprintM": [-1.092, -0.48, -0.492, 0.008],
+  "about": "Tickets 813 and 874: silhouette cells of each vehicle-fuel-tank wagon hung at hull.hitch, on a 4 mm grid, inside the rig at rest at tiers 1, 3 (`insideRig`, the wagon's stern end under the rig's casing arms; an added wagon may have no more than the guild tender), the cells an added wagon (every step after the guild tender) adds over the guild tender that lie inside the rig (`addedInsideRig`, must be all zero), and each wagon's box against the #758 wagons' union (`footprintM`; every added wagon must fit inside). Written by check_outline.py.",
+  "footprintM": [
+    -1.092,
+    -0.48,
+    -0.492,
+    0.008
+  ],
   "wagons": {
     "coal-cart": {
       "cells": 6637,
@@ -12,7 +17,12 @@
         "tier-1": 0,
         "tier-3": 0
       },
-      "boxM": [-1.08, -0.48, -0.492, -0.18],
+      "boxM": [
+        -1.08,
+        -0.48,
+        -0.492,
+        -0.18
+      ],
       "insideFootprint": true
     },
     "bunker-tender": {
@@ -25,7 +35,12 @@
         "tier-1": 0,
         "tier-3": 0
       },
-      "boxM": [-1.088, -0.48, -0.492, -0.06],
+      "boxM": [
+        -1.088,
+        -0.48,
+        -0.492,
+        -0.06
+      ],
       "insideFootprint": true
     },
     "riveted-tender": {
@@ -38,7 +53,12 @@
         "tier-1": 0,
         "tier-3": 0
       },
-      "boxM": [-1.08, -0.48, -0.492, 0.008],
+      "boxM": [
+        -1.08,
+        -0.48,
+        -0.492,
+        0.008
+      ],
       "insideFootprint": true
     },
     "guild-tender": {
@@ -51,7 +71,12 @@
         "tier-1": 0,
         "tier-3": 0
       },
-      "boxM": [-1.092, -0.48, -0.492, 0.0],
+      "boxM": [
+        -1.092,
+        -0.48,
+        -0.492,
+        0.0
+      ],
       "insideFootprint": true
     },
     "twin-tank-tender": {
@@ -64,7 +89,12 @@
         "tier-1": 0,
         "tier-3": 0
       },
-      "boxM": [-1.092, -0.48, -0.492, 0.0],
+      "boxM": [
+        -1.092,
+        -0.48,
+        -0.492,
+        0.0
+      ],
       "insideFootprint": true
     },
     "hopper-tender": {
@@ -77,7 +107,12 @@
         "tier-1": 0,
         "tier-3": 0
       },
-      "boxM": [-1.092, -0.48, -0.492, 0.004],
+      "boxM": [
+        -1.092,
+        -0.48,
+        -0.492,
+        0.004
+      ],
       "insideFootprint": true
     },
     "glass-tank-tender": {
@@ -90,7 +125,192 @@
         "tier-1": 0,
         "tier-3": 0
       },
-      "boxM": [-1.092, -0.48, -0.492, 0.004],
+      "boxM": [
+        -1.092,
+        -0.48,
+        -0.492,
+        0.004
+      ],
+      "insideFootprint": true
+    },
+    "tooled-tender": {
+      "cells": 12054,
+      "insideRig": {
+        "tier-1": 390,
+        "tier-3": 390
+      },
+      "addedInsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "boxM": [
+        -1.092,
+        -0.48,
+        -0.492,
+        0.004
+      ],
+      "insideFootprint": true
+    },
+    "plated-tender": {
+      "cells": 12054,
+      "insideRig": {
+        "tier-1": 390,
+        "tier-3": 390
+      },
+      "addedInsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "boxM": [
+        -1.092,
+        -0.48,
+        -0.492,
+        0.004
+      ],
+      "insideFootprint": true
+    },
+    "lamped-tender": {
+      "cells": 12054,
+      "insideRig": {
+        "tier-1": 390,
+        "tier-3": 390
+      },
+      "addedInsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "boxM": [
+        -1.092,
+        -0.48,
+        -0.492,
+        0.004
+      ],
+      "insideFootprint": true
+    },
+    "piped-tender": {
+      "cells": 12152,
+      "insideRig": {
+        "tier-1": 390,
+        "tier-3": 390
+      },
+      "addedInsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "boxM": [
+        -1.092,
+        -0.48,
+        -0.492,
+        0.004
+      ],
+      "insideFootprint": true
+    },
+    "gauged-tender": {
+      "cells": 12156,
+      "insideRig": {
+        "tier-1": 390,
+        "tier-3": 390
+      },
+      "addedInsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "boxM": [
+        -1.092,
+        -0.48,
+        -0.492,
+        0.004
+      ],
+      "insideFootprint": true
+    },
+    "sprung-tender": {
+      "cells": 12176,
+      "insideRig": {
+        "tier-1": 390,
+        "tier-3": 390
+      },
+      "addedInsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "boxM": [
+        -1.092,
+        -0.48,
+        -0.492,
+        0.004
+      ],
+      "insideFootprint": true
+    },
+    "guarded-tender": {
+      "cells": 12380,
+      "insideRig": {
+        "tier-1": 390,
+        "tier-3": 390
+      },
+      "addedInsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "boxM": [
+        -1.092,
+        -0.48,
+        -0.492,
+        0.004
+      ],
+      "insideFootprint": true
+    },
+    "screened-tender": {
+      "cells": 12397,
+      "insideRig": {
+        "tier-1": 390,
+        "tier-3": 390
+      },
+      "addedInsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "boxM": [
+        -1.092,
+        -0.48,
+        -0.492,
+        0.004
+      ],
+      "insideFootprint": true
+    },
+    "aether-tank-tender": {
+      "cells": 12397,
+      "insideRig": {
+        "tier-1": 390,
+        "tier-3": 390
+      },
+      "addedInsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "boxM": [
+        -1.092,
+        -0.48,
+        -0.492,
+        0.004
+      ],
+      "insideFootprint": true
+    },
+    "aether-coil-tender": {
+      "cells": 12466,
+      "insideRig": {
+        "tier-1": 390,
+        "tier-3": 390
+      },
+      "addedInsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "boxM": [
+        -1.092,
+        -0.48,
+        -0.492,
+        0.004
+      ],
       "insideFootprint": true
     }
   }
