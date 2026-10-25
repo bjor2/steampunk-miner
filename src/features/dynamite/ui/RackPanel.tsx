@@ -20,6 +20,7 @@ export function RackPanel() {
         <span>{panel.sizeText}</span>
         <span className={styles.count}>×{panel.carried}</span>
       </div>
+      {panel.cutText !== null && <div className={styles.hint}>{panel.cutText}</div>}
       {panel.nextSizeText !== null && <div className={styles.hint}>{panel.nextSizeText}</div>}
       {panel.plungerText !== null && <div className={styles.plunger}>{panel.plungerText}</div>}
     </div>

@@ -18,3 +18,4 @@ export {
 } from './systems/dynamiteSizes'
 export { DETONATE_INTENT } from './systems/dynamiteCommands'
 export { interlockReachMm, isDetonatorOpen } from './systems/plunger'
+export { liveChargeRingsOf, type ChargeRings } from './systems/chargeRings'

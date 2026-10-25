@@ -5,7 +5,9 @@ import {
   poseOnTile,
   sizedBlasterOn,
 } from '../../../systems/authority/charges/chargeFixtures'
+import { drillGearOf } from '../../../systems/authority/gatedBiteFixtures'
 import { createScriptedSession } from '../../../systems/authority/scriptedSession'
+import { withRegistrations } from '../../../registries/registrar'
 import { KEYBOARD_PROMPTS, TOUCH_PROMPTS } from '../../../systems/input/promptFixtures'
 import { rackPanelOf } from './rackPanel'
 
@@ -23,6 +25,7 @@ describe('dynamite rack panel', () => {
       size: 4,
       iconId: 'dynamite-size-4',
       sizeText: 'Size 4 · 6 m',
+      cutText: null,
       carried: 2,
       nextSizeText: null,
       plungerText: null,
@@ -54,6 +57,17 @@ describe('dynamite rack panel', () => {
     const touchPanel = (state: AuthorityState) =>
       rackPanelOf({ state, playerId: 'p1', chosenSize: 7, prompts: TOUCH_PROMPTS })
     expect(touchPanel(blaster.session.state())?.nextSizeText).toBe('Next size (size badge)')
+  })
+
+  it('marks a size whose ground is narrower than the bore the rig cuts, and only as a hint', () => {
+    const { session } = sizedBlasterOn(16, 4, 1)
+    const reamed = drillGearOf({ aheadCells: 0, sideCells: 3 })
+    const atSize = (size: number) =>
+      withRegistrations([reamed], () => panelOn(session.state(), size)?.cutText)
+    expect(atSize(4)).toBeNull()
+    session.submit(1, { type: 'debug.setCharges', payload: { size: 1, carried: 1, slotLevel: 5 } })
+    expect(atSize(1)).toBe('Narrower than your bore')
+    expect(panelOn(session.state(), 1)?.cutText).toBeNull()
   })
 
   it('offers no plunger before P22, where only the fuse fires a charge', () => {
