@@ -27,10 +27,10 @@ import { MINERAL_SKINS } from './skinTable'
 // Ticket 451's atlas rows (TD shape 6226270701 "#451 shape"): every cell a hero species, packed in
 // the order the #452 art packs it per act (ticket 744: the legacy four, then P2's three gems in the
 // foothold.heavy atlas; ticket 785: P1's three gems after the legacy four in foothold.base, and
-// the nine gems of P3 to P5 after P2's, filling foothold.heavy's page 1), each cell shipped as a
-// 256 px RGBA cell, and each shipped page one 1024 px ETC1S map within 2 MiB. Ticket 852 makes an
-// act's pages unbounded: a hero's page lives on its skin row, and a new page opens when the last
-// is full.
+// the nine gems of P3 to P5 after P2's, filling foothold.heavy's page 1; ticket 853: the fifteen
+// other heroes of P3 to P5 on its page 2), each cell shipped as a 256 px RGBA cell, and each
+// shipped page one 1024 px ETC1S map within 2 MiB. Ticket 852 makes an act's pages unbounded: a
+// hero's page lives on its skin row, and a new page opens when the last is full.
 
 const REPO = new URL('../../../../', import.meta.url)
 const ART = new URL('docs/art/ore-heroes/', REPO)
@@ -107,7 +107,7 @@ describe('hero atlases (ticket 451)', () => {
       'emerald-quartzine',
       'ruby-quartzine',
     ])
-    expect(cellsOf('foothold.heavy')).toEqual([
+    expect(heroAtlasOfAct('foothold.heavy')?.pages[0].cells).toEqual([
       ...legacy,
       'p2-r1',
       'p2-r2',
@@ -123,6 +123,39 @@ describe('hero atlases (ticket 451)', () => {
       'furnace-ruby-quartzine',
     ])
     expect(heroAtlasOfAct('foothold.heavy')?.pages[0].cells).toHaveLength(HERO_ATLAS_CELLS)
+  })
+
+  it("packs the fifteen other heroes of P3, P4 and P5 on foothold.heavy's page 2, planet by planet (ticket 853)", () => {
+    expect(heroAtlasOfAct('foothold.heavy')?.pages.map((page) => page.assetId)).toEqual([
+      'ground-hero-atlas-foothold-heavy',
+      'ground-hero-atlas-foothold-heavy-page-2',
+    ])
+    expect(heroAtlasOfAct('foothold.heavy')?.pages[1].cells).toEqual([
+      'native-platinum-brassvein',
+      'coiled-ammonite-amberbone',
+      'meteoric-iron-brassvein',
+      'star-sapphire-quartzine',
+      'opal-jaw-amberbone',
+      'wire-silver-brassvein',
+      'belemnite-amberbone',
+      'clockspring-steel-brassvein',
+      'alexandrite-quartzine',
+      'ichthyosaur-eye-amberbone',
+      'wolfram-brassvein',
+      'saurian-vertebra-amberbone',
+      'firebrass-brassvein',
+      'heat-spinel-quartzine',
+      'petrified-heartwood-amberbone',
+    ])
+  })
+
+  it('packs every hero of the P3, P4 and P5 pools, gem or not, so none draws the shader look there (ticket 853)', () => {
+    const packed = new Set(cellsOf('foothold.heavy'))
+    const heroes = MATERIALS.materials.filter(
+      (material) => material.hero && /^foothold-p[345]$/.test(material.pool),
+    )
+    expect(heroes).toHaveLength(24)
+    expect(heroes.filter((hero) => !packed.has(hero.id))).toEqual([])
   })
 
   it('packs every gem of P1 to P5 that sells as a gem, keyed on its species id (ticket 785)', () => {

@@ -1,0 +1,42 @@
+{
+  "pxPerMetre": 256,
+  "cells": [
+    {
+      "id": "native-platinum-brassvein",
+      "oreLuma": 0.0292,
+      "rockLuma": 0.0136,
+      "orePeakLuma": 0.1345,
+      "contrast": 1.25
+    },
+    {
+      "id": "coiled-ammonite-amberbone",
+      "oreLuma": 0.0344,
+      "rockLuma": 0.0148,
+      "orePeakLuma": 0.7269,
+      "contrast": 1.3
+    },
+    {
+      "id": "meteoric-iron-brassvein",
+      "oreLuma": 0.0546,
+      "rockLuma": 0.0131,
+      "orePeakLuma": 0.5802,
+      "contrast": 1.66
+    },
+    {
+      "id": "star-sapphire-quartzine",
+      "oreLuma": 0.0439,
+      "rockLuma": 0.0129,
+      "orePeakLuma": 1.0,
+      "contrast": 1.49
+    },
+    {
+      "id": "opal-jaw-amberbone",
+      "oreLuma": 0.0378,
+      "rockLuma": 0.0172,
+      "orePeakLuma": 0.4883,
+      "contrast": 1.31
+    }
+  ],
+  "oreLumaRisesAlongEveryRow": false,
+  "bodyLumaRisesAlongEveryRow": null
+}

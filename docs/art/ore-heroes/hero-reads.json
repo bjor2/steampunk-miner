@@ -346,6 +346,276 @@
           "brightOrSaturatedShare": 0.122
         }
       }
+    },
+    {
+      "speciesId": "native-platinum-brassvein",
+      "cellSha256": "344aba84229d44e5b3c3a81cfafe1c73673719544e7b47d274145b56e6878a8c",
+      "screens": {
+        "360x640": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.969,
+          "outlineContrast": 1.97,
+          "brightOrSaturatedShare": 0.017
+        },
+        "1280x800": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.345,
+          "outlineContrast": 1.96,
+          "brightOrSaturatedShare": 0.019
+        }
+      }
+    },
+    {
+      "speciesId": "coiled-ammonite-amberbone",
+      "cellSha256": "6b2081a389aa7d85736bc07fb40b5e75bc5a0777da896711733ca0a964b9ebf7",
+      "screens": {
+        "360x640": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.924,
+          "outlineContrast": 2.13,
+          "brightOrSaturatedShare": 0.008
+        },
+        "1280x800": {
+          "highlightCount": 10,
+          "facetEdgeShare": 0.746,
+          "outlineContrast": 2.21,
+          "brightOrSaturatedShare": 0.017
+        }
+      }
+    },
+    {
+      "speciesId": "meteoric-iron-brassvein",
+      "cellSha256": "00ba32cb2fdc5f3c52a24c2d7c6742e885b36850d23fa0a1b8d57d18cc2306c4",
+      "screens": {
+        "360x640": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.529,
+          "outlineContrast": 2.01,
+          "brightOrSaturatedShare": 0.002
+        },
+        "1280x800": {
+          "highlightCount": 10,
+          "facetEdgeShare": 0.673,
+          "outlineContrast": 2.04,
+          "brightOrSaturatedShare": 0.007
+        }
+      }
+    },
+    {
+      "speciesId": "star-sapphire-quartzine",
+      "cellSha256": "f63084051949a78c3de2596e4f3fb023373416abcfe1448305f08fbac120841b",
+      "screens": {
+        "360x640": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.725,
+          "outlineContrast": 1.76,
+          "brightOrSaturatedShare": 0.021
+        },
+        "1280x800": {
+          "highlightCount": 3,
+          "facetEdgeShare": 0.386,
+          "outlineContrast": 1.76,
+          "brightOrSaturatedShare": 0.029
+        }
+      }
+    },
+    {
+      "speciesId": "opal-jaw-amberbone",
+      "cellSha256": "bc894d0c64cb09644972357f4c1ae3ee26a5320ac28d828c64bfadb205c40c2d",
+      "screens": {
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.96,
+          "outlineContrast": 1.83,
+          "brightOrSaturatedShare": 0.019
+        },
+        "1280x800": {
+          "highlightCount": 6,
+          "facetEdgeShare": 0.639,
+          "outlineContrast": 1.87,
+          "brightOrSaturatedShare": 0.032
+        }
+      }
+    },
+    {
+      "speciesId": "wire-silver-brassvein",
+      "cellSha256": "dc0969beaf22d112e0fd7159301d4f9cde6479be6d06d279bc3f9c3ae7183e80",
+      "screens": {
+        "360x640": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.898,
+          "outlineContrast": 1.51,
+          "brightOrSaturatedShare": 0.0
+        },
+        "1280x800": {
+          "highlightCount": 10,
+          "facetEdgeShare": 0.806,
+          "outlineContrast": 1.54,
+          "brightOrSaturatedShare": 0.006
+        }
+      }
+    },
+    {
+      "speciesId": "belemnite-amberbone",
+      "cellSha256": "5b936f34644e721dc1c3695f8248f56c4cfbde8c3b420f55aa87348335eba9ca",
+      "screens": {
+        "360x640": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.789,
+          "outlineContrast": 1.39,
+          "brightOrSaturatedShare": 0.0
+        },
+        "1280x800": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.33,
+          "outlineContrast": 1.41,
+          "brightOrSaturatedShare": 0.0
+        }
+      }
+    },
+    {
+      "speciesId": "clockspring-steel-brassvein",
+      "cellSha256": "1315b5e907641fc57a2dfd0e3e4d9790fd018674e5636022466c9f0363fda083",
+      "screens": {
+        "360x640": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.276,
+          "outlineContrast": 1.33,
+          "brightOrSaturatedShare": 0.0
+        },
+        "1280x800": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.348,
+          "outlineContrast": 1.35,
+          "brightOrSaturatedShare": 0.0
+        }
+      }
+    },
+    {
+      "speciesId": "alexandrite-quartzine",
+      "cellSha256": "8dd26205c1f32a9bc61f7f8ea559c71018cbcbe1e7ce0f590f46667dc112a999",
+      "screens": {
+        "360x640": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.809,
+          "outlineContrast": 1.59,
+          "brightOrSaturatedShare": 0.008
+        },
+        "1280x800": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.497,
+          "outlineContrast": 1.61,
+          "brightOrSaturatedShare": 0.007
+        }
+      }
+    },
+    {
+      "speciesId": "ichthyosaur-eye-amberbone",
+      "cellSha256": "96161dee9b022b4f279d68c520e21b4cf6ae464999e42ac19b779fbbfaa2c29a",
+      "screens": {
+        "360x640": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.596,
+          "outlineContrast": 1.78,
+          "brightOrSaturatedShare": 0.0
+        },
+        "1280x800": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.53,
+          "outlineContrast": 1.8,
+          "brightOrSaturatedShare": 0.007
+        }
+      }
+    },
+    {
+      "speciesId": "wolfram-brassvein",
+      "cellSha256": "76e1af9fda461744934f81f341f708c27ddcc6d398b91893191043b4f9dcfda1",
+      "screens": {
+        "360x640": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.28,
+          "outlineContrast": 1.3,
+          "brightOrSaturatedShare": 0.0
+        },
+        "1280x800": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.176,
+          "outlineContrast": 1.32,
+          "brightOrSaturatedShare": 0.0
+        }
+      }
+    },
+    {
+      "speciesId": "saurian-vertebra-amberbone",
+      "cellSha256": "4bb72004d754c533f45f89905ddbd3d749d93d0d6e12f92e3821ac50ce398176",
+      "screens": {
+        "360x640": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.921,
+          "outlineContrast": 2.09,
+          "brightOrSaturatedShare": 0.0
+        },
+        "1280x800": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.628,
+          "outlineContrast": 2.16,
+          "brightOrSaturatedShare": 0.006
+        }
+      }
+    },
+    {
+      "speciesId": "firebrass-brassvein",
+      "cellSha256": "560f3852c19e31a91c9b2644e2029f41a3225e6196606f3f241afe705aa4b10f",
+      "screens": {
+        "360x640": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.549,
+          "outlineContrast": 1.41,
+          "brightOrSaturatedShare": 0.033
+        },
+        "1280x800": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.484,
+          "outlineContrast": 1.45,
+          "brightOrSaturatedShare": 0.035
+        }
+      }
+    },
+    {
+      "speciesId": "heat-spinel-quartzine",
+      "cellSha256": "f388be555fbdd9d32b1df09cb39e4c33cca4d5a58d4a878afd7c0e9d97f95738",
+      "screens": {
+        "360x640": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.619,
+          "outlineContrast": 1.97,
+          "brightOrSaturatedShare": 0.0
+        },
+        "1280x800": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.317,
+          "outlineContrast": 2.0,
+          "brightOrSaturatedShare": 0.0
+        }
+      }
+    },
+    {
+      "speciesId": "petrified-heartwood-amberbone",
+      "cellSha256": "c1299c065795460a0ec6150c7f00c1d59c60b0f043f5b46564ec4dc113fc9233",
+      "screens": {
+        "360x640": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.404,
+          "outlineContrast": 1.68,
+          "brightOrSaturatedShare": 0.002
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.377,
+          "outlineContrast": 1.7,
+          "brightOrSaturatedShare": 0.002
+        }
+      }
     }
   ]
 }

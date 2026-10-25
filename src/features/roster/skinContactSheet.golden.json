@@ -542,7 +542,7 @@
           "pattern": "burnished",
           "patternCode": 19,
           "colour": "#c5c7cb",
-          "heroCell": null,
+          "heroCell": 16,
           "gemRank": null,
           "gemSaleTier": null
         },
@@ -570,7 +570,7 @@
           "pattern": "nacreous",
           "patternCode": 20,
           "colour": "#c6a0b3",
-          "heroCell": null,
+          "heroCell": 17,
           "gemRank": null,
           "gemSaleTier": null
         },
@@ -584,7 +584,7 @@
           "pattern": "etched",
           "patternCode": 21,
           "colour": "#a0a1b4",
-          "heroCell": null,
+          "heroCell": 18,
           "gemRank": null,
           "gemSaleTier": null
         },
@@ -598,7 +598,7 @@
           "pattern": "starred",
           "patternCode": 22,
           "colour": "#887edf",
-          "heroCell": null,
+          "heroCell": 19,
           "gemRank": null,
           "gemSaleTier": null
         },
@@ -612,7 +612,7 @@
           "pattern": "opaline",
           "patternCode": 23,
           "colour": "#add3cf",
-          "heroCell": null,
+          "heroCell": 20,
           "gemRank": null,
           "gemSaleTier": null
         },
@@ -785,7 +785,7 @@
           "pattern": "tarnished",
           "patternCode": 35,
           "colour": "#c9cdcf",
-          "heroCell": null,
+          "heroCell": 21,
           "gemRank": null,
           "gemSaleTier": null
         },
@@ -813,7 +813,7 @@
           "pattern": "polished",
           "patternCode": 37,
           "colour": "#b0a743",
-          "heroCell": null,
+          "heroCell": 22,
           "gemRank": null,
           "gemSaleTier": null
         },
@@ -827,7 +827,7 @@
           "pattern": "blued",
           "patternCode": 38,
           "colour": "#788bc5",
-          "heroCell": null,
+          "heroCell": 23,
           "gemRank": null,
           "gemSaleTier": null
         },
@@ -841,7 +841,7 @@
           "pattern": "colour-change",
           "patternCode": 39,
           "colour": "#43b18d",
-          "heroCell": null,
+          "heroCell": 24,
           "gemRank": null,
           "gemSaleTier": null
         },
@@ -855,7 +855,7 @@
           "pattern": "plated",
           "patternCode": 40,
           "colour": "#9fbabf",
-          "heroCell": null,
+          "heroCell": 25,
           "gemRank": null,
           "gemSaleTier": null
         },
@@ -1028,7 +1028,7 @@
           "pattern": "satin",
           "patternCode": 51,
           "colour": "#9ca5ae",
-          "heroCell": null,
+          "heroCell": 26,
           "gemRank": null,
           "gemSaleTier": null
         },
@@ -1056,7 +1056,7 @@
           "pattern": "porous",
           "patternCode": 53,
           "colour": "#b7b78f",
-          "heroCell": null,
+          "heroCell": 27,
           "gemRank": null,
           "gemSaleTier": null
         },
@@ -1070,7 +1070,7 @@
           "pattern": "flame-lit",
           "patternCode": 54,
           "colour": "#b9a021",
-          "heroCell": null,
+          "heroCell": 28,
           "gemRank": null,
           "gemSaleTier": null
         },
@@ -1084,7 +1084,7 @@
           "pattern": "faceted",
           "patternCode": 77,
           "colour": "#d2659c",
-          "heroCell": null,
+          "heroCell": 29,
           "gemRank": null,
           "gemSaleTier": null
         },
@@ -1098,7 +1098,7 @@
           "pattern": "growth-ringed",
           "patternCode": 55,
           "colour": "#92a157",
-          "heroCell": null,
+          "heroCell": 30,
           "gemRank": null,
           "gemSaleTier": null
         },

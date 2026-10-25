@@ -180,6 +180,18 @@ describe('skin contact sheet of P1 to P5 (ticket 746)', () => {
     expect(unshipped).toEqual([])
   })
 
+  it.each([3, 4, 5])(
+    'draws the five non-gem heroes of planet %i from page 2 of the act atlas, the gems from page 1 (ticket 853)',
+    (planetIndex) => {
+      const rows = goldenRowsOf(planetIndex)
+      const heroRows = rows.filter((row) => row.heroCell !== null)
+      const pageOf = (row: ContactSheetRow) => heroPageOfCell(row.heroCell ?? 0)
+      expect(heroRows.filter((row) => row.gemRank === null).map(pageOf)).toEqual([2, 2, 2, 2, 2])
+      expect(heroRows.filter((row) => row.gemRank !== null).map(pageOf)).toEqual([1, 1, 1])
+      expect(sheetOf(planetIndex).rows).toEqual(rows)
+    },
+  )
+
   it("holds P2's incoming Pyrite Sun, Azurite Nodule and Argentite on the sheet", () => {
     const ids = sheetOf(2).rows.map((row) => row.speciesId)
     expect(ids).toEqual(expect.arrayContaining(P2_INCOMING))
@@ -280,7 +292,7 @@ describe('skin contact sheet of P1 to P5 (ticket 746)', () => {
   })
 
   it.each(SHEET_PLANETS)(
-    'draws every hero of planet %i from page 2 when a synthetic overflow fills page 1, each still apart from its neighbours (ticket 852)',
+    'draws every hero of planet %i one page later when a synthetic overflow fills page 1, each still apart from its neighbours (ticket 852)',
     (planetIndex) => {
       const shipped = sheetOf(planetIndex).rows
       const overflow = planetContactSheetOf(
@@ -288,10 +300,12 @@ describe('skin contact sheet of P1 to P5 (ticket 746)', () => {
         overflowAtlasOf(planetIndex),
       )
       const heroRows = overflow.rows.filter((row) => row.heroCell !== null)
-      expect(heroRows.length).toBe(shipped.filter((row) => row.heroCell !== null).length)
+      const shippedHeroRows = shipped.filter((row) => row.heroCell !== null)
+      expect(heroRows.length).toBe(shippedHeroRows.length)
       expect(heroRows.map((row) => heroPageOfCell(row.heroCell ?? 0))).toEqual(
-        heroRows.map(() => 2),
+        shippedHeroRows.map((row) => heroPageOfCell(row.heroCell ?? 0) + 1),
       )
+      expect(Math.min(...heroRows.map((row) => heroPageOfCell(row.heroCell ?? 0)))).toBe(2)
       expect(overflow.rows).toEqual(
         shipped.map((row) => ({
           ...row,

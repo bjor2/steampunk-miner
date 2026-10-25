@@ -1,0 +1,42 @@
+{
+  "pxPerMetre": 256,
+  "cells": [
+    {
+      "id": "wolfram-brassvein",
+      "oreLuma": 0.0287,
+      "rockLuma": 0.0126,
+      "orePeakLuma": 0.0914,
+      "contrast": 1.26
+    },
+    {
+      "id": "saurian-vertebra-amberbone",
+      "oreLuma": 0.0288,
+      "rockLuma": 0.0159,
+      "orePeakLuma": 0.1461,
+      "contrast": 1.2
+    },
+    {
+      "id": "firebrass-brassvein",
+      "oreLuma": 0.0215,
+      "rockLuma": 0.0142,
+      "orePeakLuma": 0.1825,
+      "contrast": 1.11
+    },
+    {
+      "id": "heat-spinel-quartzine",
+      "oreLuma": 0.0438,
+      "rockLuma": 0.0128,
+      "orePeakLuma": 0.1645,
+      "contrast": 1.49
+    },
+    {
+      "id": "petrified-heartwood-amberbone",
+      "oreLuma": 0.0634,
+      "rockLuma": 0.0207,
+      "orePeakLuma": 0.748,
+      "contrast": 1.6
+    }
+  ],
+  "oreLumaRisesAlongEveryRow": false,
+  "bodyLumaRisesAlongEveryRow": null
+}

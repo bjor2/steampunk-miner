@@ -1,5 +1,5 @@
 """
-The hero species of the materials pools with hero art (#452, tickets 744 and 785): the `hero: true`
+The hero species of the materials pools with hero art (#452, tickets 744, 785 and 853): the `hero: true`
 rows of the materials slice's `materials.json` with the body colour of their hue slot, the acts an
 authored set serves (planet-mix's `oreThemes.json`) and the cell table the per-act hero atlas (#451)
 reads. An act's atlas packs every authored set that paints one of its planets, set after set in
@@ -44,8 +44,10 @@ EVERY_HERO, GEM_HEROES, NON_GEM_HEROES = 'every', 'gems', 'non-gems'
 # earlier (#447): its gem slots bind only on a P1 under rules 12 (ticket 713), so P1's three gems are
 # their own set painting P1 alone (ticket 785), and keep the foothold.heavy atlas within 16 cells.
 # `foothold-p2` is a fresh P2's three gems (ticket 744). The gem sets of P3 to P5 (ticket 785) draw
-# the gem rows of the foothold pools of #453; their other `hero: true` rows have no art yet and draw
-# the shader look.
+# the gem rows of the foothold pools of #453, filling the foothold.heavy atlas's page 1; the hero
+# sets of P3 to P5 (ticket 853) draw the pools' other `hero: true` rows, which pack on its page 2.
+# The P6 and P7 pool (`foothold-p6-p7`) has no mineral skin rows yet, so no page can be recorded for
+# its heroes and they draw the shader look.
 AUTHORED_SETS = (
     {'id': 'legacy', 'pool': 'legacy', 'planets': (1, 2), 'heroes': NON_GEM_HEROES},
     {'id': 'p1-gems', 'pool': 'legacy', 'planets': (1,), 'heroes': GEM_HEROES},
@@ -53,6 +55,9 @@ AUTHORED_SETS = (
     {'id': 'foothold-p3-gems', 'pool': 'foothold-p3', 'planets': (3,), 'heroes': GEM_HEROES},
     {'id': 'foothold-p4-gems', 'pool': 'foothold-p4', 'planets': (4,), 'heroes': GEM_HEROES},
     {'id': 'foothold-p5-gems', 'pool': 'foothold-p5', 'planets': (5,), 'heroes': GEM_HEROES},
+    {'id': 'foothold-p3-heroes', 'pool': 'foothold-p3', 'planets': (3,), 'heroes': NON_GEM_HEROES},
+    {'id': 'foothold-p4-heroes', 'pool': 'foothold-p4', 'planets': (4,), 'heroes': NON_GEM_HEROES},
+    {'id': 'foothold-p5-heroes', 'pool': 'foothold-p5', 'planets': (5,), 'heroes': NON_GEM_HEROES},
 )
 RARITY_ORDER = ('common', 'uncommon', 'rare', 'epic', 'mythic')
 

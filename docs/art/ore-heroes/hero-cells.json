@@ -1,12 +1,15 @@
 {
-  "$comment": "The hero cells of the authored sets legacy, p1-gems, foothold-p2, foothold-p3-gems, foothold-p4-gems, foothold-p5-gems (#452, tickets 744 and 785): one 256 px albedo cell per hero species (`heroes`), and per act the cells its atlas of #451 packs (`atlases`: cell i of its page at column i mod 4, row i div 4, 248 px of content inside a 4 px gutter), set after set in packing order, each on the page its mineral skin row records (ticket 852). Rendered lit on the ore stage with the rock held out, so the alpha is the mask; the shader draws the rarity frame and glow, never the sprite.",
+  "$comment": "The hero cells of the authored sets legacy, p1-gems, foothold-p2, foothold-p3-gems, foothold-p4-gems, foothold-p5-gems, foothold-p3-heroes, foothold-p4-heroes, foothold-p5-heroes (#452, tickets 744 and 785): one 256 px albedo cell per hero species (`heroes`), and per act the cells its atlas of #451 packs (`atlases`: cell i of its page at column i mod 4, row i div 4, 248 px of content inside a 4 px gutter), set after set in packing order, each on the page its mineral skin row records (ticket 852). Rendered lit on the ore stage with the rock held out, so the alpha is the mask; the shader draws the rarity frame and glow, never the sprite.",
   "sets": [
     "legacy",
     "p1-gems",
     "foothold-p2",
     "foothold-p3-gems",
     "foothold-p4-gems",
-    "foothold-p5-gems"
+    "foothold-p5-gems",
+    "foothold-p3-heroes",
+    "foothold-p4-heroes",
+    "foothold-p5-heroes"
   ],
   "atlas": {
     "sidePx": 1024,
@@ -101,7 +104,16 @@
     },
     {
       "act": "foothold.heavy",
-      "sets": ["legacy", "foothold-p2", "foothold-p3-gems", "foothold-p4-gems", "foothold-p5-gems"],
+      "sets": [
+        "legacy",
+        "foothold-p2",
+        "foothold-p3-gems",
+        "foothold-p4-gems",
+        "foothold-p5-gems",
+        "foothold-p3-heroes",
+        "foothold-p4-heroes",
+        "foothold-p5-heroes"
+      ],
       "cells": [
         {
           "index": 0,
@@ -274,6 +286,171 @@
           "speciesId": "furnace-ruby-quartzine",
           "rect": {
             "x": 772,
+            "y": 772,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 0,
+          "page": 2,
+          "speciesId": "native-platinum-brassvein",
+          "rect": {
+            "x": 4,
+            "y": 4,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 1,
+          "page": 2,
+          "speciesId": "coiled-ammonite-amberbone",
+          "rect": {
+            "x": 260,
+            "y": 4,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 2,
+          "page": 2,
+          "speciesId": "meteoric-iron-brassvein",
+          "rect": {
+            "x": 516,
+            "y": 4,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 3,
+          "page": 2,
+          "speciesId": "star-sapphire-quartzine",
+          "rect": {
+            "x": 772,
+            "y": 4,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 4,
+          "page": 2,
+          "speciesId": "opal-jaw-amberbone",
+          "rect": {
+            "x": 4,
+            "y": 260,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 5,
+          "page": 2,
+          "speciesId": "wire-silver-brassvein",
+          "rect": {
+            "x": 260,
+            "y": 260,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 6,
+          "page": 2,
+          "speciesId": "belemnite-amberbone",
+          "rect": {
+            "x": 516,
+            "y": 260,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 7,
+          "page": 2,
+          "speciesId": "clockspring-steel-brassvein",
+          "rect": {
+            "x": 772,
+            "y": 260,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 8,
+          "page": 2,
+          "speciesId": "alexandrite-quartzine",
+          "rect": {
+            "x": 4,
+            "y": 516,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 9,
+          "page": 2,
+          "speciesId": "ichthyosaur-eye-amberbone",
+          "rect": {
+            "x": 260,
+            "y": 516,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 10,
+          "page": 2,
+          "speciesId": "wolfram-brassvein",
+          "rect": {
+            "x": 516,
+            "y": 516,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 11,
+          "page": 2,
+          "speciesId": "saurian-vertebra-amberbone",
+          "rect": {
+            "x": 772,
+            "y": 516,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 12,
+          "page": 2,
+          "speciesId": "firebrass-brassvein",
+          "rect": {
+            "x": 4,
+            "y": 772,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 13,
+          "page": 2,
+          "speciesId": "heat-spinel-quartzine",
+          "rect": {
+            "x": 260,
+            "y": 772,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 14,
+          "page": 2,
+          "speciesId": "petrified-heartwood-amberbone",
+          "rect": {
+            "x": 516,
             "y": 772,
             "w": 248,
             "h": 248
@@ -548,6 +725,216 @@
       "gradeBand": [4, 5],
       "cell": "cells/furnace-ruby-quartzine.png",
       "blend": "blend/hero-furnace-ruby-quartzine.blend"
+    },
+    {
+      "speciesId": "native-platinum-brassvein",
+      "set": "foothold-p3-heroes",
+      "pool": "foothold-p3",
+      "family": "metal",
+      "rarity": "rare",
+      "silhouette": "pebbles",
+      "pattern": "burnished",
+      "hueSlot": "native-platinum",
+      "bodyHex": "#c5c7cb",
+      "gradeBand": [3, 5],
+      "cell": "cells/native-platinum-brassvein.png",
+      "blend": "blend/hero-native-platinum-brassvein.blend"
+    },
+    {
+      "speciesId": "coiled-ammonite-amberbone",
+      "set": "foothold-p3-heroes",
+      "pool": "foothold-p3",
+      "family": "fossil",
+      "rarity": "rare",
+      "silhouette": "spirals",
+      "pattern": "nacreous",
+      "hueSlot": "coiled-ammonite",
+      "bodyHex": "#c6a0b3",
+      "gradeBand": [4, 4],
+      "cell": "cells/coiled-ammonite-amberbone.png",
+      "blend": "blend/hero-coiled-ammonite-amberbone.blend"
+    },
+    {
+      "speciesId": "meteoric-iron-brassvein",
+      "set": "foothold-p3-heroes",
+      "pool": "foothold-p3",
+      "family": "metal",
+      "rarity": "epic",
+      "silhouette": "slabs",
+      "pattern": "etched",
+      "hueSlot": "meteoric-iron",
+      "bodyHex": "#a0a1b4",
+      "gradeBand": [4, 5],
+      "cell": "cells/meteoric-iron-brassvein.png",
+      "blend": "blend/hero-meteoric-iron-brassvein.blend"
+    },
+    {
+      "speciesId": "star-sapphire-quartzine",
+      "set": "foothold-p3-heroes",
+      "pool": "foothold-p3",
+      "family": "crystal",
+      "rarity": "epic",
+      "silhouette": "domes",
+      "pattern": "starred",
+      "hueSlot": "star-sapphire",
+      "bodyHex": "#887edf",
+      "gradeBand": [4, 5],
+      "cell": "cells/star-sapphire-quartzine.png",
+      "blend": "blend/hero-star-sapphire-quartzine.blend"
+    },
+    {
+      "speciesId": "opal-jaw-amberbone",
+      "set": "foothold-p3-heroes",
+      "pool": "foothold-p3",
+      "family": "fossil",
+      "rarity": "epic",
+      "silhouette": "jaws",
+      "pattern": "opaline",
+      "hueSlot": "opal-jaw",
+      "bodyHex": "#add3cf",
+      "gradeBand": [3, 3],
+      "cell": "cells/opal-jaw-amberbone.png",
+      "blend": "blend/hero-opal-jaw-amberbone.blend"
+    },
+    {
+      "speciesId": "wire-silver-brassvein",
+      "set": "foothold-p4-heroes",
+      "pool": "foothold-p4",
+      "family": "metal",
+      "rarity": "rare",
+      "silhouette": "curls",
+      "pattern": "tarnished",
+      "hueSlot": "wire-silver",
+      "bodyHex": "#c9cdcf",
+      "gradeBand": [3, 5],
+      "cell": "cells/wire-silver-brassvein.png",
+      "blend": "blend/hero-wire-silver-brassvein.blend"
+    },
+    {
+      "speciesId": "belemnite-amberbone",
+      "set": "foothold-p4-heroes",
+      "pool": "foothold-p4",
+      "family": "fossil",
+      "rarity": "rare",
+      "silhouette": "darts",
+      "pattern": "polished",
+      "hueSlot": "belemnite",
+      "bodyHex": "#b0a743",
+      "gradeBand": [4, 4],
+      "cell": "cells/belemnite-amberbone.png",
+      "blend": "blend/hero-belemnite-amberbone.blend"
+    },
+    {
+      "speciesId": "clockspring-steel-brassvein",
+      "set": "foothold-p4-heroes",
+      "pool": "foothold-p4",
+      "family": "metal",
+      "rarity": "epic",
+      "silhouette": "springs",
+      "pattern": "blued",
+      "hueSlot": "clockspring-steel",
+      "bodyHex": "#788bc5",
+      "gradeBand": [4, 5],
+      "cell": "cells/clockspring-steel-brassvein.png",
+      "blend": "blend/hero-clockspring-steel-brassvein.blend"
+    },
+    {
+      "speciesId": "alexandrite-quartzine",
+      "set": "foothold-p4-heroes",
+      "pool": "foothold-p4",
+      "family": "crystal",
+      "rarity": "epic",
+      "silhouette": "twins",
+      "pattern": "colour-change",
+      "hueSlot": "alexandrite",
+      "bodyHex": "#43b18d",
+      "gradeBand": [4, 5],
+      "cell": "cells/alexandrite-quartzine.png",
+      "blend": "blend/hero-alexandrite-quartzine.blend"
+    },
+    {
+      "speciesId": "ichthyosaur-eye-amberbone",
+      "set": "foothold-p4-heroes",
+      "pool": "foothold-p4",
+      "family": "fossil",
+      "rarity": "epic",
+      "silhouette": "rings",
+      "pattern": "plated",
+      "hueSlot": "ichthyosaur-eye",
+      "bodyHex": "#9fbabf",
+      "gradeBand": [3, 3],
+      "cell": "cells/ichthyosaur-eye-amberbone.png",
+      "blend": "blend/hero-ichthyosaur-eye-amberbone.blend"
+    },
+    {
+      "speciesId": "wolfram-brassvein",
+      "set": "foothold-p5-heroes",
+      "pool": "foothold-p5",
+      "family": "metal",
+      "rarity": "rare",
+      "silhouette": "bars",
+      "pattern": "satin",
+      "hueSlot": "wolfram",
+      "bodyHex": "#9ca5ae",
+      "gradeBand": [3, 5],
+      "cell": "cells/wolfram-brassvein.png",
+      "blend": "blend/hero-wolfram-brassvein.blend"
+    },
+    {
+      "speciesId": "saurian-vertebra-amberbone",
+      "set": "foothold-p5-heroes",
+      "pool": "foothold-p5",
+      "family": "fossil",
+      "rarity": "rare",
+      "silhouette": "vertebrae",
+      "pattern": "porous",
+      "hueSlot": "saurian-vertebra",
+      "bodyHex": "#b7b78f",
+      "gradeBand": [4, 4],
+      "cell": "cells/saurian-vertebra-amberbone.png",
+      "blend": "blend/hero-saurian-vertebra-amberbone.blend"
+    },
+    {
+      "speciesId": "firebrass-brassvein",
+      "set": "foothold-p5-heroes",
+      "pool": "foothold-p5",
+      "family": "metal",
+      "rarity": "epic",
+      "silhouette": "ribbons",
+      "pattern": "flame-lit",
+      "hueSlot": "firebrass",
+      "bodyHex": "#b9a021",
+      "gradeBand": [4, 5],
+      "cell": "cells/firebrass-brassvein.png",
+      "blend": "blend/hero-firebrass-brassvein.blend"
+    },
+    {
+      "speciesId": "heat-spinel-quartzine",
+      "set": "foothold-p5-heroes",
+      "pool": "foothold-p5",
+      "family": "crystal",
+      "rarity": "epic",
+      "silhouette": "octahedra",
+      "pattern": "faceted",
+      "hueSlot": "heat-spinel",
+      "bodyHex": "#d2659c",
+      "gradeBand": [4, 5],
+      "cell": "cells/heat-spinel-quartzine.png",
+      "blend": "blend/hero-heat-spinel-quartzine.blend"
+    },
+    {
+      "speciesId": "petrified-heartwood-amberbone",
+      "set": "foothold-p5-heroes",
+      "pool": "foothold-p5",
+      "family": "fossil",
+      "rarity": "epic",
+      "silhouette": "logs",
+      "pattern": "growth-ringed",
+      "hueSlot": "petrified-heartwood",
+      "bodyHex": "#92a157",
+      "gradeBand": [3, 3],
+      "cell": "cells/petrified-heartwood-amberbone.png",
+      "blend": "blend/hero-petrified-heartwood-amberbone.blend"
     }
   ]
 }

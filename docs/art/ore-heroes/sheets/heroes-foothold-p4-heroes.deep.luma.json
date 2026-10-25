@@ -1,0 +1,42 @@
+{
+  "pxPerMetre": 256,
+  "cells": [
+    {
+      "id": "wire-silver-brassvein",
+      "oreLuma": 0.0255,
+      "rockLuma": 0.0125,
+      "orePeakLuma": 1.0,
+      "contrast": 1.21
+    },
+    {
+      "id": "belemnite-amberbone",
+      "oreLuma": 0.0174,
+      "rockLuma": 0.0129,
+      "orePeakLuma": 0.0738,
+      "contrast": 1.07
+    },
+    {
+      "id": "clockspring-steel-brassvein",
+      "oreLuma": 0.0318,
+      "rockLuma": 0.0132,
+      "orePeakLuma": 0.8712,
+      "contrast": 1.29
+    },
+    {
+      "id": "alexandrite-quartzine",
+      "oreLuma": 0.0316,
+      "rockLuma": 0.0128,
+      "orePeakLuma": 0.4717,
+      "contrast": 1.3
+    },
+    {
+      "id": "ichthyosaur-eye-amberbone",
+      "oreLuma": 0.051,
+      "rockLuma": 0.0181,
+      "orePeakLuma": 0.1519,
+      "contrast": 1.48
+    }
+  ],
+  "oreLumaRisesAlongEveryRow": false,
+  "bodyLumaRisesAlongEveryRow": null
+}

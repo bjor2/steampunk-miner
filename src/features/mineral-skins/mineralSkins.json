@@ -1206,7 +1206,8 @@
       "base": "burnished-scratches",
       "vein": "rolled-pebbles",
       "palette": "platinum-pale",
-      "sheen": "polished"
+      "sheen": "polished",
+      "atlasPage": 2
     },
     {
       "species": "blue-topaz-quartzine",
@@ -1221,28 +1222,32 @@
       "base": "nacre-sheets",
       "vein": "ammonite-coils",
       "palette": "ammonite-rose",
-      "sheen": "pearly"
+      "sheen": "pearly",
+      "atlasPage": 2
     },
     {
       "species": "meteoric-iron-brassvein",
       "base": "widmanstatten-etch",
       "vein": "crusted-slabs",
       "palette": "meteoric-steel",
-      "sheen": "lamella-flash"
+      "sheen": "lamella-flash",
+      "atlasPage": 2
     },
     {
       "species": "star-sapphire-quartzine",
       "base": "hex-zoning",
       "vein": "cabochon-domes",
       "palette": "sapphire-star",
-      "sheen": "asterism"
+      "sheen": "asterism",
+      "atlasPage": 2
     },
     {
       "species": "opal-jaw-amberbone",
       "base": "opal-potch",
       "vein": "toothed-jaw",
       "palette": "opal-jaw-milk",
-      "sheen": "opal-flash"
+      "sheen": "opal-flash",
+      "atlasPage": 2
     },
     {
       "species": "orichalcum-brassvein",
@@ -1265,21 +1270,24 @@
       "base": "blued-temper",
       "vein": "coil-springs",
       "palette": "clockspring-blue",
-      "sheen": "filed-gleam"
+      "sheen": "filed-gleam",
+      "atlasPage": 2
     },
     {
       "species": "alexandrite-quartzine",
       "base": "dichroic-zones",
       "vein": "cyclic-twins",
       "palette": "alexandrite-shift",
-      "sheen": "sector-flash"
+      "sheen": "sector-flash",
+      "atlasPage": 2
     },
     {
       "species": "ichthyosaur-eye-amberbone",
       "base": "sutured-plates",
       "vein": "sclerotic-ring",
       "palette": "ichthyosaur-slate",
-      "sheen": "greasy"
+      "sheen": "greasy",
+      "atlasPage": 2
     },
     {
       "species": "starsteel-brassvein",
@@ -1472,7 +1480,8 @@
       "base": "bladed-columns",
       "vein": "crossed-bars",
       "palette": "wolfram-steel",
-      "sheen": "fibre-satin"
+      "sheen": "fibre-satin",
+      "atlasPage": 2
     },
     {
       "species": "fire-garnet-quartzine",
@@ -1487,7 +1496,8 @@
       "base": "spongy-bone",
       "vein": "vertebra-column",
       "palette": "saurian-bone",
-      "sheen": "bone-dust"
+      "sheen": "bone-dust",
+      "atlasPage": 2
     },
     {
       "species": "rose-quartz-quartzine",
@@ -1508,7 +1518,8 @@
       "base": "sulphide-tarnish",
       "vein": "ramshorn-curls",
       "palette": "wire-silver-bright",
-      "sheen": "untarnished-gleam"
+      "sheen": "untarnished-gleam",
+      "atlasPage": 2
     },
     {
       "species": "watermelon-tourmaline-quartzine",
@@ -1523,28 +1534,32 @@
       "base": "radial-guards",
       "vein": "bullet-darts",
       "palette": "belemnite-amber",
-      "sheen": "guard-crescents"
+      "sheen": "guard-crescents",
+      "atlasPage": 2
     },
     {
       "species": "firebrass-brassvein",
       "base": "flame-tongues",
       "vein": "curled-ribbons",
       "palette": "firebrass-flame",
-      "sheen": "flame-flicker"
+      "sheen": "flame-flicker",
+      "atlasPage": 2
     },
     {
       "species": "heat-spinel-quartzine",
       "base": "heat-shimmer",
       "vein": "spinel-macles",
       "palette": "heat-spinel-pink",
-      "sheen": "banked-glow"
+      "sheen": "banked-glow",
+      "atlasPage": 2
     },
     {
       "species": "petrified-heartwood-amberbone",
       "base": "heartwood-grain",
       "vein": "log-rounds",
       "palette": "heartwood-olive",
-      "sheen": "chalcedony-gleam"
+      "sheen": "chalcedony-gleam",
+      "atlasPage": 2
     },
     {
       "species": "core-gold-brassvein",

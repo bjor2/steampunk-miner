@@ -26,6 +26,11 @@ const PLANET_1_START = readFileSync(
 const CELLS_PER_PAGE = 16
 const ACT = 'foothold.base'
 const OVERFLOW_ACT = `${ACT}#overflow`
+/** The first act with a shipped page 2 (ticket 853): P3's five non-gem heroes sit on it. */
+const PAGED_ACT = 'foothold.heavy'
+const PAGED_PLANET = 3
+const PAGED_HEROES = 8
+const PAGE_TWO_HEROES = 5
 /** A landscape phone at 15 m a screen height is 24 px a cell (ticket 315's phone floor). */
 const SCREENS = [
   { label: 'phone 640x360 at 24 px a cell', size: { width: 640, height: 360 }, zoom: 15, px: 24 },
@@ -87,6 +92,15 @@ function onPageTwo(cells: readonly string[]): string[] {
   })
 }
 
+function pageOf(entry: string): number {
+  const cell = Number(entry.split(':')[1])
+  return Math.floor(cell / CELLS_PER_PAGE) + 1
+}
+
+function setPlanet(page: Page, planet: number) {
+  return page.evaluate((index) => window.steampunkDebug!.setPlanet(index).ok, planet)
+}
+
 for (const screen of SCREENS) {
   test.describe(`hero atlas pages on a ${screen.label} (ticket 852)`, () => {
     test.use({ viewport: screen.size })
@@ -131,6 +145,36 @@ for (const screen of SCREENS) {
       await expect.poll(async () => (await heroAtlas(page)).residentId).toBe(ACT)
       expect((await heroAtlas(page)).pages).toBe(1)
       await expect.poll(() => heroCellsBySlot(page)).toEqual(pageOneCells)
+      expect(errors).toEqual([])
+    })
+
+    test("draws P3's five non-gem heroes from the shipped page 2 beside its three gems on page 1 (ticket 853)", async ({
+      page,
+    }, testInfo) => {
+      test.setTimeout(SLOW_BOX_TIMEOUT_MS)
+      const errors = await openScenario(page)
+      expect(await setPlanet(page, PAGED_PLANET)).toBe(true)
+      expect(await page.evaluate((m) => window.steampunkDebug!.ui.setZoom(m).ok, screen.zoom)).toBe(
+        true,
+      )
+      await expect.poll(() => pixelsPerMetre(page)).toBeGreaterThan(screen.px - PX_TOLERANCE)
+      const { unit } = await heroAtlas(page)
+      if (unit === 'absent') {
+        expect(await heroCellsBySlot(page)).toEqual([])
+        expect(errors).toEqual([])
+        return
+      }
+
+      await expect.poll(async () => (await heroAtlas(page)).residentId).toBe(PAGED_ACT)
+      await expect.poll(async () => (await heroAtlas(page)).pages).toBe(2)
+      await expect.poll(async () => (await heroCellsBySlot(page)).length).toBe(PAGED_HEROES)
+      const pages = (await heroCellsBySlot(page)).map(pageOf)
+      expect(pages.filter((at) => at === 2)).toHaveLength(PAGE_TWO_HEROES)
+      expect(pages.filter((at) => at === 1)).toHaveLength(PAGED_HEROES - PAGE_TWO_HEROES)
+      await testInfo.attach(`shipped-page-2-sprites-${screen.size.width}x${screen.size.height}`, {
+        body: await page.screenshot(),
+        contentType: 'image/png',
+      })
       expect(errors).toEqual([])
     })
   })

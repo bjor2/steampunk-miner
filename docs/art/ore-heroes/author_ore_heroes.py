@@ -1,5 +1,5 @@
 """
-Authors the hero ore looks of one authored set (#452, tickets 744 and 785; `AUTHORED_SETS` in
+Authors the hero ore looks of one authored set (#452, tickets 744, 785 and 853; `AUTHORED_SETS` in
 hero_species.py) on the ore stage (docs/art/ores): one .blend per hero species (its 1 m cell on its
 band's rock, the lamp rig and the game's orthographic camera), the 248 px lit albedo sprite of each
 (the rock held out, so the alpha is the mask) into art/build/ore-heroes/ for hero_post.py, the cell
@@ -25,7 +25,11 @@ for folder in (HERE, os.path.normpath(os.path.join(HERE, '..', 'ores')), os.path
 
 import gem_marks  # noqa: E402
 import gem_marks_deep  # noqa: E402
+import hero_bodies  # noqa: E402
 import hero_marks as marks  # noqa: E402
+import hero_marks_p3  # noqa: E402
+import hero_marks_p4  # noqa: E402
+import hero_marks_p5  # noqa: E402
 import hero_species as species  # noqa: E402
 import ore_stage as stage  # noqa: E402
 
@@ -60,7 +64,7 @@ def author(set_id, sheets=True):
 
 
 def reload_modules():
-    for module in (species, marks, gem_marks, gem_marks_deep):
+    for module in (species, marks, gem_marks, gem_marks_deep, hero_bodies, hero_marks_p3, hero_marks_p4, hero_marks_p5):
         importlib.reload(module)
 
 
