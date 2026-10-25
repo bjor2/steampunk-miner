@@ -5,7 +5,7 @@
  * (`drillQuantum.ts`, ticket 558). No float enters the authority: `n` comes from the `BigStat` drill
  * rule through `money.ts`.
  */
-import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
+import { DRILL_DESCENT_PER_CUT, DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'
 
 /**
@@ -22,6 +22,11 @@ export function cutStepMmOf(
 /** Cells a second the drill cuts through cells of `subStepsPerCell` sub-steps of `quantum`. */
 export function cutCellsPerSecondOf(subStepsPerCell: number, quantum: number): number {
   return (quantum * TICKS_PER_SECOND) / subStepsPerCell
+}
+
+/** The m/s a rig descends at while its drill cuts band-1 rock at `cellsPerSecond` (#551). */
+export function descentMetresPerSecondOf(cellsPerSecond: number): number {
+  return cellsPerSecond * DRILL_DESCENT_PER_CUT
 }
 
 /** A step in mm a tick as a speed in m/s, the unit the engine's `speedMax` is in. */

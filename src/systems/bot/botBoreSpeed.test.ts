@@ -3,7 +3,7 @@ import { TICKS_PER_SECOND } from '../../constants/physics'
 import { createAuthorityState } from '../authority/authorityState'
 import { FREEZE_ENEMIES, GROUND } from '../authority/scriptedSession'
 import { drillQuantumAt } from '../authority/stepBoundRead'
-import { cutCellsPerSecondOf } from '../vehicle/cutSpeed'
+import { cutCellsPerSecondOf, descentMetresPerSecondOf } from '../vehicle/cutSpeed'
 import { setUpgradeCommand } from '../vehicle/vehicleCommands'
 import { FACING } from '../vehicle/vehiclePose'
 import { statsOfVehicle } from '../vehicle/vehicleState'
@@ -23,8 +23,6 @@ const COLUMN: readonly TilePoint[] = Array.from({ length: 20 }, (_, depth) => ({
   tx: GROUND.tx,
   ty: GROUND.ty - depth,
 }))
-/** VS on #551 (6254671302): a rig descends at 0.891 of its band-1 cut speed in cells/s. */
-const DESCENT_PER_CUT = 0.891
 /** Drill power purchase 32: band-1 rock at about 1300 cells/s, past 840 m/s down. */
 const FAST_DRILL = 32
 /** Drill power purchase 12: band-1 rock at about 1.3 ticks a cell, a fraction a whole tick rounds. */
@@ -73,7 +71,7 @@ describe('pacing bot bore speed on the sub-step clock (ticket 559)', () => {
     const session = botWithDrill(FAST_DRILL)
     const quantum = drillQuantumAt(session.state(), PLAYER)
     const cellsPerSecond = cutCellsPerSecondOf(columnSubStepsOf(session) / COLUMN.length, quantum)
-    expect(cellsPerSecond * DESCENT_PER_CUT).toBeGreaterThan(840)
+    expect(descentMetresPerSecondOf(cellsPerSecond)).toBeGreaterThan(840)
     const ticks = boreColumn(session)
     expect(isColumnOpen(session)).toBe(true)
     expect((COLUMN.length * TICKS_PER_SECOND) / ticks).toBeGreaterThan(60)

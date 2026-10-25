@@ -1,4 +1,5 @@
 import RAPIER from '@dimforge/rapier3d-compat'
+import { DRILL_DESCENT_PER_CUT } from '../constants/balance'
 import { PHYSICS_TIMESTEP } from '../constants/physics'
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { createMemorySink } from '../logging/eventSink'
@@ -33,8 +34,11 @@ import { createRig } from './cutFollowFixtures'
 
 const SETTLE_TICKS = 6
 const MAX_GAP_M = 0.1
-/** GD on #570 (amendment 3 and the confirmation): L20 descends at least 0.891 of its cut speed. */
-const DESCENT_PER_CUT_MIN = 0.891
+/**
+ * GD on #570 (amendment 3 and the confirmation): L20 descends at least the descent/cut share of its
+ * cut speed, #551's cells to m/s mapping (re-derived for the 1.2 m bore by ticket 663).
+ */
+const DESCENT_PER_CUT_MIN = DRILL_DESCENT_PER_CUT
 const HOLD_NEVER_FULL = 60
 /** Grok Bot's probe on #570 held aim_down for 120 ticks. */
 const LEG_TICKS = 120
@@ -240,7 +244,7 @@ describe('material pop A beside B on the cut-face probe (ticket 617)', () => {
   })
 
   it.each(LEGS.filter((leg) => leg.row.name === 'L20'))(
-    `descends at least 0.891 of its cut speed in both modes, delivering the same cells/s, ${ROW}`,
+    `descends at least ${DRILL_DESCENT_PER_CUT} of its cut speed in both modes, delivering the same cells/s, ${ROW}`,
     (leg) => {
       const [a, b] = MODES.map((mode) => deliveredOf(rideOf(leg, mode)))
       console.info(

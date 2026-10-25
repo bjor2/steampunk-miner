@@ -938,6 +938,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/cutFollowRead.test.ts` | 12 | 12 |
 | `src/systems/authority/cutShare.test.ts` | 3 | 3 |
 | `src/systems/authority/depthCurveTank.test.ts` | 78 | 2 |
+| `src/systems/authority/descentPerCut.test.ts` | 2 | 2 |
 | `src/systems/authority/devFlagFlips.test.ts` | 7 | 7 |
 | `src/systems/authority/devFlagGates.test.ts` | 192 | 3 |
 | `src/systems/authority/devFlagReads.test.ts` | 1 | 1 |

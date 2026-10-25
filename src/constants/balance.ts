@@ -69,6 +69,27 @@ export const DRILL_BORE_ROWS: DrillBoreRows = { sideClearanceMm: 150 }
 export const DRILL_SIDE_CLEARANCE_RANGE_MM = { min: 100, max: 200 } as const
 
 /**
+ * The drill's cells to m/s mapping, descent over cut speed (the VS on #551, 6254671302: "the 83.9
+ * m/s is 94.1 x 0.891"): a rig descends at this share of its band-1 cut speed in cells/s. The one
+ * copy of it; `vehicle/cutSpeed.ts` applies it. Re-derived once for the 1.2 m bore (ticket 663,
+ * the VS on #661 6311530200: felt speed is the fixed point, no compensation in the drill law): the
+ * law counts a cell as a metre of the column along the axis whatever the stamp's width, and the
+ * stored-step ladder cuts band 1 in the same ticks on #36's 1.9 m bore and the 1.2 m bore (1.546
+ * cells/s at L1, 92.308 at L20, `descentPerCut.test.ts`), so the share is unchanged.
+ */
+export const DRILL_DESCENT_PER_CUT = 0.891
+
+/**
+ * The felt speed the VS holds fixed (#551, its bench band split by the TD; the VS on #661): L20 goes
+ * down band 1 at 83.9 m/s, read between 2.7% under (the drill quantum's rounding) and 0.5% over.
+ */
+export const L20_FELT_DESCENT = {
+  metresPerSecond: 83.9,
+  belowShare: 0.027,
+  aboveShare: 0.005,
+} as const
+
+/**
  * Where the stamp sits (#40: the drill axis is the 4-way facing in the local frame): this far
  * ahead of the body's centre along the facing, so it bites just past the 0.9 m body's face.
  * Driving sideways on the ground it is also raised along `localUp` by the lift

@@ -13,6 +13,7 @@
  */
 import { readFileSync } from 'node:fs'
 import { expect, test, type Page } from '@playwright/test'
+import { L20_FELT_DESCENT } from '../../src/constants/balance'
 import type { DebugApi } from '../../src/debug/debugApi'
 import { blockHardness } from '../../src/systems/economy/oreEconomy'
 import { toCanonical } from '../../src/systems/money'
@@ -34,8 +35,8 @@ const FIRST_PURCHASE = START_SAVE.start.upgrades.drill_power
 const ANCHOR_PURCHASE = 20
 const RATIO_BAND = { low: 60, high: 65 }
 /** 50 times the old L20, m/s (#551), and VS's bench band round it: -2.7% to +0.5%. */
-const TARGET_M_PER_S = 83.9
-const TARGET_BAND = { below: 0.027, above: 0.005 }
+const TARGET_M_PER_S = L20_FELT_DESCENT.metresPerSecond
+const TARGET_BAND = { below: L20_FELT_DESCENT.belowShare, above: L20_FELT_DESCENT.aboveShare }
 const HOLD_MS = 10_000
 /** Read from the third cell down: the body has its cut speed by then. */
 const FROM_DEPTH_TILES = 2
