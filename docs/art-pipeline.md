@@ -780,8 +780,9 @@ and the review renders, at desktop and at a 360 px phone's size, are in
 The art half of the drive look of the rig look ladder
 ([#576](https://github.com/bjor2/steampunk-miner/issues/576), built by
 [#731](https://github.com/bjor2/steampunk-miner/issues/731) for the wiring
-[#726](https://github.com/bjor2/steampunk-miner/issues/726) and grown to five authored steps by
-[#811](https://github.com/bjor2/steampunk-miner/issues/811), LK3): a Blender source for the
+[#726](https://github.com/bjor2/steampunk-miner/issues/726), grown to five authored steps by
+[#811](https://github.com/bjor2/steampunk-miner/issues/811), LK3, and to twenty, about P40, by
+[#871](https://github.com/bjor2/steampunk-miner/issues/871), LK8): a Blender source for the
 `engine` track's look steps, tracks and wheels per engine stage, `art/blender/vehicle-look-drive/`,
 with the base look beside them. Since #723 the `engine` track is the only drive purchase, so the
 GD keyed the drive look on `levels.engine` (drill-speed buys never move it) and had the tracks and
@@ -796,19 +797,32 @@ turbine steps). Then, on each next edge, the guild track with one more part fitt
 lock on #811: a new outline or an added part, never a recolour): `flywheel-track` (20, a
 brass-rimmed, steel-spoked flywheel on the tail roller's axle) and `exhaust-track` (25, twin
 dark-iron exhaust stacks rising from the belt either side of the thrusters, each under a brass
-spark-arrestor bonnet with a glowing mesh). The belt keeps inside the rollers' radius, so the rig's
-silhouette grows only in the gaps between the rollers, inside the undercarriage box and never
-below the ground line the rollers stand on; the flywheel stays inside the belt loop and the stacks
-inside the pod's own outline, so the rig outline, the drawn drill tip and the collider never move;
-every roller's face inside the belt stays open, so the rig's own rollers keep turning under the
+spark-arrestor bonnet with a glowing mesh). Then, from 30 to 100 on every fifth edge, the exhaust
+track with one more LK8 part fitted (GD lock on #871, the same pattern): engine fittings first
+(`sprocket-track`, a toothed drive sprocket on the bow axle; `idler-track`, idler wheels riding
+the bottom run in each gap; `coupled-track`, crank pins and a steel side rod coupling the three
+axles; `guard-track`, riveted guard plates over the bottom run; `governor-track`, a spinning
+governor on the belly between the thrusters; `cylinder-track`, twin steam cylinders over it;
+`piped-track`, copper steam lines to the stacks), then heavier running gear (`locker-track`,
+riveted side lockers over each thruster; `lamped-track`, amber running lamps; `geared-track`, a
+bull gear round the turbine; `studded-track`, a steel stud on every cleat; `coiled-track`,
+induction coils round the stacks), then the aetheric glows (`aether-hub-track`, lit hub lenses;
+`haloed-track`, halos inside the sprocket, flywheel and turbine; `aether-track`, glow strips along
+the side rod, the guards and the cylinders). The belt keeps inside the rollers' radius, so the
+rig's silhouette grows only in the gaps between the rollers, inside the undercarriage box and
+never below the ground line the rollers stand on; the wheel parts stay inside the belt loop and
+the belly parts inside the pod's own outline, under the look box's top 0.06 m over the vehicle's
+origin, so the rig outline, the drawn drill tip and the collider never move; every roller's face
+inside the belt stays open but for the side rod, so the rig's own rollers keep turning under the
 look. The rig-look seam ([#640](https://github.com/bjor2/steampunk-miner/issues/640)) registers it
 through `r.artAssets` from `rigLook.json`'s `lookAssets` and exports it to `public/assets/vehicle/`
-(6 parts, 512x1024) at `z` 3, over the chassis's 2 and under the thrusters' 4; the wiring (#726)
+(21 parts, 1024x4096) at `z` 3, over the chassis's 2 and under the thrusters' 4; the wiring (#726)
 pointed the engine steps' parts at it, retired the drive units and added the parts to the track's
-glow slots so the tail above the top step paints them. The guild track's lit core and the spark
-arrestors' mesh are the glows, at the engine turbine's 0.3, so the nose stays the brightest part.
-`docs/art/rig-look-drive/author_drive_looks.py` wrote the first version of the `.blend`, and
-`author_drive_steps.py` fitted the LK3 parts into it; from then on the file is the source. The
+glow slots so the tail above the top step paints them. The guild track's lit core, the spark
+arrestors' mesh, the lamps' lenses and the aether glows are the emissions, at the engine turbine's
+0.3, so the nose stays the brightest part. `docs/art/rig-look-drive/author_drive_looks.py` wrote
+the first version of the `.blend`, `author_drive_steps.py` fitted the LK3 parts into it and
+`author_drive_p40_steps.py` the fifteen LK8 parts; from then on the file is the source. The
 part table, the outline check at tiers 1 and 3 and the review renders, at desktop and at a 360 px
 phone's size, are in [docs/art/rig-look-drive/](art/rig-look-drive/README.md).
 

@@ -5,7 +5,9 @@ The Blender source and review renders of
 wave 576-3A of [Rig look ladder and mineral skins (#576)](https://github.com/bjor2/steampunk-miner/issues/576),
 and of the engine line's LK3 steps,
 [LK3: engine look steps to 5+ (#811)](https://github.com/bjor2/steampunk-miner/issues/811), wave
-647-7K of the P1-P5 map: the drive look of the rig. Since
+647-7K of the P1-P5 map, and its LK8 steps to about P40,
+[LK8: engine and drive look steps to P40 (#871)](https://github.com/bjor2/steampunk-miner/issues/871),
+wave 647-7Z: the drive look of the rig. Since
 [#723](https://github.com/bjor2/steampunk-miner/issues/723) the `engine` track is the only drive
 purchase, so the Game Director keyed the drive look on `levels.engine` and had the tracks and wheels
 **replace** the engine's drive units on `chassis.drive` (GD rulings on #726 and #576 comment
@@ -21,6 +23,13 @@ step keeps every later band visible. The base rig's hub is the unnamed default.
 #726 (the engine's drive units; [docs/art/rig-look-engine/](../rig-look-engine/README.md)), and the
 engine line's art is this one, so the flywheel and the stacks are drive parts: `flywheel-track` and
 `exhaust-track`, authored into this source by `author_drive_steps.py`.
+
+**LK8 (#871):** the same holds for the fifteen steps from 30 to 100 (the GD lock of 25 Oct 06:48
+and Systems' sizing row: at least 13 steps, so the median bot never goes more than 3 planets
+without a band step through P40; every LK1 edge to 100 is authored, 20 steps). Each is the exhaust
+track with one more part fitted in a socket, authored by `author_drive_p40_steps.py`: engine
+fittings first, then heavier running gear, then the aetheric glows of the guild's drive. See
+"The LK8 steps" and "Checks (25 Oct 2026, LK8)" below.
 
 **Wired by #726**: the engine's three step rows name `iron-track`, `steel-track` and `guild-track` with `asset: "vehicle-look-drive"`, the parts join the track's glow slots so the tail paints them, and `vehicle-look-engine` is retired (its `.blend` kept as source). Below 2 purchases nothing is drawn, so `bare-hub` ships unused. #731 shipped the asset: `rigLook.json`'s `lookAssets` names
 `vehicle-look-drive` with its four parts (registered through `r.artAssets`, ticket 640), the
@@ -84,32 +93,76 @@ headlamp, where the pod's own outline covers them. Piston count is the existing 
 piston, Triple flywheel), so the new flywheel is the big side wheel of a traction engine, not a
 third piston.
 
+### The LK8 steps (#871)
+
+Each step from 30 to 100 is the exhaust track with one more part fitted, in this order:
+
+| Part               | Step                  | Adds                                                                                                                      |
+| ------------------ | --------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `sprocket-track`   | 30, Drive sprocket    | a toothed brass drive sprocket with six steel spokes and a brass nut on the bow axle, mirroring the tail axle's flywheel  |
+| `idler-track`      | 35, Idler wheels      | a brass-rimmed steel idler wheel with a dark-iron hub riding the belt's bottom run in each gap between the rollers        |
+| `coupled-track`    | 40, Coupling rods     | a dark-iron crank pin with a brass rod end on each of the three axles and one steel side rod through them, a locomotive's |
+| `guard-track`      | 45, Belt guards       | a pale steel guard plate with three dark-iron rivets over the belt's bottom run in each gap                               |
+| `governor-track`   | 50, Spinning governor | a brass centrifugal governor on the keel bar between the thrusters: base, spindle, two steel arms and balls, a finial     |
+| `cylinder-track`   | 55, Twin cylinders    | twin brass steam cylinders with iron end flanges and dark-iron glands lying along the belly over the governor             |
+| `piped-track`      | 60, Steam lines       | a copper steam line from each cylinder's outer end out along the belly and down beside its stack's bonnet, brass unions   |
+| `locker-track`     | 65, Side lockers      | a riveted dark-iron side locker with a brass hinge strip and hasp on the belly over each thruster's top                   |
+| `lamped-track`     | 70, Running lamps     | a brass running lamp with an amber lens (lit) over each locker, inboard of the stack's bonnet                             |
+| `geared-track`     | 75, Bull gear         | a toothed brass bull gear round the guild turbine's vanes, inside the belt loop                                           |
+| `studded-track`    | 80, Belt studs        | a bright steel stud on every cleat round the belt, its crown at the roller's own radius                                   |
+| `coiled-track`     | 85, Induction coils   | three copper induction coils round each stack's shaft, over the tier-3 skirt line                                         |
+| `aether-hub-track` | 90, Aether hubs       | a glowing teal lens on each axle's hub and each idler's                                                                   |
+| `haloed-track`     | 95, Wheel halos       | a glowing teal halo inside the sprocket's and the flywheel's rims and round the turbine's vanes                           |
+| `aether-track`     | 100, Aether drive     | glowing teal strips along the side rod and the guards, and glowing rings round the cylinders' ends                        |
+
+Why those sockets: the thruster bells (`z` 4, x ±0.119..0.221 m, from the belt's top run up to
+0.19 m over the hub line) and the tier-3 belly skirt (`z` 5, 0.105 to 0.175 m over the hub line)
+are drawn over the look, the window ends at the roller tops, and the stacks of LK3 take the belly
+outside the thrusters, so what is left open is: the bow axle inside the belt loop (the sprocket;
+the tail axle carries the flywheel), the lower half of each frame gap under the bells' reach (the
+idlers), the line just under the axles across the whole loop (the side rod, 0.03 m under the hub
+line, clear of the turbine window above and the idlers below), the belt's bottom run in the gaps
+(the guards), the pod's belly between the thrusters over the keel bar and the middle leg's hip
+(the governor from 0.225 m up, the cylinders at 0.385 m, under the look box's top at 0.42 m), the
+belly over each thruster's top and inboard of the stacks (the lockers at 0.20 to 0.28 m, the lamps
+over them), the ring round the turbine inside the belt (the bull gear), the cleats' faces (the
+studs, whose crowns stay at the roller's radius so the ground line holds), the stacks' shafts
+between the skirt line and their lower band (the coils), and the wheels' hubs and rims (the aether
+glows). Every belly part keeps inside the pod's own silhouette (the pod's underside is 0.11 m over
+the hub line at the belly, its caps curve up from there), so the rig's drawn outline does not grow;
+the wheel parts keep inside the belt's inner edge (0.088 m). The side rod is the one part that
+crosses the rollers' open faces; it is a 16 mm bar, so the rollers still turn visibly behind it.
+The lamps' lenses and the aether glows are at the turbine core's emission (0.3), so the drill nose
+stays the brightest part of the rig.
+
 The guild track's core and the spark arrestors' mesh are the glows (emission 0.3, the engine
 turbine's, under a fifth of the nose seams' 1.6), so the drill nose stays the brightest part of the
 rig with every look.
 
 ## Files
 
-| File                       | What it is                                                                                                    |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `parts.png`                | each part alone in the game's front view at 768 px/m                                                          |
-| `tier-1.png`, `tier-3.png` | the rig at that tier, bare and with each look on the slot, 512 px/m, the nose lit as while drilling           |
-| `tier-<n>.ingame.png`      | the same at 90 px/m, about what a 1080p screen shows at the default 12 m zoom                                 |
-| `tier-<n>.phone.png`       | the same at a 360 px wide phone's 30 px/m over the 12 m zoom, enlarged 8x with no smoothing                   |
-| `glow.png`                 | the tier-1 rig, bare and with each look, by its emission alone: what the emissive map carries                 |
-| `outline.json`             | each look's silhouette cells outside the rig at tiers 1 and 3, inside and beyond the undercarriage window     |
-| `readability.json`         | the phone-size pixels each step changes at the default and the closest zoom, and the nose's brightest pixel   |
-|                            | against the look's (the window and the belly strip) and the rest of the rig's                                 |
-| `driveLooks.json`          | the asset, its slot, its window, its look box and belly strip, its parts with their step names and thresholds |
-| `author_drive_looks.py`    | wrote the first version of the source (Blender)                                                               |
-| `author_drive_steps.py`    | fitted the LK3 flywheel and exhaust stacks into the source (Blender, #811)                                    |
-| `render_drive_looks.py`    | the renders above (Blender), on the casing driller review's frame and stage, draw order kept                  |
-| `check_outline.py`         | writes `outline.json` (Blender); exits 1 when a look leaves the rig outline and the undercarriage window      |
-| `sheet_drive_looks.py`     | lays the renders out into the sheets and writes `readability.json` (Pillow, numpy)                            |
+| File                        | What it is                                                                                                    |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `parts.png`                 | each part alone in the game's front view at 768 px/m                                                          |
+| `tier-1.png`, `tier-3.png`  | the rig at that tier, bare and with each look on the slot, 512 px/m, the nose lit as while drilling           |
+| `tier-<n>.ingame.png`       | the same at 90 px/m, about what a 1080p screen shows at the default 12 m zoom                                 |
+| `tier-<n>.phone.png`        | the same at a 360 px wide phone's 30 px/m over the 12 m zoom, enlarged 8x with no smoothing                   |
+| `glow.png`                  | the tier-1 rig, bare and with each look, by its emission alone: what the emissive map carries                 |
+| `outline.json`              | each look's silhouette cells outside the rig at tiers 1 and 3, inside and beyond the undercarriage window     |
+| `readability.json`          | the phone-size pixels each step changes at the default and the closest zoom, and the nose's brightest pixel   |
+|                             | against the look's (the window and the belly strip) and the rest of the rig's                                 |
+| `driveLooks.json`           | the asset, its slot, its window, its look box and belly strip, its parts with their step names and thresholds |
+| `author_drive_looks.py`     | wrote the first version of the source (Blender)                                                               |
+| `author_drive_steps.py`     | fitted the LK3 flywheel and exhaust stacks into the source (Blender, #811)                                    |
+| `author_drive_p40_steps.py` | fitted the fifteen LK8 parts, 30 to 100, into the source (Blender, #871)                                      |
+| `render_drive_looks.py`     | the renders above (Blender), on the casing driller review's frame and stage, draw order kept                  |
+| `check_outline.py`          | writes `outline.json` (Blender); exits 1 when a look leaves the rig outline and the undercarriage window      |
+| `sheet_drive_looks.py`      | lays the renders out into the sheets and writes `readability.json` (Pillow, numpy)                            |
 
 ```
 blender -b --factory-startup --python-exit-code 1 -P docs/art/rig-look-drive/author_drive_looks.py
 blender -b --factory-startup --python-exit-code 1 -P docs/art/rig-look-drive/author_drive_steps.py
+blender -b --factory-startup --python-exit-code 1 -P docs/art/rig-look-drive/author_drive_p40_steps.py
 blender -b --factory-startup --python-exit-code 1 -P docs/art/rig-look-drive/check_outline.py
 blender -b --factory-startup --python-exit-code 1 -P docs/art/rig-look-drive/render_drive_looks.py [-- alone|rig|glow]
 python3 docs/art/rig-look-drive/sheet_drive_looks.py
@@ -199,6 +252,75 @@ Against #811's acceptance, with the numbers the scripts wrote:
 - **Band names:** `Drive flywheel` and `Twin exhaust stacks`, data strings of 2 and 3 words in
   `rigLook.json` (`card`) and `driveLooks.json`; the table checks refuse longer ones.
 
+## Checks (25 Oct 2026, LK8)
+
+Against #871's acceptance, with the numbers the scripts wrote:
+
+- **Step count and edges** (`driveLooks.json`, `rigLook.json`): twenty authored steps on every
+  LK1 edge of 5 from 5 to 100, about P40 on the median path; at least the 13 Systems' sizing row
+  asks for, so the median bot never goes more than 3 planets without a band step through P40.
+  The five steps of #731 and LK3 stay the first steps; the fifteen LK8 parts follow, each an added
+  part in a socket, none a recolour. The band rule, the edges and the finish cycle are LK1's as
+  they were, so the economy and the thresholds do not move; above 100 the finish tail keeps the
+  aether track. The PK7 trace (#826) is not on main yet, so the thresholds are LK1's frozen edges,
+  and the cadence lane (`rigLookPlanets.lane.test.ts`) is where the 3-planet rule is measured.
+- **Inside the rig outline and the undercarriage window** (`outline.json`): on a 4 mm grid every
+  LK8 look has **0 cells** outside the rig and the window at tier 1 and at tier 3 (the cells
+  outside the rig inside the window, 2108 to 2112 and 1732 to 1733, are the belt's, as before;
+  the studs add 2 and the aether strips 2 at the belt's edge). The parts live on `chassis.drive`
+  only, so the drawn drill tip is untouched (#789), and the collider is the code constant
+  (`COLLIDER_M`, 0.9 m) no art feeds; `vehicle.blend` is untouched.
+- **Readable at 360 px and 1280+** (`tier-<n>.phone.png`, `tier-<n>.ingame.png`,
+  `readability.json`): the pixels of the look box each step changes against the step before it, a
+  channel moving more than 24 of 255, untinted renders. At the closest zoom (8 m, 45 px/m on a
+  360 px phone, where `rigLookSweep.spec.ts` judges one visible step as 16 pixels), tier 1 / tier 3:
+
+  | Step (from)            | Closest zoom, tier 1 | Tier 3 | Default zoom, tier 1 | Tier 3 |
+  | ---------------------- | -------------------: | -----: | -------------------: | -----: |
+  | Drive sprocket (30)    |                   32 |     26 |                   13 |      9 |
+  | Idler wheels (35)      |                    9 |      7 |                    1 |      2 |
+  | Coupling rods (40)     |                   37 |     18 |                   16 |      2 |
+  | Belt guards (45)       |                   13 |     13 |                   10 |      8 |
+  | Spinning governor (50) |                   14 |     15 |                    3 |      6 |
+  | Twin cylinders (55)    |                   12 |     14 |                    5 |      8 |
+  | Steam lines (60)       |                   20 |     21 |                   10 |     10 |
+  | Side lockers (65)      |                   33 |     29 |                   18 |     15 |
+  | Running lamps (70)     |                   14 |     14 |                    2 |      4 |
+  | Bull gear (75)         |                   27 |     23 |                   13 |      9 |
+  | Belt studs (80)        |                    0 |      0 |                    0 |      0 |
+  | Induction coils (85)   |                   12 |     13 |                    3 |      2 |
+  | Aether hubs (90)       |                   10 |      9 |                    4 |      3 |
+  | Wheel halos (95)       |                   39 |     33 |                   13 |     12 |
+  | Aether drive (100)     |                   18 |     35 |                    0 |      0 |
+
+  The sprocket, the rods, the steam lines, the lockers, the bull gear, the halos and the aether
+  drive clear the line by geometry alone. The parts that are small by nature (a 22 mm idler, a
+  26 mm lamp, 30 mm coils, 15 mm lenses) sit at 7 to 15 pixels: a 20 mm part is under a pixel at
+  45 px/m, and the studs (7.5 mm domes) move no phone pixel at all; the guards, the governor and
+  the cylinders are each 1 to 2 px tall there. A first authoring had the studs, lenses, lamps and
+  strips smaller still (0, 6, 7 and 1); they were enlarged to what their sockets allow. In the
+  game every band also wears its own tint and glow from `rigLook.json` on the whole look, which
+  the sweep's crop diff sees and these renders leave out; whether that carries the small steps on
+  a phone is the Tester's sweep and G&V's call (**finding for G&V**, as LK6 and LK7 found for
+  their rivets and face parts). At 90 px/m (`tier-<n>.ingame.png`, a 1280 px desktop) every step
+  reads on the rig: the idlers as pale discs under the thrusters, the lamps as amber dots over the
+  lockers, the coils as copper bands on the stacks, the studs as a bright dotted belt edge.
+
+- **Glow under the `rigBody` cap** (`glow.png`, `readability.json`): the lamps' lenses and the
+  aether parts glow at the turbine core's emission (0.3). By emission alone the drill nose stays
+  the brightest part: 245 to 246 against the look's 128 to 145 (the halos and the aether drive at
+  145; the exhaust track alone was 131). Lit, the look's brightest pixel is 214 to 217 at tier 1
+  against the bare rig's own 217 there, and 223 to 225 at tier 3 against 224, with the lit nose
+  at 203 and 253. The step glows in `rigLook.json` are 0.74 on every LK8 step, the brightest LK3
+  left under the `rigBody` cap of 1 with the glint's 0.25 (`rigLookTableChecks` refuses more).
+- **Band names:** fifteen data strings of 2 words in `rigLook.json` (`card`) and
+  `driveLooks.json`; the table checks refuse longer ones. Progression and G&V may rename them in
+  those two files.
+- **Look-only:** no kernel, state, save or digest change; `engineLooks.test.ts` pins the state
+  digest byte-identical at the lowest and the highest look, and `rigLookLines.test.ts` plays a
+  dock run buying across every edge with the slice registered and looked at, or not, to the same
+  digest.
+
 ## Known limits
 
 - **Tier 3's grousers stand outside the belt.** The belt keeps inside the tier-1 roller's 0.12 m
@@ -216,6 +338,17 @@ Against #811's acceptance, with the numbers the scripts wrote:
   is one rule for every step, not so the base rig changes.
 - **The flywheel does not turn.** Like the belt it is a still sprite over the tail roller, whose
   own face keeps spinning between the spokes; at in-game and phone sizes that is not seen.
+- **The side rod crosses the rollers' open faces.** It is the one LK8 part that does: a 16 mm steel
+  bar 30 mm under the hub line (from 40 purchases), as a locomotive's side rod crosses its wheels;
+  the rollers keep turning visibly above and below it. Like the belt and the flywheel it does not
+  move.
+- **The belt studs move no phone pixel by geometry.** 7.5 mm domes are a third of a pixel at
+  45 px/m; at 90 px/m they read as a dotted belt edge. The step is an added part (23 studs round
+  the loop), never a recolour; its phone read rests on the band's tint and glow, which the
+  sweep's crop diff sees.
+- **Tier 3's skirt covers the lockers' feet and the coils' lower ring.** The belly skirt (`z` 5)
+  is drawn over the look from 0.105 to 0.175 m over the hub line; the lockers start at 0.20 m and
+  the coils at 0.19 m, so the skirt's top edge brushes them on the tier-3 rig (`tier-3.png`).
 - **The stacks stand in front of the belly.** The look draws at `z` 3 over the chassis's legs and
   keel, so the stacks read as mounted on the pod's belly in front of the hip joints; the thruster
   bells (`z` 4) are clear of them.

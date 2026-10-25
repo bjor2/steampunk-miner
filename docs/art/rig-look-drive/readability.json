@@ -1,5 +1,5 @@
 {
-  "about": "Tickets 731 and 811: at a 360 px wide phone (30 px/m over the 12 m zoom, and 45 px/m over the closest 8 m zoom the sweep spec judges at), the pixels of the drive look box [-0.44, -0.48, 0.44, 0.06] (the undercarriage and the pod's belly the stacks rise over) that change from each look to the next (a channel moving more than 24 of 255; the bare rig to the base look should change none), and the brightest pixel (Rec. 709 luminance, 0-255) of the drill nose against the look (the undercarriage window [-0.44, -0.48, 0.44, -0.24] and the belly strip [-0.33, -0.24, 0.33, 0.06] the stacks rise through, clear of the lit headlamp) and the rest of the rig for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_drive_looks.py. The nose must stay the brightest glow.",
+  "about": "Tickets 731, 811 and 871: at a 360 px wide phone (30 px/m over the 12 m zoom, and 45 px/m over the closest 8 m zoom the sweep spec judges at), the pixels of the drive look box [-0.44, -0.48, 0.44, 0.06] (the undercarriage and the pod's belly the stacks rise over) that change from each look to the next (a channel moving more than 24 of 255; the bare rig to the base look should change none), and the brightest pixel (Rec. 709 luminance, 0-255) of the drill nose against the look (the undercarriage window [-0.44, -0.48, 0.44, -0.24] and the belly strip [-0.33, -0.24, 0.33, 0.06] the stacks rise through, clear of the lit headlamp) and the rest of the rig for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_drive_looks.py. The nose must stay the brightest glow.",
   "lit": {
     "tier-1": {
       "phonePxPerM": 30.0,
@@ -27,6 +27,66 @@
         "flywheel-track -> exhaust-track": {
           "changed": 38,
           "of": 504
+        },
+        "exhaust-track -> sprocket-track": {
+          "changed": 13,
+          "of": 504
+        },
+        "sprocket-track -> idler-track": {
+          "changed": 1,
+          "of": 504
+        },
+        "idler-track -> coupled-track": {
+          "changed": 16,
+          "of": 504
+        },
+        "coupled-track -> guard-track": {
+          "changed": 10,
+          "of": 504
+        },
+        "guard-track -> governor-track": {
+          "changed": 3,
+          "of": 504
+        },
+        "governor-track -> cylinder-track": {
+          "changed": 5,
+          "of": 504
+        },
+        "cylinder-track -> piped-track": {
+          "changed": 10,
+          "of": 504
+        },
+        "piped-track -> locker-track": {
+          "changed": 18,
+          "of": 504
+        },
+        "locker-track -> lamped-track": {
+          "changed": 2,
+          "of": 504
+        },
+        "lamped-track -> geared-track": {
+          "changed": 13,
+          "of": 504
+        },
+        "geared-track -> studded-track": {
+          "changed": 0,
+          "of": 504
+        },
+        "studded-track -> coiled-track": {
+          "changed": 3,
+          "of": 504
+        },
+        "coiled-track -> aether-hub-track": {
+          "changed": 4,
+          "of": 504
+        },
+        "aether-hub-track -> haloed-track": {
+          "changed": 13,
+          "of": 504
+        },
+        "haloed-track -> aether-track": {
+          "changed": 0,
+          "of": 504
         }
       },
       "closestZoomPxPerM": 45.0,
@@ -53,6 +113,66 @@
         },
         "flywheel-track -> exhaust-track": {
           "changed": 96,
+          "of": 1000
+        },
+        "exhaust-track -> sprocket-track": {
+          "changed": 32,
+          "of": 1000
+        },
+        "sprocket-track -> idler-track": {
+          "changed": 9,
+          "of": 1000
+        },
+        "idler-track -> coupled-track": {
+          "changed": 37,
+          "of": 1000
+        },
+        "coupled-track -> guard-track": {
+          "changed": 13,
+          "of": 1000
+        },
+        "guard-track -> governor-track": {
+          "changed": 14,
+          "of": 1000
+        },
+        "governor-track -> cylinder-track": {
+          "changed": 12,
+          "of": 1000
+        },
+        "cylinder-track -> piped-track": {
+          "changed": 20,
+          "of": 1000
+        },
+        "piped-track -> locker-track": {
+          "changed": 33,
+          "of": 1000
+        },
+        "locker-track -> lamped-track": {
+          "changed": 14,
+          "of": 1000
+        },
+        "lamped-track -> geared-track": {
+          "changed": 27,
+          "of": 1000
+        },
+        "geared-track -> studded-track": {
+          "changed": 0,
+          "of": 1000
+        },
+        "studded-track -> coiled-track": {
+          "changed": 12,
+          "of": 1000
+        },
+        "coiled-track -> aether-hub-track": {
+          "changed": 10,
+          "of": 1000
+        },
+        "aether-hub-track -> haloed-track": {
+          "changed": 39,
+          "of": 1000
+        },
+        "haloed-track -> aether-track": {
+          "changed": 18,
           "of": 1000
         }
       },
@@ -91,6 +211,81 @@
           "nose": 203,
           "track": 215,
           "restOfRig": 255
+        },
+        "sprocket-track": {
+          "nose": 203,
+          "track": 215,
+          "restOfRig": 255
+        },
+        "idler-track": {
+          "nose": 203,
+          "track": 215,
+          "restOfRig": 255
+        },
+        "coupled-track": {
+          "nose": 203,
+          "track": 215,
+          "restOfRig": 255
+        },
+        "guard-track": {
+          "nose": 203,
+          "track": 215,
+          "restOfRig": 255
+        },
+        "governor-track": {
+          "nose": 203,
+          "track": 215,
+          "restOfRig": 255
+        },
+        "cylinder-track": {
+          "nose": 203,
+          "track": 215,
+          "restOfRig": 255
+        },
+        "piped-track": {
+          "nose": 203,
+          "track": 215,
+          "restOfRig": 255
+        },
+        "locker-track": {
+          "nose": 203,
+          "track": 215,
+          "restOfRig": 255
+        },
+        "lamped-track": {
+          "nose": 203,
+          "track": 215,
+          "restOfRig": 255
+        },
+        "geared-track": {
+          "nose": 203,
+          "track": 215,
+          "restOfRig": 255
+        },
+        "studded-track": {
+          "nose": 203,
+          "track": 215,
+          "restOfRig": 255
+        },
+        "coiled-track": {
+          "nose": 203,
+          "track": 215,
+          "restOfRig": 255
+        },
+        "aether-hub-track": {
+          "nose": 203,
+          "track": 215,
+          "restOfRig": 255
+        },
+        "haloed-track": {
+          "nose": 203,
+          "track": 215,
+          "restOfRig": 255
+        },
+        "aether-track": {
+          "nose": 203,
+          "track": 216,
+          "restOfRig": 255
         }
       }
     },
@@ -120,6 +315,66 @@
         "flywheel-track -> exhaust-track": {
           "changed": 27,
           "of": 504
+        },
+        "exhaust-track -> sprocket-track": {
+          "changed": 9,
+          "of": 504
+        },
+        "sprocket-track -> idler-track": {
+          "changed": 2,
+          "of": 504
+        },
+        "idler-track -> coupled-track": {
+          "changed": 2,
+          "of": 504
+        },
+        "coupled-track -> guard-track": {
+          "changed": 8,
+          "of": 504
+        },
+        "guard-track -> governor-track": {
+          "changed": 6,
+          "of": 504
+        },
+        "governor-track -> cylinder-track": {
+          "changed": 8,
+          "of": 504
+        },
+        "cylinder-track -> piped-track": {
+          "changed": 10,
+          "of": 504
+        },
+        "piped-track -> locker-track": {
+          "changed": 15,
+          "of": 504
+        },
+        "locker-track -> lamped-track": {
+          "changed": 4,
+          "of": 504
+        },
+        "lamped-track -> geared-track": {
+          "changed": 9,
+          "of": 504
+        },
+        "geared-track -> studded-track": {
+          "changed": 0,
+          "of": 504
+        },
+        "studded-track -> coiled-track": {
+          "changed": 2,
+          "of": 504
+        },
+        "coiled-track -> aether-hub-track": {
+          "changed": 3,
+          "of": 504
+        },
+        "aether-hub-track -> haloed-track": {
+          "changed": 12,
+          "of": 504
+        },
+        "haloed-track -> aether-track": {
+          "changed": 0,
+          "of": 504
         }
       },
       "closestZoomPxPerM": 45.0,
@@ -146,6 +401,66 @@
         },
         "flywheel-track -> exhaust-track": {
           "changed": 60,
+          "of": 1000
+        },
+        "exhaust-track -> sprocket-track": {
+          "changed": 26,
+          "of": 1000
+        },
+        "sprocket-track -> idler-track": {
+          "changed": 7,
+          "of": 1000
+        },
+        "idler-track -> coupled-track": {
+          "changed": 18,
+          "of": 1000
+        },
+        "coupled-track -> guard-track": {
+          "changed": 13,
+          "of": 1000
+        },
+        "guard-track -> governor-track": {
+          "changed": 15,
+          "of": 1000
+        },
+        "governor-track -> cylinder-track": {
+          "changed": 14,
+          "of": 1000
+        },
+        "cylinder-track -> piped-track": {
+          "changed": 21,
+          "of": 1000
+        },
+        "piped-track -> locker-track": {
+          "changed": 29,
+          "of": 1000
+        },
+        "locker-track -> lamped-track": {
+          "changed": 14,
+          "of": 1000
+        },
+        "lamped-track -> geared-track": {
+          "changed": 23,
+          "of": 1000
+        },
+        "geared-track -> studded-track": {
+          "changed": 0,
+          "of": 1000
+        },
+        "studded-track -> coiled-track": {
+          "changed": 13,
+          "of": 1000
+        },
+        "coiled-track -> aether-hub-track": {
+          "changed": 9,
+          "of": 1000
+        },
+        "aether-hub-track -> haloed-track": {
+          "changed": 33,
+          "of": 1000
+        },
+        "haloed-track -> aether-track": {
+          "changed": 35,
           "of": 1000
         }
       },
@@ -181,6 +496,81 @@
           "restOfRig": 255
         },
         "exhaust-track": {
+          "nose": 253,
+          "track": 225,
+          "restOfRig": 255
+        },
+        "sprocket-track": {
+          "nose": 253,
+          "track": 225,
+          "restOfRig": 255
+        },
+        "idler-track": {
+          "nose": 253,
+          "track": 225,
+          "restOfRig": 255
+        },
+        "coupled-track": {
+          "nose": 253,
+          "track": 225,
+          "restOfRig": 255
+        },
+        "guard-track": {
+          "nose": 253,
+          "track": 225,
+          "restOfRig": 255
+        },
+        "governor-track": {
+          "nose": 253,
+          "track": 224,
+          "restOfRig": 255
+        },
+        "cylinder-track": {
+          "nose": 253,
+          "track": 225,
+          "restOfRig": 255
+        },
+        "piped-track": {
+          "nose": 253,
+          "track": 225,
+          "restOfRig": 255
+        },
+        "locker-track": {
+          "nose": 253,
+          "track": 225,
+          "restOfRig": 255
+        },
+        "lamped-track": {
+          "nose": 253,
+          "track": 225,
+          "restOfRig": 255
+        },
+        "geared-track": {
+          "nose": 253,
+          "track": 225,
+          "restOfRig": 255
+        },
+        "studded-track": {
+          "nose": 253,
+          "track": 225,
+          "restOfRig": 255
+        },
+        "coiled-track": {
+          "nose": 253,
+          "track": 225,
+          "restOfRig": 255
+        },
+        "aether-hub-track": {
+          "nose": 253,
+          "track": 225,
+          "restOfRig": 255
+        },
+        "haloed-track": {
+          "nose": 253,
+          "track": 225,
+          "restOfRig": 255
+        },
+        "aether-track": {
           "nose": 253,
           "track": 225,
           "restOfRig": 255
@@ -222,6 +612,81 @@
     "exhaust-track": {
       "nose": 246,
       "track": 131,
+      "restOfRig": 253
+    },
+    "sprocket-track": {
+      "nose": 246,
+      "track": 131,
+      "restOfRig": 253
+    },
+    "idler-track": {
+      "nose": 246,
+      "track": 131,
+      "restOfRig": 253
+    },
+    "coupled-track": {
+      "nose": 246,
+      "track": 131,
+      "restOfRig": 253
+    },
+    "guard-track": {
+      "nose": 246,
+      "track": 131,
+      "restOfRig": 253
+    },
+    "governor-track": {
+      "nose": 246,
+      "track": 133,
+      "restOfRig": 253
+    },
+    "cylinder-track": {
+      "nose": 246,
+      "track": 130,
+      "restOfRig": 253
+    },
+    "piped-track": {
+      "nose": 246,
+      "track": 128,
+      "restOfRig": 253
+    },
+    "locker-track": {
+      "nose": 246,
+      "track": 128,
+      "restOfRig": 253
+    },
+    "lamped-track": {
+      "nose": 246,
+      "track": 140,
+      "restOfRig": 253
+    },
+    "geared-track": {
+      "nose": 246,
+      "track": 140,
+      "restOfRig": 253
+    },
+    "studded-track": {
+      "nose": 246,
+      "track": 140,
+      "restOfRig": 253
+    },
+    "coiled-track": {
+      "nose": 246,
+      "track": 140,
+      "restOfRig": 253
+    },
+    "aether-hub-track": {
+      "nose": 246,
+      "track": 140,
+      "restOfRig": 253
+    },
+    "haloed-track": {
+      "nose": 246,
+      "track": 145,
+      "restOfRig": 253
+    },
+    "aether-track": {
+      "nose": 245,
+      "track": 145,
       "restOfRig": 253
     }
   }

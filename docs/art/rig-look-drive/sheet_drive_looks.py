@@ -1,11 +1,11 @@
 """
-The review sheets cut from render_drive_looks.py's renders (tickets 731 and 811): every look alone,
+The review sheets cut from render_drive_looks.py's renders (tickets 731, 811 and 871): every look alone,
 the rig at tiers 1 and 3 bare and with each look on the slot, each row resampled to a 1080p screen's
 90 px/m at the default 12 m zoom (#39) and to a 360 px wide phone's 30 px/m over the same zoom
 (the width the #576 ladder is judged at), the phone copy enlarged 8x with no smoothing so each
 phone pixel shows. It also measures what the eye is asked to judge and writes readability.json:
 how many phone pixels of the look box (the table's `lookBoxM`: the undercarriage's footprint plus
-the pod's belly the LK3 stacks rise over) change between each look and the one before it (and
+the pod's belly the LK3 stacks and the LK8 fittings rise over) change between each look and the one before it (and
 between the bare rig and the base look, which should be none), at the default zoom and at the
 closest, where the sweep spec judges a step, and the brightest pixel of the drill nose against the
 brightest of the look box and of the rest of the rig for each look, lit and by glow alone (the
@@ -47,6 +47,8 @@ RIG_FRAME = ((0.05, 0.05), 2.1, 1.75)
 RIG_TIERS = (1, 3)
 GLOW_TIER = 1
 BARE = 'rig'
+# Seven tiles a row, as the hull's sheets (ticket 816), so 22 rig tiles make four rows.
+SHEET_COLUMNS = 7
 # A phone pixel counts as changed when a channel moves by more than this (of 255).
 CHANGED_THRESHOLD = 24
 
@@ -95,11 +97,16 @@ def labelled(tile, label):
 
 
 def laid_out(tiles):
-    """Side by side in equal cells, each tile centred: the parts differ in size, the rig tiles do not."""
+    """Equal cells on a grid of SHEET_COLUMNS, row by row, each tile centred in its cell: the parts
+    differ in size, the rig tiles do not. Twenty-one looks (ticket 871) no longer fit one row."""
     width, height = max(tile.width for tile in tiles), max(tile.height for tile in tiles)
-    sheet = Image.new('RGB', (len(tiles) * width, height), BACKGROUND)
+    columns = min(SHEET_COLUMNS, len(tiles))
+    rows = (len(tiles) + columns - 1) // columns
+    sheet = Image.new('RGB', (columns * width, rows * height), BACKGROUND)
     for index, tile in enumerate(tiles):
-        sheet.paste(tile, (index * width + (width - tile.width) // 2, (height - tile.height) // 2))
+        left = (index % columns) * width + (width - tile.width) // 2
+        top = (index // columns) * height + (height - tile.height) // 2
+        sheet.paste(tile, (left, top))
     return sheet
 
 
@@ -214,7 +221,7 @@ def part_bounds(part):
 
 def report_about(table, lit, glow):
     return {
-        'about': 'Tickets 731 and 811: at a 360 px wide phone (%g px/m over the 12 m zoom, and %g px/m over the '
+        'about': 'Tickets 731, 811 and 871: at a 360 px wide phone (%g px/m over the 12 m zoom, and %g px/m over the '
                  'closest %g m zoom the sweep spec judges at), the pixels of the drive look box %s (the '
                  'undercarriage and the pod\'s belly the stacks rise over) that change from each look to the next '
                  '(a channel moving more than %d of 255; the bare rig to the base look should change none), and the '
