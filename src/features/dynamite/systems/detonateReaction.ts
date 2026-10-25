@@ -1,8 +1,8 @@
 /**
  * The plant key becomes Detonate while a charge is live (#153: one rack, one verb), through the
  * slices' input reactions (#217): while the kernel has nothing to plant, `plant_charge` asks this
- * reaction, which submits the plunger once `remote_detonator` is open. Before that, or with no
- * live charge, it gives nothing, so nothing is buffered or logged. Inside the interlock the press
+ * reaction, which submits the plunger on every planet (D4 #863: price only). With no live charge
+ * it gives nothing, so nothing is buffered or logged. Inside the interlock the press
  * is still submitted: the authority's clunk (`detonate_refused {in_radius}`) is the answer.
  */
 import type { CommandIntent } from '../../../systems/authority/authorityCommand'

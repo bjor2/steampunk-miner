@@ -74,9 +74,9 @@ describe('dynamite rack panel', () => {
     expect(panelOn(session.state(), 1)?.cutText).toBeNull()
   })
 
-  it('offers no plunger before P22, where only the fuse fires a charge', () => {
-    const blaster = sizedBlasterOn(19, 5)
+  it('offers the plunger on every planet, P1 too: no planet opens it (D4 #863)', () => {
+    const blaster = sizedBlasterOn(1, 5)
     plantSized(blaster.session, blaster, 5, 1)
-    expect(panelOn(blaster.session.state(), 5)?.plungerText).toBeNull()
+    expect(panelOn(blaster.session.state(), 5)?.plungerText).toBe('Back off to detonate')
   })
 })

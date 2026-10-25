@@ -149,10 +149,7 @@ describe('gate looks in the ground', () => {
 
   it("gives each extractor's cells a pattern of their own, apart from the drill's and dynamite's", () => {
     const rigPatterns = GATE_ROWS.rigs.map((rig) => gatePatternOf({ kind: 'rig', rig }))
-    const others = [
-      gatePatternOf({ kind: 'dense' }),
-      gatePatternOf({ kind: 'dynamite', minCharge: 1 }),
-    ]
+    const others = [gatePatternOf({ kind: 'dense' }), gatePatternOf({ kind: 'dynamite', tier: 1 })]
     expect(new Set([...rigPatterns, ...others]).size).toBe(GATE_ROWS.rigs.length + 2)
     expect(gatePatternOf({ kind: 'drillSignature' })).toBe(gatePatternOf({ kind: 'dense' }))
   })

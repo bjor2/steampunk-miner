@@ -11,7 +11,6 @@ import {
 } from '../money'
 import {
   blastEnemyDamage,
-  blastHardnessCap,
   blastSelfHit,
   keptBlastOreUnits,
   rackCapacity,
@@ -23,7 +22,7 @@ import { ENEMY_KINDS } from './economyDefinition'
 import { readEconomy } from './readEconomy'
 import economyFile from './economy.json'
 import { enemyHealth, enemyTier } from './enemyStats'
-import { blockHardness, coreHardness, oreTier, oreValue } from './oreEconomy'
+import { oreTier, oreValue } from './oreEconomy'
 import { paceScale } from './planetEconomy'
 import { hullMax, onCurveLevel } from './vehicleStats'
 
@@ -89,9 +88,8 @@ describe('blasting charges economy', () => {
     }
   })
 
-  it('breaks rock up to band 5 of the planet and never the harder core', () => {
-    expect(textOf(blastHardnessCap(7))).toBe(textOf(blockHardness(7, 5)))
-    expect(cmp(coreHardness(7), blastHardnessCap(7))).toBe(1)
+  it('reads no hardness cap: D4 #863 lets a blast break every ungated tile however hard', () => {
+    expect(economyFile.blastingCharges).not.toHaveProperty('hardnessCapBand')
   })
 
   it('keeps 40% of the ore units a blast breaks, dithered to whole units', () => {

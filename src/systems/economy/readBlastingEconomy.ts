@@ -1,11 +1,12 @@
 /**
  * Reads the `blasting_charges` part of `economy.json` (spec #109, the size ladder of K8 #218, its
  * 12 rows of 3 types and the Blast Radius track's growth from D1 #860, the bare blast's collapse
- * chance per size from D2 #861).
+ * chance per size from D2 #861, the gate tiers of blast-only rock from D4 #863).
  */
 import { BASIS_POINTS } from '../../constants/balance'
 import { add, ceil, cmp, fromCanonical, type BigStat } from '../money'
 import type {
+  BlastGateTiers,
   BlastingChargeRules,
   BlastRadiusTrack,
   ChargeSizeLadder,
@@ -16,6 +17,7 @@ import { readIntegerList, type FieldReader } from './economyFieldReader'
 const PATH = 'blastingCharges'
 const SIZES_PATH = `${PATH}.sizes`
 const TRACK_PATH = `${PATH}.radiusTrack`
+const GATE_TIERS_PATH = `${PATH}.gateTiers`
 /** The only growth whose square is linear in the level, so r² stays an integer (TD on #860). */
 const SQUARE_ROOT = '0.5'
 
@@ -34,18 +36,26 @@ export function readBlastingCharges(
     rackStart: reader.safeInteger(`${PATH}.rackStart`, rules.rackStart),
     rackMax: reader.safeInteger(`${PATH}.rackMax`, rules.rackMax),
     rackSlotCostCurveId: reader.text(`${PATH}.rackSlotCostCurveId`, rules.rackSlotCostCurveId),
-    hardnessCapBand: reader.safeInteger(`${PATH}.hardnessCapBand`, rules.hardnessCapBand),
     botBlastThresholdTicks: reader.safeInteger(
       `${PATH}.botBlastThresholdTicks`,
       rules.botBlastThresholdTicks,
     ),
     radiusTrack: readRadiusTrack(reader, reader.object(TRACK_PATH, rules.radiusTrack)),
+    gateTiers: readGateTiers(reader, reader.object(GATE_TIERS_PATH, rules.gateTiers)),
     sizes: readChargeSizes(reader, reader.object(SIZES_PATH, rules.sizes)),
   }
   checkRackSlotCurve(reader, read, costCurves)
   checkChargeSizes(reader, read)
   checkRadiusTrack(reader, read.radiusTrack)
+  checkGateTiers(reader, read)
   return read
+}
+
+function readGateTiers(reader: FieldReader, tiers: Record<string, unknown>): BlastGateTiers {
+  return {
+    fromPlanet: readIntegerList(reader, `${GATE_TIERS_PATH}.fromPlanet`, tiers.fromPlanet),
+    newestTierLead: reader.safeInteger(`${GATE_TIERS_PATH}.newestTierLead`, tiers.newestTierLead),
+  }
 }
 
 function readRadiusTrack(reader: FieldReader, track: Record<string, unknown>): BlastRadiusTrack {
@@ -66,8 +76,6 @@ function readChargeSizes(reader: FieldReader, sizes: Record<string, unknown>): C
       .map((tiers, index) =>
         readIntegerList(reader, `${SIZES_PATH}.breaksGateByType[${index}]`, tiers),
       ),
-    unlockFrom: reader.safeInteger(`${SIZES_PATH}.unlockFrom`, sizes.unlockFrom),
-    unlockEvery: reader.safeInteger(`${SIZES_PATH}.unlockEvery`, sizes.unlockEvery),
     oreUnitsBand: reader.safeInteger(`${SIZES_PATH}.oreUnitsBand`, sizes.oreUnitsBand),
     oreUnitsBase: reader.money(`${SIZES_PATH}.oreUnitsBase`, sizes.oreUnitsBase),
     oreUnitsRatio: reader.money(`${SIZES_PATH}.oreUnitsRatio`, sizes.oreUnitsRatio),
@@ -77,7 +85,6 @@ function readChargeSizes(reader: FieldReader, sizes: Record<string, unknown>): C
     fuseTicks: readIntegerList(reader, `${SIZES_PATH}.fuseTicks`, sizes.fuseTicks),
     lethalCoreFrom: reader.safeInteger(`${SIZES_PATH}.lethalCoreFrom`, sizes.lethalCoreFrom),
     lethalCoreFraction: reader.money(`${SIZES_PATH}.lethalCoreFraction`, sizes.lethalCoreFraction),
-    newestSizeLead: reader.safeInteger(`${SIZES_PATH}.newestSizeLead`, sizes.newestSizeLead),
     remoteDisarmTicks: reader.safeInteger(
       `${SIZES_PATH}.remoteDisarmTicks`,
       sizes.remoteDisarmTicks,
@@ -127,10 +134,6 @@ function ladderProblems({ sizes, rackMax }: BlastingChargeRules): string[] {
       'fuseTicks must fuse size 1 and no size past the radius list',
     ],
     [sizes.fuseTicks.every((ticks) => ticks >= 1), 'fuseTicks must be at least 1'],
-    [
-      sizes.unlockFrom >= 1 && sizes.unlockEvery >= 1,
-      'unlockFrom and unlockEvery must be at least 1',
-    ],
     [sizes.remoteDisarmTicks >= 1, 'remoteDisarmTicks must be at least 1'],
     [sizes.collapseBp.length === count, 'collapseBp must hold one entry per radius'],
     [sizes.collapseBp.every(isBasisPoints), 'collapseBp must lie in 0 to 10000'],
@@ -144,6 +147,33 @@ function checkRadiusTrack(reader: FieldReader, track: BlastRadiusTrack): void {
   if (cmp(track.exponent, fromCanonical(SQUARE_ROOT)) !== 0) {
     reader.record(`${TRACK_PATH}.exponent must be ${SQUARE_ROOT}: r² is an integer only then`)
   }
+}
+
+/**
+ * Tiers laid from planet 1 on, never earlier than the tier below, and every tier broken by some
+ * type while no type names a tier that is never laid: so each gated cell has a charge that opens it.
+ */
+function checkGateTiers(reader: FieldReader, rules: BlastingChargeRules): void {
+  gateTierProblems(rules).forEach((problem) => reader.record(`${GATE_TIERS_PATH}.${problem}`))
+}
+
+function gateTierProblems({ gateTiers, sizes }: BlastingChargeRules): string[] {
+  const { fromPlanet, newestTierLead } = gateTiers
+  const named = new Set(sizes.breaksGateByType.flat())
+  const tiers = fromPlanet.map((_, at) => at + 1)
+  const checks: [boolean, string][] = [
+    [fromPlanet.length > 0, 'fromPlanet must lay at least tier 1'],
+    [fromPlanet.every((planet) => planet >= 1), 'fromPlanet must name planets from 1'],
+    [isNeverFalling(fromPlanet), 'fromPlanet must never lay a tier before the tier below it'],
+    [tiers.every((tier) => named.has(tier)), 'every tier must be broken by some charge type'],
+    [[...named].every((tier) => tier <= tiers.length), 'breaksGateByType names an unlaid tier'],
+    [newestTierLead >= 0, 'newestTierLead must be at least 0'],
+  ]
+  return checks.filter(([isMet]) => !isMet).map(([, problem]) => problem)
+}
+
+function isNeverFalling(planets: readonly number[]): boolean {
+  return planets.every((planet, at) => at === 0 || planet >= planets[at - 1])
 }
 
 /** A radius the disc stamps from an integer: `2 L_i`, `L_i + L_i`, is whole (TD on #860). */

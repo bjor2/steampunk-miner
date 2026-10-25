@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { chargePrice } from '../../../systems/economy/chargeSizes'
 import { ECONOMY } from '../../../systems/economy/economy'
+import { toCanonical } from '../../../systems/money'
 import { oreHardness, signatureHardness } from '../../../systems/economy/oreEconomy'
 import { canMine, minTipLevelOf } from './canMine'
 import {
@@ -133,28 +135,68 @@ describe('canMine: extractors', () => {
   })
 })
 
-describe('canMine: dynamite', () => {
-  it('refuses a sealed shell to the drill, naming the charge it needs and the one carried', () => {
-    const { session, fixture } = gatedOn(7, 'dynamite')
+describe('canMine: dynamite (blast-only rock by tier, D4 #863)', () => {
+  it('refuses blast-only rock to the drill, naming the charge type and that the miner carries it', () => {
+    const { session, fixture } = gatedOn(7, 'dynamite', (gated) => gated.entry.lead === 1)
     setCharges(session, 1)
     expect(canMine(queryOf(session, fixture))).toEqual({
       outcome: 'refused',
       gateKind: 'dynamite',
-      required: 'size:1',
-      have: 'size:1',
+      required: 'type:1',
+      have: 'owned',
     })
   })
 
-  it('frees a shell to a charge of at least its minCharge and refuses a smaller one', () => {
+  it("names that charge's dock price on this planet when the rack carries none that breaks it", () => {
+    const { session, fixture } = gatedOn(7, 'dynamite', (gated) => gated.entry.lead === 2)
+    setCharges(session, 4)
+    expect(canMine(queryOf(session, fixture))).toEqual({
+      outcome: 'refused',
+      gateKind: 'dynamite',
+      required: 'type:2',
+      have: `price:${toCanonical(chargePrice(5, 1, 7))}`,
+    })
+  })
+
+  it("opens rock to a charge whose type's breaksGate holds its tier, and no other", () => {
     const { session, fixture } = gatedOn(10, 'dynamite', (gated) => gated.entry.lead === 2)
-    expect(fixture.gate).toEqual({ kind: 'dynamite', minCharge: 2 })
-    expect(canMine(queryOf(session, fixture, { blastSize: 1 }))?.outcome).toBe('refused')
-    expect(canMine(queryOf(session, fixture, { blastSize: 2 }))?.outcome).toBe('cut')
+    expect(fixture.gate).toEqual({ kind: 'dynamite', tier: 3 })
+    const outcomeOf = (blastSize: number) =>
+      canMine(queryOf(session, fixture, { blastSize }))?.outcome
+    expect([1, 4, 5, 8, 9, 12].map(outcomeOf)).toEqual([
+      'refused',
+      'refused',
+      'refused',
+      'refused',
+      'cut',
+      'cut',
+    ])
+    expect(canMine(queryOf(session, fixture, { blastSize: 5 }))).toMatchObject({
+      required: 'type:3',
+      have: 'type:2',
+    })
+  })
+
+  it('opens tier-1 rock to every type and tier-2 rock from type 2 on', () => {
+    const tierOne = gatedOn(7, 'dynamite', (gated) => gated.entry.lead === 1)
+    const tierTwo = gatedOn(7, 'dynamite', (gated) => gated.entry.lead === 2)
+    expect(tierTwo.fixture.gate).toEqual({ kind: 'dynamite', tier: 2 })
+    const outcomeOf = ({ session, fixture }: typeof tierOne, blastSize: number) =>
+      canMine(queryOf(session, fixture, { blastSize }))?.outcome
+    expect([1, 5, 9].map((size) => outcomeOf(tierOne, size))).toEqual(['cut', 'cut', 'cut'])
+    expect([4, 5, 9].map((size) => outcomeOf(tierTwo, size))).toEqual(['refused', 'cut', 'cut'])
   })
 
   it('keeps a shell standing against a tool', () => {
     const { session, fixture } = gatedOn(7, 'dynamite')
     expect(canMine(queryOf(session, fixture, { tool: 'probe.drain' }))?.outcome).toBe('refused')
+  })
+})
+
+describe('canMine: drill-tier gates against a blast (D4 #863 deleted the hardness cap)', () => {
+  it('keeps a drill-gated signature standing against every charge, as the band-5 cap kept it', () => {
+    const { session, fixture } = gatedOn(4, 'drillSignature')
+    expect(canMine(queryOf(session, fixture, { blastSize: 12 }))?.outcome).toBe('refused')
   })
 })
 

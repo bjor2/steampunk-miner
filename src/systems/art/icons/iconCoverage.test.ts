@@ -84,8 +84,8 @@ function upgradeBayIconsOf(model: UpgradeBayModel): string[] {
     model.casing,
     model.lining,
     model.guns,
-    ...(model.charges?.restock ?? []),
-    model.charges?.rack,
+    ...model.charges.restock,
+    model.charges.rack,
   ]
   return [
     ...rows.flatMap((row) => (row == null ? [] : [row.iconId])),

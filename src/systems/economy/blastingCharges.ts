@@ -6,7 +6,8 @@
  *   self hit      26 * 1.12^T * r(n) / r(1), T the enemy tier at the blast tile (1.5 crawler hits at
  *                 size 1, no arc); from size 4 the inner half of the radius wrecks the planter
  *   enemy damage  2 * health(kind, T) for an enemy in the radius: it kills anything native there
- *   hardness cap  a tile breaks only if no harder than the band-5 rock of the planet; never core
+ *   breaks        every ungated tile however hard, never core; gated rock as its gate says (D4
+ *                 #863 deleted the band-5 hardness cap)
  *   rack slot     ceilMilli([6, 8, 10, 12, 14][s] * V(t(p, 5)) * paceScale(p)) from slot s to s + 1
  * The prices are the `bandOre` family of the travel fee, the refinery slots (#105) and the gun mount
  * (#107): ore units of band 5 at the planet they are paid on. The rack holds 3 slots and each
@@ -20,7 +21,6 @@ import { bandOrePrice } from './bandOreCost'
 import { bandOreCurveOf } from './costCurveLookup'
 import type { BandOreCostCurve, EnemyKind } from './economyDefinition'
 import { enemyHealth, enemyTier } from './enemyStats'
-import { blockHardness } from './oreEconomy'
 import { keptFractionOf, selfHitScaleOf } from './chargeSizes'
 
 const { blastingCharges: charges } = ECONOMY
@@ -62,11 +62,6 @@ export function blastSelfHit(planetIndex: number, band: number, size: number): B
 export function blastEnemyDamage(kind: EnemyKind, planetIndex: number, band: number): BigStat {
   const health = enemyHealth(kind, enemyTier(planetIndex, band))
   return mul(charges.enemyDamageHealthMultiple, health)
-}
-
-/** The hardest tile a blast breaks on planet `planetIndex`. */
-export function blastHardnessCap(planetIndex: number): BigStat {
-  return blockHardness(planetIndex, charges.hardnessCapBand)
 }
 
 /** Of `units` ore units of one tier a blast of `size` broke, how many reach the hold. */

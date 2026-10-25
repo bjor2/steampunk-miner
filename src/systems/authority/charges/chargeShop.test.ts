@@ -35,10 +35,16 @@ function shopOn(planetIndex: number, bay: 'sell' | 'upgrade' = 'upgrade', money 
 }
 
 describe('blasting charges at the Upgrade bay (#109)', () => {
-  it('sells no charges before planet 7', () => {
-    const shop = shopOn(6)
-    expect(shop.submit(restock(1, 1))).toMatchObject([{ reason: 'feature_locked' }])
-    expect(shop.submit(RACK_SLOT)).toMatchObject([{ reason: 'feature_locked' }])
+  it('sells charges and rack slots on planet 1: price is the only gate (D4 #863)', () => {
+    const shop = shopOn(1)
+    expect(shop.submit(restock(1, 1))).toMatchObject([{ type: 'ChargesRestocked', size: 1 }])
+    expect(shop.submit(RACK_SLOT)).toMatchObject([{ type: 'ChargeRackUpgraded', from: 0, to: 1 }])
+  })
+
+  it('refuses a buy the wallet cannot pay on planet 1, never a planet lock', () => {
+    expect(shopOn(1, 'upgrade', '0').submit(restock(1, 1))).toMatchObject([
+      { reason: 'money_short' },
+    ])
   })
 
   it('fills the rack with 3 charges on planet 7, bolting it on, at 2 band-5 units each', () => {
@@ -100,9 +106,11 @@ describe('charge sizes at the Upgrade bay (K8 #218)', () => {
     expect(shop.submit(restock(1, 1))).toMatchObject([{ reason: 'rack_full' }])
   })
 
-  it('refuses a size before its planet: size 2 opens on planet 10', () => {
-    expect(shopOn(9).submit(restock(2, 1))).toMatchObject([{ reason: 'size_locked' }])
-    expect(shopOn(10).submit(restock(2, 1))).toMatchObject([
+  it('sells every size on every planet, a type-2 size on planet 1 too (D4 #863)', () => {
+    expect(shopOn(1).submit(restock(5, 1))).toMatchObject([
+      { type: 'ChargesRestocked', size: 5, count: 1, price: toCanonical(chargePrice(5, 1, 1)) },
+    ])
+    expect(shopOn(9).submit(restock(2, 1))).toMatchObject([
       { type: 'ChargesRestocked', size: 2, count: 1 },
     ])
   })

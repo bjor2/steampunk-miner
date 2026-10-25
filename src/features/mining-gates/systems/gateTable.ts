@@ -5,13 +5,17 @@
  *
  * 1. Common cells (lead 0) are never gated beyond the ordinary drill rule.
  * 2. Lead cells take their family's `gateClass` (#141): `drill` is dense; a rig class is that
- *    rig's gate from its arrival planet, dense before; `dynamite` is a dynamite gate at #143's
- *    `minChargeFor`.
+ *    rig's gate from its arrival planet, dense before; `dynamite` is blast-only rock of the tier
+ *    D4's `gateTierFor` gives it (1 and 2 from P7, 3 from P9), dense in the first band (never
+ *    band 0, so the surface toughness rule of #625 holds: the HS rows on #647).
  * 3. The signature asks for the planet's signature rig, or is a drill-gated signature with none.
  * 4. Same-item rule: a +2 entry needing the item a +1 entry of its band needs falls back to dense.
  * 5. 15% guard: per item (each rig, dynamite, the drill-gated signature's tip), the band's ore
  *    value needing it is at most 15%, valued at each entry's sale tier. Over it, the lead entries
  *    needing it fall back to dense first, then the signature to a drill-gated signature.
+ * 6. 10% rock guard (D4 #863, the HS rows on #647): dynamite-gated cells hold at most 10% of the
+ *    band's ore weight; over it, the band's dynamite-gated lead entries fall back to dense, so
+ *    gated rock stays a shell round the band's rarer ore and never a layer.
  *
  * Before gate content, only signatures are gated: drill-gated, as #232 drills them. Vertical for
  * the drill gates, horizontal for the rig and dynamite gates, both for the guard.
@@ -28,7 +32,7 @@ import {
   ZERO_MONEY,
   type Money,
 } from '../../../systems/money'
-import { minChargeFor } from '../../dynamite'
+import { gateTierFor } from '../../dynamite'
 import { gateClassOf, type OreMix, type OreMixEntry } from '../../planet-mix'
 import { GATE_ROWS, type GateRows, type Rig } from './gateRows'
 import { isRigAvailableOn, rigOfGateClass, signatureRigOf } from './rigs'
@@ -38,7 +42,8 @@ export type CellGate =
   | { kind: 'dense' }
   | { kind: 'drillSignature' }
   | { kind: 'rig'; rig: Rig }
-  | { kind: 'dynamite'; minCharge: number }
+  /** Blast-only rock: a charge whose type's `breaksGate[]` holds `tier` opens it (D4 #863). */
+  | { kind: 'dynamite'; tier: number }
 
 export type CellGateKind = CellGate['kind']
 
@@ -81,7 +86,7 @@ export function bandGatesOf(
     entry,
     gate: gateByRuleOf(planetIndex, band, entry, rows),
   }))
-  return guardedOf(withSameItemRule(gated), rows)
+  return withinDynamiteShare(guardedOf(withSameItemRule(gated), rows), rows)
 }
 
 /** What a cell of this gate needs that an on-curve vehicle may lack, or null for none. */
@@ -123,11 +128,20 @@ function leadGateOf(
   rows: GateRows,
 ): CellGate {
   const gateClass = gateClassOf(entry.family)
-  if (gateClass === 'dynamite') {
-    return { kind: 'dynamite', minCharge: minChargeFor({ lead: entry.lead, band }, planetIndex) }
-  }
+  if (gateClass === 'dynamite') return dynamiteGateOf(planetIndex, band, entry, rows)
   const rig = rigOfGateClass(gateClass, rows)
   return rig !== null && isRigAvailableOn(rig, planetIndex, rows) ? { kind: 'rig', rig } : DENSE
+}
+
+/** Blast-only rock of the cell's tier; dense above the gate's first band or with no tier laid. */
+function dynamiteGateOf(
+  planetIndex: number,
+  band: number,
+  entry: OreMixEntry,
+  rows: GateRows,
+): CellGate {
+  const tier = gateTierFor({ lead: entry.lead, band }, planetIndex)
+  return band < rows.dynamiteGateFromBand || tier === 0 ? DENSE : { kind: 'dynamite', tier }
 }
 
 /** A +2 entry needing what a +1 entry of the band needs falls back to dense (#142 rule 4). */
@@ -150,6 +164,27 @@ function guardedOf(gated: readonly GatedEntry[], rows: GateRows): GatedEntry[] {
       ? { ...one, gate: DRILL_SIGNATURE }
       : one,
   )
+}
+
+/** Over the 10% rock guard, the band's dynamite-gated lead entries fall back to dense (rule 6). */
+function withinDynamiteShare(gated: readonly GatedEntry[], rows: GateRows): GatedEntry[] {
+  if (dynamiteWeightBpOf(gated) <= rows.maxDynamiteBandShareBp) return [...gated]
+  return gated.map((one) => (isDynamiteGated(one) ? { ...one, gate: DENSE } : one))
+}
+
+/** Basis points of the band's ore weight whose cells are dynamite-gated. */
+export function dynamiteWeightBpOf(gated: readonly GatedEntry[]): number {
+  const total = weightOf(gated)
+  if (total === 0) return 0
+  return Math.floor((weightOf(gated.filter(isDynamiteGated)) * BASIS_POINTS) / total)
+}
+
+function isDynamiteGated({ gate }: GatedEntry): boolean {
+  return gate.kind === 'dynamite'
+}
+
+function weightOf(gated: readonly GatedEntry[]): number {
+  return gated.reduce((sum, { entry }) => sum + entry.weightBp, 0)
 }
 
 function isOverGuard(gated: readonly GatedEntry[], gate: CellGate, rows: GateRows): boolean {

@@ -3,11 +3,11 @@
  * each with its icon, level, next cost, effect "before -> after" and Buy; then the Casing row
  * (#41, Game Director's scope review on #54), which is not a vehicle track: its grade "G -> G+1",
  * next cost and Buy; then the Lining row once a lining type is offered (#113); then the Guns row
- * once `auto_guns` is offered (#107); then the Charges and Rack rows once `blasting_charges` is
- * (#109); then one row per vehicle item the tech tree unlocked and a slice sells (ticket 248);
- * then the slices' bay entries once their anchor row is open (ticket 344); then Repair with its
- * cost; and the live preview hook, under the shared header and footer. Bay entries never feed the
- * preview.
+ * once `auto_guns` is offered (#107); then the Charges and Rack rows on every planet (#109, D4
+ * #863: price only); then one row per vehicle item the tech tree unlocked and a slice sells
+ * (ticket 248); then the slices' bay entries once their anchor row is open (ticket 344); then
+ * Repair with its cost; and the live preview hook, under the shared header and footer. Bay entries
+ * never feed the preview.
  *
  * The preview is presentation only (#37, `upgradePreview`): focus and the install animation are UI
  * state, so moving focus never touches the authority or the digest.
@@ -93,8 +93,8 @@ export interface UpgradeBayModel {
   lining: LiningRow | null
   /** Null until `auto_guns` is unlocked here or bolted on (#90: nothing shows before). */
   guns: GunRow | null
-  /** Null until `blasting_charges` is open here or the rack is bolted on (#109). */
-  charges: ChargeRows | null
+  /** Every size on every planet (#109, D4 #863: price is the only gate). */
+  charges: ChargeRows
   /** The researched vehicle items on sale here, none before research (ticket 248). */
   items: VehicleItemRow[]
   /** The slices' bay entries, none before their anchor row opens (ticket 344). */
@@ -217,7 +217,7 @@ interface ShopRows {
   casing: CasingRow
   lining: LiningRow | null
   guns: GunRow | null
-  charges: ChargeRows | null
+  charges: ChargeRows
   items: readonly VehicleItemRow[]
   entries: readonly BayEntryRow[]
   repair: RepairReading

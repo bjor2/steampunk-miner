@@ -1,9 +1,9 @@
 {
-  "source": "Ticket 238 and #142 'What the player sees and hears' (the HUD hint chip names what the cell needs and what the miner has), in #159's ledger voice (the Guild quartermaster's ledger, section 4). Extractors go by name, never 'rig' (#159 Game Director naming ruling), so the ticket's 'tether rig required' reads 'Aether Tether required'. {need} and {have} take the numbers of gate_hit's required and have; {extractor} takes the extractor's name. Every template passes #159's flavour rules. The chip holds for chipShowTicks (3 s at 60 ticks a second; a starting value for Gameplay & Vehicle, #142 open questions), once per cell per dive.",
+  "source": "Ticket 238 and #142 'What the player sees and hears' (the HUD hint chip names what the cell needs and what the miner has), in #159's ledger voice (the Guild quartermaster's ledger, section 4). Extractors go by name, never 'rig' (#159 Game Director naming ruling), so the ticket's 'tether rig required' reads 'Aether Tether required'. {need} and {have} take the numbers of gate_hit's required and have, {price} its dock price (D4 #863: blast-only rock names the charge type that breaks it and says the miner carries one or what it costs, never that it is locked); {extractor} takes the extractor's name. Every template passes #159's flavour rules. The chip holds for chipShowTicks (3 s at 60 ticks a second; a starting value for Gameplay & Vehicle, #142 open questions), once per cell per dive.",
   "chipShowTicks": 180,
   "drill": "Ledger: drill tip {need} required, the miner has {have}.",
-  "dynamite": "Ledger: dynamite size {need} required, the miner carries size {have}.",
-  "dynamiteNoneCarried": "Ledger: dynamite size {need} required, the miner carries none.",
+  "dynamite": "Ledger: a type {need} charge breaks this rock, the miner carries one.",
+  "dynamiteAtDock": "Ledger: a type {need} charge breaks this rock, {price} at the dock.",
   "extractorMissing": {
     "refused": "Ledger: {extractor} required.",
     "vented": "Ledger: {extractor} required, the ore vented.",

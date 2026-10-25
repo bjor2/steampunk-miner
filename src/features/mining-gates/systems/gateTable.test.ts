@@ -43,10 +43,10 @@ describe('gate table', () => {
     expect(commons.every(({ gate }) => gate.kind === 'none')).toBe(true)
   })
 
-  it("seals planet 7's fossil leads for a size-1 charge, its showcase rare", () => {
+  it("seals planet 7's fossil leads in tier-1 blast-only rock, its showcase rare", () => {
     expect(gateOf(7, 5, ({ entry }) => entry.family === 'fossil' && entry.lead === 1)).toEqual({
       kind: 'dynamite',
-      minCharge: 1,
+      tier: 1,
     })
   })
 

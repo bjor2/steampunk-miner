@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { baseTilesSqOf } from '../authority/charges/blastDisc'
 import { inRadiusCount } from '../authority/charges/blastFront'
-import { chargePrice, chargeRadiusMm, minChargeFor } from '../economy/chargeSizes'
+import { chargePrice, chargeRadiusMm, gateTierFor } from '../economy/chargeSizes'
 import { oreTier } from '../economy/oreEconomy'
 import { cmp, div, fromSafeInteger, toCanonical, ZERO_MONEY } from '../money'
 import {
@@ -19,20 +19,20 @@ function bandOf(
   gates: { plusOne: boolean; plusTwo: boolean },
 ): GatedMixEntry[] {
   const tier = oreTier(planetIndex, band)
-  const minCharge = (lead: number) => minChargeFor({ lead, band }, planetIndex)
+  const gateTier = (lead: number) => gateTierFor({ lead, band }, planetIndex)
   return [
-    { tier, weightBp: 9000, signature: false, minCharge: null },
+    { tier, weightBp: 9000, signature: false, gateTier: null },
     {
       tier: tier + 1,
       weightBp: 700,
       signature: false,
-      minCharge: gates.plusOne ? minCharge(1) : null,
+      gateTier: gates.plusOne ? gateTier(1) : null,
     },
     {
       tier: tier + 2,
       weightBp: 300,
       signature: false,
-      minCharge: gates.plusTwo ? minCharge(2) : null,
+      gateTier: gates.plusTwo ? gateTier(2) : null,
     },
   ]
 }
@@ -50,12 +50,12 @@ describe('charge payoff under the share model (ticket 247, Systems on K8 #218)',
     expect(new Set(rows.map((row) => row.band))).toEqual(new Set([4]))
   })
 
-  it('lists every open size up to the band and none above it', () => {
+  it('lists all twelve sizes in every gated band, every size sold on every planet (D4 #863)', () => {
+    const twelve = Array.from({ length: 12 }, (_, at) => at + 1)
     const late = chargeSharePayoffsOnPlanet(40, planetOf(40, [3, 5]))
-    expect(late.filter((row) => row.band === 3).map((row) => row.size)).toEqual([1, 2, 3])
-    expect(late.filter((row) => row.band === 5).map((row) => row.size)).toEqual([1, 2, 3, 4, 5])
+    expect(late.filter((row) => row.band === 3).map((row) => row.size)).toEqual(twelve)
     const first = chargeSharePayoffsOnPlanet(7, planetOf(7, [5]))
-    expect(first.map((row) => row.size)).toEqual([1])
+    expect(first.map((row) => row.size)).toEqual(twelve)
   })
 
   it('has no rows before planet 7 and covers planets 7 to 40 and 50', () => {
@@ -69,11 +69,12 @@ describe('charge payoff under the share model (ticket 247, Systems on K8 #218)',
     expect(planets.size).toBe(35)
   })
 
-  it('frees nothing with a size under the cells minCharge', () => {
+  it('frees nothing with a size whose type does not break the cells gate tier', () => {
     const entries = bandOf(40, 5, { plusOne: true, plusTwo: false })
-    const below = chargeSharePayoffOf(40, 5, entries, minChargeFor({ lead: 1, band: 5 }, 40) - 1)
-    expect(cmp(below.valueFreed, ZERO_MONEY)).toBe(0)
-    expect(cmp(below.payoff, ZERO_MONEY)).toBe(0)
+    const typeOne = chargeSharePayoffOf(40, 5, entries, 4)
+    expect(cmp(typeOne.valueFreed, ZERO_MONEY)).toBe(0)
+    expect(cmp(typeOne.payoff, ZERO_MONEY)).toBe(0)
+    expect(cmp(chargeSharePayoffOf(40, 5, entries, 5).valueFreed, ZERO_MONEY)).toBe(1)
   })
 
   it('frees the gated share of the radius and divides by one charge of the size', () => {
@@ -91,8 +92,8 @@ describe('charge payoff under the share model (ticket 247, Systems on K8 #218)',
   it('caps the gated value at 15% of the band', () => {
     const tier = oreTier(22, 5)
     const heavy: GatedMixEntry[] = [
-      { tier, weightBp: 5000, signature: false, minCharge: null },
-      { tier: tier + 1, weightBp: 5000, signature: false, minCharge: 5 },
+      { tier, weightBp: 5000, signature: false, gateTier: null },
+      { tier: tier + 1, weightBp: 5000, signature: false, gateTier: 2 },
     ]
     const capped = chargeSharePayoffOf(22, 5, heavy, 5)
     const light = chargeSharePayoffOf(22, 5, [heavy[0], { ...heavy[1], weightBp: 1 }], 5)

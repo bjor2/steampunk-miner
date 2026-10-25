@@ -6,18 +6,25 @@
  * - The band's cells are valued from `oreMixFor`'s weights at `1.5^lead` (a signature at its sale
  *   tier, as #142's guard values it), in units of the band's ore at `bandOreWorth` (Systems: "the
  *   ore price (`bandOrePriceAt`) of the gated cells a charge opens").
- * - `gated(n)` is the dynamite-gated lead entries a size `n` charge frees, those whose `minCharge`
- *   is at most `n`; their value share is capped by the 15% guard of the band's expected value.
+ * - `gated(n)` is the dynamite-gated lead entries a size `n` charge frees, those whose gate tier
+ *   its type's `breaksGate[]` holds (D4 #863); their value share is capped by the 15% guard of the
+ *   band's expected value.
  * - `valueFreed = inRadiusCount(r(n)) * min(gated(n), 15% of the band) * the band's ore`, kept
  *   ordinary ore left out; `price` is one charge of size `n` (`chargePrice`).
  *
- * Domain (#247 scope): planets 7 to 40 and 50, only bands with dynamite-gated lead cells, sizes up
- * to the band and open on the planet. Reported, gating nothing: #148 gates the bot's medians.
+ * Domain (#247 scope): planets 7 to 40 and 50, only bands with dynamite-gated lead cells, every
+ * size (all sold on every planet, D4). Reported, gating nothing: #148 gates the bot's medians.
  */
 import { baseTilesSqOf } from '../authority/charges/blastDisc'
 import { inRadiusCount } from '../authority/charges/blastFront'
 import { bandOreWorth } from '../economy/bandOreCost'
-import { chargePrice, chargeRadiusMm, chargeSizesUpTo, largestSizeOn } from '../economy/chargeSizes'
+import {
+  chargePrice,
+  chargeRadiusMm,
+  chargeSizeCount,
+  chargeSizesUpTo,
+  doesSizeBreakGate,
+} from '../economy/chargeSizes'
 import { oreTier, oreValue, signatureSaleTier } from '../economy/oreEconomy'
 import { add, cmp, div, fromSafeInteger, mul, ZERO_MONEY, type Money } from '../money'
 import { GATED_VALUE_SHARE_CAP_BP, PAYOFF_PLANETS } from './chargePayoff'
@@ -27,8 +34,8 @@ export interface GatedMixEntry {
   tier: number
   weightBp: number
   signature: boolean
-  /** The entry's `minCharge` when its cells are dynamite-gated, else null. */
-  minCharge: number | null
+  /** The entry's gate tier when its cells are dynamite-gated, else null. */
+  gateTier: number | null
 }
 
 /** A planet's gate table: bands 1 to 5. */
@@ -74,8 +81,9 @@ function bandPayoffsOf(
   band: number,
   entries: readonly GatedMixEntry[],
 ): ChargeSharePayoff[] {
-  const top = Math.min(band, largestSizeOn(planetIndex))
-  return chargeSizesUpTo(top).map((size) => chargeSharePayoffOf(planetIndex, band, entries, size))
+  return chargeSizesUpTo(chargeSizeCount()).map((size) =>
+    chargeSharePayoffOf(planetIndex, band, entries, size),
+  )
 }
 
 export function chargeSharePayoffOf(
@@ -102,11 +110,11 @@ export function chargeSharePayoffOf(
 }
 
 export function hasDynamiteGatedCells(entries: readonly GatedMixEntry[]): boolean {
-  return entries.some((entry) => entry.minCharge !== null)
+  return entries.some((entry) => entry.gateTier !== null)
 }
 
 function isFreedBy(entry: GatedMixEntry, size: number): boolean {
-  return entry.minCharge !== null && entry.minCharge <= size
+  return entry.gateTier !== null && doesSizeBreakGate(size, entry.gateTier)
 }
 
 /** The share of the band's expected ore value the `part` entries hold. */

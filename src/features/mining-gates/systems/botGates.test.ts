@@ -14,23 +14,29 @@ import { paramsOfSession, tileKindAt } from '../../../systems/bot/botWorld'
 import { newMineLayout } from '../../../systems/bot/mineLayout'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import { FIXTURE_SEED, worldCellOfGate } from './gateFixtures'
-import type { CellGateKind } from './gateTable'
+import type { CellGate, CellGateKind } from './gateTable'
 
 // The pacing bot meets planet 7's gated cells (#142 acceptance 8 and 9, ticket 236): it blasts a
-// dynamite-gated shell with a charge that frees it, wants that size when it carries none, and
-// never bores a cell a gate leaves standing. The bot stands west of the cell, facing it, with an
+// dynamite-gated shell with a charge that frees it, wants that size when it carries none (the
+// first size of the type that breaks the rock's tier, D4 #863), and never bores a cell a gate
+// leaves standing. The bot stands west of the cell, facing it, with an
 // open way back west for the blast.
 
 const PLANET = 7
 /** Tiles carved open behind the bot: past size 1's reach of 2, and its own tile. */
 const OPEN_BEHIND = 4
 
-function botFacing(kind: CellGateKind, carried: number) {
+/** The first gate of `kind`, or of tier `tier` when it is blast-only rock. */
+function isGateOf(kind: CellGateKind, tier: number): (gate: CellGate) => boolean {
+  return (gate) => gate.kind === kind && (gate.kind !== 'dynamite' || gate.tier === tier)
+}
+
+function botFacing(kind: CellGateKind, carried: number, tier = 1) {
   const session = createBotSession(
     createAuthorityState({ planetIndex: PLANET, planetSeed: FIXTURE_SEED, playerIds: ['p1'] }),
     'p1',
   )
-  const cell = worldCellOfGate(paramsOfSession(session.state()), (gate) => gate.kind === kind)
+  const cell = worldCellOfGate(paramsOfSession(session.state()), isGateOf(kind, tier))
   const stand = westOf(cell.tile, 1)
   session.submit(FREEZE_ENEMIES)
   session.submit(setChargesIntent(carried))
@@ -86,6 +92,13 @@ describe('bot: dynamite-gated shells and gate walls', () => {
     expect(tileKindAt(session.state(), target)).toBe('ore')
     expect(planet.hasMetBlastTile).toBe(true)
     expect(restockSizeOf(planet)).toBe(1)
+  })
+
+  it('wants the first type-2 size for tier-2 rock and leaves it standing to a type-1 charge', () => {
+    const { session, planet, target } = botFacing('dynamite', 1, 2)
+    expect(blastShellOpen(session, planet, target)).toBe(false)
+    expect(tileKindAt(session.state(), target)).toBe('ore')
+    expect(restockSizeOf(planet)).toBe(5)
   })
 
   it('never blasts a shell under the comparison policy', () => {

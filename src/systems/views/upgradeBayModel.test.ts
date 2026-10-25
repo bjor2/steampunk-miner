@@ -111,6 +111,7 @@ describe('upgrade bay model: the Guns row (#107)', () => {
         'casing',
         'lining',
         'guns',
+        'charges',
         'repair',
         'footer',
       ])
@@ -210,9 +211,9 @@ describe('upgrade bay model', () => {
     expect(model.tracks.every((row) => row.buy.reason === 'wrong_bay')).toBe(true)
   })
 
-  it('orders focus tracks, casing, lining, guns, repair, footer and starts on the first track', () => {
+  it('orders focus tracks, casing, lining, guns, charges, repair, footer and starts on the first track', () => {
     // The kernel's own rows: a slice's bay entries (ticket 344) join before Repair. The lining and
-    // the guns are on sale from planet 1 (#411).
+    // the guns are on sale from planet 1 (#411), the charges too (D4 #863).
     withRegistrations([], () => {
       const model = upgradeBayOf(atUpgradeBay())
       expect([...new Set(model.focusStops.map((stop) => stop.panel))]).toEqual([
@@ -220,6 +221,7 @@ describe('upgrade bay model', () => {
         'casing',
         'lining',
         'guns',
+        'charges',
         'repair',
         'footer',
       ])

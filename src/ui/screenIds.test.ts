@@ -267,9 +267,8 @@ function upgradeBayTexts(model: UpgradeBayModel): Partial<Record<UiId, string | 
     [UI_IDS.upgradebayCasingBuy]: null,
     ...(model.lining === null ? {} : { [UI_IDS.upgradebayLiningButton]: null }),
     ...(model.guns === null ? {} : { [UI_IDS.upgradebayGunsBuy]: null }),
-    ...(model.charges === null
-      ? {}
-      : { [UI_IDS.upgradebayChargesRestock]: null, [UI_IDS.upgradebayRackBuy]: null }),
+    [UI_IDS.upgradebayChargesRestock]: null,
+    [UI_IDS.upgradebayRackBuy]: null,
   }
 }
 
@@ -660,7 +659,7 @@ function renderWithCharges(): string[] {
   })
   expect(hud.chargeFuse).not.toBeNull()
   const bay = upgradeBayOn(7)
-  expect(bay.charges).not.toBeNull()
+  expect(bay.charges.restock).not.toHaveLength(0)
   return [
     ...checkScreen(hudWithDetail(hud, false), hudTexts(hud)),
     ...checkScreen(

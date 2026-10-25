@@ -80,11 +80,10 @@ export interface RejectionReasons {
   slots_max: true
   nothing_to_collect: true
   // Registered by the charge commands (#109, sizes K8 #218): the charges asked for do not fit the
-  // rack's free slots, no charge of that size is carried, the size is not open on this planet, one
-  // is already live, or the vehicle faces no wall to plant on (`feature_locked`, `max_level` above).
+  // rack's free slots, no charge of that size is carried, one is already live, or the vehicle faces
+  // no wall to plant on (`max_level` above). D4 #863 retired `size_locked`: every size is sold.
   rack_full: true
   no_charge_of_size: true
-  size_locked: true
   charge_live: true
   no_wall: true
   // Registered by the lining types (#113): not a lining type, already unlocked, or not unlocked yet.

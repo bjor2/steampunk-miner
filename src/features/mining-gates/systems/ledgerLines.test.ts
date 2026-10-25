@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatAmount } from '../../../systems/displayAmount'
+import { formatAmount, formatPrice } from '../../../systems/displayAmount'
 import { fromCanonical } from '../../../systems/money'
 import { ledgerIconIdOf, ledgerLineOf, type GateHit } from './ledgerLines'
 
@@ -42,7 +42,7 @@ describe('gate ledger lines', () => {
   it('prints every amount in every line through formatAmount, and no other number (ticket 299)', () => {
     const hits = [
       refused('drill', 'tip:123456789', 'tip:1000000'),
-      refused('dynamite', 'size:12345', 'size:1000'),
+      refused('dynamite', 'type:12345', 'owned'),
       refused('rig', 'rig.resonance', 'none'),
       refused('rig', 'rig.resonance:tuned', 'rig.resonance'),
     ]
@@ -55,13 +55,21 @@ describe('gate ledger lines', () => {
     }
   })
 
-  it('names the charge size a shell needs and the size carried, or none', () => {
-    expect(ledgerLineOf(refused('dynamite', 'size:3', 'size:1'))).toBe(
-      'Ledger: dynamite size 3 required, the miner carries size 1.',
+  it('names the charge type blast-only rock needs, and says the miner carries one (D4 #863)', () => {
+    expect(ledgerLineOf(refused('dynamite', 'type:2', 'owned'))).toBe(
+      'Ledger: a type 2 charge breaks this rock, the miner carries one.',
     )
-    expect(ledgerLineOf(refused('dynamite', 'size:2', 'size:0'))).toBe(
-      'Ledger: dynamite size 2 required, the miner carries none.',
+  })
+
+  it('names the dock price of that charge when none is carried, rounded up, never "locked"', () => {
+    const line = ledgerLineOf(refused('dynamite', 'type:3', 'price:1234567.891'))
+    expect(line).toBe(
+      `Ledger: a type 3 charge breaks this rock, ${formatPrice(fromCanonical('1234567.891'))} at the dock.`,
     )
+    expect(
+      withoutAmounts(line ?? '', ['3', formatPrice(fromCanonical('1234567.891'))]),
+    ).not.toMatch(/\d/)
+    expect(line).not.toMatch(/lock/i)
   })
 
   it('names the missing extractor by its player name, never rig', () => {
@@ -91,13 +99,15 @@ describe('gate ledger lines', () => {
   it('has no line for a gate kind or words it does not know', () => {
     expect(ledgerLineOf(refused('quicksand', 'tip:3', 'tip:1'))).toBeNull()
     expect(ledgerLineOf(refused('drill', 'size:3', 'tip:1'))).toBeNull()
+    expect(ledgerLineOf(refused('dynamite', 'size:3', 'size:1'))).toBeNull()
+    expect(ledgerLineOf(refused('dynamite', 'type:2', 'price:01'))).toBeNull()
     expect(ledgerLineOf(refused('rig', 'rig.unknown', 'none'))).toBeNull()
     expect(ledgerLineOf(refused('rig', 'rig.resonance:hummed', 'rig.resonance'))).toBeNull()
   })
 
   it('wears the drill tip, the charge or the missing extractor as its icon', () => {
     expect(ledgerIconIdOf(refused('drill', 'tip:3', 'tip:1'))).toBe('icon-track-drill-tip')
-    expect(ledgerIconIdOf(refused('dynamite', 'size:1', 'size:0'))).toBe('icon-blasting-charges')
+    expect(ledgerIconIdOf(refused('dynamite', 'type:1', 'owned'))).toBe('icon-blasting-charges')
     expect(ledgerIconIdOf(refused('rig', 'rig.acid_etcher:etched', 'rig.acid_etcher'))).toBe(
       'item-rig-acid-etcher',
     )

@@ -1,13 +1,15 @@
 /**
  * The gate's ledger line (ticket 238; #142 "HUD hint chip", in #159's ledger voice): what a
  * stopped cell needs and what the miner has, read off `gate_hit`'s `required` and `have` words
- * (`tip:<major>`, `size:<n>`, an extractor id or `<extractor>:<state>`, `none`; see canMine.ts).
+ * (`tip:<major>`, `type:<t>` against `owned` or `price:<money>`, an extractor id or
+ * `<extractor>:<state>`, `none`; see canMine.ts).
  * The same line is the HUD chip and the refusal text. The numbers come only from those words, so
  * the templates stay inside #159's flavour rules; a gate kind this slice does not word has no line.
- * The numbers print through `formatAmount` like every count the player sees (#32; GD ruling on
- * ticket 238, Vertical Scaler: ledger amounts go through Money/formatAmount, #164).
+ * The numbers print through `formatAmount` like every count the player sees, a dock price through
+ * `formatPrice`, rounded up (#32; GD ruling on ticket 238, Vertical Scaler: ledger amounts go
+ * through Money/formatAmount, #164).
  */
-import { formatAmount } from '../../../systems/displayAmount'
+import { formatAmount, formatPrice } from '../../../systems/displayAmount'
 import { fromCanonical } from '../../../systems/money'
 import LEDGER_FILE from '../ledgerLines.json'
 import type { Rig } from './gateRows'
@@ -23,8 +25,10 @@ export interface GateHit {
 
 export interface LedgerTemplates {
   drill: string
+  /** Blast-only rock while the rack carries a charge that breaks it (D4 #863). */
   dynamite: string
-  dynamiteNoneCarried: string
+  /** Blast-only rock with none carried: the dock price of the first charge that breaks it. */
+  dynamiteAtDock: string
   /** Without the extractor: skidded off, or the ore lost as its row says. */
   extractorMissing: { refused: string; vented: string; drifted: string }
   /** With it: what the cell still waits for, by the state `required` names. */
@@ -37,10 +41,12 @@ export const LEDGER_TEMPLATES: LedgerTemplates = LEDGER_FILE
 const DRILL_ICON_ID = 'icon-track-drill-tip'
 const DYNAMITE_ICON_ID = 'icon-blasting-charges'
 
-const NONE_CARRIED = '0'
+const OWNED = 'owned'
 const SLOT = /\{(\w+)\}/g
 /** A whole count with no leading zeros, so it reads as canonical Money text. */
 const WHOLE_COUNT = /^(0|[1-9][0-9]*)$/
+/** Canonical Money text: a whole part with no leading zeros and an optional fraction. */
+const CANONICAL_AMOUNT = /^(0|[1-9][0-9]*)(\.[0-9]+)?$/
 
 type LineOfHit = (hit: GateHit, templates: LedgerTemplates) => string | null
 
@@ -68,7 +74,7 @@ export function ledgerTemplatesOf(templates = LEDGER_TEMPLATES): string[] {
   return [
     templates.drill,
     templates.dynamite,
-    templates.dynamiteNoneCarried,
+    templates.dynamiteAtDock,
     ...Object.values(templates.extractorMissing),
     ...Object.values(templates.extractorAtWork),
   ]
@@ -90,11 +96,16 @@ function drillLineOf(hit: GateHit, templates: LedgerTemplates): string | null {
 }
 
 function dynamiteLineOf(hit: GateHit, templates: LedgerTemplates): string | null {
-  const need = countOf(hit.required, 'size')
-  const have = countOf(hit.have, 'size')
-  if (need === null || have === null) return null
-  const template = have === NONE_CARRIED ? templates.dynamiteNoneCarried : templates.dynamite
-  return fillLedgerTemplate(template, shownCountsOf(need, have))
+  const type = countOf(hit.required, 'type')
+  if (type === null) return null
+  const need = shownAmountOf(type)
+  if (hit.have === OWNED) return fillLedgerTemplate(templates.dynamite, { need })
+  const price = amountOf(hit.have, 'price')
+  if (price === null) return null
+  return fillLedgerTemplate(templates.dynamiteAtDock, {
+    need,
+    price: formatPrice(fromCanonical(price)),
+  })
 }
 
 function extractorLineOf(hit: GateHit, templates: LedgerTemplates): string | null {
@@ -121,8 +132,18 @@ function countOf(word: string, name: string): string | null {
   return wordName === name && WHOLE_COUNT.test(count ?? '') ? count : null
 }
 
+/** `price:1234.5` → `1234.5` for the word `price`; null for any other shape. */
+function amountOf(word: string, name: string): string | null {
+  const [wordName, amount] = word.split(':')
+  return wordName === name && CANONICAL_AMOUNT.test(amount ?? '') ? amount : null
+}
+
 function shownCountsOf(need: string, have: string): { need: string; have: string } {
-  return { need: formatAmount(fromCanonical(need)), have: formatAmount(fromCanonical(have)) }
+  return { need: shownAmountOf(need), have: shownAmountOf(have) }
+}
+
+function shownAmountOf(amount: string): string {
+  return formatAmount(fromCanonical(amount))
 }
 
 function rigOfRequired(required: string): Rig | null {

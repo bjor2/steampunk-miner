@@ -1,14 +1,14 @@
 /**
  * The dynamite size ladder (#143 numbers with amendments 2 and 3, #153 design and amendments, the
  * Game Director, Technical Director and Systems locks on #149, K8 #218; 12 rows of 3 types, D1
- * #860 with the D6 radii of #865). Sizes run from 1 to `chargeSizeCount()`; size 1 is the shipped
- * `blasting_charges` charge (#109) with all its numbers.
+ * #860 with the D6 radii of #865; money only from D4 #863). Sizes run from 1 to `chargeSizeCount()`;
+ * size 1 is the shipped `blasting_charges` charge (#109) with all its numbers.
  *
  *   radius        `sizes.radius[n - 1]` tiles: 2.5 3.5 4.5 6 | 8 10 13 16 | 20 24 30 37, the
  *                 only ladder, in whole half-tiles so the disc's r² is an integer (`blastDisc.ts`)
  *   type          1 (breaking) sizes 1-4, 2 (deep) 5-8, 3 (biggest) 9-12: types are verbs, sizes
  *                 scale; each type's `breaksGate[]` names the gate tiers its blast breaks
- *   unlock        planet 7 + 3 (n - 1); largest size s(p) = min(12, 1 + floor((p - 7) / 3))
+ *   sold          every size on every planet, its price the only gate (D4 #863)
  *   price         ceilMilli(count * 2 * 1.8^(n - 1) * V(t(p, 5)) * paceScale(p)), through
  *                 `bandOrePriceAt`, never its raw worth (Systems on #218)
  *   kept          0.4 * 0.8^(n - 1) of the ordinary ore the blast breaks
@@ -16,7 +16,9 @@
  *   fuse          120 120 120 150 180 210 ticks; sizes 7-12 are remote, fired by the plunger
  *                 (#149) and disarmed 3600 ticks after planting (#153)
  *   self hit      selfHit(p) * r(n) / r(1); from size 4 the inner half of the radius wrecks
- *   minCharge     clamp(s(p) - 2 + lead, 1, band) for a dynamite-gated cell (#143 amendment 2)
+ *   gate tier     a dynamite-gated cell's tier: clamp(T(p) - 2 + lead, 1, band), T(p) the newest
+ *                 tier laid on the planet (1 and 2 from P7, 3 from P9); a blast opens it only when
+ *                 the tier is in its type's `breaksGate[]` (D4 #863)
  *   collapse      a bare rim block collapses when its roll is under collapseBp: 0 for sizes 1-4,
  *                 1250 2500 3750 5000 for 5-8 and 5000 for 9-12 (D6 #865, rolled by D2 #861)
  */
@@ -37,7 +39,7 @@ import { growGeometric } from './curveFamilies'
 import { ECONOMY } from './economy'
 import type { BandOreCost } from './economyDefinition'
 
-const { sizes } = ECONOMY.blastingCharges
+const { sizes, gateTiers } = ECONOMY.blastingCharges
 const MM_PER_TILE = fromSafeInteger(MM_PER_METRE)
 
 /** One size of the ladder as #143 reads it (`chargeSpec(n, p)`), priced for one charge on `p`. */
@@ -48,7 +50,6 @@ export interface ChargeSpec {
   /** The gate tiers its blast breaks (`breaksGate[]`). */
   breaksGate: readonly number[]
   radiusMm: number
-  unlockPlanet: number
   price: Money
   keptFraction: BigStat
   rackSlots: number
@@ -56,7 +57,7 @@ export interface ChargeSpec {
   fuseTicks: number | null
 }
 
-/** A dynamite-gated ore cell as `minChargeFor` reads it: its rarity lead (+1, +2) and its band. */
+/** A dynamite-gated ore cell as `gateTierFor` reads it: its rarity lead and its band. */
 export interface DynamiteGatedCell {
   lead: number
   band: number
@@ -68,7 +69,6 @@ export function chargeSpec(size: number, planetIndex: number): ChargeSpec {
     type: chargeTypeOf(size),
     breaksGate: breaksGateOf(size),
     radiusMm: chargeRadiusMm(size),
-    unlockPlanet: sizeUnlockPlanet(size),
     price: chargePrice(size, 1, planetIndex),
     keptFraction: keptFractionOf(size),
     rackSlots: rackSlotsOf(size),
@@ -76,10 +76,49 @@ export function chargeSpec(size: number, planetIndex: number): ChargeSpec {
   }
 }
 
-/** The smallest size that frees a dynamite-gated cell whole, capped by its band (#143 am. 2). */
-export function minChargeFor(cell: DynamiteGatedCell, planetIndex: number): number {
-  const wanted = largestSizeOn(planetIndex) - sizes.newestSizeLead + cell.lead
-  return Math.min(Math.max(wanted, 1), cell.band)
+/**
+ * The gate tier of a dynamite-gated cell on planet `planetIndex`: the newest tier laid there less
+ * `newestTierLead` plus the cell's lead, at least 1 and at most its band; 0 before any is laid.
+ */
+export function gateTierFor(cell: DynamiteGatedCell, planetIndex: number): number {
+  const newest = newestGateTierOn(planetIndex)
+  if (newest === 0) return 0
+  const wanted = newest - gateTiers.newestTierLead + cell.lead
+  return Math.min(Math.max(wanted, 1), newest, cell.band)
+}
+
+/** T(p): the newest gate tier laid on planet `planetIndex`, 0 before the first. */
+export function newestGateTierOn(planetIndex: number): number {
+  return gateTiers.fromPlanet.filter((fromPlanet) => fromPlanet <= planetIndex).length
+}
+
+/** Whether a blast of `size` opens rock of gate tier `tier`: its type's `breaksGate[]` holds it. */
+export function doesSizeBreakGate(size: number, tier: number): boolean {
+  return breaksGateOf(size).includes(tier)
+}
+
+/** Whether a charge of type `type` opens rock of gate tier `tier`. */
+export function doesTypeBreakGate(type: number, tier: number): boolean {
+  return (sizes.breaksGateByType[type - 1] ?? []).includes(tier)
+}
+
+/** The first charge type whose blast opens gate tier `tier`; the reader has every laid tier named. */
+export function chargeTypeBreaking(tier: number): number {
+  const at = sizes.breaksGateByType.findIndex((tiers) => tiers.includes(tier))
+  if (at === -1) throw new RangeError(`no charge type breaks gate tier ${tier}`)
+  return at + 1
+}
+
+/** The smallest charge that opens rock of gate tier `tier`: the first size of the first type. */
+export function smallestSizeBreaking(tier: number): number {
+  return firstSizeOfType(chargeTypeBreaking(tier))
+}
+
+/** The smallest size of charge type `type`. */
+export function firstSizeOfType(type: number): number {
+  const at = sizes.type.indexOf(type)
+  if (at === -1) throw new RangeError(`no charge size is of type ${type}`)
+  return at + 1
 }
 
 export function chargeSizeCount(): number {
@@ -93,26 +132,6 @@ export function chargeSizesUpTo(top: number): number[] {
 
 export function isChargeSize(size: number): boolean {
   return Number.isSafeInteger(size) && size >= 1 && size <= chargeSizeCount()
-}
-
-export function sizeUnlockPlanet(size: number): number {
-  return sizes.unlockFrom + sizes.unlockEvery * indexOfSize(size)
-}
-
-/** s(p): the largest size open on planet `planetIndex`, 0 before charges open. */
-export function largestSizeOn(planetIndex: number): number {
-  if (planetIndex < sizes.unlockFrom) return 0
-  const opened = 1 + Math.floor((planetIndex - sizes.unlockFrom) / sizes.unlockEvery)
-  return Math.min(opened, chargeSizeCount())
-}
-
-/**
- * Whether size `size` is still closed on planet `planetIndex`. Size 1 never is: it is the shipped
- * charge, closed where it is sold (from `unlockFrom`, planet 7), so a rack carries and
- * plants it anywhere as before.
- */
-export function isSizeLockedOn(size: number, planetIndex: number): boolean {
-  return size > 1 && planetIndex < sizeUnlockPlanet(size)
 }
 
 /** The size's charge type, 1 to the last type listed. */

@@ -1,8 +1,8 @@
 /**
  * The HUD rack panel (#153 section 1: "the HUD rack shows the selected size"; #149 scope): the size
  * the plant key plants, its radius and how many of it the rack holds, the key that steps the size,
- * and, while a charge is live and the plunger is open, whether the plant key now detonates it or
- * the interlock holds it. The kernel HUD keeps the rack's slots and the fuse warning (#109).
+ * and, while a charge is live, whether the plant key now detonates it or the interlock holds it.
+ * The kernel HUD keeps the rack's slots and the fuse warning (#109).
  * Text says it, never colour alone (#33 section 7). Nothing until the rack is bolted on (#90).
  * The radius is the ground the size clears at the planter's Blast Radius level, and a size whose
  * ground is narrower than the rig's bore is marked: soft information only, never a refusal (D1
@@ -15,7 +15,7 @@ import { chargeSizeToPlantOf, nextChargeSizeOf } from '../../../systems/vehicle/
 import { carriedOf, type VehicleCharges } from '../../../systems/vehicle/vehicleCharges'
 import { groundReachMmOf, isSmallerThanCut } from './chargeRings'
 import { dynamiteSizeIconIdOf } from './dynamiteSizes'
-import { isDetonatorOpen, isWithinInterlock, liveChargeOf } from './plunger'
+import { isWithinInterlock, liveChargeOf } from './plunger'
 
 export interface RackPanel {
   size: number
@@ -77,7 +77,7 @@ function nextSizeTextOf(charges: VehicleCharges, source: RackPanelSource): strin
 
 function plungerTextOf({ state, playerId, prompts }: RackPanelSource): string | null {
   const charge = liveChargeOf(state, playerId)
-  if (charge === null || !isDetonatorOpen(state)) return null
+  if (charge === null) return null
   if (isWithinInterlock(vehicleOf(state, playerId).pose, charge)) return 'Back off to detonate'
   return `Detonate (${promptLabelOf('plant_charge', prompts, prompts.inputDevice)})`
 }

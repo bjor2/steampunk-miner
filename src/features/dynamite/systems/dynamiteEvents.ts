@@ -19,8 +19,6 @@ declare module '../../../systems/authority/domainEvent' {
     'dynamite.DetonateRefused': { reason: DetonateRefusal; size: number }
   }
   interface RejectionReasons {
-    /** `remote_detonator` (Schedule C, P22) is not open on this planet. */
-    'dynamite.detonator_locked': true
     /** The caller has no live charge to fire. */
     'dynamite.no_live_charge': true
   }

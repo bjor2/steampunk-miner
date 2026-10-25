@@ -13,10 +13,11 @@ const WORLD_SEED = 83921
 const TRADES = chargeSizeTradesOf(WORLD_SEED)
 
 describe('charge size guard (#143 guard 1, #153, K8 #218)', () => {
-  it('judges every size on its unlock planet and planet 40, in every band, at 24 and 45 ticks a tile', () => {
+  it('judges every size on planets 1 and 40, in every band, at 24 and 45 ticks a tile', () => {
+    // D4 #863: every size is sold from planet 1, so planet 1 replaces each size's unlock planet.
     expect(TRADES).toHaveLength(chargeSizeCount() * 2 * 5 * GUARD_DRILL_TICKS_PER_TILE.length)
     expect(new Set(TRADES.filter((trade) => trade.size === 10).map((t) => t.planetIndex))).toEqual(
-      new Set([34, 40]),
+      new Set([1, 40]),
     )
   })
 

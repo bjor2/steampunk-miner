@@ -1,9 +1,9 @@
 /**
  * The command rules `dynamite` registers (feature-slices.md 3.15):
  *
- * - `dynamite.detonate_charge {}`: the plunger (`plunger.ts`). Rejected, changing nothing, while
- *   `remote_detonator` is shut on this planet (`dynamite.detonator_locked`) or the caller has no
- *   live charge (`dynamite.no_live_charge`). Within the interlock it answers
+ * - `dynamite.detonate_charge {}`: the plunger (`plunger.ts`), on every planet (D4 #863: price
+ *   only). Rejected, changing nothing, while the caller has no live charge
+ *   (`dynamite.no_live_charge`). Within the interlock it answers
  *   `dynamite.DetonateRefused {in_radius}` and the charge stays live; outside it the kernel blows
  *   the charge as `charge_detonated {by: plunger}`.
  */
@@ -20,7 +20,7 @@ import { noPlanetRejection } from '../../../systems/authority/planetOfState'
 import type { SliceCommandRules } from '../../../systems/registries/commandRules'
 import type { PlantedCharge } from '../../../systems/vehicle/vehicleCharges'
 import './dynamiteEvents'
-import { isDetonatorOpen, isWithinInterlock, liveChargeOf } from './plunger'
+import { isWithinInterlock, liveChargeOf } from './plunger'
 
 export const DETONATE_INTENT: CommandIntent<'dynamite.detonate_charge'> = {
   type: 'dynamite.detonate_charge',
@@ -38,17 +38,8 @@ export const DYNAMITE_RULES: SliceCommandRules = {
 function detonateRejection(state: AuthorityState, playerId: string): Rejection | null {
   return firstRejection([
     () => noPlanetRejection(state.planet),
-    () => lockedDetonatorRejection(state),
     () => noLiveChargeRejection(state, playerId),
   ])
-}
-
-function lockedDetonatorRejection(state: AuthorityState): Rejection | null {
-  if (isDetonatorOpen(state)) return null
-  return rejectionOf(
-    'dynamite.detonator_locked',
-    `remote_detonator is not open on planet ${state.planet.index}`,
-  )
 }
 
 function noLiveChargeRejection(state: AuthorityState, playerId: string): Rejection | null {

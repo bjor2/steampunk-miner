@@ -81,8 +81,11 @@ function carveTile(session: BotSession, tile: TilePoint): void {
 }
 
 describe('bot: blasting charges policy (#109)', () => {
-  it('fills the rack at the Upgrade bay from planet 7, and not before', () => {
-    expect(chargeRestockOf(botAtUpgradeBayOn(6), 1)).toBeNull()
+  it('fills the rack at the Upgrade bay on every planet, P1 too: price is the only gate (D4 #863)', () => {
+    expect(chargeRestockOf(botAtUpgradeBayOn(1), 1)).toEqual({
+      intent: restockChargesCommand(1, 3),
+      price: chargePrice(1, 3, 1),
+    })
     expect(chargeRestockOf(botAtUpgradeBayOn(7), 1)).toEqual({
       intent: restockChargesCommand(1, 3),
       price: chargePrice(1, 3, 7),

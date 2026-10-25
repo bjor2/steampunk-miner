@@ -5,21 +5,15 @@
  *   plants one on the wall its last reported pose faces (the drill's nose tile). A fused size blows
  *   its size's `fuseTicks` later on the authority's clock (`chargeDetonation.ts`); a remote one
  *   (sizes 7 to 12) waits for the plunger (#149) and is disarmed if nobody fires it
- *   (`chargeDisarm.ts`). A size not open on this planet is refused `size_locked`, one the rack does
- *   not hold `no_charge_of_size`. Logs `charge_planted`, or `remote_charge_planted`.
+ *   (`chargeDisarm.ts`). Every size plants on every planet (D4 #863: price only); one the rack does
+ *   not hold is refused `no_charge_of_size`. Logs `charge_planted`, or `remote_charge_planted`.
  * - `debug.setCharges`: a scenario's mounted rack, its slots and the charges of one size in it, no
  *   price.
  *
  * The Upgrade bay's charge commands are in `chargeShopRules.ts`. A refused command changes nothing.
  */
 import { rackCapacity, rackMaxSlotLevel } from '../../economy/blastingCharges'
-import {
-  chargeSizeCount,
-  fuseTicksOf,
-  isChargeSize,
-  isSizeLockedOn,
-  rackSlotsOf,
-} from '../../economy/chargeSizes'
+import { chargeSizeCount, fuseTicksOf, isChargeSize, rackSlotsOf } from '../../economy/chargeSizes'
 import {
   carriedOf,
   totalCarriedOf,
@@ -83,7 +77,6 @@ export function plantRefusal(
     () => noPlanetRejection(state.planet),
     () => activeVehicleRejection(vehicle),
     () => unknownSizeRejection(size),
-    () => lockedSizeRejection(size, state.planet.index),
     () => noChargeOfSizeRejection(vehicle.charges, size),
     () => liveChargeRejection(vehicle.charges),
     () => noWallRejection(state, vehicle.pose),
@@ -113,11 +106,6 @@ export function withCharges(
 export function unknownSizeRejection(size: number): Rejection | null {
   if (isChargeSize(size)) return null
   return rejectionOf('out_of_range', `size must be 1 to ${chargeSizeCount()}, got ${size}`)
-}
-
-export function lockedSizeRejection(size: number, planetIndex: number): Rejection | null {
-  if (!isSizeLockedOn(size, planetIndex)) return null
-  return rejectionOf('size_locked', `charge size ${size} is not open on planet ${planetIndex}`)
 }
 
 function activeVehicleRejection(vehicle: VehicleState): Rejection | null {

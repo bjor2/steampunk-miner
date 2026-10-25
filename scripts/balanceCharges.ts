@@ -8,14 +8,14 @@
  *    ore money a minute drilling against blasting, and the time to push a shaft 3 tiles deeper
  *    either way. Acceptance 3 wants blasting to earn less a minute wherever a tile takes at most 2x
  *    the floor, and to reach the next band faster at 4x or more.
- * 2. The size guard (`chargeSizeTrade.ts`): every size on its unlock planet and planet 40, in every
+ * 2. The size guard (`chargeSizeTrade.ts`): every size on planet 1 (D4 #863) and planet 40, in every
  *    band, at 24 and 45 ticks a tile, the net ore money a minute of a blast against the drill, at
  *    the band's ore density (the guard: never above the drill) and centred on a full patch
  *    (reported; #143 amendment 2 accepts sizes 1 and 2 above the drill there).
  * 3. The payoff guard (`chargePayoff.ts`, #143 guard 2, GD lock on K8 #218): on planets 7 to 40
- *    and 50, in bands 3 to 5, for a +1 and a +2 dynamite-gated lead patch, what one `minCharge`
- *    frees (Vertical's patch model) over its price, expected at 2 or more, with #142's 15% share
- *    cap beside it for information. Reported only: #148 gates the bot's `gate_cleared` medians.
+ *    and 50, in bands 3 to 5, for a +1 and a +2 dynamite-gated lead patch, what the smallest
+ *    charge breaking its gate tier (D4 #863) frees (Vertical's patch model) over its price,
+ *    expected at 2 or more, with #142's 15% share cap beside it for information. Reported only: #148 gates the bot's `gate_cleared` medians.
  *    Beside it, the share model (`chargeSharePayoff.ts`, Systems on K8 #218, ticket 247): per size,
  *    planet and band with dynamite-gated lead cells in the seed's gate table (the mining-gates
  *    debug action), the gated value one charge frees, capped by #142's 15% guard, over its price.
@@ -192,7 +192,7 @@ const text = [
         `| ${planet} | ${drill} | ${trade.band} | ${trade.drillTicksPerTile} | ${trade.floorMultiple.toFixed(1)} | ${perMinute(trade.drillMoneyPerTick)} | ${perMinute(trade.blastMoneyPerTick)} | ${seconds(trade.drillAdvanceTicks)} | ${seconds(trade.blastAdvanceTicks)} |`,
     ),
   ].join('\n'),
-  '### The size guard: every size on its unlock planet and planet 40 (#143 guard 1, K8 #218)',
+  '### The size guard: every size on planets 1 and 40 (#143 guard 1, K8 #218, D4 #863)',
   [
     '| size | planet | band | ticks/tile | cycle | drill $/min | blast $/min | blast / drill | patch drill $/min | patch blast $/min | patch blast / drill |',
     '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |',
@@ -202,9 +202,9 @@ const text = [
     ),
   ].join('\n'),
   `### Centred on a full patch, above the drill (reported: #143 amendment 2)\n\n${patchFindingsText()}`,
-  `### The payoff guard: one minCharge on a dynamite-gated lead patch (#143 guard 2, reported; expected at least ${PAYOFF_FLOOR}x)`,
+  `### The payoff guard: the smallest breaking charge on a dynamite-gated lead patch (#143 guard 2, reported; expected at least ${PAYOFF_FLOOR}x)`,
   [
-    '| planet | band | lead | minCharge | cells freed | value freed | price | payoff | share-cap payoff (info) |',
+    '| planet | band | lead | charge | cells freed | value freed | price | payoff | share-cap payoff (info) |',
     '| --- | --- | --- | --- | --- | --- | --- | --- | --- |',
     ...payoffs.map(
       (row) =>
@@ -251,7 +251,7 @@ interface GateTableAnswer {
     tier: number
     weightBp: number
     signature: boolean
-    gate: { kind: string; minCharge?: number }
+    gate: { kind: string; tier?: number }
   }[][]
   problems?: string[]
 }
@@ -352,7 +352,7 @@ function gateTableOnScenarioSeed(planet: number): GatedMixBands {
       tier,
       weightBp,
       signature,
-      minCharge: gate.kind === 'dynamite' ? (gate.minCharge ?? null) : null,
+      gateTier: gate.kind === 'dynamite' ? (gate.tier ?? null) : null,
     })),
   )
 }

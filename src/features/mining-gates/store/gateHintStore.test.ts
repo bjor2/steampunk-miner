@@ -15,8 +15,8 @@ const shell: DomainEvent = {
   tier: 21,
   gateKind: 'dynamite',
   outcome: 'refused',
-  required: 'size:1',
-  have: 'size:0',
+  required: 'type:1',
+  have: 'price:1250',
   playerId: 'p1',
   tick: 300,
   seq: 9,
@@ -38,7 +38,7 @@ describe('gate hint store', () => {
     useGateHintStore.getState().observeGateEvents([shell], 'p1')
     const { board, tick } = useGateHintStore.getState()
     expect(chipShownAt(board, tick)?.line).toBe(
-      'Ledger: dynamite size 1 required, the miner carries none.',
+      'Ledger: a type 1 charge breaks this rock, 1,250 at the dock.',
     )
     expect(heard.map((request) => request.cueId)).toEqual(['mining-gates.shell-knock'])
   })

@@ -353,12 +353,22 @@ export interface BlastingChargeRules {
   rackStart: number
   rackMax: number
   rackSlotCostCurveId: string
-  /** No tile harder than this band's rock of the current planet breaks; core tiles never do. */
-  hardnessCapBand: number
   /** The bot blasts a tile whose drill time would be over this many ticks (4x the old 24-tick floor). */
   botBlastThresholdTicks: number
   radiusTrack: BlastRadiusTrack
+  gateTiers: BlastGateTiers
   sizes: ChargeSizeLadder
+}
+
+/**
+ * The gate tiers of dynamite-gated rock (D4 #863, the HS rows on #647): tier `t` is laid from
+ * planet `fromPlanet[t - 1]` (1 and 2 from P7, 3 from P9). A gated cell of lead `newestTierLead`
+ * takes the newest tier laid, one of a lower lead that many tiers less, never above its band.
+ * World content, so planet-gated; the charges that break it are sold on price alone.
+ */
+export interface BlastGateTiers {
+  fromPlanet: readonly number[]
+  newestTierLead: number
 }
 
 /**
@@ -376,14 +386,12 @@ export type ChargeGateTiers = readonly number[]
 
 /**
  * The dynamite size ladder (#143 numbers with amendments 2 and 3, #153 design, the #149 locks):
- * size n (1 first) has `radius[n - 1]` tiles, opens on planet `unlockFrom + unlockEvery * (n - 1)`,
- * costs `oreUnitsBase * oreUnitsRatio^(n - 1)` ore units of band `oreUnitsBand`, keeps
+ * size n (1 first) has `radius[n - 1]` tiles, is sold on every planet (D4 #863: price only), costs `oreUnitsBase * oreUnitsRatio^(n - 1)` ore units of band `oreUnitsBand`, keeps
  * `keptBase * keptRatio^(n - 1)` of the ordinary ore it breaks, takes `rackSlots[n - 1]` rack
  * slots, and blows `fuseTicks[n - 1]` ticks after planting; a size past the fuse list is remote
  * (the plunger, #149) and is disarmed `remoteDisarmTicks` after planting. A bare blast of size n
  * collapses each bare rim block it rolls under `collapseBp[n - 1]` (D2 #861, rows of D6 #865). From size
- * `lethalCoreFrom` the inner `lethalCoreFraction` of the radius wrecks the planter. A dynamite-gated
- * cell of lead `newestSizeLead` asks the newest open size, one of a lower lead that many sizes less.
+ * `lethalCoreFrom` the inner `lethalCoreFraction` of the radius wrecks the planter.
  */
 export interface ChargeSizeLadder {
   /** The one radius ladder (Systems pin on #149, 12 rows D6 #865): whole half-tiles, no formula. */
@@ -392,8 +400,6 @@ export interface ChargeSizeLadder {
   type: readonly number[]
   /** Per type, the gate tiers its blast breaks (`breaksGate[]`, D4 #863 reads it). */
   breaksGateByType: readonly ChargeGateTiers[]
-  unlockFrom: number
-  unlockEvery: number
   oreUnitsBand: number
   oreUnitsBase: BigStat
   oreUnitsRatio: BigStat
@@ -403,7 +409,6 @@ export interface ChargeSizeLadder {
   fuseTicks: readonly number[]
   lethalCoreFrom: number
   lethalCoreFraction: BigStat
-  newestSizeLead: number
   remoteDisarmTicks: number
   /** Per size, the basis points out of 10000 a bare rim block's roll collapses under (D6 #865). */
   collapseBp: readonly number[]
@@ -443,7 +448,8 @@ export interface Economy {
    * The economy rules these rows are (TD on #894): it moves with every change of a price row, so
    * golden runs and run metadata record it and a run replays only under the rows that made it. A
    * save stores no prices, so a loaded save simply buys at the rows of the build that loads it.
-   * 4 is #894's casing rise (`kCasing` x10, the grade base x5).
+   * 4 is #894's casing rise (`kCasing` x10, the grade base x5). 5 is D4 #863's money-only
+   * dynamite: no planet opens a charge size, no hardness cap on a blast, gated rock by tier.
    */
   economyRulesVersion: number
   ore: {

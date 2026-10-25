@@ -29,15 +29,14 @@ function liveChargeOn(planet: number, size: number): AuthorityState {
 const DETONATE = { kind: 'submit', intent: { type: 'dynamite.detonate_charge', payload: {} } }
 
 describe('dynamite plunger: the plant key', () => {
-  it('detonates the live charge from P22, inside the interlock too, so the clunk is logged', () => {
+  it('detonates the live charge, inside the interlock too, so the clunk is logged', () => {
     expect(reactionToPress('plant_charge', drivingOn(liveChargeOn(22, 6)))).toEqual(DETONATE)
     expect(reactionToPress('plant_charge', drivingOn(liveChargeOn(25, 7)))).toEqual(DETONATE)
   })
 
-  it('offers no Detonate before P22, so a press with a charge live does nothing', () => {
-    expect(reactionToPress('plant_charge', drivingOn(liveChargeOn(19, 5)))).toEqual({
-      kind: 'none',
-    })
+  it('offers Detonate on every planet, P1 too: no planet opens the plunger (D4 #863)', () => {
+    expect(reactionToPress('plant_charge', drivingOn(liveChargeOn(1, 7)))).toEqual(DETONATE)
+    expect(reactionToPress('plant_charge', drivingOn(liveChargeOn(19, 5)))).toEqual(DETONATE)
   })
 
   it('does nothing with no live charge, and still plants whatever the kernel can plant', () => {

@@ -1,9 +1,10 @@
 /**
- * The dynamite ladder's payoff guard (#143 guard 2, the GD lock and Systems on K8 #218): what a
- * charge of `minCharge` size frees from a dynamite-gated lead patch, over its price. Vertical's
- * patch model, as the GD lock writes it:
+ * The dynamite ladder's payoff guard (#143 guard 2, the GD lock and Systems on K8 #218): what the
+ * smallest charge that breaks a dynamite-gated lead patch frees, over its price. Vertical's patch
+ * model, as the GD lock writes it, with D4 #863's gate tiers in place of `minCharge`:
  *
- * - `mc = minChargeFor({lead, band}, p) = clamp(s(p) - 2 + lead, 1, band)`
+ * - `mc = smallestSizeBreaking(gateTierFor({lead, band}, p))`: the first size of the first type
+ *   whose `breaksGate[]` holds the cell's tier
  * - `valueFreed = min(M_b, inRadiusCount(r(mc))) * V(t(p, b) + lead)`, `M_b` the band's mean patch
  *   cells (`patchMeanCells`, #42). Kept ordinary ore is left out, so the figure is conservative.
  * - `price` is one charge of size `mc` (`chargePrice`, through `bandOrePriceAt`).
@@ -19,7 +20,12 @@
  */
 import { baseTilesSqOf } from '../authority/charges/blastDisc'
 import { inRadiusCount } from '../authority/charges/blastFront'
-import { chargePrice, chargeRadiusMm, minChargeFor } from '../economy/chargeSizes'
+import {
+  chargePrice,
+  chargeRadiusMm,
+  gateTierFor,
+  smallestSizeBreaking,
+} from '../economy/chargeSizes'
 import { oreSalePrice, oreTier } from '../economy/oreEconomy'
 import { cmp, div, fromSafeInteger, mul, type Money } from '../money'
 import { freshPlanetParamsFor, type PlanetParams } from '../world/planetParams'
@@ -40,7 +46,7 @@ export interface ChargePayoff {
   planetIndex: number
   band: number
   lead: number
-  /** `minCharge` for this lead cell. */
+  /** The smallest charge that breaks this lead cell's gate tier. */
   size: number
   /** The gated patch cells inside the radius. */
   cellsFreed: number
@@ -62,7 +68,7 @@ export function chargePayoffsOf(worldSeed: number): ChargePayoff[] {
 }
 
 export function chargePayoffOf(params: PlanetParams, band: number, lead: number): ChargePayoff {
-  const size = minChargeFor({ lead, band }, params.planetIndex)
+  const size = smallestSizeBreaking(gateTierFor({ lead, band }, params.planetIndex))
   const radiusCells = inRadiusCount(baseTilesSqOf(chargeRadiusMm(size)))
   const cellsFreed = Math.min(params.patchMeanCells[band - 1], radiusCells)
   const leadValue = oreSalePrice(oreTier(params.planetIndex, band) + lead)

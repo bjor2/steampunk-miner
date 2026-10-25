@@ -3,6 +3,12 @@ import { ceilMilli, cmp, fromCanonical, mul, toCanonical, type BigStat } from '.
 import { bandOrePriceAt, bandOreWorthAt } from './bandOreCost'
 import {
   breaksGateOf,
+  chargeTypeBreaking,
+  doesSizeBreakGate,
+  doesTypeBreakGate,
+  gateTierFor,
+  newestGateTierOn,
+  smallestSizeBreaking,
   chargeCostOf,
   chargePrice,
   chargeRadiusMm,
@@ -14,14 +20,10 @@ import {
   isInChargeRadius,
   isInLethalCore,
   hasLethalCore,
-  isSizeLockedOn,
   keptFractionOf,
-  largestSizeOn,
-  minChargeFor,
   rackSlotsOf,
   remoteDisarmTicks,
   selfHitScaleOf,
-  sizeUnlockPlanet,
 } from './chargeSizes'
 import { readEconomy } from './readEconomy'
 import economyFile from './economy.json'
@@ -75,23 +77,6 @@ describe('charge size ladder', () => {
       [1, 2, 3],
       [1, 2, 3],
     ])
-  })
-
-  it('opens size n on planet 7 + 3(n - 1), size 12 on planet 40', () => {
-    expect(SIZES.map(sizeUnlockPlanet)).toEqual([7, 10, 13, 16, 19, 22, 25, 28, 31, 34, 37, 40])
-  })
-
-  it('names the largest open size of a planet, none before planet 7 and 12 from planet 40 on', () => {
-    expect([6, 7, 9, 10, 22, 33, 34, 39, 40, 500].map(largestSizeOn)).toEqual([
-      0, 1, 1, 2, 6, 9, 10, 11, 12, 12,
-    ])
-  })
-
-  it('keeps a size closed before its planet, and never size 1, the shipped charge', () => {
-    expect(isSizeLockedOn(2, 9)).toBe(true)
-    expect(isSizeLockedOn(2, 10)).toBe(false)
-    expect(isSizeLockedOn(10, 33)).toBe(true)
-    expect(isSizeLockedOn(1, 1)).toBe(false)
   })
 
   it('takes 1, 1, 1, 2, 2, 3, 4, 5, 6, 8, 8 and 8 rack slots, so sizes 10 to 12 fill a full rack', () => {
@@ -186,7 +171,6 @@ describe('charge size ladder', () => {
       type: 2,
       breaksGate: [1, 2],
       radiusMm: 13000,
-      unlockPlanet: 25,
       price: chargePrice(7, 1, 25),
       keptFraction: keptFractionOf(7),
       rackSlots: 4,
@@ -201,21 +185,66 @@ describe('charge size ladder', () => {
   })
 })
 
-describe('minCharge of a dynamite-gated cell', () => {
-  it('asks size 1 of every gated cell on planet 7', () => {
-    expect(minChargeFor({ lead: 1, band: 5 }, 7)).toBe(1)
-    expect(minChargeFor({ lead: 2, band: 5 }, 7)).toBe(1)
+describe('gate tiers of blast-only rock (D4 #863)', () => {
+  it('lays tiers 1 and 2 from planet 7 and tier 3 from planet 9, none before', () => {
+    expect([1, 6, 7, 8, 9, 40, 5_000_000].map(newestGateTierOn)).toEqual([0, 0, 2, 2, 3, 3, 3])
+    expect(gateTierFor({ lead: 1, band: 5 }, 6)).toBe(0)
   })
 
-  it('asks one size behind the newest of a +1 cell and the newest of a +2 cell', () => {
-    expect(minChargeFor({ lead: 1, band: 5 }, 13)).toBe(2)
-    expect(minChargeFor({ lead: 2, band: 5 }, 13)).toBe(3)
+  it('gives a +1 cell one tier behind the newest and a +2 cell the newest', () => {
+    expect(gateTierFor({ lead: 1, band: 5 }, 7)).toBe(1)
+    expect(gateTierFor({ lead: 2, band: 5 }, 7)).toBe(2)
+    expect(gateTierFor({ lead: 1, band: 5 }, 9)).toBe(2)
+    expect(gateTierFor({ lead: 2, band: 5 }, 9)).toBe(3)
   })
 
-  it('never asks more than the cell band, so sizes 6 to 12 are never a toll', () => {
-    expect(minChargeFor({ lead: 2, band: 5 }, 40)).toBe(5)
-    expect(minChargeFor({ lead: 2, band: 4 }, 40)).toBe(4)
-    expect(minChargeFor({ lead: 1, band: 1 }, 40)).toBe(1)
+  it('never lays a tier above the newest or the cell band, nor below 1', () => {
+    expect(gateTierFor({ lead: 4, band: 5 }, 40)).toBe(3)
+    expect(gateTierFor({ lead: 2, band: 2 }, 40)).toBe(2)
+    expect(gateTierFor({ lead: 0, band: 5 }, 7)).toBe(1)
+  })
+
+  it('breaks tier 1 with every type, tier 2 from type 2 and tier 3 with type 3 alone', () => {
+    expect([1, 2, 3].map(chargeTypeBreaking)).toEqual([1, 2, 3])
+    expect([1, 2, 3].map(smallestSizeBreaking)).toEqual([1, 5, 9])
+    expect(SIZES.filter((size) => doesSizeBreakGate(size, 3))).toEqual([9, 10, 11, 12])
+    expect([1, 2, 3].map((type) => doesTypeBreakGate(type, 2))).toEqual([false, true, true])
+    expect(() => chargeTypeBreaking(4)).toThrow(RangeError)
+  })
+
+  it('sells every size on every planet: no size column opens by planet', () => {
+    const sizes = economyFile.blastingCharges.sizes
+    expect(sizes).not.toHaveProperty('unlockFrom')
+    expect(sizes).not.toHaveProperty('unlockEvery')
+    expect(sizes).not.toHaveProperty('newestSizeLead')
+  })
+})
+
+describe('gate tier data', () => {
+  function economyWithGateTiers(gateTiers: Record<string, unknown>) {
+    return { ...economyFile, blastingCharges: { ...economyFile.blastingCharges, gateTiers } }
+  }
+
+  it('refuses a tier laid before the tier below it', () => {
+    const problems = readEconomy(
+      economyWithGateTiers({ fromPlanet: [7, 9, 8], newestTierLead: 2 }),
+    ).problems
+    expect(problems).toContain(
+      'blastingCharges.gateTiers.fromPlanet must never lay a tier before the tier below it',
+    )
+  })
+
+  it('refuses a laid tier no charge type breaks, and a type naming a tier never laid', () => {
+    const fourTiers = readEconomy(
+      economyWithGateTiers({ fromPlanet: [7, 7, 9, 12], newestTierLead: 2 }),
+    ).problems
+    expect(fourTiers).toContain(
+      'blastingCharges.gateTiers.every tier must be broken by some charge type',
+    )
+    const twoTiers = readEconomy(
+      economyWithGateTiers({ fromPlanet: [7, 7], newestTierLead: 2 }),
+    ).problems
+    expect(twoTiers).toContain('blastingCharges.gateTiers.breaksGateByType names an unlaid tier')
   })
 })
 

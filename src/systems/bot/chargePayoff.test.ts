@@ -25,11 +25,12 @@ describe('charge payoff guard (#143 guard 2, GD lock on K8 #218)', () => {
     expect(new Set(rows.map((row) => row.band))).toEqual(new Set([3, 4, 5]))
   })
 
-  it('asks for the minCharge of the lead cell, never a size above its band', () => {
+  it("asks for the smallest charge whose type breaks the lead cell's gate tier (D4 #863)", () => {
     const params = planetParamsFor(WORLD_SEED, 22)
     expect(chargePayoffOf(params, 5, 1).size).toBe(5)
-    expect(chargePayoffOf(params, 3, 2).size).toBe(3)
-    expect(chargePayoffOf(planetParamsFor(WORLD_SEED, 7), 5, 2).size).toBe(1)
+    expect(chargePayoffOf(params, 3, 2).size).toBe(9)
+    expect(chargePayoffOf(planetParamsFor(WORLD_SEED, 7), 5, 1).size).toBe(1)
+    expect(chargePayoffOf(planetParamsFor(WORLD_SEED, 7), 5, 2).size).toBe(5)
   })
 
   it("frees no more cells than the band's mean patch, nor than the radius holds", () => {
@@ -40,7 +41,7 @@ describe('charge payoff guard (#143 guard 2, GD lock on K8 #218)', () => {
     expect(small.cellsFreed).toBe(inRadiusCount(baseTilesSqOf(chargeRadiusMm(small.size))))
   })
 
-  it('sells the freed cells at the lead tier and charges one minCharge at its price', () => {
+  it('sells the freed cells at the lead tier and charges one breaking charge at its price', () => {
     const params = planetParamsFor(WORLD_SEED, 19)
     const row = chargePayoffOf(params, 4, 2)
     const value = mul(fromSafeInteger(row.cellsFreed), oreSalePrice(oreTier(19, 4) + 2))

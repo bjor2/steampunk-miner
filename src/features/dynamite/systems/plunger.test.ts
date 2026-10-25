@@ -21,14 +21,11 @@ function plantedThenBackedOff(planet: number, size: number, tiles: number) {
   return blaster
 }
 
-describe('dynamite plunger: gating (#153 amendment 2, #189 lock)', () => {
-  it('is refused before remote_detonator opens at P22, and the fuse still blows the charge', () => {
-    const { session, wall } = plantedThenBackedOff(19, 5, 12)
-    expect(session.submit(3, DETONATE_INTENT)).toMatchObject([
-      { type: 'CommandRejected', reason: 'dynamite.detonator_locked' },
-    ])
-    expect(ofType(session.advanceTo(181), 'ChargeDetonated')).toEqual([
-      expect.objectContaining({ ...wall, size: 5, by: 'fuse' }),
+describe('dynamite plunger: gating (#153 amendment 2, #189 lock, D4 #863)', () => {
+  it('fires a remote charge on planet 1: no planet opens the plunger, price is the gate (D4 #863)', () => {
+    const { session, wall } = plantedThenBackedOff(1, 7, 16)
+    expect(ofType(session.submit(3, DETONATE_INTENT), 'ChargeDetonated')).toEqual([
+      expect.objectContaining({ ...wall, size: 7, by: 'plunger' }),
     ])
   })
 

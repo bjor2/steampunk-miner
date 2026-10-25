@@ -19,7 +19,6 @@ import {
   sizedBlasterOn,
 } from '../../systems/authority/charges/chargeFixtures'
 import type { DomainEvent } from '../../systems/authority/domainEvent'
-import { sizeUnlockPlanet } from '../../systems/economy/chargeSizes'
 import {
   chargeBlastKickOf,
   SHIPPED_CHARGE_BLAST_KICK,
@@ -50,9 +49,12 @@ import { blastVfxSeedOf } from './systems/render/blastVfxSeed'
 // `blast_resolved` line stays as it was. The slice is presentation only, so the world it blasts
 // is the same with it or without it.
 
-/** A fused charge of `size` planted on its unlock planet, run until its blast has resolved. */
+/** Every size is sold on every planet (D4 #863); the blasts run on the planet the log names. */
+const BLAST_PLANET = 34
+
+/** A fused charge of `size` planted on the blast planet, run until its blast has resolved. */
 function fusedBlastEvents(size: number): DomainEvent[] {
-  const blaster = sizedBlasterOn(sizeUnlockPlanet(size), size)
+  const blaster = sizedBlasterOn(BLAST_PLANET, size)
   plantSized(blaster.session, blaster, size, 1)
   blaster.session.advanceTo(400)
   return blaster.session.events()
@@ -60,7 +62,7 @@ function fusedBlastEvents(size: number): DomainEvent[] {
 
 /** A remote size-10 charge fired by the plunger from well outside its interlock. */
 function plungedSize10Events(): DomainEvent[] {
-  const blaster = sizedBlasterOn(sizeUnlockPlanet(10), 10)
+  const blaster = sizedBlasterOn(BLAST_PLANET, 10)
   const { session, wall } = blaster
   plantSized(session, blaster, 10, 1)
   session.submit(2, poseOnTile({ tx: wall.tx - 26, ty: wall.ty }))

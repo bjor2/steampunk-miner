@@ -4,15 +4,16 @@
  * every problem listed.
  *
  * - `mining-gates.economy.json` (Systems): the planet gate content starts on (the GD lock: P7, with
- *   the dynamite gate), #142's 15% guard in basis points of a band's ore value, the extractor
- *   cadence `first + every * k`, the extractor price in band-5 ore at its own planet, and the
- *   endless signature cycle.
+ *   the dynamite gate), #142's 15% guard in basis points of a band's ore value, the dynamite gate's
+ *   first band and its cap on the band's ore weight (D4 #863, the HS rows on #647: never band 0,
+ *   at most 10% of a band), the extractor cadence `first + every * k`, the extractor price in
+ *   band-5 ore at its own planet, and the endless signature cycle.
  * - `rigs.json` (Progression & Content): the five extractors in arrival order, each with the gate
  *   class it opens, what a cell of that class does without it (`refused` or `lost`), its mount, its
  *   tree node and its player text.
  *
  * The dense floor is the kernel's `drill.denseScratchFloor` (GD lock: kernel economy.json), and a
- * dynamite gate's charge size is #143's `minChargeFor` from the dynamite index.
+ * dynamite gate's tier is D4's `gateTierFor` from the dynamite index.
  */
 import {
   createFieldReader,
@@ -51,6 +52,10 @@ export interface Rig {
 export interface GateRows {
   gateContentFromPlanet: number
   maxGatedValueShareBp: number
+  /** The first band a dynamite gate is laid in; shallower its cells are dense. */
+  dynamiteGateFromBand: number
+  /** Basis points of a band's ore weight dynamite-gated cells may hold at most. */
+  maxDynamiteBandShareBp: number
   rigFirstPlanet: number
   rigEveryPlanets: number
   rigPrice: BandOreCost
@@ -73,9 +78,15 @@ export function readGateRows(
   const gates = reader.object('miningGates', reader.object('economy', economy).miningGates)
   const availability = reader.object('miningGates.rigAvailability', gates.rigAvailability)
   const cycle = reader.object('miningGates.endlessSignatureCycle', gates.endlessSignatureCycle)
+  const dynamite = reader.object('miningGates.dynamiteGate', gates.dynamiteGate)
   const rows: GateRows = {
     gateContentFromPlanet: reader.safeInteger('gateContentFromPlanet', gates.gateContentFromPlanet),
     maxGatedValueShareBp: reader.safeInteger('maxGatedValueShareBp', gates.maxGatedValueShareBp),
+    dynamiteGateFromBand: reader.safeInteger('dynamiteGate.fromBand', dynamite.fromBand),
+    maxDynamiteBandShareBp: reader.safeInteger(
+      'dynamiteGate.maxBandShareBp',
+      dynamite.maxBandShareBp,
+    ),
     rigFirstPlanet: reader.safeInteger('rigAvailability.first', availability.first),
     rigEveryPlanets: reader.safeInteger('rigAvailability.every', availability.every),
     rigPrice: readBandOreCost(reader, 'miningGates.rigPrice', gates.rigPrice),

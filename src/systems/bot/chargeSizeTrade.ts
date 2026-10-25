@@ -1,7 +1,7 @@
 /**
  * The dynamite ladder's blast-or-drill guard (#143 guard 1 and amendments 2 and 3, #153 amendment
  * point 4, K8 #218), beside the shipped charge's trade (`blastTrade.ts`): for a charge of each
- * size, on the planet it opens on and on planet 40, in each band, against a drill taking 24 and
+ * size, on planet 1, where every size is sold since D4 #863, and on planet 40, in each band, against a drill taking 24 and
  * 45 ticks a tile, the net ore money of one blast (the kept share of the ore in its radius less
  * the charge's price) over its cycle, against the drill's ore money a tick on the same ground.
  *
@@ -24,7 +24,6 @@ import {
   chargeSizeCount,
   fuseTicksOf,
   keptFractionOf,
-  sizeUnlockPlanet,
 } from '../economy/chargeSizes'
 import { oreSalePrice, oreTier } from '../economy/oreEconomy'
 import { onCurveLevels, vehicleStatsAt } from '../economy/vehicleStats'
@@ -34,8 +33,11 @@ import { moveTicks } from './botWorld'
 
 /** The drill speeds the guard compares at (#153 amendment point 4): the floor and a slow tile. */
 export const GUARD_DRILL_TICKS_PER_TILE: readonly number[] = [24, 45]
+/** Every size is sold from planet 1 (D4 #863: price only), so every size is judged there. */
+export const GUARD_FIRST_PLANET = 1
 /** The last authored planet (#143 amendment 2): every size is judged there too. */
 export const GUARD_LAST_PLANET = 40
+const GUARD_PLANETS = [GUARD_FIRST_PLANET, GUARD_LAST_PLANET]
 const BANDS = [1, 2, 3, 4, 5]
 const BASIS_POINTS = 10000
 const ONE_CHARGE = 1
@@ -57,10 +59,10 @@ export interface ChargeSizeTrade {
   patchBlastMoneyPerTick: Money
 }
 
-/** Every size at its unlock planet and planet 40, every band, at both drill speeds. */
+/** Every size on planets 1 and 40, every band, at both drill speeds. */
 export function chargeSizeTradesOf(worldSeed: number): ChargeSizeTrade[] {
   return chargeSizesUpTo(chargeSizeCount()).flatMap((size) =>
-    guardPlanetsOf(size).flatMap((planetIndex) =>
+    GUARD_PLANETS.flatMap((planetIndex) =>
       tradesOnPlanet(freshPlanetParamsFor(worldSeed, planetIndex), size),
     ),
   )
@@ -97,10 +99,6 @@ export function isBlastAboveDrill(trade: ChargeSizeTrade): boolean {
 /** Reported, not judged: centred on a full patch, a blast earns more a tick than the drill. */
 export function isPatchBlastAboveDrill(trade: ChargeSizeTrade): boolean {
   return cmp(trade.patchBlastMoneyPerTick, trade.patchDrillMoneyPerTick) > 0
-}
-
-function guardPlanetsOf(size: number): number[] {
-  return [sizeUnlockPlanet(size), GUARD_LAST_PLANET]
 }
 
 function tradesOnPlanet(params: PlanetParams, size: number): ChargeSizeTrade[] {

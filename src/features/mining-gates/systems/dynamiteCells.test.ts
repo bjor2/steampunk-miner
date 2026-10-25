@@ -29,7 +29,7 @@ function histogramOf(bands: [string, number][][]): PlanetHistogram {
   }
 }
 
-const SHELL: CellGate = { kind: 'dynamite', minCharge: 1 }
+const SHELL: CellGate = { kind: 'dynamite', tier: 1 }
 const NONE: CellGate = { kind: 'none' }
 
 describe('mining gates: dynamite cells per seed (GD ruling on ticket 237)', () => {

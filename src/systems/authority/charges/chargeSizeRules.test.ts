@@ -33,9 +33,11 @@ describe('charge sizes: planting (K8 #218)', () => {
     ])
   })
 
-  it('refuses a size before the planet it opens on', () => {
-    const { session, stand, wall } = sizedBlasterOn(9, 2)
-    expect(plantSized(session, { stand, wall }, 2, 1)).toMatchObject([{ reason: 'size_locked' }])
+  it('plants every size on every planet, planet 1 too: no size opens by planet (D4 #863)', () => {
+    const { session, stand, wall } = sizedBlasterOn(1, 9)
+    expect(plantSized(session, { stand, wall }, 9, 1)).toMatchObject([
+      { type: 'ChargePlanted', size: 9 },
+    ])
   })
 
   it('refuses a size off the ladder', () => {

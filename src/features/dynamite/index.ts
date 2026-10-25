@@ -6,7 +6,9 @@
 export const DYNAMITE_SLICE_ID = 'dynamite'
 export {
   chargeSpec,
-  minChargeFor,
+  chargeTypeBreaking,
+  doesSizeBreakGate,
+  gateTierFor,
   type ChargeSpec,
   type DynamiteGatedCell,
 } from '../../systems/economy/chargeSizes'
@@ -17,5 +19,5 @@ export {
   type DynamiteSize,
 } from './systems/dynamiteSizes'
 export { DETONATE_INTENT } from './systems/dynamiteCommands'
-export { interlockReachMm, isDetonatorOpen } from './systems/plunger'
+export { interlockReachMm } from './systems/plunger'
 export { liveChargeRingsOf, type ChargeRings } from './systems/chargeRings'

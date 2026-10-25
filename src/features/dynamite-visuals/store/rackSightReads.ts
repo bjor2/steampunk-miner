@@ -8,7 +8,6 @@ import { readAuthorityState } from '../../../store/authorityLink'
 import { useGameStore } from '../../../store/gameStore'
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import { UNOWNED_RADIUS_LEVEL } from '../../../systems/authority/charges/blastDisc'
-import { isDetonatorOpen } from '../../dynamite'
 import { rackPartIdsOf, type RackSight } from '../systems/render/rackLook'
 
 export function readRackSight(): RackSight {
@@ -25,8 +24,6 @@ function rackSightOf(state: AuthorityState, playerId: string): RackSight {
   const { charges } = vehicleOf(state, playerId)
   return {
     isRackMounted: charges.isRackMounted,
-    planetIndex: state.planet.index,
-    isDetonatorOpen: isDetonatorOpen(state),
     carriedBySize: charges.carriedBySize,
     radiusLevel: UNOWNED_RADIUS_LEVEL,
     isBlastCasingOwned: false,

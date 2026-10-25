@@ -101,14 +101,14 @@ describe('HUD: blasting charges (#109)', () => {
 })
 
 describe('upgrade bay model: the charge rows (#109)', () => {
-  it('shows no charge rows before charges are sold on planet 7 (#90: nothing before)', () => {
-    expect(upgradeBayOf(atUpgradeBayOn(6)).charges).toBeNull()
+  it('shows the charge rows on planet 1: every size, price the only gate (D4 #863)', () => {
+    expect(upgradeBayOf(atUpgradeBayOn(1)).charges.restock).toHaveLength(12)
   })
 
   it('offers the rack with three charges on planet 7 at two band-5 units each', () => {
     const charges = upgradeBayOf(atUpgradeBayOn(7)).charges
-    expect(charges?.restock).toHaveLength(1)
-    expect(charges?.restock[0]).toMatchObject({
+    expect(charges.restock).toHaveLength(12)
+    expect(charges.restock[0]).toMatchObject({
       iconId: 'icon-blasting-charges',
       label: 'Charges',
       levelText: '0/3',
@@ -127,7 +127,7 @@ describe('upgrade bay model: the charge rows (#109)', () => {
   it('says the rack is full after a restock, its Buy carrying rack_full', () => {
     const session = atUpgradeBayOn(7)
     session.submit(2, restockChargesCommand(1, 3))
-    expect(upgradeBayOf(session).charges?.restock[0]).toMatchObject({
+    expect(upgradeBayOf(session).charges.restock[0]).toMatchObject({
       levelText: '3/3',
       effectText: 'rack full',
       buy: { label: 'Restock', reason: 'rack_full' },
@@ -137,16 +137,21 @@ describe('upgrade bay model: the charge rows (#109)', () => {
   it('says top size at the last slot, with no price, and carries max_level', () => {
     const session = atUpgradeBayOn(7)
     for (let slot = 0; slot < 5; slot += 1) session.submit(2, buyChargeRackSlotCommand(CLICK_CHAIN))
-    expect(upgradeBayOf(session).charges?.rack).toMatchObject({
+    expect(upgradeBayOf(session).charges.rack).toMatchObject({
       levelText: '8 (top)',
       cost: null,
       buy: { reason: 'max_level' },
     })
   })
 
-  it('offers a row per open size, size 2 from planet 10, under its own ids (#218)', () => {
-    const rows = upgradeBayOf(atUpgradeBayOn(10)).charges?.restock
-    expect(rows?.map((row) => row.label)).toEqual(['Charges', 'Charges size 2'])
+  it('offers a row per size, smallest first, each under its own ids (#218, D4 #863)', () => {
+    const rows = upgradeBayOf(atUpgradeBayOn(10)).charges.restock
+    expect(rows.map((row) => row.label).slice(0, 3)).toEqual([
+      'Charges',
+      'Charges size 2',
+      'Charges size 3',
+    ])
+    expect(rows.at(-1)?.label).toBe('Charges size 12')
     expect(rows?.[1]).toMatchObject({
       key: 'charges-2',
       levelText: '0/3',
@@ -158,7 +163,7 @@ describe('upgrade bay model: the charge rows (#109)', () => {
   it('offers only the size-4 charges that fit the free slots (#218)', () => {
     const session = atUpgradeBayOn(16)
     session.submit(2, restockChargesCommand(1, 1))
-    expect(upgradeBayOf(session).charges?.restock[3]).toMatchObject({
+    expect(upgradeBayOf(session).charges.restock[3]).toMatchObject({
       label: 'Charges size 4',
       levelText: '0/1',
       effectText: '+1 charges',
@@ -166,10 +171,11 @@ describe('upgrade bay model: the charge rows (#109)', () => {
     })
   })
 
-  it('visits Restock and the rack slot after the Guns row in focus order', () => {
+  it('visits every Restock and then the rack slot after the Guns row in focus order', () => {
     const ids = upgradeBayOf(atUpgradeBayOn(7)).focusStops.map((stop) => stop.id)
     const restockAt = ids.indexOf(UI_IDS.upgradebayChargesRestock)
     expect(ids.indexOf(UI_IDS.upgradebayGunsBuy)).toBeLessThan(restockAt)
-    expect(ids[restockAt + 1]).toBe(UI_IDS.upgradebayRackBuy)
+    expect(ids[restockAt + 1]).toBe(UI_ID_TEMPLATES.upgradebayChargeSizeRestock(2))
+    expect(ids[restockAt + 12]).toBe(UI_IDS.upgradebayRackBuy)
   })
 })

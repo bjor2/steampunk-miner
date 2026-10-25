@@ -38,7 +38,7 @@ describe('mining gates: debug actions', () => {
       expect.objectContaining({
         family: 'fossil',
         lead: 1,
-        gate: { kind: 'dynamite', minCharge: 1 },
+        gate: { kind: 'dynamite', tier: 1 },
       }),
     )
     expect(actions.gateTableOf(0, 83921).ok).toBe(false)

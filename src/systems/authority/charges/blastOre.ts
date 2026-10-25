@@ -1,7 +1,7 @@
 /**
  * What a charge's blast breaks and pays (spec #109 "Yield trade" and "Limits", numbers): every
- * tile within the radius that is no harder than the planet's band-5 rock and not core loses its
- * unlined ground, lined rings hold, and of each tier's ore units the blast broke
+ * tile within the radius that is not core loses its unlined ground however hard it is (D4 #863
+ * deleted the band-5 hardness cap), lined rings hold, and of each tier's ore units the blast broke
  * `floor(n * k + d)` reach the hold, `k` the charge size's kept fraction (0.4 at size 1, K8 #218)
  * and `d` drawn from the blast tile so a share `k` arrives on average. The
  * rest is lost and its sale value is what `blast_resolved.oreValueLost` reports. A kept unit
@@ -16,11 +16,10 @@
  * blast keeps exactly what one break of every tile would.
  */
 import { hashCell } from '../../cellRandom'
-import { blastHardnessCap, keptBlastOreUnits } from '../../economy/blastingCharges'
-import { groundHardnessInSystem } from '../../starMap/systemPlanetParams'
+import { keptBlastOreUnits } from '../../economy/blastingCharges'
 import { chargeReachTiles, isInChargeRadius } from '../../economy/chargeSizes'
 import { oreSalePrice } from '../../economy/oreEconomy'
-import { add, cmp, div, fromSafeInteger, mul, ZERO_MONEY, type Money } from '../../money'
+import { add, div, fromSafeInteger, mul, ZERO_MONEY, type Money } from '../../money'
 import { MM_PER_METRE } from '../../../constants/physics'
 import { BLAST_VISITS_PER_TICK } from '../../../constants/terrainBudget'
 import { blastGround, type GroundBlast, type IsBlastBreakable } from '../../world/blastGround'
@@ -32,7 +31,7 @@ import type { AuthorityState } from '../authorityState'
 import { chainEffects, type RuleEffect } from '../commandRule'
 import type { DomainEventBody } from '../domainEvent'
 import { groundChangedEventsOf } from '../groundChangedEvents'
-import { collectOreUnit, hardnessOfTile, kindNameOf } from '../groundDrill'
+import { collectOreUnit, kindNameOf } from '../groundDrill'
 import { minedOreOf, type MinedOre } from '../minedOre'
 import { groundTilesSqOf } from './blastDisc'
 import { frontWalkFrom, parkFrontWalk } from './blastFront'
@@ -89,7 +88,7 @@ export function breakBlastSlice(
   const walked: WalkedRing = { ring: null }
   const tiles = frontTilesFrom(live, params, walked)
   const limits = { maxCleared, maxVisited: BLAST_VISITS_PER_TICK }
-  const ground = blastGround(state.world, params, tiles, isBreakableOn(params, gateOf), limits)
+  const ground = blastGround(state.world, params, tiles, isBreakableOn(gateOf), limits)
   const ores = blastedOreOf(params, ground.yielded, gateOf)
   const tiers = slicedTiersOf(ores.shared, live, ditherOf(state, live))
   const world = { ...state, world: ground.world }
@@ -173,22 +172,16 @@ function ringReaching(ring: FrontRing | null, distanceSq: number): FrontRing {
   return { innerSq: ring?.innerSq ?? distanceSq, outerSq: distanceSq }
 }
 
-/** A gated cell breaks as its gate says; any other as before, under the planet's hardness cap. */
-function isBreakableOn(params: PlanetParams, gateOf: BlastGateOf): IsBlastBreakable {
-  const isBreakableRock = isBreakableRockOn(params)
+/** A gated cell breaks as its gate says; any other whenever it is ground and not core. */
+function isBreakableOn(gateOf: BlastGateOf): IsBlastBreakable {
   return (tile, material) => {
     const gated = gateOf({ tile, cell: material })
-    return gated === null ? isBreakableRock(tile, material) : !isStandingAgainstBlast(gated)
+    return gated === null ? isBreakableGround(material) : !isStandingAgainstBlast(gated)
   }
 }
 
-function isBreakableRockOn(params: PlanetParams): IsBlastBreakable {
-  // The cap is the planet's band-5 rock, so it takes the system jump's step with it (ticket 759).
-  const cap = groundHardnessInSystem(params, blastHardnessCap(params.planetIndex))
-  return (tile, material) =>
-    isRemovableCell(material) &&
-    kindOfCell(material) !== CELL_KIND.core &&
-    cmp(hardnessOfTile(params, tile, material), cap) <= 0
+function isBreakableGround(material: number): boolean {
+  return isRemovableCell(material) && kindOfCell(material) !== CELL_KIND.core
 }
 
 function ditherOf(state: AuthorityState, live: LiveBlast): Money {

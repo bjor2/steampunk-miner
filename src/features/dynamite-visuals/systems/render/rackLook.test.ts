@@ -6,14 +6,13 @@ import { radiusGrowthOf } from './chargeTypeLook'
 import { rackMountOf, rackPartIdsOf, rackQuadsOf, stockOfType, type RackSight } from './rackLook'
 
 // The GD lock of 25 Oct on #647 (D7, ticket 866): a rack socket with a slot per type and stock
-// pips. A bay shows once a size of its type is open on the planet; its pips light one per charge
-// of the type carried; the reel and plunger come with the remote detonator, the nozzle with the
-// Blast Casing node; the bundles grow with the Blast Radius band (#869).
+// pips. Every type is sold on every planet (D4 #863: price only), so a bolted rack shows a bay for
+// each; its pips light one per charge of the type carried; the reel and plunger hang on every
+// rack, the plunger working on every planet; the nozzle comes with the Blast Casing node; the
+// bundles grow with the Blast Radius band (#869).
 
 const bolted: RackSight = {
   isRackMounted: true,
-  planetIndex: 7,
-  isDetonatorOpen: false,
   carriedBySize: {},
   radiusLevel: 0,
   isBlastCasingOwned: false,
@@ -24,29 +23,24 @@ const pips = (type: number, count: number) =>
 
 describe('dynamite rack look', () => {
   it('shows nothing until the rack is bolted on', () => {
-    expect(rackPartIdsOf({ ...bolted, isRackMounted: false, planetIndex: 40 })).toEqual([])
+    expect(rackPartIdsOf({ ...bolted, isRackMounted: false })).toEqual([])
   })
 
-  it('shows the frame and a bay for every type with a size open on the planet, never a locked type', () => {
-    // Sizes open from planet 7, one more every 3 planets: size 5 (type 2) on P19, size 9 (type 3) on P31.
-    expect(rackPartIdsOf({ ...bolted, planetIndex: 7 })).toEqual(['rack-frame', 'slot-1'])
-    expect(rackPartIdsOf({ ...bolted, planetIndex: 18 })).toEqual(['rack-frame', 'slot-1'])
-    expect(rackPartIdsOf({ ...bolted, planetIndex: 19 })).toEqual([
+  it('shows the frame, a bay for every type and the plunger on every bolted rack', () => {
+    expect(rackPartIdsOf(bolted)).toEqual([
       'rack-frame',
       'slot-1',
       'slot-2',
+      'slot-3',
+      'wire-reel',
+      'plunger',
     ])
-    expect(rackPartIdsOf({ ...bolted, planetIndex: 31 })).toContain('slot-3')
-  })
-
-  it('keeps the shipped size on a rack bolted on before planet 7, as the kernel lets it plant', () => {
-    expect(rackPartIdsOf({ ...bolted, planetIndex: 1 })).toEqual(['rack-frame', 'slot-1'])
   })
 
   it('lights one pip per charge of the type carried, whatever its size, up to the rack’s eight', () => {
     const carriedBySize = { '1': 2, '3': 1, '5': 3, '9': 11 }
     expect([1, 2, 3].map((type) => stockOfType(carriedBySize, type))).toEqual([3, 3, 11])
-    expect(rackPartIdsOf({ ...bolted, planetIndex: 40, carriedBySize })).toEqual([
+    expect(rackPartIdsOf({ ...bolted, carriedBySize })).toEqual([
       'rack-frame',
       'slot-1',
       ...pips(1, 3),
@@ -54,13 +48,9 @@ describe('dynamite rack look', () => {
       ...pips(2, 3),
       'slot-3',
       ...pips(3, 8),
+      'wire-reel',
+      'plunger',
     ])
-  })
-
-  it('hangs the wire reel and the plunger once the remote detonator is open', () => {
-    const sight = { ...bolted, planetIndex: 22, isDetonatorOpen: true }
-    expect(rackPartIdsOf(sight).slice(-2)).toEqual(['wire-reel', 'plunger'])
-    expect(rackPartIdsOf({ ...sight, isDetonatorOpen: false })).not.toContain('plunger')
   })
 
   it('hangs the casing nozzle once the Blast Casing node is owned', () => {

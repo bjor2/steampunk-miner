@@ -2,28 +2,41 @@
  * #142's `canMine`: the verdict of a cell's gate on the means asking (the drill, a blast, or a
  * power-up's terrain edit), registered as the slice's gate check (feature-slices.md 3.6).
  *
- * | gate            | drill                                   | blast                  | tool    |
- * | --------------- | --------------------------------------- | ---------------------- | ------- |
- * | none (from P7)  | refused below the ordinary floor        | none                   | none    |
- * | dense           | refused below its floor                 | refused (an anchor)    | refused |
- * | drill signature | blocked below its floor (scratch-only)  | none (the kernel cap)  | refused |
- * | rig             | its extractor's verb, else its rule     | refused (an anchor)    | refused |
- * | dynamite        | refused (a sealed shell)                | cut from `minCharge`   | refused |
+ * | gate            | drill                                   | blast                   | tool    |
+ * | --------------- | --------------------------------------- | ----------------------- | ------- |
+ * | none (from P7)  | refused below the ordinary floor        | none                    | none    |
+ * | dense           | refused below its floor                 | refused (an anchor)     | refused |
+ * | drill signature | blocked below its floor (scratch-only)  | refused (an anchor)     | refused |
+ * | rig             | its extractor's verb, else its rule     | refused (an anchor)     | refused |
+ * | dynamite        | refused (blast-only rock)               | cut by a type breaking  | refused |
+ * |                 |                                         | its tier (`breaksGate`) |         |
  *
  * An extractor's verb (tune, capture, mark, pull, tow) is `extractorVerdicts.ts`; the coil's own
  * pull is the one tool an extractor cell lets through.
  *
  * Drill gates read the tip of the last completed major (#180 amendment 2) through the kernel's
- * floors, so a gate opens exactly where `canScratch` does. `required` and `have` are the words of
- * `gate_hit` and the HUD chip: `tip:<major>`, an extractor id or `none`, `size:<n>`.
+ * floors, so a gate opens exactly where `canScratch` does. The drill-tier gates (dense, drill
+ * signature) stand against every blast, as the blast's band-5 hardness cap kept them before D4
+ * #863 deleted it. `required` and `have` are the words of `gate_hit` and the HUD chip: `tip:<major>`,
+ * an extractor id or `none`; for blast-only rock `type:<t>`, the first charge type that breaks its
+ * tier, against `owned` when the rack carries a charge that does, else `price:<money>`, that
+ * type's smallest size at this planet's dock (D4: never "locked", price is the only gate), and
+ * against the blast's own `type:<t>` when a charge asks.
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import { hardnessOfTile } from '../../../systems/authority/groundDrill'
 import { planetParamsOf } from '../../../systems/authority/planetOfState'
 import { scratchFloorOfCell } from '../../../systems/authority/signatureCells'
+import {
+  chargePrice,
+  chargeTypeBreaking,
+  chargeTypeOf,
+  doesSizeBreakGate,
+  smallestSizeBreaking,
+} from '../../../systems/economy/chargeSizes'
 import { majorOf } from '../../../systems/economy/upgradeSteps'
 import { drillTip } from '../../../systems/economy/vehicleStats'
-import type { BigStat } from '../../../systems/money'
+import { toCanonical, type BigStat } from '../../../systems/money'
 import type { GateQuery, GateVerdict } from '../../../systems/registries/gateChecks'
 import { carriedSizesOf } from '../../../systems/vehicle/vehicleCharges'
 import { canScratch } from '../../../systems/vehicle/drillRule'
@@ -40,6 +53,9 @@ import type { CellGate } from './gateTable'
 
 /** The deepest major `minTipLevelOf` looks at: far past any campaign or endless tier. */
 const HIGHEST_MAJOR = 4096
+/** A shell's `have` while the rack carries a charge that opens it. */
+const OWNED = 'owned'
+const ONE_CHARGE = 1
 
 export function canMine(query: GateQuery): GateVerdict | null {
   const params = planetParamsOf(query.state.planet)
@@ -52,7 +68,7 @@ export function canMine(query: GateQuery): GateVerdict | null {
 
 function drillVerdictOf(gate: CellGate, params: PlanetParams, query: GateQuery) {
   if (gate.kind === 'rig') return extractorDrillVerdictOf(gate.rig, query)
-  if (gate.kind === 'dynamite') return shellVerdictOf(gate.minCharge, carriedSizeOf(query))
+  if (gate.kind === 'dynamite') return shellVerdictOf(gate.tier, standingOf(query, gate.tier))
   if (isScratchable(params, query)) return null
   if (gate.kind === 'none' && !hasGateContent(params)) return null
   return tipVerdictOf(gate.kind === 'drillSignature' ? 'blocked' : 'refused', params, query)
@@ -60,10 +76,10 @@ function drillVerdictOf(gate: CellGate, params: PlanetParams, query: GateQuery) 
 
 function blastVerdictOf(gate: CellGate, params: PlanetParams, query: GateQuery, size: number) {
   if (gate.kind === 'rig') return extractorStandingVerdictOf(gate.rig, query)
-  if (gate.kind === 'dense') return tipVerdictOf('refused', params, query)
+  if (isDrillTierGate(gate)) return tipVerdictOf('refused', params, query)
   if (gate.kind !== 'dynamite') return null
-  const verdict = shellVerdictOf(gate.minCharge, size)
-  return size >= gate.minCharge ? { ...verdict, outcome: 'cut' as const } : verdict
+  const verdict = shellVerdictOf(gate.tier, `type:${chargeTypeOf(size)}`)
+  return doesSizeBreakGate(size, gate.tier) ? { ...verdict, outcome: 'cut' as const } : verdict
 }
 
 /** #142 "Constraints on other systems": a power-up never takes a gated cell, whatever is owned. */
@@ -71,17 +87,38 @@ function toolVerdictOf(gate: CellGate, params: PlanetParams, query: GateQuery) {
   if (gate.kind === 'none') return null
   if (gate.kind === 'rig' && isCoilPull(gate.rig, query)) return null
   if (gate.kind === 'rig') return extractorStandingVerdictOf(gate.rig, query)
-  if (gate.kind === 'dynamite') return shellVerdictOf(gate.minCharge, carriedSizeOf(query))
+  if (gate.kind === 'dynamite') return shellVerdictOf(gate.tier, standingOf(query, gate.tier))
   return tipVerdictOf('refused', params, query)
 }
 
-function shellVerdictOf(minCharge: number, size: number): GateVerdict {
+function shellVerdictOf(tier: number, have: string): GateVerdict {
   return {
     outcome: 'refused',
     gateKind: 'dynamite',
-    required: `size:${minCharge}`,
-    have: `size:${size}`,
+    required: `type:${chargeTypeBreaking(tier)}`,
+    have,
   }
+}
+
+/** Dense cells and drill-gated signatures: gates the tip keys, never a blast. */
+function isDrillTierGate(gate: CellGate): boolean {
+  return gate.kind === 'dense' || gate.kind === 'drillSignature'
+}
+
+/** `owned` when the rack carries a charge that breaks `tier`, else that charge's dock price here. */
+function standingOf(query: GateQuery, tier: number): string {
+  return isBreakerCarried(query, tier) ? OWNED : dockPriceWordOf(query.state, tier)
+}
+
+function isBreakerCarried({ state, playerId }: GateQuery, tier: number): boolean {
+  const carried = carriedSizesOf(vehicleOf(state, playerId).charges)
+  return carried.some((size) => doesSizeBreakGate(size, tier))
+}
+
+/** `price:<money>`: one charge of the smallest size whose type breaks `tier`, bought here. */
+function dockPriceWordOf(state: AuthorityState, tier: number): string {
+  const size = smallestSizeBreaking(tier)
+  return `price:${toCanonical(chargePrice(size, ONE_CHARGE, state.planet.index))}`
 }
 
 function tipVerdictOf(outcome: 'refused' | 'blocked', params: PlanetParams, query: GateQuery) {
@@ -124,11 +161,6 @@ export function hasGateContent(params: PlanetParams): boolean {
 
 function tipMajorOf(state: AuthorityState, playerId: string): number {
   return majorOf(vehicleOf(state, playerId).levels.drill_tip)
-}
-
-/** The largest charge size the vehicle carries, 0 with none. */
-function carriedSizeOf({ state, playerId }: GateQuery): number {
-  return Math.max(0, ...carriedSizesOf(vehicleOf(state, playerId).charges))
 }
 
 function hardnessOf(params: PlanetParams, { tile, cell }: GateQuery): BigStat {

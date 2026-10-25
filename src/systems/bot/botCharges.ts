@@ -20,7 +20,7 @@
  */
 import type { CommandIntent } from '../authority/authorityCommand'
 import { chargesOf } from '../authority/charges/chargeRules'
-import { areChargesOffered, restockPriceOf } from '../authority/charges/chargeShopRules'
+import { restockPriceOf } from '../authority/charges/chargeShopRules'
 import { botBlastThresholdTicks } from '../economy/blastingCharges'
 import { chargeReachTiles, isRemoteSize } from '../economy/chargeSizes'
 import type { Money } from '../money'
@@ -48,13 +48,13 @@ export interface ChargeRestock {
 const STUCK_RULE_SIZE = 1
 
 /**
- * Filling the rack's free slots with `size`, while charges are offered here and it has room; null
- * otherwise. `size` is the stuck rule's, or the size the shells met on this planet need.
+ * Filling the rack's free slots with `size` while it has room (charges are sold on every planet,
+ * D4 #863); null otherwise. `size` is the stuck rule's, or the size the shells met on this planet need.
  */
 export function chargeRestockOf(session: BotSession, size: number): ChargeRestock | null {
   const state = session.state()
   const count = chargesThatFitOf(chargesOf(state, session.playerId), size)
-  if (count === 0 || !areChargesOffered(state, session.playerId)) return null
+  if (count === 0) return null
   return { intent: restockChargesCommand(size, count), price: restockPriceOf(state, size, count) }
 }
 
