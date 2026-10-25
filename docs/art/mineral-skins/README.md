@@ -377,8 +377,7 @@ Authored through the Blender MCP (see Pipeline).
 The foothold-p3 pool's crystal and fossil uncommons and its three rares, kind slots 6 to 10 on P3.
 The layers come from the species row, as on P1. No layer is shared within the batch or with P1;
 P3's slots 1 to 5 (ticket 598, p3-b1) and 11 to 15 (ticket 600) add theirs. Slots 16 and 17, the two
-fossil commons of #453 (chalk bed, fish bed), are held: no ticket skins them, and a spec pins them
-unskinned.
+fossil commons of #453 (chalk bed, fish bed), were held until ticket 854 skinned them (`p3-b4`).
 
 <!-- p3-b2 -->
 
@@ -464,7 +463,7 @@ teeth). No layer is shared within the batch or with P1 or p3-b2.
 The `foothold-p4` pool's four commons and its metal uncommon, kind slots 1 to 5 on P4. P4's slots
 11 to 15 and its signature material came first (ticket 603, p4-b3), so this batch's report measures
 it against them (`planet_mates`); slots 6 to 10 come with #602. Slots 16 and 17 are #453's two
-appended fossil commons (grey marl, crinoid stem), whose skins are held. The layers come from the
+appended fossil commons (grey marl, crinoid stem), held until ticket 854 (`p4-b4`). The layers come from the
 species rows as before; no layer is shared with another batch or within this one.
 
 <!-- p4-b1 -->
@@ -507,7 +506,7 @@ species rows as before; no layer is shared with another batch or within this one
 The `foothold-p4` pool's crystal and fossil uncommons and its three rares, kind slots 6 to 10 on
 P4. P4's slots 1 to 5 (ticket 601, p4-b1) and 11 to 15 with its signature material (ticket 603,
 p4-b3) came first, so this batch's report measures it against them (`planet_mates`). Slots 16 and
-17 are #453's two appended fossil commons (grey marl, crinoid stem), whose skins are held. The
+17 are #453's two appended fossil commons (grey marl, crinoid stem), held until ticket 854. The
 layers come from the species rows as before; no layer is shared with another batch or within this
 one.
 
@@ -561,7 +560,7 @@ The `foothold-p4` pool's three epics and two mythics, kind slots 11 to 15 on P4,
 the planet's signature material: the relic (Cogwork) ore at its band-5 tier, `relic_t14`, the
 slotless 16th material of #453 E1. It has no species row, so its skin is the planet's `signatures`
 row in the table (feature-slices 3.73). P4's slots 16 and 17 are #453's two appended fossil commons
-(grey marl, crinoid stem), whose skins are held: this batch does not skin them. P4's slots 1 to 10
+(grey marl, crinoid stem), held until ticket 854: this batch does not skin them. P4's slots 1 to 10
 come with #601 and #602, after this batch, so their reports compare against it (`planet_mates`).
 The species' layers come from their rows as before; no layer is shared with P1's batches or within
 this one.
@@ -607,7 +606,7 @@ this one.
 ## Batch p5-b1: P5's species 1 to 5 (ticket 604)
 
 The `foothold-p5` pool's four commons and its metal uncommon, kind slots 1 to 5 on P5. P5's slots
-16 and 17 are #453's two appended fossil commons (coprolite, ash bed), whose skins are held: this
+16 and 17 are #453's two appended fossil commons (coprolite, ash bed), held until ticket 854: this
 batch does not skin them. P5's slots 6 to 15 and its signature material come with #605 and #606,
 after this batch, so their reports compare against it (`planet_mates`). The layers come from the
 species rows as before; no layer is shared with another batch or within this one.
@@ -650,7 +649,7 @@ species rows as before; no layer is shared with another batch or within this one
 
 The `foothold-p5` pool's crystal and fossil uncommons and its three rares, kind slots 6 to 10 on P5.
 The layers come from the species rows as before; no layer is shared with another batch or within
-this one. P5's slots 16 and 17, #453's coprolite and ash bed, stay held, and P5's slots 11 to 15
+this one. P5's slots 16 and 17, #453's coprolite and ash bed, stay held (until ticket 854), and P5's slots 11 to 15
 and its signature material come with #606. These layers were authored through the Blender MCP, in
 the shared Blender (the procedure under Pipeline), and a second run wrote byte-identical cells.
 
@@ -690,7 +689,7 @@ the shared Blender (the procedure under Pipeline), and a second run wrote byte-i
 The `foothold-p5` pool's three epics and two mythics, kind slots 11 to 15 on P5, and the skin of
 the planet's signature material: the relic (Cogwork) ore at its band-5 tier, `relic_t17`, the
 slotless 16th material of #453 E1, which wears the planet's `signatures` row (`p5-signature` in the
-cell table). P5's slots 16 and 17, #453's coprolite and ash bed, stay held. This batch closes the
+cell table). P5's slots 16 and 17, #453's coprolite and ash bed, stay held (until ticket 854, `p5-b4`). This batch closes the
 planet: slots 1 to 15 and the signature are skinned. The species' layers come from their rows as
 before, and the signature's from its family's look (Cogwork: clockwork). No layer is shared with
 another batch or within this one. Authored through the Blender MCP (the procedure under Pipeline);
@@ -748,6 +747,116 @@ a headless run of the same recipes wrote byte-identical cells.
   at 0.56 to 0.65 (shark tooth, chromite, wolfram), which a teal joins under deuteranopia. It is the
   planet's only blue-green.
 - **Seeds 801 to 852**, apart from P5's other batches (601 to 691, 701 to 791).
+
+## Batches p3-b4 to p6-b4: every species left unskinned (ticket 854)
+
+HS ruling (c) of 24 Oct on #852: every material should look different, and a CI check holds every
+species of `materials.json` to a skin row (`mineralSkins.everySpecies.test.ts`). Two sets had none:
+the fossil commons #453 appended on slots 16 and 17 of P3, P4 and P5 (`p3-b4`, `p4-b4`, `p5-b4`),
+and the whole `foothold-p6-p7` pool, P6 and P7's 17 species (`p6-b1` to `p6-b4`, posted on P2's
+heavy-act rock as the others). **No layer is drawn for them:** each row reuses a base, vein and
+sheen already in `cells/`, none worn by another species of its pool, and adds only a palette, built
+by `ramp_of_slot` on its hue slot. The cell table's `wornBy` lists the second wearers.
+
+<!-- p3-b4 -->
+
+| slot | species               | base             | vein             | palette (shadow, body, light)                    | sheen            |
+| ---- | --------------------- | ---------------- | ---------------- | ------------------------------------------------ | ---------------- |
+| 16   | `chalk-bed-amberbone` | `ochre-powder`   | `nodule-bed`     | `chalk-bone-white` `#696a63` `#d2d3c6` `#e8e9e2` | `bone-dust`      |
+| 17   | `fish-bed-amberbone`  | `slaty-cleavage` | `lobed-segments` | `fish-shale-olive` `#4a5040` `#94a07f` `#cad0bf` | `cleavage-sheen` |
+
+<!-- /p3-b4 -->
+
+<!-- p4-b4 -->
+
+| slot | species                  | base            | vein              | palette (shadow, body, light)                | sheen     |
+| ---- | ------------------------ | --------------- | ----------------- | -------------------------------------------- | --------- |
+| 16   | `grey-marl-amberbone`    | `gravel-bed`    | `crumbled-masses` | `marl-grey` `#62625b` `#c3c4b6` `#e1e2db`    | `powdery` |
+| 17   | `crinoid-stem-amberbone` | `scalloped-jet` | `vertebra-column` | `crinoid-sage` `#52574c` `#a3ae98` `#d1d6cc` | `dull`    |
+
+<!-- /p4-b4 -->
+
+<!-- p5-b4 -->
+
+| slot | species               | base             | vein             | palette (shadow, body, light)                   | sheen    |
+| ---- | --------------------- | ---------------- | ---------------- | ----------------------------------------------- | -------- |
+| 16   | `coprolite-amberbone` | `peat-crumb`     | `limonite-clods` | `coprolite-olive` `#444a34` `#899567` `#c4cab3` | `greasy` |
+| 17   | `ash-bed-amberbone`   | `graphite-smear` | `bullet-darts`   | `ash-bone-grey` `#4a3c3a` `#937875` `#c9bcba`   | `matte`  |
+
+<!-- /p5-b4 -->
+
+<!-- p6-b1 -->
+
+| slot | species                    | base             | vein                 | palette (shadow, body, light)                     | sheen            |
+| ---- | -------------------------- | ---------------- | -------------------- | ------------------------------------------------- | ---------------- |
+| 1    | `salt-iron-brassvein`      | `crusted-scale`  | `nugget-cluster`     | `salt-iron-grey` `#565a5c` `#adb4b7` `#d6dadb`    | `smudged`        |
+| 2    | `wind-copper-brassvein`    | `oxide-film`     | `plate-stack`        | `wind-copper-green` `#2c5c50` `#59b8a0` `#acdbd0` | `tumbled-polish` |
+| 3    | `halite-quartzine`         | `cubic-cleavage` | `hopper-terraces`    | `halite-white` `#727374` `#e4e6e7` `#f2f3f3`      | `vitreous`       |
+| 4    | `desert-rose-quartzine`    | `sulphur-crumb`  | `swallowtail-blades` | `desert-rose-sand` `#60504c` `#c19f98` `#e0cfcc`  | `fleck-glints`   |
+| 5    | `mesa-manganese-brassvein` | `inner-feathers` | `wire-dendrite`      | `manganese-black` `#403e4a` `#807b93` `#c0bdc9`   | `earthy`         |
+
+<!-- /p6-b1 -->
+
+<!-- p6-b2 -->
+
+| slot | species                 | base              | vein             | palette (shadow, body, light)                      | sheen             |
+| ---- | ----------------------- | ----------------- | ---------------- | -------------------------------------------------- | ----------------- |
+| 6    | `turquoise-quartzine`   | `leopard-nodules` | `olive-drops`    | `turquoise-sky` `#2a6361` `#53c6c2` `#a9e2e0`      | `waxy`            |
+| 7    | `sand-dollar-amberbone` | `phosphate-beds`  | `cabochon-domes` | `sand-dollar-cream` `#686660` `#d0cdbf` `#e8e6df`  | `sugary`          |
+| 8    | `electrum-brassvein`    | `watered-damask`  | `flake-scatter`  | `electrum-pale-gold` `#6a683d` `#d3d07a` `#e9e7bc` | `brilliant`       |
+| 9    | `moonstone-quartzine`   | `adularia-milk`   | `framed-ovals`   | `moonstone-glow` `#6a6d71` `#d4dae2` `#eaecf0`     | `moon-sheen`      |
+| 10   | `sickle-claw-amberbone` | `ripple-shale`    | `toothed-jaw`    | `sickle-claw-sage` `#53563a` `#a6ab73` `#d2d5b9`   | `guard-crescents` |
+
+<!-- /p6-b2 -->
+
+<!-- p6-b3 -->
+
+| slot | species                   | base               | vein             | palette (shadow, body, light)                     | sheen           |
+| ---- | ------------------------- | ------------------ | ---------------- | ------------------------------------------------- | --------------- |
+| 11   | `thunder-iron-brassvein`  | `black-grain`      | `star-bursts`    | `thunder-iron-blue` `#505366` `#9fa6cb` `#cfd2e5` | `lamella-flash` |
+| 12   | `mirage-glass-quartzine`  | `conchoidal-glass` | `lens-stack`     | `mirage-glass-cyan` `#596c6d` `#b2d7da` `#d8ebec` | `oil-film`      |
+| 13   | `leviathan-rib-amberbone` | `spongy-bone`      | `sclerotic-ring` | `leviathan-ivory` `#636255` `#c6c4aa` `#e3e2d4`   | `satin`         |
+| 14   | `windsilver-brassvein`    | `molten-pour`      | `needle-sheaves` | `windsilver-white` `#717375` `#e2e6ea` `#f0f2f4`  | `mirror-polish` |
+| 15   | `dawn-opal-quartzine`     | `opal-potch`       | `curled-ribbons` | `dawn-opal-rose` `#6c516c` `#d7a2d7` `#ebd1eb`    | `colour-play`   |
+
+<!-- /p6-b3 -->
+
+<!-- p6-b4 -->
+
+| slot | species                  | base           | vein            | palette (shadow, body, light)                    | sheen          |
+| ---- | ------------------------ | -------------- | --------------- | ------------------------------------------------ | -------------- |
+| 16   | `dune-scatter-amberbone` | `frosted-face` | `split-slabs`   | `dune-bone-buff` `#625f54` `#c3bea8` `#e1ded3`   | `velvet-frost` |
+| 17   | `salt-shell-amberbone`   | `bloom-crust`  | `ribbed-valves` | `salt-shell-frost` `#606466` `#c0c9cc` `#e0e4e6` | `grain-caps`   |
+
+<!-- /p6-b4 -->
+
+- **Fossils read as bone or shell in rock** (P&N): each fossil pairs a vein brighter than its base
+  (cell means, vein over base: chalk bed 0.52 over 0.43, fish bed 0.59 over 0.50, grey marl 0.55
+  over 0.47, crinoid stem 0.52 over 0.38, coprolite 0.56 over 0.44, sand dollar 0.58 over 0.47,
+  sickle claw 0.55 over 0.52, leviathan rib 0.60 over 0.54, dune scatter 0.58 over 0.50, salt shell
+  0.56 over 0.45) with a dull or dusty sheen, so the shape sits pale on a darker ground. Ash bed is
+  the exception by mean (its darts 0.45 on a 0.45 base): the darts are lit along their length and
+  rimmed in the shadow end on a streaked ground, and read pale at 22 px
+  (`sheets/p5-b4.phone-x4.png`). The veins are bone and shell shapes: pebbly nodules for chalk, a
+  trilobite print for the fish bed, crumbled clumps for marl, a column of vertebra-like discs for
+  the crinoid, soft clods for the coprolite, splinter-like darts for the ash bed, round discs for
+  the sand dollar, a toothed curved bone for the sickle claw, a ring of plates for the leviathan
+  rib, broken slabs for the dune scatter, ribbed valves for the salt shell. Three first picks were
+  swapped after the eye check because they read as crystal: `shard-spray` (ash bed),
+  `serrated-teeth` (sickle claw) and `flake-books` (dune scatter, hexagonal plates).
+- **Distinct from the planet's neighbours.** Every new skin differs from every other skin of its
+  planet in base, vein, palette and sheen. The least different pairs (`sheets/<batch>.distinct.json`,
+  22 px a tile): chalk bed vs native platinum on P3 (colour 0.052, texture 0.065), crinoid stem vs
+  trilobite on P4 (0.071, 0.067), coprolite vs petrified heartwood on P5 (0.092, 0.059). On P6 and
+  P7, salt shell vs salt iron (colour 0.007, texture 0.082): their hue slots (192 and 195 degrees,
+  saturation 0.10 and 0.06) are materials.json's, so the two part on texture, as P3's rail quartz
+  and native platinum do (0.014, 0.059); halite vs windsilver (0.034, 0.060) the same way.
+- **The P6 and P7 heroes** (electrum, moonstone, sickle claw, thunder iron, mirage glass, leviathan
+  rib, windsilver, dawn opal) now have the skin rows a hero sprite is built from (#853's
+  follow-up); their rows record no `atlasPage` until an atlas packs them.
+- **Look only.** The terrain shader reads no skin row, so the contact sheet
+  (`roster/skinContactSheet.golden.json`) is unchanged, as are ids, stats rows, prices and the
+  generator; no row carries a casingGrade.
 
 ## Compositing
 

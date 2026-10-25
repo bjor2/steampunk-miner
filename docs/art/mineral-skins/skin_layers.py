@@ -47,7 +47,9 @@ LIGHT_LUMA_SHARE = 0.5
 # P2 slots 1 to 5, of the foothold-p2 pool, which binds the legacy slots, #596 its slots 6 to 9,
 # the four uncommons, #597 its slots 10 to 12, the three rares, #710 its slots 13 to 15, the pool's
 # own kinds of ticket 709, and #736 the species its slots 6, 7 and 12 swap in under ore rules 9; #713
-# is P1 slots 13 to 15, the legacy pool's own three gems under ore rules 12),
+# is P1 slots 13 to 15, the legacy pool's own three gems under ore rules 12; #854 dresses the
+# fossil commons #453 appended on slots 16 and 17 of P3 to P5 (`p<n>-b4`) and the whole foothold-p6-p7
+# pool, P6 and P7's, from layers already drawn (`p6-b1` to `p6-b4`), so it draws no new layer),
 # named `p<planet>-b<n>`, in slot order. A batch is measured against all of its planet's other
 # batches (`planet_mates`), less the skins on the slots it dresses itself (`mate_skins`). A batch's
 # `signature` is the planet whose signature skin row it adds. A batch's `oreRules` picks, on a slot
@@ -75,6 +77,13 @@ BATCHES = {
     'p5-b2': {'pool': 'foothold-p5', 'slots': ('mixed.u2', 'mixed.u3', 'mixed.r1', 'mixed.r2', 'mixed.r3')},
     'p5-b3': {'pool': 'foothold-p5', 'slots': ('mixed.e1', 'mixed.e2', 'mixed.e3', 'mixed.m1', 'mixed.m2'),
               'signature': 5},
+    'p3-b4': {'pool': 'foothold-p3', 'slots': ('mixed.c5', 'mixed.c6')},
+    'p4-b4': {'pool': 'foothold-p4', 'slots': ('mixed.c5', 'mixed.c6')},
+    'p5-b4': {'pool': 'foothold-p5', 'slots': ('mixed.c5', 'mixed.c6')},
+    'p6-b1': {'pool': 'foothold-p6-p7', 'slots': ('mixed.c1', 'mixed.c2', 'mixed.c3', 'mixed.c4', 'mixed.u1')},
+    'p6-b2': {'pool': 'foothold-p6-p7', 'slots': ('mixed.u2', 'mixed.u3', 'mixed.r1', 'mixed.r2', 'mixed.r3')},
+    'p6-b3': {'pool': 'foothold-p6-p7', 'slots': ('mixed.e1', 'mixed.e2', 'mixed.e3', 'mixed.m1', 'mixed.m2')},
+    'p6-b4': {'pool': 'foothold-p6-p7', 'slots': ('mixed.c5', 'mixed.c6')},
 }
 # A signature material has no hue slot (#453 E1): its palette is built on a slot-shaped look chosen
 # inside its family's hue and luma bands of docs/art/ores (#151; relic 155-168 degrees, luma

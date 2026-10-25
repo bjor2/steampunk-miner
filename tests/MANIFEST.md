@@ -289,11 +289,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/materials/systems/materialTable.test.ts` | 50 | 47 |
 | `src/features/materials/systems/render/rarityLooks.test.ts` | 5 | 5 |
 
-### `mineral-skins`: 11 files, 179 tests
+### `mineral-skins`: 12 files, 282 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/mineral-skins/mineralSkins.art.test.ts` | 31 | 3 |
+| `src/features/mineral-skins/mineralSkins.everySpecies.test.ts` | 103 | 3 |
 | `src/features/mineral-skins/mineralSkins.noTwoAlike.test.ts` | 8 | 2 |
 | `src/features/mineral-skins/mineralSkins.planet1.test.ts` | 17 | 3 |
 | `src/features/mineral-skins/mineralSkins.planet2.test.ts` | 24 | 6 |

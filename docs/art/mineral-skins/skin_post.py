@@ -42,9 +42,9 @@ GAP_PX = 6
 LABEL_PX = 14
 JPEG_QUALITY = 90
 # The palette each planet's ground wears (planetTable.ts PLANET_ARCHETYPES: P1 archetype.base, P2
-# on archetype.heavy until the heat act at P8).
+# on archetype.heavy until the heat act at P8; p6 posts the foothold-p6-p7 pool, P6 and P7's).
 ROCK_PALETTES = {'p1': 'palette.planet_1', 'p2': 'palette.planet_2', 'p3': 'palette.planet_2',
-                 'p4': 'palette.planet_2', 'p5': 'palette.planet_2'}
+                 'p4': 'palette.planet_2', 'p5': 'palette.planet_2', 'p6': 'palette.planet_2'}
 # The planet of the batch being posted: its rock is the ground every sheet lays a skin in.
 rock_planet = 'p1'
 BACKGROUND = (0.07, 0.05, 0.05)

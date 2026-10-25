@@ -1,0 +1,286 @@
+{
+  "batch": "p5-b4",
+  "tilePx": 22,
+  "rockLuma": 0.289,
+  "skins": {
+    "coprolite-amberbone": {
+      "meanHex": "#88926c",
+      "luma": 0.543,
+      "hueDeg": 75.6,
+      "rockContrast": 1.75
+    },
+    "ash-bed-amberbone": {
+      "meanHex": "#8f7875",
+      "luma": 0.496,
+      "hueDeg": 6.4,
+      "rockContrast": 1.61
+    }
+  },
+  "pairs": [
+    {
+      "a": "furnace-iron-brassvein",
+      "b": "coprolite-amberbone",
+      "colourDistance": 0.176,
+      "deutanDistance": 0.103,
+      "lumaDifference": 0.061,
+      "textureDifference": 0.076
+    },
+    {
+      "a": "furnace-iron-brassvein",
+      "b": "ash-bed-amberbone",
+      "colourDistance": 0.091,
+      "deutanDistance": 0.043,
+      "lumaDifference": 0.014,
+      "textureDifference": 0.084
+    },
+    {
+      "a": "magnetite-brassvein",
+      "b": "coprolite-amberbone",
+      "colourDistance": 0.145,
+      "deutanDistance": 0.158,
+      "lumaDifference": 0.037,
+      "textureDifference": 0.087
+    },
+    {
+      "a": "magnetite-brassvein",
+      "b": "ash-bed-amberbone",
+      "colourDistance": 0.105,
+      "deutanDistance": 0.085,
+      "lumaDifference": 0.01,
+      "textureDifference": 0.094
+    },
+    {
+      "a": "selenite-blade-quartzine",
+      "b": "coprolite-amberbone",
+      "colourDistance": 0.588,
+      "deutanDistance": 0.567,
+      "lumaDifference": 0.298,
+      "textureDifference": 0.066
+    },
+    {
+      "a": "selenite-blade-quartzine",
+      "b": "ash-bed-amberbone",
+      "colourDistance": 0.603,
+      "deutanDistance": 0.615,
+      "lumaDifference": 0.345,
+      "textureDifference": 0.076
+    },
+    {
+      "a": "ember-agate-quartzine",
+      "b": "coprolite-amberbone",
+      "colourDistance": 0.27,
+      "deutanDistance": 0.086,
+      "lumaDifference": 0.033,
+      "textureDifference": 0.065
+    },
+    {
+      "a": "ember-agate-quartzine",
+      "b": "ash-bed-amberbone",
+      "colourDistance": 0.221,
+      "deutanDistance": 0.144,
+      "lumaDifference": 0.08,
+      "textureDifference": 0.074
+    },
+    {
+      "a": "chromite-brassvein",
+      "b": "coprolite-amberbone",
+      "colourDistance": 0.24,
+      "deutanDistance": 0.226,
+      "lumaDifference": 0.054,
+      "textureDifference": 0.071
+    },
+    {
+      "a": "chromite-brassvein",
+      "b": "ash-bed-amberbone",
+      "colourDistance": 0.227,
+      "deutanDistance": 0.223,
+      "lumaDifference": 0.101,
+      "textureDifference": 0.078
+    },
+    {
+      "a": "peridot-quartzine",
+      "b": "coprolite-amberbone",
+      "colourDistance": 0.213,
+      "deutanDistance": 0.231,
+      "lumaDifference": 0.096,
+      "textureDifference": 0.072
+    },
+    {
+      "a": "peridot-quartzine",
+      "b": "ash-bed-amberbone",
+      "colourDistance": 0.312,
+      "deutanDistance": 0.333,
+      "lumaDifference": 0.143,
+      "textureDifference": 0.082
+    },
+    {
+      "a": "shark-tooth-amberbone",
+      "b": "coprolite-amberbone",
+      "colourDistance": 0.182,
+      "deutanDistance": 0.179,
+      "lumaDifference": 0.02,
+      "textureDifference": 0.114
+    },
+    {
+      "a": "shark-tooth-amberbone",
+      "b": "ash-bed-amberbone",
+      "colourDistance": 0.171,
+      "deutanDistance": 0.161,
+      "lumaDifference": 0.067,
+      "textureDifference": 0.126
+    },
+    {
+      "a": "wolfram-brassvein",
+      "b": "coprolite-amberbone",
+      "colourDistance": 0.288,
+      "deutanDistance": 0.274,
+      "lumaDifference": 0.104,
+      "textureDifference": 0.072
+    },
+    {
+      "a": "wolfram-brassvein",
+      "b": "ash-bed-amberbone",
+      "colourDistance": 0.294,
+      "deutanDistance": 0.296,
+      "lumaDifference": 0.151,
+      "textureDifference": 0.084
+    },
+    {
+      "a": "fire-garnet-quartzine",
+      "b": "coprolite-amberbone",
+      "colourDistance": 0.385,
+      "deutanDistance": 0.038,
+      "lumaDifference": 0.06,
+      "textureDifference": 0.071
+    },
+    {
+      "a": "fire-garnet-quartzine",
+      "b": "ash-bed-amberbone",
+      "colourDistance": 0.304,
+      "deutanDistance": 0.065,
+      "lumaDifference": 0.013,
+      "textureDifference": 0.076
+    },
+    {
+      "a": "saurian-vertebra-amberbone",
+      "b": "coprolite-amberbone",
+      "colourDistance": 0.29,
+      "deutanDistance": 0.277,
+      "lumaDifference": 0.158,
+      "textureDifference": 0.089
+    },
+    {
+      "a": "saurian-vertebra-amberbone",
+      "b": "ash-bed-amberbone",
+      "colourDistance": 0.319,
+      "deutanDistance": 0.344,
+      "lumaDifference": 0.205,
+      "textureDifference": 0.091
+    },
+    {
+      "a": "firebrass-brassvein",
+      "b": "coprolite-amberbone",
+      "colourDistance": 0.267,
+      "deutanDistance": 0.231,
+      "lumaDifference": 0.065,
+      "textureDifference": 0.083
+    },
+    {
+      "a": "firebrass-brassvein",
+      "b": "ash-bed-amberbone",
+      "colourDistance": 0.318,
+      "deutanDistance": 0.323,
+      "lumaDifference": 0.112,
+      "textureDifference": 0.087
+    },
+    {
+      "a": "heat-spinel-quartzine",
+      "b": "coprolite-amberbone",
+      "colourDistance": 0.328,
+      "deutanDistance": 0.177,
+      "lumaDifference": 0.017,
+      "textureDifference": 0.103
+    },
+    {
+      "a": "heat-spinel-quartzine",
+      "b": "ash-bed-amberbone",
+      "colourDistance": 0.258,
+      "deutanDistance": 0.167,
+      "lumaDifference": 0.064,
+      "textureDifference": 0.107
+    },
+    {
+      "a": "petrified-heartwood-amberbone",
+      "b": "coprolite-amberbone",
+      "colourDistance": 0.092,
+      "deutanDistance": 0.1,
+      "lumaDifference": 0.052,
+      "textureDifference": 0.059
+    },
+    {
+      "a": "petrified-heartwood-amberbone",
+      "b": "ash-bed-amberbone",
+      "colourDistance": 0.183,
+      "deutanDistance": 0.202,
+      "lumaDifference": 0.099,
+      "textureDifference": 0.077
+    },
+    {
+      "a": "core-gold-brassvein",
+      "b": "coprolite-amberbone",
+      "colourDistance": 0.533,
+      "deutanDistance": 0.507,
+      "lumaDifference": 0.251,
+      "textureDifference": 0.07
+    },
+    {
+      "a": "core-gold-brassvein",
+      "b": "ash-bed-amberbone",
+      "colourDistance": 0.595,
+      "deutanDistance": 0.609,
+      "lumaDifference": 0.298,
+      "textureDifference": 0.083
+    },
+    {
+      "a": "furnace-ruby-quartzine",
+      "b": "coprolite-amberbone",
+      "colourDistance": 0.39,
+      "deutanDistance": 0.058,
+      "lumaDifference": 0.055,
+      "textureDifference": 0.092
+    },
+    {
+      "a": "furnace-ruby-quartzine",
+      "b": "ash-bed-amberbone",
+      "colourDistance": 0.32,
+      "deutanDistance": 0.126,
+      "lumaDifference": 0.008,
+      "textureDifference": 0.113
+    },
+    {
+      "a": "p5-signature",
+      "b": "coprolite-amberbone",
+      "colourDistance": 0.279,
+      "deutanDistance": 0.1,
+      "lumaDifference": 0.014,
+      "textureDifference": 0.077
+    },
+    {
+      "a": "p5-signature",
+      "b": "ash-bed-amberbone",
+      "colourDistance": 0.336,
+      "deutanDistance": 0.132,
+      "lumaDifference": 0.033,
+      "textureDifference": 0.097
+    },
+    {
+      "a": "coprolite-amberbone",
+      "b": "ash-bed-amberbone",
+      "colourDistance": 0.111,
+      "deutanDistance": 0.102,
+      "lumaDifference": 0.047,
+      "textureDifference": 0.084
+    }
+  ],
+  "leastDifferentPair": ["petrified-heartwood-amberbone", "coprolite-amberbone"]
+}

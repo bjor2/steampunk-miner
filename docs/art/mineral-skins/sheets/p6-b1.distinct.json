@@ -1,0 +1,600 @@
+{
+  "batch": "p6-b1",
+  "tilePx": 22,
+  "rockLuma": 0.289,
+  "skins": {
+    "salt-iron-brassvein": {
+      "meanHex": "#b6bbbe",
+      "luma": 0.729,
+      "hueDeg": 197.3,
+      "rockContrast": 2.3
+    },
+    "wind-copper-brassvein": {
+      "meanHex": "#68b3a1",
+      "luma": 0.606,
+      "hueDeg": 165.1,
+      "rockContrast": 1.94
+    },
+    "halite-quartzine": {
+      "meanHex": "#dadcdd",
+      "luma": 0.86,
+      "hueDeg": 198.6,
+      "rockContrast": 2.69
+    },
+    "desert-rose-quartzine": {
+      "meanHex": "#bda09a",
+      "luma": 0.658,
+      "hueDeg": 10.3,
+      "rockContrast": 2.09
+    },
+    "mesa-manganese-brassvein": {
+      "meanHex": "#817c92",
+      "luma": 0.502,
+      "hueDeg": 252.7,
+      "rockContrast": 1.63
+    }
+  },
+  "pairs": [
+    {
+      "a": "turquoise-quartzine",
+      "b": "salt-iron-brassvein",
+      "colourDistance": 0.305,
+      "deutanDistance": 0.061,
+      "lumaDifference": 0.06,
+      "textureDifference": 0.066
+    },
+    {
+      "a": "turquoise-quartzine",
+      "b": "wind-copper-brassvein",
+      "colourDistance": 0.158,
+      "deutanDistance": 0.158,
+      "lumaDifference": 0.063,
+      "textureDifference": 0.066
+    },
+    {
+      "a": "turquoise-quartzine",
+      "b": "halite-quartzine",
+      "colourDistance": 0.46,
+      "deutanDistance": 0.258,
+      "lumaDifference": 0.191,
+      "textureDifference": 0.064
+    },
+    {
+      "a": "turquoise-quartzine",
+      "b": "desert-rose-quartzine",
+      "colourDistance": 0.398,
+      "deutanDistance": 0.174,
+      "lumaDifference": 0.011,
+      "textureDifference": 0.056
+    },
+    {
+      "a": "turquoise-quartzine",
+      "b": "mesa-manganese-brassvein",
+      "colourDistance": 0.364,
+      "deutanDistance": 0.355,
+      "lumaDifference": 0.167,
+      "textureDifference": 0.054
+    },
+    {
+      "a": "sand-dollar-amberbone",
+      "b": "salt-iron-brassvein",
+      "colourDistance": 0.058,
+      "deutanDistance": 0.053,
+      "lumaDifference": 0.003,
+      "textureDifference": 0.115
+    },
+    {
+      "a": "sand-dollar-amberbone",
+      "b": "wind-copper-brassvein",
+      "colourDistance": 0.344,
+      "deutanDistance": 0.161,
+      "lumaDifference": 0.126,
+      "textureDifference": 0.114
+    },
+    {
+      "a": "sand-dollar-amberbone",
+      "b": "halite-quartzine",
+      "colourDistance": 0.242,
+      "deutanDistance": 0.24,
+      "lumaDifference": 0.128,
+      "textureDifference": 0.112
+    },
+    {
+      "a": "sand-dollar-amberbone",
+      "b": "desert-rose-quartzine",
+      "colourDistance": 0.14,
+      "deutanDistance": 0.137,
+      "lumaDifference": 0.074,
+      "textureDifference": 0.113
+    },
+    {
+      "a": "sand-dollar-amberbone",
+      "b": "mesa-manganese-brassvein",
+      "colourDistance": 0.364,
+      "deutanDistance": 0.384,
+      "lumaDifference": 0.23,
+      "textureDifference": 0.108
+    },
+    {
+      "a": "electrum-brassvein",
+      "b": "salt-iron-brassvein",
+      "colourDistance": 0.234,
+      "deutanDistance": 0.232,
+      "lumaDifference": 0.01,
+      "textureDifference": 0.082
+    },
+    {
+      "a": "electrum-brassvein",
+      "b": "wind-copper-brassvein",
+      "colourDistance": 0.388,
+      "deutanDistance": 0.239,
+      "lumaDifference": 0.133,
+      "textureDifference": 0.08
+    },
+    {
+      "a": "electrum-brassvein",
+      "b": "halite-quartzine",
+      "colourDistance": 0.369,
+      "deutanDistance": 0.355,
+      "lumaDifference": 0.121,
+      "textureDifference": 0.076
+    },
+    {
+      "a": "electrum-brassvein",
+      "b": "desert-rose-quartzine",
+      "colourDistance": 0.164,
+      "deutanDistance": 0.18,
+      "lumaDifference": 0.081,
+      "textureDifference": 0.07
+    },
+    {
+      "a": "electrum-brassvein",
+      "b": "mesa-manganese-brassvein",
+      "colourDistance": 0.39,
+      "deutanDistance": 0.43,
+      "lumaDifference": 0.237,
+      "textureDifference": 0.068
+    },
+    {
+      "a": "moonstone-quartzine",
+      "b": "salt-iron-brassvein",
+      "colourDistance": 0.178,
+      "deutanDistance": 0.176,
+      "lumaDifference": 0.099,
+      "textureDifference": 0.08
+    },
+    {
+      "a": "moonstone-quartzine",
+      "b": "wind-copper-brassvein",
+      "colourDistance": 0.482,
+      "deutanDistance": 0.346,
+      "lumaDifference": 0.222,
+      "textureDifference": 0.065
+    },
+    {
+      "a": "moonstone-quartzine",
+      "b": "halite-quartzine",
+      "colourDistance": 0.055,
+      "deutanDistance": 0.054,
+      "lumaDifference": 0.032,
+      "textureDifference": 0.071
+    },
+    {
+      "a": "moonstone-quartzine",
+      "b": "desert-rose-quartzine",
+      "colourDistance": 0.334,
+      "deutanDistance": 0.335,
+      "lumaDifference": 0.17,
+      "textureDifference": 0.062
+    },
+    {
+      "a": "moonstone-quartzine",
+      "b": "mesa-manganese-brassvein",
+      "colourDistance": 0.542,
+      "deutanDistance": 0.558,
+      "lumaDifference": 0.326,
+      "textureDifference": 0.054
+    },
+    {
+      "a": "sickle-claw-amberbone",
+      "b": "salt-iron-brassvein",
+      "colourDistance": 0.263,
+      "deutanDistance": 0.253,
+      "lumaDifference": 0.081,
+      "textureDifference": 0.071
+    },
+    {
+      "a": "sickle-claw-amberbone",
+      "b": "wind-copper-brassvein",
+      "colourDistance": 0.287,
+      "deutanDistance": 0.153,
+      "lumaDifference": 0.042,
+      "textureDifference": 0.072
+    },
+    {
+      "a": "sickle-claw-amberbone",
+      "b": "halite-quartzine",
+      "colourDistance": 0.461,
+      "deutanDistance": 0.444,
+      "lumaDifference": 0.212,
+      "textureDifference": 0.067
+    },
+    {
+      "a": "sickle-claw-amberbone",
+      "b": "desert-rose-quartzine",
+      "colourDistance": 0.146,
+      "deutanDistance": 0.104,
+      "lumaDifference": 0.01,
+      "textureDifference": 0.063
+    },
+    {
+      "a": "sickle-claw-amberbone",
+      "b": "mesa-manganese-brassvein",
+      "colourDistance": 0.254,
+      "deutanDistance": 0.292,
+      "lumaDifference": 0.146,
+      "textureDifference": 0.059
+    },
+    {
+      "a": "thunder-iron-brassvein",
+      "b": "salt-iron-brassvein",
+      "colourDistance": 0.145,
+      "deutanDistance": 0.163,
+      "lumaDifference": 0.09,
+      "textureDifference": 0.075
+    },
+    {
+      "a": "thunder-iron-brassvein",
+      "b": "wind-copper-brassvein",
+      "colourDistance": 0.248,
+      "deutanDistance": 0.118,
+      "lumaDifference": 0.033,
+      "textureDifference": 0.076
+    },
+    {
+      "a": "thunder-iron-brassvein",
+      "b": "halite-quartzine",
+      "colourDistance": 0.355,
+      "deutanDistance": 0.37,
+      "lumaDifference": 0.221,
+      "textureDifference": 0.077
+    },
+    {
+      "a": "thunder-iron-brassvein",
+      "b": "desert-rose-quartzine",
+      "colourDistance": 0.196,
+      "deutanDistance": 0.169,
+      "lumaDifference": 0.019,
+      "textureDifference": 0.07
+    },
+    {
+      "a": "thunder-iron-brassvein",
+      "b": "mesa-manganese-brassvein",
+      "colourDistance": 0.253,
+      "deutanDistance": 0.254,
+      "lumaDifference": 0.137,
+      "textureDifference": 0.066
+    },
+    {
+      "a": "mirage-glass-quartzine",
+      "b": "salt-iron-brassvein",
+      "colourDistance": 0.154,
+      "deutanDistance": 0.155,
+      "lumaDifference": 0.077,
+      "textureDifference": 0.056
+    },
+    {
+      "a": "mirage-glass-quartzine",
+      "b": "wind-copper-brassvein",
+      "colourDistance": 0.406,
+      "deutanDistance": 0.324,
+      "lumaDifference": 0.2,
+      "textureDifference": 0.058
+    },
+    {
+      "a": "mirage-glass-quartzine",
+      "b": "halite-quartzine",
+      "colourDistance": 0.142,
+      "deutanDistance": 0.081,
+      "lumaDifference": 0.054,
+      "textureDifference": 0.056
+    },
+    {
+      "a": "mirage-glass-quartzine",
+      "b": "desert-rose-quartzine",
+      "colourDistance": 0.331,
+      "deutanDistance": 0.317,
+      "lumaDifference": 0.148,
+      "textureDifference": 0.047
+    },
+    {
+      "a": "mirage-glass-quartzine",
+      "b": "mesa-manganese-brassvein",
+      "colourDistance": 0.5,
+      "deutanDistance": 0.534,
+      "lumaDifference": 0.304,
+      "textureDifference": 0.039
+    },
+    {
+      "a": "leviathan-rib-amberbone",
+      "b": "salt-iron-brassvein",
+      "colourDistance": 0.087,
+      "deutanDistance": 0.088,
+      "lumaDifference": 0.034,
+      "textureDifference": 0.084
+    },
+    {
+      "a": "leviathan-rib-amberbone",
+      "b": "wind-copper-brassvein",
+      "colourDistance": 0.381,
+      "deutanDistance": 0.213,
+      "lumaDifference": 0.157,
+      "textureDifference": 0.077
+    },
+    {
+      "a": "leviathan-rib-amberbone",
+      "b": "halite-quartzine",
+      "colourDistance": 0.21,
+      "deutanDistance": 0.205,
+      "lumaDifference": 0.097,
+      "textureDifference": 0.08
+    },
+    {
+      "a": "leviathan-rib-amberbone",
+      "b": "desert-rose-quartzine",
+      "colourDistance": 0.174,
+      "deutanDistance": 0.182,
+      "lumaDifference": 0.105,
+      "textureDifference": 0.071
+    },
+    {
+      "a": "leviathan-rib-amberbone",
+      "b": "mesa-manganese-brassvein",
+      "colourDistance": 0.411,
+      "deutanDistance": 0.437,
+      "lumaDifference": 0.261,
+      "textureDifference": 0.066
+    },
+    {
+      "a": "windsilver-brassvein",
+      "b": "salt-iron-brassvein",
+      "colourDistance": 0.258,
+      "deutanDistance": 0.255,
+      "lumaDifference": 0.148,
+      "textureDifference": 0.064
+    },
+    {
+      "a": "windsilver-brassvein",
+      "b": "wind-copper-brassvein",
+      "colourDistance": 0.558,
+      "deutanDistance": 0.425,
+      "lumaDifference": 0.271,
+      "textureDifference": 0.061
+    },
+    {
+      "a": "windsilver-brassvein",
+      "b": "halite-quartzine",
+      "colourDistance": 0.034,
+      "deutanDistance": 0.033,
+      "lumaDifference": 0.017,
+      "textureDifference": 0.06
+    },
+    {
+      "a": "windsilver-brassvein",
+      "b": "desert-rose-quartzine",
+      "colourDistance": 0.404,
+      "deutanDistance": 0.411,
+      "lumaDifference": 0.219,
+      "textureDifference": 0.052
+    },
+    {
+      "a": "windsilver-brassvein",
+      "b": "mesa-manganese-brassvein",
+      "colourDistance": 0.622,
+      "deutanDistance": 0.639,
+      "lumaDifference": 0.375,
+      "textureDifference": 0.048
+    },
+    {
+      "a": "dawn-opal-quartzine",
+      "b": "salt-iron-brassvein",
+      "colourDistance": 0.173,
+      "deutanDistance": 0.095,
+      "lumaDifference": 0.008,
+      "textureDifference": 0.064
+    },
+    {
+      "a": "dawn-opal-quartzine",
+      "b": "wind-copper-brassvein",
+      "colourDistance": 0.482,
+      "deutanDistance": 0.226,
+      "lumaDifference": 0.131,
+      "textureDifference": 0.066
+    },
+    {
+      "a": "dawn-opal-quartzine",
+      "b": "halite-quartzine",
+      "colourDistance": 0.2,
+      "deutanDistance": 0.215,
+      "lumaDifference": 0.123,
+      "textureDifference": 0.062
+    },
+    {
+      "a": "dawn-opal-quartzine",
+      "b": "desert-rose-quartzine",
+      "colourDistance": 0.258,
+      "deutanDistance": 0.241,
+      "lumaDifference": 0.079,
+      "textureDifference": 0.058
+    },
+    {
+      "a": "dawn-opal-quartzine",
+      "b": "mesa-manganese-brassvein",
+      "colourDistance": 0.463,
+      "deutanDistance": 0.415,
+      "lumaDifference": 0.235,
+      "textureDifference": 0.044
+    },
+    {
+      "a": "dune-scatter-amberbone",
+      "b": "salt-iron-brassvein",
+      "colourDistance": 0.1,
+      "deutanDistance": 0.096,
+      "lumaDifference": 0.013,
+      "textureDifference": 0.071
+    },
+    {
+      "a": "dune-scatter-amberbone",
+      "b": "wind-copper-brassvein",
+      "colourDistance": 0.33,
+      "deutanDistance": 0.137,
+      "lumaDifference": 0.11,
+      "textureDifference": 0.069
+    },
+    {
+      "a": "dune-scatter-amberbone",
+      "b": "halite-quartzine",
+      "colourDistance": 0.287,
+      "deutanDistance": 0.284,
+      "lumaDifference": 0.144,
+      "textureDifference": 0.064
+    },
+    {
+      "a": "dune-scatter-amberbone",
+      "b": "desert-rose-quartzine",
+      "colourDistance": 0.102,
+      "deutanDistance": 0.099,
+      "lumaDifference": 0.058,
+      "textureDifference": 0.065
+    },
+    {
+      "a": "dune-scatter-amberbone",
+      "b": "mesa-manganese-brassvein",
+      "colourDistance": 0.336,
+      "deutanDistance": 0.359,
+      "lumaDifference": 0.214,
+      "textureDifference": 0.058
+    },
+    {
+      "a": "salt-shell-amberbone",
+      "b": "salt-iron-brassvein",
+      "colourDistance": 0.007,
+      "deutanDistance": 0.007,
+      "lumaDifference": 0.004,
+      "textureDifference": 0.082
+    },
+    {
+      "a": "salt-shell-amberbone",
+      "b": "wind-copper-brassvein",
+      "colourDistance": 0.332,
+      "deutanDistance": 0.177,
+      "lumaDifference": 0.127,
+      "textureDifference": 0.075
+    },
+    {
+      "a": "salt-shell-amberbone",
+      "b": "halite-quartzine",
+      "colourDistance": 0.221,
+      "deutanDistance": 0.217,
+      "lumaDifference": 0.127,
+      "textureDifference": 0.074
+    },
+    {
+      "a": "salt-shell-amberbone",
+      "b": "desert-rose-quartzine",
+      "colourDistance": 0.187,
+      "deutanDistance": 0.172,
+      "lumaDifference": 0.075,
+      "textureDifference": 0.071
+    },
+    {
+      "a": "salt-shell-amberbone",
+      "b": "mesa-manganese-brassvein",
+      "colourDistance": 0.372,
+      "deutanDistance": 0.393,
+      "lumaDifference": 0.231,
+      "textureDifference": 0.067
+    },
+    {
+      "a": "salt-iron-brassvein",
+      "b": "wind-copper-brassvein",
+      "colourDistance": 0.329,
+      "deutanDistance": 0.17,
+      "lumaDifference": 0.123,
+      "textureDifference": 0.071
+    },
+    {
+      "a": "salt-iron-brassvein",
+      "b": "halite-quartzine",
+      "colourDistance": 0.226,
+      "deutanDistance": 0.223,
+      "lumaDifference": 0.131,
+      "textureDifference": 0.061
+    },
+    {
+      "a": "salt-iron-brassvein",
+      "b": "desert-rose-quartzine",
+      "colourDistance": 0.179,
+      "deutanDistance": 0.165,
+      "lumaDifference": 0.071,
+      "textureDifference": 0.065
+    },
+    {
+      "a": "salt-iron-brassvein",
+      "b": "mesa-manganese-brassvein",
+      "colourDistance": 0.367,
+      "deutanDistance": 0.386,
+      "lumaDifference": 0.227,
+      "textureDifference": 0.055
+    },
+    {
+      "a": "wind-copper-brassvein",
+      "b": "halite-quartzine",
+      "colourDistance": 0.531,
+      "deutanDistance": 0.393,
+      "lumaDifference": 0.254,
+      "textureDifference": 0.067
+    },
+    {
+      "a": "wind-copper-brassvein",
+      "b": "desert-rose-quartzine",
+      "colourDistance": 0.345,
+      "deutanDistance": 0.06,
+      "lumaDifference": 0.052,
+      "textureDifference": 0.06
+    },
+    {
+      "a": "wind-copper-brassvein",
+      "b": "mesa-manganese-brassvein",
+      "colourDistance": 0.246,
+      "deutanDistance": 0.224,
+      "lumaDifference": 0.104,
+      "textureDifference": 0.06
+    },
+    {
+      "a": "halite-quartzine",
+      "b": "desert-rose-quartzine",
+      "colourDistance": 0.37,
+      "deutanDistance": 0.377,
+      "lumaDifference": 0.202,
+      "textureDifference": 0.055
+    },
+    {
+      "a": "halite-quartzine",
+      "b": "mesa-manganese-brassvein",
+      "colourDistance": 0.591,
+      "deutanDistance": 0.609,
+      "lumaDifference": 0.358,
+      "textureDifference": 0.049
+    },
+    {
+      "a": "desert-rose-quartzine",
+      "b": "mesa-manganese-brassvein",
+      "colourDistance": 0.277,
+      "deutanDistance": 0.265,
+      "lumaDifference": 0.156,
+      "textureDifference": 0.047
+    }
+  ],
+  "leastDifferentPair": ["salt-shell-amberbone", "salt-iron-brassvein"]
+}
