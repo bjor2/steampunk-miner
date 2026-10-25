@@ -129,7 +129,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dock-buildings/systems/render/worksSteam.test.ts` | 4 | 4 |
 | `src/features/dock-buildings/systems/render/workshopStaging.test.ts` | 6 | 6 |
 
-### `drill-gear`: 31 files, 259 tests
+### `drill-gear`: 32 files, 262 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -148,14 +148,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/drill-gear/systems/deepParity.test.ts` | 60 | 3 |
 | `src/features/drill-gear/systems/dielectricBit.test.ts` | 5 | 5 |
 | `src/features/drill-gear/systems/drillGearEconomy.test.ts` | 6 | 6 |
-| `src/features/drill-gear/systems/drillGearFork.test.ts` | 10 | 10 |
+| `src/features/drill-gear/systems/drillGearFork.test.ts` | 9 | 9 |
 | `src/features/drill-gear/systems/drillGearItems.test.ts` | 12 | 12 |
 | `src/features/drill-gear/systems/drillGearPowerUps.test.ts` | 4 | 4 |
 | `src/features/drill-gear/systems/drillGearSales.test.ts` | 2 | 2 |
 | `src/features/drill-gear/systems/gatesFixture.test.ts` | 22 | 3 |
 | `src/features/drill-gear/systems/moneyOnlyGates.test.ts` | 5 | 2 |
 | `src/features/drill-gear/systems/samplingCorer.test.ts` | 11 | 10 |
-| `src/features/drill-gear/systems/sideCutterMarks.test.ts` | 8 | 8 |
+| `src/features/drill-gear/systems/sideCutterMarks.test.ts` | 9 | 9 |
 | `src/features/drill-gear/systems/softGroundLink.test.ts` | 6 | 6 |
 | `src/features/drill-gear/systems/statPreview.test.ts` | 12 | 12 |
 | `src/features/drill-gear/systems/travelShare.test.ts` | 6 | 6 |
@@ -164,6 +164,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/drill-gear/systems/useResolution.test.ts` | 13 | 13 |
 | `src/features/drill-gear/systems/vibratoryCrumble.test.ts` | 4 | 4 |
 | `src/features/drill-gear/twinBitPace.test.ts` | 4 | 2 |
+| `src/features/drill-gear/widthReportRows.test.ts` | 3 | 3 |
 
 ### `drill-look`: 2 files, 14 tests
 
@@ -888,6 +889,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/bore/boreWalk.test.ts` | 14 | 14 |
 | `src/systems/authority/bore/groundGun.test.ts` | 33 | 33 |
 | `src/systems/authority/bore/shotShape.test.ts` | 14 | 14 |
+| `src/systems/authority/boreWidthCut.test.ts` | 7 | 7 |
 | `src/systems/authority/builtFacilities.test.ts` | 6 | 6 |
 | `src/systems/authority/carryRelease.test.ts` | 22 | 13 |
 | `src/systems/authority/carveGeometryKnownRed.test.ts` | 5 | 5 |
@@ -1014,7 +1016,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/serviceReserve.test.ts` | 4 | 4 |
 | `src/systems/authority/sessionSnapshot.test.ts` | 21 | 21 |
 | `src/systems/authority/sideCellsPerMetre.test.ts` | 4 | 1 |
-| `src/systems/authority/sideOreCredit.test.ts` | 6 | 6 |
+| `src/systems/authority/sideOreCredit.test.ts` | 7 | 7 |
 | `src/systems/authority/signatureCells.test.ts` | 9 | 9 |
 | `src/systems/authority/sliceSectionSnapshot.test.ts` | 12 | 12 |
 | `src/systems/authority/spanBudget.test.ts` | 5 | 5 |
@@ -1249,7 +1251,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/diveSummaries.test.ts` | 4 | 4 |
 | `src/logging/domainEventLog.test.ts` | 21 | 21 |
 | `src/logging/downSpeedReport.test.ts` | 2 | 2 |
-| `src/logging/drillCutLine.test.ts` | 12 | 12 |
+| `src/logging/drillCutLine.test.ts` | 13 | 13 |
 | `src/logging/drillLadder.test.ts` | 3 | 3 |
 | `src/logging/drillLadderReport.test.ts` | 9 | 9 |
 | `src/logging/drillLadderSteps.test.ts` | 4 | 4 |
@@ -1831,6 +1833,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/aim.test.ts` | 11 | 11 |
 | `src/systems/vehicle/bandDig.test.ts` | 8 | 8 |
 | `src/systems/vehicle/bodySpeedDips.test.ts` | 6 | 6 |
+| `src/systems/vehicle/boreWidthStamp.test.ts` | 4 | 4 |
 | `src/systems/vehicle/carryDebt.test.ts` | 8 | 8 |
 | `src/systems/vehicle/carryWalk.test.ts` | 52 | 22 |
 | `src/systems/vehicle/casingTrail.test.ts` | 27 | 19 |
@@ -1845,7 +1848,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/cutStartBreakdown.test.ts` | 6 | 6 |
 | `src/systems/vehicle/downCutRamp.test.ts` | 12 | 12 |
 | `src/systems/vehicle/downCutRampFront.test.ts` | 5 | 5 |
-| `src/systems/vehicle/drillBore.test.ts` | 10 | 10 |
+| `src/systems/vehicle/drillBore.test.ts` | 18 | 15 |
 | `src/systems/vehicle/drillContact.test.ts` | 7 | 7 |
 | `src/systems/vehicle/drillGearCells.test.ts` | 12 | 12 |
 | `src/systems/vehicle/drillQuantum.test.ts` | 6 | 6 |
