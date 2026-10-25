@@ -494,8 +494,16 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    at their origin's merchant taking premium rows too, said in `OreSaleLifted`;
  *    `debug.setPremiumLedger` sets the ledger for a scenario. With no premium seam registered no
  *    unit is counted, so a run moves no digest.
+ * 110: the contact effects of #651's hazards and the tool trade-off seam (ticket 848, the GD lock
+ *    on #823 Q1/Q2 and the TD's seam as amended): a drill cut of a hazard cell plays its kind's
+ *    contact-effect row on the cutting rig (`HazardRefilled`, `HazardBit`, `HazardShoved`), a rig
+ *    standing in a cut drain pocket drains on its commands (`HazardDrained`), the vehicle carries
+ *    the optional `hazardHullBp`, `hazardShove` and `actingTools`, `ToolActingChanged` says a tool
+ *    started or stopped acting, and `debug.placeHazard` places a hazard for a scenario in the
+ *    session's optional `placedHazards`. Planet 1 holds no hazard and a factor of 0 plays nothing,
+ *    so those runs move no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 109
+export const AUTHORITY_PROTOCOL_VERSION = 110
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
