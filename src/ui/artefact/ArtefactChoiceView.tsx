@@ -1,17 +1,22 @@
 /**
- * The artefact cache's three cards drawn from their view model (#46 Choice UI): name, one line and
- * Choose on each, then "Leave it". Each is the kernel item card once a describer answers, its
- * flavour and stat lines in place of the summary (K7 #199). On a phone held upright the cards
- * stand in one column and scroll in the shared scroll area (#470 PT-5). Markup only.
+ * The artefact cache's cards drawn from their view model (#46 Choice UI), on brass since ticket
+ * 885: the kit's sheet-framed panel titled on the shared Title+OneLine element, and per option a
+ * card in the baked card frame (#683) with its name and one line, each stat line's value as an
+ * icon-plus-value fact (`artefactCardFaceOf`), and its kit Choose; then "Leave it". On a phone held
+ * upright the cards stand in one column and scroll in the shared scroll area (#470 PT-5). Markup
+ * only.
  */
+import { artefactCardFaceOf, type ArtefactStatRow } from '../../systems/views/artefactCardFace'
 import type { ArtefactCard, ArtefactChoiceModel } from '../../systems/views/artefactChoiceModel'
-import { ItemCard } from '../kit/ItemCard'
+import { IconFact } from '../kit/IconFacts'
 import { Panel } from '../kit/Panel'
 import { ScrollArea } from '../kit/ScrollArea'
+import { TitleOneLine } from '../kit/TitleOneLine'
 import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
 import { ScreenButtonView } from '../ScreenButtonView'
-import { VectorIcon } from '../VectorIcon'
 import styles from './ArtefactChoice.module.css'
+
+const HEADING_ID = 'artefact.cache'
 
 export function ArtefactChoiceView({
   model,
@@ -22,7 +27,12 @@ export function ArtefactChoiceView({
 }) {
   return (
     <div className={styles.overlay} data-testid={UI_IDS.artefactChoice}>
-      <Panel title={model.title} iconId={model.titleIconId}>
+      <Panel
+        frame="sheet"
+        title={model.title}
+        iconId={model.titleIconId}
+        heading={{ id: HEADING_ID, oneLine: model.oneLine, tooltipLines: [] }}
+      >
         <ScrollArea className={styles.scroll}>
           <div className={styles.cards}>
             {model.cards.map((card) => (
@@ -37,17 +47,26 @@ export function ArtefactChoiceView({
 }
 
 function CardView({ card, focusedId }: { card: ArtefactCard; focusedId: string }) {
-  const choose = <ScreenButtonView button={card.choose} focusedId={focusedId} />
+  const face = artefactCardFaceOf(card)
   return (
-    <ItemCard variant="full" card={card.card} action={choose}>
-      <article className={styles.card} data-testid={UI_ID_TEMPLATES.artefactCard(card.optionId)}>
-        <h3 className={styles.name}>
-          <VectorIcon iconId={card.iconId} />
-          {card.name}
-        </h3>
-        <p className={styles.summary}>{card.summary}</p>
-        {choose}
-      </article>
-    </ItemCard>
+    <article className={styles.card} data-testid={UI_ID_TEMPLATES.artefactCard(card.optionId)}>
+      <TitleOneLine text={face.text} iconId={face.iconId}>
+        {face.stats.length > 0 && <StatRows rows={face.stats} />}
+        <ScreenButtonView button={card.choose} focusedId={focusedId} />
+      </TitleOneLine>
+    </article>
+  )
+}
+
+function StatRows({ rows }: { rows: readonly ArtefactStatRow[] }) {
+  return (
+    <ul className={styles.stats}>
+      {rows.map((row) => (
+        <li key={row.label} className={styles.stat}>
+          <span>{row.label}</span>
+          <IconFact fact={row.fact} />
+        </li>
+      ))}
+    </ul>
   )
 }

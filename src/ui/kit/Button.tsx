@@ -1,6 +1,7 @@
 /**
  * The UI kit's button: a brass-outlined control. Tab reaches it and draws its focus ring (#173);
  * a click never leaves it focused, so Space and Enter go back to the game afterwards.
+ * `data-kit-control` tells the brass crop check (ticket 885) it is no browser-default control.
  */
 import type { MouseEvent } from 'react'
 import styles from './Button.module.css'
@@ -19,6 +20,7 @@ export function Button({
     <button
       type="button"
       className={styles.button}
+      data-kit-control
       data-testid={testId}
       onMouseDown={keepFocusOnGame}
       onClick={onPress}

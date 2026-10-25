@@ -24,7 +24,7 @@ import { UnsavedChip } from './ui/save/UnsavedChip'
 import { ExactAmountSheet } from './ui/sheets/ExactAmountSheet'
 import { TitleMenu } from './ui/title/TitleMenu'
 import { TouchControls } from './ui/touch/TouchControls'
-import { TravelTransitionCard } from './ui/TravelTransitionCard'
+import { TravelTransitionCard } from './ui/travel/TravelTransitionCard'
 
 export default function App() {
   return (

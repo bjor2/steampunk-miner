@@ -5,6 +5,18 @@
   background: var(--color-panel);
 }
 
+/*
+ * A plate that stands alone over the play view (ticket 885): the #683 baked sheet frame, a double
+ * brass frame, iron band and rivets, over the CSS double frame it falls back to while the asset is
+ * a placeholder; an opaque ground, since it lies over the world.
+ */
+.panel[data-frame='sheet'] {
+  border: var(--frame-double) double var(--color-brass);
+  border-image: var(--art-sheet-frame) var(--art-sheet-frame-slice) fill /
+    var(--art-sheet-frame-width);
+  background: var(--color-bg);
+}
+
 .title {
   display: flex;
   align-items: center;

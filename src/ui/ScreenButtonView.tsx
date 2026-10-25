@@ -6,7 +6,8 @@
  * Tab reaches it and draws its focus ring (#173, so a focus-driven UI stays possible), and the
  * browser's focus and the store's menu focus are one: focusing it moves menu focus here, and menu
  * keys carry the browser's focus along. A key never clicks it, because the game already confirms
- * the focused control from the same Enter or Space; a click or tap presses it.
+ * the focused control from the same Enter or Space; a click or tap presses it. It wears the kit's
+ * brass outline, so it carries `data-kit-control` for the brass crop check (ticket 885).
  */
 import { useEffect, useRef, type MouseEvent } from 'react'
 import { useGameStore } from '../store/gameStore'
@@ -35,6 +36,7 @@ export function ScreenButtonView({
       ref={ref}
       type="button"
       className={styles.button}
+      data-kit-control
       data-testid={button.id}
       data-reason={button.reason ?? undefined}
       data-state={state}

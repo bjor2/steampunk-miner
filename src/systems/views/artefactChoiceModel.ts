@@ -34,7 +34,9 @@ export interface ArtefactCard {
 }
 
 export interface ArtefactChoiceModel {
+  /** Three words at most (#678 copy budget); the rule of the pick is the one line under it. */
   title: string
+  oneLine: string
   titleIconId: string
   cards: ArtefactCard[]
   leave: ScreenButton
@@ -54,7 +56,8 @@ export function selectArtefactChoiceModel(
   )
   const leave = uiButton(UI_IDS.artefactLeave, 'Leave it', { kind: 'closeArtefactChoice' })
   return {
-    title: 'Ancient cache: take one, the others are lost',
+    title: 'Ancient cache',
+    oneLine: 'Take one; the others are lost for good.',
     titleIconId: panelIconIdOf('cache'),
     cards,
     leave,

@@ -1,12 +1,23 @@
+/*
+ * The artefact cache (#46, on brass since ticket 885): a modal choice over a dimmed view, the
+ * kit's sheet-framed panel at most the screen less its margins, and each card in the #683 baked
+ * card frame over a brass hairline, its stat rows a label left and the glyph-and-value fact right.
+ */
 .overlay {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: var(--hud-inset-top) var(--hud-inset-right) var(--hud-inset-bottom) var(--hud-inset-left);
   background: rgb(27 22 19 / 0.6);
   font-family: var(--font-body);
   pointer-events: auto;
+}
+
+.overlay > * {
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 /* The shared scroll area (build #423) bounds the cards; it owns the overflow and the rail. */
@@ -25,24 +36,29 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-2);
-  border: 1px solid var(--color-brass);
-  border-radius: var(--radius-panel);
+  padding: var(--space-2) var(--space-3);
+  border: var(--frame-hairline) solid var(--color-brass);
+  border-radius: var(--radius-card);
+  border-image: var(--art-card-frame) var(--art-card-frame-slice) fill / var(--art-card-frame-width);
+  background: var(--color-panel);
+  color: var(--color-parchment);
 }
 
-.name {
+.stats {
   display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin: 0;
-  color: var(--color-brass);
-  font-size: 1.1rem;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: var(--space-1) 0 var(--space-2);
+  padding: 0;
+  list-style: none;
 }
 
-.summary {
-  flex: 1;
-  margin: 0;
+.stat {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-2);
 }
 
 /* A phone held upright (#470 PT-5): three cards side by side need 480 px; they stand in a column. */

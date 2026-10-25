@@ -1758,6 +1758,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/ui/brassScreens.test.ts` | 6 | 6 |
 | `src/ui/hud/hudBoxes.test.ts` | 9 | 6 |
 | `src/ui/hud/hudPanels.test.ts` | 5 | 5 |
 | `src/ui/hud/hudRows.test.ts` | 6 | 6 |
@@ -1859,6 +1860,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/bayEntryRows.test.ts` | 8 | 8 |
 | `src/systems/views/bayPanelPages.test.ts` | 8 | 8 |
 | `src/systems/views/bayPresentation.test.ts` | 6 | 6 |
+| `src/systems/views/brassCrop.test.ts` | 5 | 5 |
 | `src/systems/views/cardReveal.test.ts` | 6 | 6 |
 | `src/systems/views/chargeViews.test.ts` | 14 | 14 |
 | `src/systems/views/combatStatuses.test.ts` | 8 | 8 |
@@ -1922,6 +1924,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/titleOnlyText.test.ts` | 5 | 5 |
 | `src/systems/views/toolSlotBar.test.ts` | 13 | 13 |
 | `src/systems/views/tooltipOpening.test.ts` | 9 | 9 |
+| `src/systems/views/travelCardView.test.ts` | 5 | 5 |
 | `src/systems/views/tripIncome.test.ts` | 8 | 8 |
 | `src/systems/views/uiBudgetRatchet.test.ts` | 8 | 8 |
 | `src/systems/views/uiBudgetReading.test.ts` | 9 | 9 |

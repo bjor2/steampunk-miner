@@ -1,0 +1,36 @@
+/*
+ * The travel card (ticket 885): a sheet-framed plate low in the bottom thumb zone, so its Skip
+ * sits under the thumb and the plate stays out of the drill head's middle band (30% to 70% of
+ * the height, design-system section 9) on a phone and on desktop alike; at most 28rem wide and
+ * never past the margins. It drops in over `--motion-standard`, none under Reduce Motion.
+ */
+.anchor {
+  position: absolute;
+  right: var(--hud-inset-right);
+  bottom: var(--hud-inset-bottom);
+  left: var(--hud-inset-left);
+  display: flex;
+  justify-content: center;
+  font-family: var(--font-body);
+  pointer-events: none;
+  animation: card-enter var(--motion-standard) var(--ease-enter);
+}
+
+.anchor > * {
+  box-sizing: border-box;
+  width: min(100%, 28rem);
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anchor {
+    animation: none;
+  }
+}
+
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-3));
+  }
+}
