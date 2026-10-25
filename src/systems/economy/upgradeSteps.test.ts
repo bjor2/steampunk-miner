@@ -205,7 +205,7 @@ describe('upgrade steps: stats', () => {
       cargoCapacityAtStep(20 + purchase),
     )
     const energies = Array.from({ length: 6 }, (_, purchase) => energyMaxAtStep(20 + purchase))
-    expect(capacities).toEqual([67, 74, 81, 90, 98, 108])
+    expect(capacities).toEqual([67n, 74n, 81n, 90n, 98n, 108n])
     expect(energies).toEqual([1009, 1110, 1221, 1343, 1477, 1625])
   })
 

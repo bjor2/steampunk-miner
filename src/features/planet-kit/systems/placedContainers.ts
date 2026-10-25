@@ -18,6 +18,7 @@
  * Pure: the planet key, the cap and the hold's capacity come in as arguments.
  */
 import { cargoUnitsOf, EMPTY_CARGO, type Cargo } from '../../../systems/vehicle/vehicleState'
+import { countAsSafeInteger, largerCount, smallerCount } from '../../../systems/wholeCount'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import {
   EMPTY_PREMIUM_LEDGER,
@@ -79,8 +80,8 @@ export interface ContainerPickup {
   playerId: string
   containerId: number
   hold: Cargo
-  /** The hold's capacity in units. */
-  capacity: number
+  /** The hold's capacity in units (unbounded, ticket 849). */
+  capacity: bigint
 }
 
 export type PickupRefusal = 'unknown_container' | 'not_allowed' | 'hold_full'
@@ -101,7 +102,7 @@ export type PickupOutcome =
 
 /** Why `drop` cannot apply, or null when it can. */
 export function dropRefusalOf(placed: PlacedContainers, drop: ContainerDrop): DropRefusal | null {
-  if (cargoUnitsOf(drop.hold) === 0) return 'empty_hold'
+  if (cargoUnitsOf(drop.hold) === 0n) return 'empty_hold'
   if (placedCountOf(placed, drop.planetKey, drop.ownerId, drop.kind) >= drop.cap) {
     return 'container_cap'
   }
@@ -129,7 +130,7 @@ export function pickupRefusalOf(
   const container = containerAt(placed, pickup.planetKey, pickup.containerId)
   if (container === null) return 'unknown_container'
   if (!canPickUp(container, pickup.playerId)) return 'not_allowed'
-  if (freeRoomOf(pickup.hold, pickup.capacity) === 0) return 'hold_full'
+  if (freeRoomOf(pickup.hold, pickup.capacity) === 0n) return 'hold_full'
   return null
 }
 
@@ -143,7 +144,7 @@ export function pickupContainer(placed: PlacedContainers, pickup: ContainerPicku
     freeRoomOf(pickup.hold, pickup.capacity),
   )
   const premium = premiumMovedWith(container.premium ?? EMPTY_PREMIUM_LEDGER, taken)
-  const left = cargoUnitsOf(rest) === 0 ? null : containerLeftWith(container, rest, premium.left)
+  const left = cargoUnitsOf(rest) === 0n ? null : containerLeftWith(container, rest, premium.left)
   return {
     isPickedUp: true,
     placed: withContainerLeft(placed, pickup.planetKey, container.containerId, left),
@@ -190,10 +191,10 @@ export function placedCountOf(
 }
 
 /** The units held in every container on every planet: the conservation total beside the holds. */
-export function containedUnitsOf(placed: PlacedContainers): number {
+export function containedUnitsOf(placed: PlacedContainers): bigint {
   return Object.values(placed)
     .flatMap((planet) => Object.values(planet.byId))
-    .reduce((total, container) => total + cargoUnitsOf(container.cargo), 0)
+    .reduce((total, container) => total + cargoUnitsOf(container.cargo), 0n)
 }
 
 export function containerAt(
@@ -258,25 +259,25 @@ function withContainerLeft(
   return { ...placed, [planetKey]: { nextContainerId: planet.nextContainerId, byId } }
 }
 
-function freeRoomOf(hold: Cargo, capacity: number): number {
-  return Math.max(0, capacity - cargoUnitsOf(hold))
+function freeRoomOf(hold: Cargo, capacity: bigint): bigint {
+  return largerCount(0n, capacity - cargoUnitsOf(hold))
 }
 
 /** Up to `room` units of `cargo`: core fragments first, then ore tiers from the highest down. */
-function takeHighestFirst(cargo: Cargo, room: number): { taken: Cargo; rest: Cargo } {
-  const fragments = Math.min(cargo.coreFragments, room)
+function takeHighestFirst(cargo: Cargo, room: bigint): { taken: Cargo; rest: Cargo } {
+  const fragments = smallerCount(BigInt(cargo.coreFragments), room)
   let left = room - fragments
-  const taken: Record<string, number> = {}
-  const rest: Record<string, number> = {}
+  const taken: Record<string, bigint> = {}
+  const rest: Record<string, bigint> = {}
   for (const tier of tiersHighestFirst(cargo)) {
-    const units = Math.min(cargo.ore[tier], left)
+    const units = smallerCount(cargo.ore[tier], left)
     left -= units
-    if (units > 0) taken[tier] = units
+    if (units > 0n) taken[tier] = units
     if (cargo.ore[tier] > units) rest[tier] = cargo.ore[tier] - units
   }
   return {
-    taken: { ore: taken, coreFragments: fragments },
-    rest: { ore: rest, coreFragments: cargo.coreFragments - fragments },
+    taken: { ore: taken, coreFragments: countAsSafeInteger(fragments) },
+    rest: { ore: rest, coreFragments: cargo.coreFragments - countAsSafeInteger(fragments) },
   }
 }
 
@@ -287,6 +288,6 @@ function tiersHighestFirst(cargo: Cargo): string[] {
 
 function addedCargo(hold: Cargo, moved: Cargo): Cargo {
   const ore = { ...hold.ore }
-  for (const [tier, units] of Object.entries(moved.ore)) ore[tier] = (ore[tier] ?? 0) + units
+  for (const [tier, units] of Object.entries(moved.ore)) ore[tier] = (ore[tier] ?? 0n) + units
   return { ore, coreFragments: hold.coreFragments + moved.coreFragments }
 }

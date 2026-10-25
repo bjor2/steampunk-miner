@@ -43,7 +43,7 @@ export const HINT_CONDITIONS = {
   docked: (moment) => hasPlayerEvent(moment, 'DockEntered'),
   dockedAtSellBayWithCargo: (moment) =>
     playerEventsOf(moment, 'DockEntered').some(
-      (event) => event.bay === 'sell' && event.cargoUnits > 0,
+      (event) => event.bay === 'sell' && event.cargoUnits > 0n,
     ),
   leftSellBay: (moment) => playerEventsOf(moment, 'DockLeft').some((event) => event.bay === 'sell'),
   affordsUpgradeAtSellBay: isUpgradeAffordableAtSellBay,

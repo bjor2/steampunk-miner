@@ -7,6 +7,7 @@ import type { DomainEvent } from '../domainEvent'
 import type { ScriptedSession } from '../scriptedSession'
 import { dockAtBayOf, mineSurfaceOre, REFINERY_SITE, sessionOnPlanet } from './refineryFixtures'
 import { stepOfMajor } from '../../economy/upgradeSteps'
+import { oreUnitsOf } from '../../vehicle/vehicleState'
 
 /** Planet 3's band-1 ore, the tier the fixtures mine. */
 const TIER = oreTier(3, 1)
@@ -25,7 +26,7 @@ const rejectionOf = (events: readonly DomainEvent[]) =>
   events.find((event) => event.type === 'CommandRejected')
 const eventOf = (events: readonly DomainEvent[], type: DomainEvent['type']) =>
   events.find((event) => event.type === type)
-const heldOf = (session: ScriptedSession) => session.vehicle().cargo.ore[String(TIER)] ?? 0
+const heldOf = (session: ScriptedSession) => oreUnitsOf(session.vehicle().cargo, TIER)
 
 /** On planet 3 with a drill that digs its band 1, 6 band-1 ore in the hold, docked at the Refinery bay. */
 function dockedAtRefineryWithOre(money = '0'): { session: ScriptedSession; tick: number } {
@@ -44,14 +45,14 @@ describe('refinery queue', () => {
     expect(eventOf(events, 'RefineQueued')).toMatchObject({
       slot: 0,
       tier: TIER,
-      units: 4,
-      requestedUnits: 4,
+      units: 4n,
+      requestedUnits: 4n,
     })
-    expect(heldOf(session)).toBe(2)
+    expect(heldOf(session)).toBe(2n)
     expect(session.state().platform.refinerySlots[0]).toEqual({
       owner: 'p1',
       tier: TIER,
-      units: 4,
+      units: 4n,
       readyAtTick: tick + 1 + REFINE_TICKS,
       queuedTick: tick + 1,
       queuedPlanet: 3,
@@ -61,8 +62,8 @@ describe('refinery queue', () => {
   it('clamps a request past half the hold to floor(0.5 x cargoCapacity) and logs what was asked', () => {
     const { session, tick } = dockedAtRefineryWithOre()
     const events = session.submit(tick + 1, queue(50))
-    expect(eventOf(events, 'RefineQueued')).toMatchObject({ units: 5, requestedUnits: 50 })
-    expect(heldOf(session)).toBe(1)
+    expect(eventOf(events, 'RefineQueued')).toMatchObject({ units: 5n, requestedUnits: 50n })
+    expect(heldOf(session)).toBe(1n)
   })
 
   it('refuses core fragments: they go to the core bay', () => {
@@ -140,13 +141,13 @@ describe('refinery timer and collection', () => {
     const events = session.submit(tick + 2 + REFINE_TICKS, collect)
     expect(eventOf(events, 'RefineCollected')).toMatchObject({
       slot: 0,
-      units: 4,
-      value: toCanonical(refinedValue(TIER, 4)),
+      units: 4n,
+      value: toCanonical(refinedValue(TIER, 4n)),
       waitSeconds: 180,
       queuedPlanet: 3,
     })
     expect(toCanonical(session.state().players.p1.wallet)).toBe(
-      toCanonical(sub(add(before, refinedValue(TIER, 4)), bill)),
+      toCanonical(sub(add(before, refinedValue(TIER, 4n)), bill)),
     )
     expect(session.state().platform.refinerySlots).toEqual([null])
   })
@@ -164,7 +165,7 @@ describe('refinery timer and collection', () => {
     session.submit(tick + 1, queue(4))
     dockAtBayOf(session, tick + 1 + REFINE_TICKS, REFINERY_SITE, 'sell')
     const events = session.submit(tick + 2 + REFINE_TICKS, { type: 'quickService', payload: {} })
-    expect(eventOf(events, 'RefineCollected')).toMatchObject({ units: 4 })
+    expect(eventOf(events, 'RefineCollected')).toMatchObject({ units: 4n })
     expect(session.state().platform.refinerySlots).toEqual([null])
   })
 
@@ -180,7 +181,7 @@ describe('refinery timer and collection', () => {
     expect(session.state().planet.index).toBe(4)
     const events = session.submit(tick + 2 + REFINE_TICKS, collect)
     expect(eventOf(events, 'RefineCollected')).toMatchObject({
-      value: toCanonical(refinedValue(TIER, 4)),
+      value: toCanonical(refinedValue(TIER, 4n)),
       queuedPlanet: 3,
     })
   })

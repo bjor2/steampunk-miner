@@ -35,7 +35,7 @@ describe('income trip cap', () => {
       BANDS.filter((band) => {
         const fullHold = mul(fromSafeInteger(24), oreValue(oreTier(planet, band)))
         const expected = floorMilli(mul(money('0.15'), fullHold))
-        return toCanonical(tripCapAt(planet, band, 24)) !== toCanonical(expected)
+        return toCanonical(tripCapAt(planet, band, 24n)) !== toCanonical(expected)
       }).map((band) => `P${planet} band ${band}`),
     )
     expect(misses).toEqual([])
@@ -43,9 +43,9 @@ describe('income trip cap', () => {
 
   it('grows with the hold and with the band', () => {
     // V(1) is 10: a hold of 20 band-1 units is worth 200, its 15% is 30.
-    expect(toCanonical(tripCapAt(1, 1, 20))).toBe(toCanonical(money('30')))
-    expect(toCanonical(tripCapAt(1, 1, 40))).toBe(toCanonical(money('60')))
-    expect(cmp(tripCapAt(9, 5, 20), tripCapAt(9, 4, 20))).toBe(1)
+    expect(toCanonical(tripCapAt(1, 1, 20n))).toBe(toCanonical(money('30')))
+    expect(toCanonical(tripCapAt(1, 1, 40n))).toBe(toCanonical(money('60')))
+    expect(cmp(tripCapAt(9, 5, 20n), tripCapAt(9, 4, 20n))).toBe(1)
   })
 
   it('leaves the room under the cap, and none at or past it', () => {

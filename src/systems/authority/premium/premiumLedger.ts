@@ -13,7 +13,7 @@
  * JSON. Entries are kept sorted by tier then key, so one ledger has one shape.
  */
 import { readIndexText } from '../../starMap/planetAddress'
-import type { Cargo } from '../../vehicle/vehicleState'
+import { oreUnitsOf, type Cargo } from '../../vehicle/vehicleState'
 
 export interface PremiumCount {
   /** The hold tier the units are stored at. */
@@ -94,7 +94,7 @@ export function premiumOverHoldProblems(
   where: string,
 ): string[] {
   return [...new Set(ledger.map((count) => count.tier))]
-    .filter((tier) => premiumUnitsOfTier(ledger, tier) > BigInt(hold.ore[String(tier)] ?? 0))
+    .filter((tier) => premiumUnitsOfTier(ledger, tier) > oreUnitsOf(hold, tier))
     .map((tier) => `${where}: tier ${tier} counts more premium units than the hold holds`)
 }
 

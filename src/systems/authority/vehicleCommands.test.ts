@@ -206,7 +206,7 @@ describe('vehicle cargo', () => {
       resourceTier: 1,
       amount: 1,
     })
-    expect(session.vehicle().cargo).toEqual({ ore: { 1: 1 }, coreFragments: 0 })
+    expect(session.vehicle().cargo).toEqual({ ore: { 1: 1n }, coreFragments: 0 })
   })
 
   it('destroys an ore tile with a full hold, keeps the cargo and logs one lost unit', () => {
@@ -224,7 +224,7 @@ describe('vehicle cargo', () => {
       'StorageFull',
     ])
     expect(events[4]).toMatchObject({ lostUnits: 1 })
-    expect(session.vehicle().cargo.ore).toEqual({ 1: 10 })
+    expect(session.vehicle().cargo.ore).toEqual({ 1: 10n })
   })
 })
 
@@ -249,7 +249,7 @@ describe('vehicle core fragments', () => {
     ])
     expect(events[4]).toMatchObject({ tilesRemaining: 155, fragments: 1 })
     expect(session.vehicle().cargo).toEqual({ ore: {}, coreFragments: 1 })
-    expect(cargoUnitsOf(session.vehicle().cargo)).toBe(1)
+    expect(cargoUnitsOf(session.vehicle().cargo)).toBe(1n)
   })
 })
 

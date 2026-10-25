@@ -22,6 +22,7 @@ import {
   type Money,
 } from '../../../systems/money'
 import { BURST_TIMING, type BurstTiming } from './burstTiming'
+import { countAsSafeInteger } from '../../../systems/wholeCount'
 
 /** A sale as the burst hears it: the gross credits, its coin count and the bill paid out of it. */
 export interface BurstSale {
@@ -118,30 +119,35 @@ export function netOf(wave: BurstWave): Money {
  * for several, in mixed sizes (#171 section 1).
  */
 export function chunksOfSale(items: readonly SoldItem[], room: number): BurstChunk[] {
-  const units = items.reduce((total, item) => total + item.amount, 0)
-  if (units <= room) return items.flatMap(unitChunksOf)
+  const units = items.reduce((total, item) => total + item.amount, 0n)
+  if (units <= BigInt(room)) return items.flatMap(unitChunksOf)
   return Array.from({ length: room }, (_, index) => collapsedChunkOf(items, index, units, room))
 }
 
+/** Only ever called within the room, so the tier's units are a small count. */
 function unitChunksOf(item: SoldItem): BurstChunk[] {
-  return Array.from({ length: item.amount }, () => ({ tier: item.tier, size: 1 }))
+  return Array.from({ length: countAsSafeInteger(item.amount) }, () => ({
+    tier: item.tier,
+    size: 1,
+  }))
 }
 
+/** The sale's units are unbounded (ticket 849), so the share is taken in bigint. */
 function collapsedChunkOf(
   items: readonly SoldItem[],
   index: number,
-  units: number,
+  units: bigint,
   room: number,
 ): BurstChunk {
   return {
-    tier: tierOfUnit(items, Math.floor((index * units) / room)),
+    tier: tierOfUnit(items, (BigInt(index) * units) / BigInt(room)),
     size: index % 2 === 0 ? 2 : 3,
   }
 }
 
 /** The tier of the sale's `unit`-th unit, items in the order the sale lists them. */
-function tierOfUnit(items: readonly SoldItem[], unit: number): number {
-  let before = 0
+function tierOfUnit(items: readonly SoldItem[], unit: bigint): number {
+  let before = 0n
   const owner = items.find((item) => {
     before += item.amount
     return unit < before

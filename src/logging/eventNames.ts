@@ -280,14 +280,14 @@ export const RUN_EVENT_REGISTRY = {
   dock_entered: {
     group: 'platform',
     level: 'core',
-    payload: { bay: BAY, cargoUnits: 'integer', energy: 'integer', hull: 'money' },
+    payload: { bay: BAY, cargoUnits: 'count', energy: 'integer', hull: 'money' },
   },
   dock_left: { group: 'platform', level: 'core', payload: { bay: BAY, durationTicks: 'integer' } },
   resource_sold: {
     group: 'platform',
     level: 'core',
     payload: {
-      items: { listOf: { tier: 'integer', amount: 'integer' } },
+      items: { listOf: { tier: 'integer', amount: 'count' } },
       value: 'money',
       mode: { oneOf: ['all', 'single'] },
       coinsShown: 'integer',
@@ -407,12 +407,12 @@ export const RUN_EVENT_REGISTRY = {
   refine_queued: {
     group: 'platform',
     level: 'core',
-    payload: { slot: 'integer', tier: 'integer', units: 'integer', requestedUnits: 'integer' },
+    payload: { slot: 'integer', tier: 'integer', units: 'count', requestedUnits: 'count' },
   },
   refine_ready: {
     group: 'platform',
     level: 'core',
-    payload: { slot: 'integer', tier: 'integer', units: 'integer' },
+    payload: { slot: 'integer', tier: 'integer', units: 'count' },
   },
   refine_collected: {
     group: 'platform',
@@ -420,7 +420,7 @@ export const RUN_EVENT_REGISTRY = {
     payload: {
       slot: 'integer',
       tier: 'integer',
-      units: 'integer',
+      units: 'count',
       rawValue: 'money',
       value: 'money',
       waitSeconds: 'integer',

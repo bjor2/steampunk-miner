@@ -20,7 +20,7 @@ import type { Cargo } from '../../../systems/vehicle/vehicleState'
 export function premiumMovedWith(premium: PremiumLedger, moved: Cargo): PremiumTake {
   return Object.entries(moved.ore).reduce<PremiumTake>(
     (take, [tier, units]) => {
-      const tierTake = takePremiumOfTier(take.left, Number.parseInt(tier, 10), BigInt(units))
+      const tierTake = takePremiumOfTier(take.left, Number.parseInt(tier, 10), units)
       return { taken: withPremiumCounts(take.taken, tierTake.taken), left: tierTake.left }
     },
     { taken: EMPTY_PREMIUM_LEDGER, left: premium },

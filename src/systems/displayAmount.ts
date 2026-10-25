@@ -25,7 +25,15 @@
  *   0.01% to 99.9%               3 significant digits, truncated           0.41%, 22.8%
  *   from 100%                    as `formatAmount` prints the percent      100%, 1,234%, 10.0M%
  */
-import { fromCanonical, fromSafeInteger, isMoneyText, mul, toCanonical, type Money } from './money'
+import {
+  fromBigInt,
+  fromCanonical,
+  fromSafeInteger,
+  isMoneyText,
+  mul,
+  toCanonical,
+  type Money,
+} from './money'
 import { DESIGN_TOKENS } from './views/designSystem'
 
 const NUMBERS = DESIGN_TOKENS.numbers
@@ -61,35 +69,41 @@ interface DecimalParts {
 type RoundingWay = 'down' | 'up'
 
 /** Short screen text for a balance, an income or a safe-integer count, rounded toward zero. */
-export function formatAmount(amount: Money | number): string {
+export function formatAmount(amount: Money | number | bigint): string {
   return formatParts(splitCanonical(exactAmount(amount)), 'down')
 }
 
 /** Short screen text for a price or a charge, rounded up, so it never reads as less than it is. */
-export function formatPrice(amount: Money | number): string {
+export function formatPrice(amount: Money | number | bigint): string {
   return formatParts(splitCanonical(exactAmount(amount)), 'up')
 }
 
 /** A desktop hover's full balance, income or count: up to 12 figures, rounded toward zero. */
-export function formatAmountLong(amount: Money | number): string {
+export function formatAmountLong(amount: Money | number | bigint): string {
   return formatLongParts(splitCanonical(exactAmount(amount)), 'down')
 }
 
 /** A desktop hover's full price: up to 12 figures, rounded up, as the price chip is. */
-export function formatPriceLong(amount: Money | number): string {
+export function formatPriceLong(amount: Money | number | bigint): string {
   return formatLongParts(splitCanonical(exactAmount(amount)), 'up')
 }
 
 /** The exact canonical `Money` string, for tooltips, detail views and logs. */
-export function exactAmount(amount: Money | number): string {
-  return toCanonical(typeof amount === 'number' ? fromSafeInteger(amount) : amount)
+export function exactAmount(amount: Money | number | bigint): string {
+  return toCanonical(moneyOfShown(amount))
+}
+
+/** A shown count as money: a bounded number, or a count of the unbounded hold (ticket 849). */
+function moneyOfShown(amount: Money | number | bigint): Money {
+  if (typeof amount === 'number') return fromSafeInteger(amount)
+  return typeof amount === 'bigint' ? fromBigInt(amount) : amount
 }
 
 /**
  * Whether the short text drops digits of the amount (a cut mantissa or fraction), so a tap on the
  * readout has an exact value to show (ticket 476); grouping commas alone hide nothing.
  */
-export function isAmountShortened(amount: Money | number): boolean {
+export function isAmountShortened(amount: Money | number | bigint): boolean {
   const parts = splitCanonical(exactAmount(amount))
   return parts.digits.length > shownDigitCountOf(parts)
 }

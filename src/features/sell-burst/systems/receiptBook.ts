@@ -27,7 +27,7 @@ export interface ReceiptBook {
   lastTripNet: Money | null
   isShown: boolean
   /** The hold the manifest was last cut back to, so an unchanged hold costs nothing. */
-  heldOre: Readonly<Record<string, number>> | null
+  heldOre: Readonly<Record<string, bigint>> | null
 }
 
 /** One authority batch as the receipt hears it: the events and the state they answered. */

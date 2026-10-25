@@ -12,6 +12,7 @@ import type { CommandIntent } from '../authority/authorityCommand'
 import { toIndexText } from '../starMap/planetAddress'
 import type { OreSelection } from '../authority/platformServices'
 import type { BayId } from '../world/dockBays'
+import { countToJson } from '../wholeCount'
 
 export function dockCommand(bay: BayId): CommandIntent<'dock'> {
   return { type: 'dock', payload: { bay } }
@@ -72,9 +73,9 @@ export function selectLiningTypeCommand(liningType: string): CommandIntent<'sele
 
 export function queueRefineCommand(
   resourceTier: number,
-  units: number,
+  units: bigint,
 ): CommandIntent<'queueRefine'> {
-  return { type: 'queueRefine', payload: { resourceTier, units } }
+  return { type: 'queueRefine', payload: { resourceTier, units: countToJson(units) } }
 }
 
 export function buyRefinerySlotCommand(): CommandIntent<'buyRefinerySlot'> {

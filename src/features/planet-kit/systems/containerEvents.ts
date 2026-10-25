@@ -9,14 +9,7 @@
  * this g; a later sale prices them where and when it happens (point 7).
  */
 import { oreSalePrice } from '../../../systems/economy/oreEconomy'
-import {
-  add,
-  fromSafeInteger,
-  mul,
-  toCanonical,
-  ZERO_MONEY,
-  type Money,
-} from '../../../systems/money'
+import { add, fromBigInt, mul, toCanonical, ZERO_MONEY, type Money } from '../../../systems/money'
 import { cargoUnitsOf, type Cargo } from '../../../systems/vehicle/vehicleState'
 import type { PlacedContainer } from './placedContainers'
 
@@ -44,16 +37,16 @@ declare module '../../../systems/authority/authorityCommand' {
 declare module '../../../systems/authority/domainEvent' {
   interface DomainEventBodies {
     'planet-kit.ContainerDropped': ContainerMoveBody & {
-      /** What the container holds. */
-      units: number
+      /** What the container holds: unbounded, as the hold's counts are (ticket 849). */
+      units: bigint
       value: string
     }
     'planet-kit.ContainerPickedUp': ContainerMoveBody & {
       /** What moved into the hold. */
-      units: number
+      units: bigint
       value: string
       /** What stays in the container; 0 when the pickup emptied and removed it. */
-      unitsLeft: number
+      unitsLeft: bigint
     }
   }
   interface RejectionReasons {
@@ -113,7 +106,7 @@ export function containerPickedUpOf(
 export function contentsValueOf(cargo: Cargo): Money {
   return Object.entries(cargo.ore).reduce(
     (total, [tier, units]) =>
-      add(total, mul(oreSalePrice(Number.parseInt(tier, 10)), fromSafeInteger(units))),
+      add(total, mul(oreSalePrice(Number.parseInt(tier, 10)), fromBigInt(units))),
     ZERO_MONEY,
   )
 }

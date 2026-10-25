@@ -10,12 +10,13 @@ import {
   withPremiumUnit,
   type PremiumLedger,
 } from './premiumLedger'
+import { oreUnitsFrom } from '../../vehicle/cargoFixtures'
 
 const AMBER = { tier: 2, origin: '1:1', speciesId: 'honey-amber-quartzine' }
 const LENS = { tier: 2, origin: '1:2', speciesId: 'p2-u3' }
 const FAR = { tier: 2, origin: '10:1', speciesId: 'a-far-ore' }
 
-const holdOf = (ore: Record<string, number>): Cargo => ({ ...EMPTY_CARGO, ore })
+const holdOf = (ore: Record<string, number>): Cargo => ({ ...EMPTY_CARGO, ore: oreUnitsFrom(ore) })
 
 describe('premium ledger', () => {
   it('counts each collected unit under its tier and origin, in key order', () => {

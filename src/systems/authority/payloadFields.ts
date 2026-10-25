@@ -8,6 +8,7 @@ import { readIndexText } from '../starMap/planetAddress'
 import { isAim } from '../vehicle/aim'
 import { isDriveSigns } from '../vehicle/driveSigns'
 import { isBayId } from '../world/dockBays'
+import { isJsonCount } from '../wholeCount'
 
 export type FieldKind =
   | 'wholeNumber'
@@ -36,6 +37,12 @@ export type FieldKind =
    * one (ticket 791), so every command before protocol 107 still reads.
    */
   | 'optionalAim'
+  /**
+   * A whole count from 0 in its JSON spelling (ticket 849): a safe integer, or its canonical
+   * decimal text past 2^53, as a Refinery batch of an unbounded hold asks for its units. Every
+   * command before protocol 111 wrote a safe integer, so it still reads.
+   */
+  | 'count'
 
 export type PayloadFields = Readonly<Record<string, FieldKind>>
 
@@ -80,6 +87,10 @@ const FIELD_CHECKS: Record<FieldKind, { isValid: (value: unknown) => boolean; ex
     optionalAim: {
       isValid: (value) => value === undefined || isAim(value),
       expected: 'a whole step from 0 to 63, or no aim',
+    },
+    count: {
+      isValid: isJsonCount,
+      expected: 'a whole count >= 0, its decimal text past 2^53',
     },
   }
 

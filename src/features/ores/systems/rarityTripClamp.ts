@@ -23,6 +23,7 @@ import {
   cmp,
   div,
   floorMilli,
+  fromBigInt,
   fromSafeInteger,
   mul,
   ZERO_MONEY,
@@ -45,7 +46,8 @@ export interface RarityFind {
   saleTier: number
   /** Set on a gem's unit (ticket 741): the gem tier is not a clamped tier. */
   gem?: true
-  cargoCapacity: number
+  /** The hold's units (unbounded, ticket 849). */
+  cargoCapacity: bigint
 }
 
 export interface PaidRarityFind {
@@ -62,10 +64,10 @@ const BASIS_POINTS = fromSafeInteger(10000)
 export function rarityTripCapAt(
   planetIndex: number,
   band: number,
-  cargoCapacity: number,
+  cargoCapacity: bigint,
   rows: OreRows = ORE_ROWS,
 ): Money {
-  const fullHold = mul(fromSafeInteger(cargoCapacity), oreValue(oreTier(planetIndex, band)))
+  const fullHold = mul(fromBigInt(cargoCapacity), oreValue(oreTier(planetIndex, band)))
   const share = div(fromSafeInteger(rows.rarity.tripClampShareBp), BASIS_POINTS)
   return floorMilli(mul(share, fullHold))
 }

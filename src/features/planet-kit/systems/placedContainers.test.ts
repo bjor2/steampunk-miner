@@ -26,7 +26,7 @@ const P1 = '1:1'
 const P2 = '1:2'
 const OWNER = 'player_1'
 const GUEST = 'player_2'
-const MIXED_HOLD: Cargo = { ore: { '1': 4, '2': 3, '5': 2 }, coreFragments: 1 }
+const MIXED_HOLD: Cargo = { ore: { '1': 4n, '2': 3n, '5': 2n }, coreFragments: 1 }
 
 function crateDrop(planetKey: string, hold: Cargo, ownerId = OWNER): ContainerDrop {
   return {
@@ -50,8 +50,8 @@ function dropped(placed: PlacedContainers, drop: ContainerDrop): PlacedContainer
 /** A hold filled to the capacity of cargo level `level`, spread over three tiers. */
 function fullHoldAt(level: number): Cargo {
   const capacity = cargoCapacity(level)
-  const third = Math.floor(capacity / 3)
-  return { ore: { '1': capacity - 2 * third, '4': third, '9': third }, coreFragments: 0 }
+  const third = capacity / 3n
+  return { ore: { '1': capacity - 2n * third, '4': third, '9': third }, coreFragments: 0 }
 }
 
 /** Through the save codec and back, as a save and load does. */
@@ -92,7 +92,7 @@ describe('placed containers (ticket 823)', () => {
       playerId: OWNER,
       containerId: 1,
       hold: EMPTY_CARGO,
-      capacity: 100,
+      capacity: 100n,
     })
     if (!pickup.isPickedUp) throw new Error('pickup refused')
     placed = dropped(pickup.placed, crateDrop(P1, MIXED_HOLD))
@@ -120,7 +120,7 @@ describe('placed containers (ticket 823)', () => {
 
   it('refuses a pickup by anyone but the owner while the crate is the owner’s', () => {
     const placed = dropped(NO_PLACED_CONTAINERS, crateDrop(P1, MIXED_HOLD))
-    const pickup = { planetKey: P1, containerId: 1, hold: EMPTY_CARGO, capacity: 100 }
+    const pickup = { planetKey: P1, containerId: 1, hold: EMPTY_CARGO, capacity: 100n }
     expect(pickupContainer(placed, { ...pickup, playerId: GUEST })).toEqual({
       isPickedUp: false,
       reason: 'not_allowed',
@@ -131,13 +131,13 @@ describe('placed containers (ticket 823)', () => {
   it('opens a crew container to every player, so sharing is a data flip', () => {
     const drop = { ...crateDrop(P1, MIXED_HOLD), access: 'crew' as const }
     const placed = dropped(NO_PLACED_CONTAINERS, drop)
-    const pickup = { planetKey: P1, containerId: 1, hold: EMPTY_CARGO, capacity: 100 }
+    const pickup = { planetKey: P1, containerId: 1, hold: EMPTY_CARGO, capacity: 100n }
     expect(pickupContainer(placed, { ...pickup, playerId: GUEST }).isPickedUp).toBe(true)
   })
 
   it('refuses a pickup into a full hold and of a container that is not there', () => {
     const placed = dropped(NO_PLACED_CONTAINERS, crateDrop(P1, MIXED_HOLD))
-    const full = { planetKey: P1, playerId: OWNER, containerId: 1, hold: MIXED_HOLD, capacity: 10 }
+    const full = { planetKey: P1, playerId: OWNER, containerId: 1, hold: MIXED_HOLD, capacity: 10n }
     expect(pickupContainer(placed, full)).toEqual({ isPickedUp: false, reason: 'hold_full' })
     expect(pickupContainer(placed, { ...full, containerId: 2, hold: EMPTY_CARGO })).toEqual({
       isPickedUp: false,
@@ -147,18 +147,18 @@ describe('placed containers (ticket 823)', () => {
 
   it('picks up core fragments first, then ore from the highest tier, leaving the rest in the crate', () => {
     const placed = dropped(NO_PLACED_CONTAINERS, crateDrop(P1, MIXED_HOLD))
-    const hold: Cargo = { ore: { '1': 6 }, coreFragments: 0 }
+    const hold: Cargo = { ore: { '1': 6n }, coreFragments: 0 }
     const outcome = pickupContainer(placed, {
       planetKey: P1,
       playerId: OWNER,
       containerId: 1,
       hold,
-      capacity: 10,
+      capacity: 10n,
     })
     if (!outcome.isPickedUp) throw new Error('pickup refused')
-    expect(outcome.moved).toEqual({ ore: { '5': 2, '2': 1 }, coreFragments: 1 })
-    expect(outcome.hold).toEqual({ ore: { '1': 6, '5': 2, '2': 1 }, coreFragments: 1 })
-    expect(outcome.left?.cargo).toEqual({ ore: { '1': 4, '2': 2 }, coreFragments: 0 })
+    expect(outcome.moved).toEqual({ ore: { '5': 2n, '2': 1n }, coreFragments: 1 })
+    expect(outcome.hold).toEqual({ ore: { '1': 6n, '5': 2n, '2': 1n }, coreFragments: 1 })
+    expect(outcome.left?.cargo).toEqual({ ore: { '1': 4n, '2': 2n }, coreFragments: 0 })
   })
 
   it('removes a container its pickup empties', () => {
@@ -168,7 +168,7 @@ describe('placed containers (ticket 823)', () => {
       playerId: OWNER,
       containerId: 1,
       hold: EMPTY_CARGO,
-      capacity: 100,
+      capacity: 100n,
     })
     if (!outcome.isPickedUp) throw new Error('pickup refused')
     expect(outcome.left).toBeNull()
@@ -181,23 +181,23 @@ describe('placed containers (ticket 823)', () => {
     const drop = dropContainer(NO_PLACED_CONTAINERS, crateDrop(P1, MIXED_HOLD))
     if (!drop.isDropped) throw new Error('drop refused')
     const loaded = savedAndLoaded(drop.placed)
-    const awayAndBack = dropped(loaded, crateDrop(P2, { ore: { '3': 2 }, coreFragments: 0 }))
-    expect(containedUnitsOf(awayAndBack) - 2).toBe(before)
+    const awayAndBack = dropped(loaded, crateDrop(P2, { ore: { '3': 2n }, coreFragments: 0 }))
+    expect(containedUnitsOf(awayAndBack) - 2n).toBe(before)
     const pickup = pickupContainer(savedAndLoaded(awayAndBack), {
       planetKey: P1,
       playerId: OWNER,
       containerId: 1,
       hold: drop.hold,
-      capacity: 100,
+      capacity: 100n,
     })
     if (!pickup.isPickedUp) throw new Error('pickup refused')
     expect(pickup.hold).toEqual(MIXED_HOLD)
-    expect(cargoUnitsOf(pickup.hold) + containedUnitsOf(pickup.placed) - 2).toBe(before)
+    expect(cargoUnitsOf(pickup.hold) + containedUnitsOf(pickup.placed) - 2n).toBe(before)
   })
 
   it('keeps two players’ totals apart and hides a departed owner’s crate until they rejoin', () => {
     let placed = dropped(NO_PLACED_CONTAINERS, crateDrop(P1, MIXED_HOLD))
-    placed = dropped(placed, crateDrop(P1, { ore: { '2': 5 }, coreFragments: 0 }, GUEST))
+    placed = dropped(placed, crateDrop(P1, { ore: { '2': 5n }, coreFragments: 0 }, GUEST))
     expect(shownContainersOn(placed, P1, [OWNER, GUEST]).map((c) => c.ownerId)).toEqual([
       OWNER,
       GUEST,
@@ -205,12 +205,15 @@ describe('placed containers (ticket 823)', () => {
     expect(shownContainersOn(placed, P1, [GUEST]).map((c) => c.ownerId)).toEqual([GUEST])
     const rejoined = savedAndLoaded(placed)
     expect(shownContainersOn(rejoined, P1, [GUEST, OWNER])).toHaveLength(2)
-    expect(containedUnitsOf(rejoined)).toBe(cargoUnitsOf(MIXED_HOLD) + 5)
+    expect(containedUnitsOf(rejoined)).toBe(cargoUnitsOf(MIXED_HOLD) + 5n)
   })
 
   it('refuses a saved body with a foreign key, an empty crate or an unknown field', () => {
     const placed = dropped(NO_PLACED_CONTAINERS, crateDrop(P1, MIXED_HOLD))
-    const body = structuredClone(placed) as unknown as Record<string, Record<string, unknown>>
+    const body = JSON.parse(JSON.stringify(toPortablePlacedContainers(placed))) as Record<
+      string,
+      Record<string, unknown>
+    >
     expect(placedContainersProblems({ ...body, g6: body[P1] })).toEqual([
       'placed containers key "g6" is not a planet\'s s:p',
     ])
@@ -231,10 +234,10 @@ describe('placed containers at any g and hold size (ticket 823, VS goldens)', ()
     { g: 1_000_000n, system: 200_000n, planet: 5n },
   ]
   /**
-   * The VS's sizes 1 and 99, and 361 for its third (1e6): the last level the kernel's hold counts
-   * reach until the bignum hold of #849 (the GD lock and TD ruling on #823, Q4).
+   * The VS's sizes 1, 99 and 1e6, with 361 and 362 either side of the safe integers: the hold
+   * counts are bigint since #849, so every level moves its units exactly (the TD's Q4 on #823).
    */
-  const LEVELS = [1, 99, 361]
+  const LEVELS = [1, 99, 361, 362, 1_000_000]
 
   it('keys the three planets by the (s,p) whose campaign index is g', () => {
     for (const { g, system, planet } of PLANETS) expect(campaignIndex(system, planet)).toBe(g)
@@ -248,7 +251,7 @@ describe('placed containers at any g and hold size (ticket 823, VS goldens)', ()
         const capacity = cargoCapacity(level)
         const drop = dropContainer(NO_PLACED_CONTAINERS, crateDrop(key, hold))
         if (!drop.isDropped) throw new Error('drop refused')
-        const partial: Cargo = { ore: { '1': Math.ceil(capacity / 2) + 1 }, coreFragments: 0 }
+        const partial: Cargo = { ore: { '1': (capacity + 1n) / 2n + 1n }, coreFragments: 0 }
         const pickup = pickupContainer(savedAndLoaded(drop.placed), {
           planetKey: key,
           playerId: OWNER,
@@ -259,11 +262,17 @@ describe('placed containers at any g and hold size (ticket 823, VS goldens)', ()
         if (!pickup.isPickedUp) throw new Error('pickup refused')
         expect(cargoUnitsOf(pickup.hold)).toBe(capacity)
         expect(cargoUnitsOf(pickup.moved)).toBe(capacity - cargoUnitsOf(partial))
-        // Compared part by part: at level 361 the two holds' sum passes the safe integers.
         expect(containedUnitsOf(pickup.placed)).toBe(capacity - cargoUnitsOf(pickup.moved))
       }
     }
   })
 
-  it.todo('moves a full hold of cargo level 1e6 the same way, once #849 makes hold counts bignum')
+  it('saves a full hold of cargo level 1e6 with every unit, its counts never a float', () => {
+    const hold = fullHoldAt(1_000_000)
+    const drop = dropContainer(NO_PLACED_CONTAINERS, crateDrop('200000:5', hold))
+    if (!drop.isDropped) throw new Error('drop refused')
+    const text = JSON.stringify(toPortablePlacedContainers(drop.placed))
+    expect(text).toContain(`"9":"${hold.ore['9']}"`)
+    expect(containersOn(savedAndLoaded(drop.placed), '200000:5')[0].cargo).toEqual(hold)
+  })
 })

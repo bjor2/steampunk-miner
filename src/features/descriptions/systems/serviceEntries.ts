@@ -18,6 +18,7 @@ import { vehicleStatsAt, type VehicleStats } from '../../../systems/economy/vehi
 import type { ItemCtx } from '../../../systems/registries/itemDescriber'
 import type { ItemSnapshotView } from '../../../systems/registries/itemSnapshotView'
 import { bayItemOf, KERNEL_ITEMS } from '../../../systems/registries/kernelItems'
+import { fromBigInt } from '../../../systems/money'
 import type { DescribedStatLineSpec } from './describedLineSpec'
 import { fixedLine, kernelEntryOf, type DescribedEntry } from './kernelEntry'
 
@@ -100,7 +101,7 @@ export function bayEntries(): readonly DescribedEntry[] {
 
 function refineBatchLine(): DescribedStatLineSpec {
   return fixedLine('Batch cap in units', 'linearInt', ({ view }) =>
-    refineBatchCap(vehicleStatsOf(view).cargoCapacity),
+    fromBigInt(refineBatchCap(vehicleStatsOf(view).cargoCapacity)),
   )
 }
 

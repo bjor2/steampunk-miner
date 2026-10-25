@@ -6,7 +6,8 @@
  * are not ore: they never get a sale value or a `resource_collected` line.
  */
 import { fragmentsPerCoreTile } from '../economy/planetEconomy'
-import { cargoUnitsOf, statsOfVehicle, type VehicleState } from '../vehicle/vehicleState'
+import { cargoRoomOf, type VehicleState } from '../vehicle/vehicleState'
+import { countHeldToSafe } from '../wholeCount'
 import { coreTileCount } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
 import { vehicleOf, withVehicle, type AuthorityState } from './authorityState'
@@ -59,7 +60,7 @@ function collectCoreFragments(
 }
 
 function freeCargoUnitsOf(vehicle: VehicleState): number {
-  return Math.max(0, statsOfVehicle(vehicle).cargoCapacity - cargoUnitsOf(vehicle.cargo))
+  return countHeldToSafe(cargoRoomOf(vehicle))
 }
 
 function lostFragmentEvents(lostUnits: number): DomainEventBody[] {

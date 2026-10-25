@@ -21,6 +21,7 @@ import {
   type ScriptedSession,
 } from '../scriptedSession'
 import { premiumLedgerOf } from './premiumLedgerState'
+import { oreUnitsFrom } from '../../vehicle/cargoFixtures'
 
 // The premium ledger at the Sell bay (ticket 844; the TD ruling on #821 as amended, Systems'
 // goldens): N premium units mined on this planet plus M commons of their tier sell for
@@ -49,7 +50,10 @@ const withMerchant = <T>(run: () => T, lift?: SaleLift): T =>
 /** The hold holds `ore` units per tier: there is no scenario field for cargo yet (Build 4). */
 function withHold(state: AuthorityState, ore: Record<number, number>): AuthorityState {
   const vehicle = vehicleOf(state, 'p1')
-  return withVehicle(state, 'p1', { ...vehicle, cargo: { ...vehicle.cargo, ore } })
+  return withVehicle(state, 'p1', {
+    ...vehicle,
+    cargo: { ...vehicle.cargo, ore: oreUnitsFrom(ore) },
+  })
 }
 
 function setLedger(session: ScriptedSession, tick: number, counts: Record<string, string>) {
@@ -202,7 +206,7 @@ describe('premium sale goldens at g = 1, 6 and 1e6', () => {
     })
     return {
       tier,
-      sale: withMerchant(() => tierSaleOf(ledgered.state, 'p1', { tier, amount: 5 }), lift),
+      sale: withMerchant(() => tierSaleOf(ledgered.state, 'p1', { tier, amount: 5n }), lift),
     }
   }
 

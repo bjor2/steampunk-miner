@@ -5,22 +5,29 @@
  * a sim tick fixed when it was queued, so it keeps refining through dives and travel and the
  * server owns the timer. The record (`owner`, `tier`, `units`, `readyAtTick`) is what a later
  * mobile mode can reuse (#105 resolution); `queuedTick` and `queuedPlanet` are for the log.
- * Plain safe integers and strings only, so the canonical JSON and the digest stay exact.
+ * Safe integers and strings, with `units` a bigint as the hold's counts are (ticket 849): a save
+ * writes it in its JSON spelling (`wholeCount.ts`), so the canonical JSON and the digest stay exact.
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { refineSeconds, refinerySlotsStart } from '../../economy/refineryEconomy'
+import { countOfJson, countToJson, isJsonCount, type JsonCount } from '../../wholeCount'
 import { isJsonObject, isWholeNumber } from '../payloadFields'
 
 export interface RefineryBatch {
   owner: string
   tier: number
-  units: number
+  units: bigint
   readyAtTick: number
   queuedTick: number
   queuedPlanet: number
 }
 
 export type RefinerySlot = RefineryBatch | null
+
+/** A batch as a save holds it: its units in their JSON spelling. */
+export type PortableRefineryBatch = Omit<RefineryBatch, 'units'> & { units: JsonCount }
+
+export type PortableRefinerySlot = PortableRefineryBatch | null
 
 /** What a new platform's refinery has: `slotsStart` empty slots. */
 export function newRefinerySlots(): readonly RefinerySlot[] {
@@ -63,13 +70,18 @@ export function refinerySlotsProblems(value: unknown, path: string): string[] {
   )
 }
 
-/** A deep copy, so a restored session never shares a batch with the snapshot it came from. */
-export function copyRefinerySlots(slots: readonly RefinerySlot[]): RefinerySlot[] {
-  return slots.map((slot) => (slot === null ? null : { ...slot }))
+/** The slots as a save holds them. */
+export function portableRefinerySlotsOf(slots: readonly RefinerySlot[]): PortableRefinerySlot[] {
+  return slots.map((slot) => (slot === null ? null : { ...slot, units: countToJson(slot.units) }))
+}
+
+/** A restored copy, so a session never shares a batch with the snapshot it came from. */
+export function refinerySlotsOfPortable(slots: readonly PortableRefinerySlot[]): RefinerySlot[] {
+  return slots.map((slot) => (slot === null ? null : { ...slot, units: countOfJson(slot.units) }))
 }
 
 function isRefineryBatch(value: unknown): boolean {
   if (!isJsonObject(value) || typeof value.owner !== 'string') return false
-  const counts = [value.tier, value.units, value.readyAtTick, value.queuedTick, value.queuedPlanet]
-  return counts.every(isWholeNumber)
+  const counts = [value.tier, value.readyAtTick, value.queuedTick, value.queuedPlanet]
+  return counts.every(isWholeNumber) && isJsonCount(value.units)
 }

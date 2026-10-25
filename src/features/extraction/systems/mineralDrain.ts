@@ -26,7 +26,8 @@ import { collectOreUnit } from '../../../systems/authority/groundDrill'
 import { planetParamsOf } from '../../../systems/authority/planetOfState'
 import { queueTerrainEdit } from '../../../systems/authority/terrain/terrainEdits'
 import { add, cmp, ZERO_MONEY } from '../../../systems/money'
-import { cargoUnitsOf, statsOfVehicle } from '../../../systems/vehicle/vehicleState'
+import { cargoRoomOf, statsOfVehicle } from '../../../systems/vehicle/vehicleState'
+import { countHeldToSafe } from '../../../systems/wholeCount'
 import { bandOfTile } from '../../../systems/world/planetGeometry'
 import type { PlanetParams } from '../../../systems/world/planetParams'
 import { GROUND_CELL } from '../../../systems/world/worldCell'
@@ -86,7 +87,7 @@ function drainSceneOf(state: AuthorityState, params: PlanetParams, use: PowerUpU
   const take = takeDrainCells(forkChosenCellsOf(state, use.playerId, ordered), {
     maxCells: forkCellsPerUseOf(state, use.playerId, use.magnitude ?? balanceOf(item).cellsPerUse),
     room: roomUnderCapOf(trip.incomeItemValue, cap),
-    holdRoom: statsOfVehicle(vehicle).cargoCapacity - cargoUnitsOf(vehicle.cargo),
+    holdRoom: countHeldToSafe(cargoRoomOf(vehicle)),
     yieldShare: EXTRACTION_ECONOMY.income.yieldShare,
     yieldCarry: trip.yieldCarry,
   })

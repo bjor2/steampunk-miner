@@ -209,7 +209,7 @@ export function moneyShortRejection(available: Money, cost: Money): Rejection | 
 function soldItemsOf(cargo: Cargo, selection: OreSelection): SoldItem[] {
   return Object.entries(cargo.ore)
     .map(([tier, amount]) => ({ tier: Number.parseInt(tier, 10), amount }))
-    .filter((item) => item.amount > 0 && (selection === 'all' || item.tier === selection))
+    .filter((item) => item.amount > 0n && (selection === 'all' || item.tier === selection))
     .sort((a, b) => a.tier - b.tier)
 }
 

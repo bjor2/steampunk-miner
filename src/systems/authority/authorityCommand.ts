@@ -9,6 +9,7 @@
 
 import type { BayId } from '../world/dockBays'
 import type { DriveSigns } from '../vehicle/driveSigns'
+import type { JsonCount } from '../wholeCount'
 
 /**
  * Bump when a command or domain event changes shape or meaning; run metadata records it.
@@ -582,7 +583,8 @@ export interface KernelCommandPayloads {
    * The Refinery bay (#105): moves up to half the hold of one ore tier into a free slot, and buys
    * the next slot. Ready batches are collected, and paid, at the Sell bay only.
    */
-  queueRefine: { resourceTier: number; units: number }
+  /** `units` in a count's JSON spelling (ticket 849): a safe integer, or decimal text past 2^53. */
+  queueRefine: { resourceTier: number; units: JsonCount }
   buyRefinerySlot: Record<string, never>
   collectRefined: Record<string, never>
   /** Moves the docked platform to the next planet, paying the fee and the core (#10). */

@@ -14,6 +14,8 @@ import { batchCapOf } from '../authority/refinery/refineryRules'
 import { rawRefineValue } from '../economy/refineryEconomy'
 import { add, cmp, sub } from '../money'
 import { collectRefinedCommand, queueRefineCommand } from '../platform/platformCommands'
+import { oreUnitsOf } from '../vehicle/vehicleState'
+import { smallerCount } from '../wholeCount'
 import type { BotPlanet } from './botPilot'
 import type { BotSession } from './botSession'
 import { wouldAccept } from './botDryRun'
@@ -41,7 +43,7 @@ export function refineWhenWorthIt(session: BotSession, planet: BotPlanet): void 
 
 interface PlannedBatch {
   tier: number
-  units: number
+  units: bigint
 }
 
 /**
@@ -57,7 +59,7 @@ function plannedBatches(session: BotSession): PlannedBatch[] {
   let paidIn = add(state.players[session.playerId].wallet, quote.saleValue)
   const batches: PlannedBatch[] = []
   for (const tier of heldTiersByValue(session).slice(0, freeSlots)) {
-    const units = Math.min(session.vehicle().cargo.ore[String(tier)], cap)
+    const units = smallerCount(oreUnitsOf(session.vehicle().cargo, tier), cap)
     const left = sub(paidIn, rawRefineValue(tier, units))
     if (cmp(left, charges) < 0) break
     paidIn = left
@@ -73,7 +75,7 @@ function submitWhenAccepted(session: BotSession, intent: CommandIntent): void {
 /** Ore value rises with the tier (#6 `V(t)`), so the highest tier is the most valuable. */
 function heldTiersByValue(session: BotSession): number[] {
   return Object.entries(session.vehicle().cargo.ore)
-    .filter(([, units]) => units > 0)
+    .filter(([, units]) => units > 0n)
     .map(([tier]) => Number.parseInt(tier, 10))
     .sort((a, b) => b - a)
 }

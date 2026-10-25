@@ -20,7 +20,7 @@ function manifestOf(units: readonly HeldUnit[]): HeldManifest {
 }
 
 function countsOf(manifest: HeldManifest): [string, number][] {
-  return manifest.map((kind) => [`${kind.tier}/${kind.key}`, kind.count])
+  return manifest.map((kind) => [`${kind.tier}/${kind.key}`, Number(kind.count)])
 }
 
 describe('held manifest', () => {
@@ -40,7 +40,7 @@ describe('held manifest', () => {
 
   it('cuts a tier back to what the hold holds, the latest kinds first', () => {
     const manifest = manifestOf([unit(3, 'a'), unit(3, 'a'), unit(3, 'b'), unit(4, 'c')])
-    expect(countsOf(manifestWithinHold(manifest, { '3': 2, '4': 1 }))).toEqual([
+    expect(countsOf(manifestWithinHold(manifest, { '3': 2n, '4': 1n }))).toEqual([
       ['3/a', 2],
       ['4/c', 1],
     ])
@@ -48,12 +48,12 @@ describe('held manifest', () => {
 
   it('drops a tier the hold no longer holds', () => {
     const manifest = manifestOf([unit(3, 'a'), unit(4, 'c')])
-    expect(countsOf(manifestWithinHold(manifest, { '4': 1 }))).toEqual([['4/c', 1]])
+    expect(countsOf(manifestWithinHold(manifest, { '4': 1n }))).toEqual([['4/c', 1]])
   })
 
   it('sells every kind of a sold tier and leaves the other tiers held', () => {
     const manifest = manifestOf([unit(3, 'a'), unit(3, 'b'), unit(4, 'c')])
-    const { sold, manifest: left } = takeSoldKinds(manifest, [{ tier: 3, amount: 2 }])
+    const { sold, manifest: left } = takeSoldKinds(manifest, [{ tier: 3, amount: 2n }])
     expect(countsOf(sold)).toEqual([
       ['3/a', 1],
       ['3/b', 1],
@@ -62,7 +62,7 @@ describe('held manifest', () => {
   })
 
   it("sells the units no pickup named as the tier's own kind", () => {
-    const { sold } = takeSoldKinds(manifestOf([unit(3, 'a')]), [{ tier: 3, amount: 5 }])
+    const { sold } = takeSoldKinds(manifestOf([unit(3, 'a')]), [{ tier: 3, amount: 5n }])
     expect(countsOf(sold)).toEqual([
       ['3/a', 1],
       ['3/tier:3', 4],

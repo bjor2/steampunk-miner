@@ -14,7 +14,8 @@ import { buttonIconIdOf } from '../art/icons/iconSet'
 import type { AuthorityState } from '../authority/authorityState'
 import { isAssayLiftedFor } from '../authority/oreSaleLift'
 import { sellBayUnitPrice, serviceQuote } from '../authority/platformServices'
-import { fromSafeInteger, mul } from '../money'
+import { fromBigInt, mul } from '../money'
+import { countToJson, type JsonCount } from '../wholeCount'
 import { sellCargoCommand } from '../platform/platformCommands'
 import { cargoGaugeText } from '../vehicle/vehicleReadout'
 import { cargoUnitsOf, statsOfVehicle } from '../vehicle/vehicleState'
@@ -40,7 +41,8 @@ export interface HoldTierCard {
   iconId: string
   title: string
   line: string
-  amount: number
+  /** The tier's units in a count's JSON spelling (ticket 849), as a screen model stays JSON. */
+  amount: JsonCount
   unitValue: AmountReading
   /** `assay_beacon` priced this tier at the mid-band unit value (#46: shown with an assay glyph). */
   isAssayed: boolean
@@ -97,10 +99,10 @@ export function holdTotalsOf(
   }
 }
 
-function heldTiers(ore: Readonly<Record<string, number>>): [number, number][] {
+function heldTiers(ore: Readonly<Record<string, bigint>>): [number, bigint][] {
   return Object.entries(ore)
-    .map(([tier, amount]): [number, number] => [Number.parseInt(tier, 10), amount])
-    .filter(([, amount]) => amount > 0)
+    .map(([tier, amount]): [number, bigint] => [Number.parseInt(tier, 10), amount])
+    .filter(([, amount]) => amount > 0n)
     .sort(([a], [b]) => a - b)
 }
 
@@ -108,7 +110,7 @@ function holdTierCardOf(
   state: AuthorityState,
   playerId: string,
   tier: number,
-  amount: number,
+  amount: bigint,
 ): HoldTierCard {
   const unit = sellBayUnitPrice(state, playerId, tier)
   const unitValue = amountReading(unit)
@@ -119,10 +121,10 @@ function holdTierCardOf(
     iconId: oreIconIdOf('mixed', tier),
     title: `Tier ${tier} ore`,
     line: tierLineOf(amount, unitValue.text, isAssayed),
-    amount,
+    amount: countToJson(amount),
     unitValue,
     isAssayed,
-    lineValue: amountReading(mul(unit, fromSafeInteger(amount))),
+    lineValue: amountReading(mul(unit, fromBigInt(amount))),
     sell: commandButton(
       state,
       playerId,
@@ -134,7 +136,7 @@ function holdTierCardOf(
 }
 
 /** "12 held, 4.5k each." in the ledger voice; an assayed price carries the glyph and says so. */
-function tierLineOf(amount: number, unitText: string, isAssayed: boolean): string {
+function tierLineOf(amount: bigint, unitText: string, isAssayed: boolean): string {
   if (isAssayed) return `${amount} held, ${ASSAY_MARK} ${unitText} each at the assay price.`
   return `${amount} held, ${unitText} each.`
 }

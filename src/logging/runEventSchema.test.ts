@@ -81,10 +81,20 @@ describe('run event schema', () => {
     expect(runEventProblems(withData({ ...resourceSold.data, value: '1250' }))).toHaveLength(1)
   })
 
-  it('refuses a float in an integer field, inside a list', () => {
-    const data = { ...resourceSold.data, items: [{ tier: 2, amount: 6.5 }] }
+  it('refuses a float in an integer field and in a count field, inside a list', () => {
+    const data = { ...resourceSold.data, items: [{ tier: 2.5, amount: 6.5 }] }
     expect(runEventProblems(withData(data))).toEqual([
-      'resource_sold.items[0].amount must be a safe integer, got 6.5',
+      'resource_sold.items[0].tier must be a safe integer, got 2.5',
+      'resource_sold.items[0].amount must be a whole count: a safe integer, or its decimal text past 2^53, got 6.5',
+    ])
+  })
+
+  it('reads a count past 2^53 as decimal text and refuses one below it written as text (ticket 849)', () => {
+    const past = { ...resourceSold.data, items: [{ tier: 2, amount: '9007199254740992' }] }
+    expect(runEventProblems(withData(past))).toEqual([])
+    const below = { ...resourceSold.data, items: [{ tier: 2, amount: '6' }] }
+    expect(runEventProblems(withData(below))).toEqual([
+      'resource_sold.items[0].amount must be a whole count: a safe integer, or its decimal text past 2^53, got "6"',
     ])
   })
 

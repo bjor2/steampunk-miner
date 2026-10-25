@@ -13,7 +13,7 @@ import { tripCapAt } from './systems/tripCap'
 const AT: IncomeAt = {
   planetIndex: 10,
   band: 3,
-  cargoCapacity: 24,
+  cargoCapacity: 24n,
   drillOrePerMinute: fromCanonical('1000'),
   tripMinutes: fromCanonical('2'),
 }

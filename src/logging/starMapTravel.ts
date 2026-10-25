@@ -60,7 +60,7 @@ function tallyEvent(
 
 /** A run ends where the vehicle docks at the Sell bay with a hold to sell. */
 function isHaulDocked(event: DomainEvent): boolean {
-  return event.type === 'DockEntered' && event.bay === 'sell' && event.cargoUnits > 0
+  return event.type === 'DockEntered' && event.bay === 'sell' && event.cargoUnits > 0n
 }
 
 function openRun(tally: StarMapTravelTally, planet: number): void {

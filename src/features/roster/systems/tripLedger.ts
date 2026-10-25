@@ -148,7 +148,7 @@ function clampBookOf(at: TripPatch, draws: readonly Draw[], rows: OreRows): Clam
   const answers = new Map<number, PaidUnit>()
   const ask = (key: number, draw: Draw): PaidUnit => {
     const saleTier = bandTier + draw.saleLead
-    const find = { ...at, tierAboveBand: draw.lead, saleTier, cargoCapacity: at.hold }
+    const find = { ...at, tierAboveBand: draw.lead, saleTier, cargoCapacity: BigInt(at.hold) }
     const paid = paidRarityFind(trips.get(key) as RarityTrip, find, rows)
     const isPaidInFull = paid.saleTier === saleTier
     const nextKey = isPaidInFull ? key + keyDigitOf(draw.lead - firstClampedLead) : key

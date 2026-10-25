@@ -5,6 +5,7 @@
 import { toCanonical, type Money } from '../../../systems/money'
 import type { ReceiptBook } from './receiptBook'
 import { isRollDone, rolledTotalAt } from './tripReceipt'
+import { countToJson, type JsonCount } from '../../../systems/wholeCount'
 
 export interface ReceiptReadingOut {
   isShown: boolean
@@ -14,7 +15,8 @@ export interface ReceiptReadingOut {
     key: string
     name: string | null
     rarity: string | null
-    count: number
+    /** In a count's JSON spelling (ticket 849). */
+    count: JsonCount
     coin: string
   }[]
   credits: string | null
@@ -35,7 +37,7 @@ export function receiptReadingOf(book: ReceiptBook & { rollStep: number }): Rece
       key: line.key,
       name: line.name,
       rarity: line.rarity?.rarity ?? null,
-      count: line.count,
+      count: countToJson(line.count),
       coin: toCanonical(line.coin),
     })),
     credits: canonicalOrNull(receipt?.credits),

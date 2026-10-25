@@ -14,7 +14,7 @@ function saleOf(
   overrides: Partial<BurstSale> = {},
 ): BurstSale {
   return {
-    items: [{ tier: 1, amount: 4 }],
+    items: [{ tier: 1, amount: 4n }],
     credits: fromCanonical(credits),
     coinsShown: 12,
     liningPaid: fromCanonical(liningPaid),

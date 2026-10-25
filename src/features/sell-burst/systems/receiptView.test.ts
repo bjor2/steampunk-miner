@@ -1,12 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  add,
-  fromCanonical,
-  fromSafeInteger,
-  mul,
-  ZERO_MONEY,
-  type Money,
-} from '../../../systems/money'
+import { add, fromCanonical, fromBigInt, mul, ZERO_MONEY, type Money } from '../../../systems/money'
 import type { SeenRarity } from '../../../systems/render/seenRarity'
 import type { HeldKind } from './heldManifest'
 import { RECEIPT } from './receiptData'
@@ -18,13 +11,13 @@ const RARE: SeenRarity = { lead: 2, rarity: 'rare', tint: [0.2, 0.4, 1], pulse: 
 const WIDEST = 6
 
 function kind(tier: number, key: string, count: number, rarity: SeenRarity | null): HeldKind {
-  return { tier, key, name: key === 'unnamed' ? null : key, rarity, count }
+  return { tier, key, name: key === 'unnamed' ? null : key, rarity, count: BigInt(count) }
 }
 
 function receiptOf(sold: readonly HeldKind[], unitPrice: string, liningPaid = '0'): TripReceipt {
   const price = fromCanonical(unitPrice)
   const credits = sold.reduce(
-    (total, held) => add(total, mul(price, fromSafeInteger(held.count))),
+    (total, held) => add(total, mul(price, fromBigInt(held.count))),
     ZERO_MONEY,
   )
   return receiptWithSale(

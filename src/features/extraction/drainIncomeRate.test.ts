@@ -27,7 +27,7 @@ import { tripCapAt } from './systems/tripCap'
 const AT: IncomeAt = {
   planetIndex: 20,
   band: 4,
-  cargoCapacity: 48,
+  cargoCapacity: 48n,
   drillOrePerMinute: fromCanonical('1000'),
   tripMinutes: fromCanonical('0.5'),
 }
@@ -45,7 +45,7 @@ describe('mineral drain income rate', () => {
   it('reports a trip of its minute at the last Mark once the drain is owned', () => {
     const lastMark = drainAtEveryMark().at(-1)!
     const rows = drainRowsAt(AT, DRAIN_OWNED)
-    const minute = drainForAMinute(lastMark, 20, 4, 48)
+    const minute = drainForAMinute(lastMark, 20, 4, 48n)
     expect(rows.map((row) => [row.rateId, toCanonical(row.unclampedValuePerTrip)])).toEqual([
       ['extraction.mineral_drain', toCanonical(mul(minute, AT.tripMinutes))],
     ])

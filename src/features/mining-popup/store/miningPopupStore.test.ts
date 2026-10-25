@@ -249,7 +249,7 @@ describe('mining popup store', () => {
     game().fastForward(1, [poseOver(tile, readAuthorityTick() + 1)])
     const params = planetParamsOf(readAuthorityState().planet)!
     const densityLeft = () => cellDensitySum(readAuthorityState().world, params, tile)
-    while (game().vehicle.cargoUnits === 0) drillOneTick(tile)
+    while (game().vehicle.cargoUnits === 0n) drillOneTick(tile)
     expect(densityLeft()).toBeGreaterThan(0)
     expect(popup().chipBoard.chips).toEqual([])
     while (densityLeft() > 0) drillOneTick(tile)

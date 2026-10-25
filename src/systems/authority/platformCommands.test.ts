@@ -125,7 +125,7 @@ describe('platform: docking', () => {
     const events = session.submit(5, dock)
     expect(typesOf(events)).toEqual(['VehicleModeChanged', 'DockEntered', 'StateDigested'])
     expect(events[0]).toMatchObject({ from: 'active', to: 'docked', reason: 'dock' })
-    expect(events[1]).toMatchObject({ cargoUnits: 0, energy: FULL_TANK, hull: '1e+2' })
+    expect(events[1]).toMatchObject({ cargoUnits: 0n, energy: FULL_TANK, hull: '1e+2' })
     expect(events[2]).toMatchObject({ scope: 'dock' })
     expect(session.vehicle().mode).toBe('docked')
   })
@@ -192,7 +192,7 @@ describe('platform: core bay', () => {
       total: 10,
       source: 'dock',
     })
-    expect(events[1]).toMatchObject({ type: 'DockEntered', cargoUnits: 10 })
+    expect(events[1]).toMatchObject({ type: 'DockEntered', cargoUnits: 10n })
     expect(session.vehicle().cargo.coreFragments).toBe(0)
     expect(session.state().platform.coreBay).toBe(10)
   })
@@ -284,7 +284,11 @@ describe('platform: shop', () => {
     const events = session.submit(tick + 1, sell('all'))
     // Scripted mining lines its tiles as a player's drill does (#115), so the sale settles that bill.
     expect(typesOf(events)).toEqual(['ResourceSold', 'LiningSettled'])
-    expect(events[0]).toMatchObject({ items: [{ tier: 1, amount: 4 }], value: '4e+1', mode: 'all' })
+    expect(events[0]).toMatchObject({
+      items: [{ tier: 1, amount: 4n }],
+      value: '4e+1',
+      mode: 'all',
+    })
     expect(walletOf(session)).toBe(toCanonical(sub(fromCanonical('40'), lining)))
     expect(session.vehicle().cargo.ore).toEqual({})
   })

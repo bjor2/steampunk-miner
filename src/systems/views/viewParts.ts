@@ -76,12 +76,12 @@ export function withIcon(button: ScreenButton, iconId: string): ScreenButton {
 }
 
 /** A balance, an income or a count: the short text rounds toward zero (ticket 681). */
-export function amountReading(amount: Money | number): AmountReading {
+export function amountReading(amount: Money | number | bigint): AmountReading {
   return { text: formatAmount(amount), exact: exactAmount(amount) }
 }
 
 /** A price, a fee or a bill: the short text rounds up, so it never reads cheaper (ticket 681). */
-export function priceReading(amount: Money | number): AmountReading {
+export function priceReading(amount: Money | number | bigint): AmountReading {
   return { text: formatPrice(amount), exact: exactAmount(amount) }
 }
 

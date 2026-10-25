@@ -14,6 +14,7 @@ import {
   cmp,
   div,
   floorMilli,
+  fromBigInt,
   fromSafeInteger,
   mul,
   sub,
@@ -127,7 +128,7 @@ function linesWithKind(
   kind: HeldKind,
   unitPrice: Money,
 ): ReceiptLine[] {
-  const coin = mul(unitPrice, fromSafeInteger(kind.count))
+  const coin = mul(unitPrice, fromBigInt(kind.count))
   const at = lines.findIndex((line) => line.tier === kind.tier && line.key === kind.key)
   if (at < 0) return [...lines, { ...kind, coin }]
   return lines.map((line, index) => (index === at ? mergedLineOf(line, kind, coin) : line))

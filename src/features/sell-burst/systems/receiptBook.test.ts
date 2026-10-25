@@ -39,7 +39,7 @@ function walletOf(session: ScriptedSession) {
 }
 
 function soldUnitsOf(book: ReceiptBook): number {
-  return (book.receipt?.lines ?? []).reduce((total, line) => total + line.count, 0)
+  return Number((book.receipt?.lines ?? []).reduce((total, line) => total + line.count, 0n))
 }
 
 describe('sell receipt book', () => {
@@ -95,9 +95,9 @@ describe('sell receipt book', () => {
   it('never holds more of a tier than the hold does', () => {
     const heard = heardSession()
     mineSurfaceOre(heard, 3, 0)
-    const counted = heard.book().manifest.reduce((total, kind) => total + kind.count, 0)
-    const held = Object.values(heard.session.vehicle().cargo.ore).reduce((a, b) => a + b, 0)
-    expect(held).toBe(3)
+    const counted = heard.book().manifest.reduce((total, kind) => total + kind.count, 0n)
+    const held = Object.values(heard.session.vehicle().cargo.ore).reduce((a, b) => a + b, 0n)
+    expect(held).toBe(3n)
     expect(counted).toBe(held)
   })
 })

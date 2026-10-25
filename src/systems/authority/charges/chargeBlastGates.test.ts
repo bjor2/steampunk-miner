@@ -106,7 +106,7 @@ describe('charge blast gates', () => {
 
   it('frees a dynamite-gated cell whole: every unit reaches the hold and none is lost', () => {
     const blasted = blastSiteWith([gateSliceOf(dynamiteGate)])
-    expect(blasted.cargo).toEqual({ [String(SITE.tier)]: 5 })
+    expect(blasted.cargo).toEqual({ [String(SITE.tier)]: 5n })
     expect(ofType(blasted.events, 'CargoAdded')).toHaveLength(5)
     expect(blasted.resolved.oreValueLost).toBe(toCanonical(ZERO_MONEY))
     expect(blasted.oreDensities).toEqual(Array(5).fill(0))

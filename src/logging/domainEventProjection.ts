@@ -15,6 +15,7 @@ import {
   type DomainEvent,
   type DomainEventBodies,
   type KernelDomainEventType,
+  type SoldItem,
 } from '../systems/authority/domainEvent'
 import { chargeDetonatedDataOf } from './chargeDetonationLine'
 import { heldStepFieldsOf } from './purchaseStepLine'
@@ -22,6 +23,7 @@ import { resourceCollectedDataOf } from './resourceCollectedLine'
 import type { RunEventData, RunEventName } from './eventNames'
 import { sliceEventProjectionOf, type SliceRunLogLine } from './registries/eventProjections'
 import type { CommandRef } from './runEvent'
+import { countToJson } from '../systems/wholeCount'
 
 /** An event name with the payload registered for it. */
 export type RunLogLine = { [N in RunEventName]: { event: N; data: RunEventData<N> } }[RunEventName]
@@ -260,7 +262,7 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
   }),
   DockEntered: ({ bay, cargoUnits, energy, hull }) => ({
     event: 'dock_entered',
-    data: { bay, cargoUnits, energy, hull },
+    data: { bay, cargoUnits: countToJson(cargoUnits), energy, hull },
   }),
   DockLeft: ({ bay, durationTicks }) => ({ event: 'dock_left', data: { bay, durationTicks } }),
   CoreReached: () => ({ event: 'core_reached', data: {} }),
@@ -307,7 +309,7 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
   }),
   ResourceSold: ({ items, value, mode, coinsShown }) => ({
     event: 'resource_sold',
-    data: { items, value, mode, coinsShown },
+    data: { items: items.map(soldItemLineOf), value, mode, coinsShown },
   }),
   LiningSettled: ({ billed, paid, forgiven }) => ({
     event: 'lining_settled',
@@ -333,15 +335,18 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
   }),
   RefineQueued: ({ slot, tier, units, requestedUnits }) => ({
     event: 'refine_queued',
-    data: { slot, tier, units, requestedUnits },
+    data: { slot, tier, units: countToJson(units), requestedUnits: countToJson(requestedUnits) },
   }),
-  RefineReady: ({ slot, tier, units }) => ({ event: 'refine_ready', data: { slot, tier, units } }),
+  RefineReady: ({ slot, tier, units }) => ({
+    event: 'refine_ready',
+    data: { slot, tier, units: countToJson(units) },
+  }),
   RefineCollected: (collected) => ({
     event: 'refine_collected',
     data: {
       slot: collected.slot,
       tier: collected.tier,
-      units: collected.units,
+      units: countToJson(collected.units),
       rawValue: collected.rawValue,
       value: collected.value,
       waitSeconds: collected.waitSeconds,
@@ -438,6 +443,11 @@ function kernelLineOf(event: DomainEvent): RunLogLine | null {
 
 function sliceLineOf(event: DomainEvent): SliceRunLogLine | null {
   return sliceEventProjectionOf(event.type)?.(event) ?? null
+}
+
+/** A sold tier as its line writes it: the units in their JSON spelling (ticket 849). */
+function soldItemLineOf({ tier, amount }: SoldItem): { tier: number; amount: number | string } {
+  return { tier, amount: countToJson(amount) }
 }
 
 export function causeOf(event: DomainEvent): { cmd?: CommandRef } {

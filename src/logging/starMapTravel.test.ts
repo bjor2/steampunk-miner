@@ -40,7 +40,7 @@ function step(tally: ReturnType<typeof emptyStarMapTravelTally>, bodies: DomainE
 const docked = (bay: 'sell' | 'upgrade', cargoUnits: number): DomainEventBody => ({
   type: 'DockEntered',
   bay,
-  cargoUnits,
+  cargoUnits: BigInt(cargoUnits),
   energy: 0,
   hull: '1e+2',
 })

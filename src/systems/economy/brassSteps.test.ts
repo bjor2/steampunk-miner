@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import { add, cmp, div, fromCanonical, fromSafeInteger, mul, sub, type Money } from '../money'
+import {
+  add,
+  cmp,
+  div,
+  fromBigInt,
+  fromCanonical,
+  fromSafeInteger,
+  mul,
+  sub,
+  type Money,
+} from '../money'
 import { oreSalePrice, oreTier } from './oreEconomy'
 import { rechargePrice, repairPrice, rescueFeeBounds } from './planetCharges'
 import { paceScale } from './planetEconomy'
@@ -40,7 +50,7 @@ function band5SalePrice(planetIndex: number): Money {
 
 /** A full on-curve hold of band-5 ore sold at the dock: the synthetic on-curve wallet. */
 function fullHoldSale(planetIndex: number): Money {
-  const units = fromSafeInteger(cargoCapacity(onCurveLevel('cargo_hold', planetIndex)))
+  const units = fromBigInt(cargoCapacity(onCurveLevel('cargo_hold', planetIndex)))
   return mul(units, band5SalePrice(planetIndex))
 }
 

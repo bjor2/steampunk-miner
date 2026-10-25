@@ -23,8 +23,8 @@ export interface VehicleReplica {
   energyMax: number
   hull: Money
   hullMax: Money
-  cargoUnits: number
-  cargoCapacity: number
+  cargoUnits: bigint
+  cargoCapacity: bigint
   /** 1 to 3 from the upgrade levels (#7, #20): which placeholder parts the vehicle shows. */
   visualTier: number
   /** 0 with no guns; the turret and its barrel look follow it (#107). */

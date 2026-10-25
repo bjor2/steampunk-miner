@@ -88,7 +88,7 @@ describe('ground-gun: picking up the ore a bore frees', () => {
     expect(cargo.map((event) => event.value)).toEqual(
       bored.map((tile) => toCanonical(unitValueOf(tile))),
     )
-    expect(cargoUnitsOf(session.vehicle().cargo)).toBe(bored.length)
+    expect(cargoUnitsOf(session.vehicle().cargo)).toBe(BigInt(bored.length))
   })
 
   it("counts what it pays on the trip's shared income counter", () => {

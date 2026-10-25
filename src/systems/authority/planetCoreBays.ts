@@ -53,9 +53,12 @@ export function coreBaysOnLanding(
 }
 
 /** The platform with `bays` under its key, or no key at all while no planet is left banked. */
-export function withAwayCoreBays(platform: PlatformState, bays: AwayCoreBays): PlatformState {
+export function withAwayCoreBays<P extends Pick<PlatformState, 'awayCoreBays'>>(
+  platform: P,
+  bays: AwayCoreBays,
+): P {
   const { awayCoreBays: _left, ...rest } = platform
-  return Object.keys(bays).length === 0 ? rest : { ...rest, awayCoreBays: bays }
+  return (Object.keys(bays).length === 0 ? rest : { ...rest, awayCoreBays: bays }) as P
 }
 
 export function copyAwayCoreBays(bays: AwayCoreBays): AwayCoreBays {

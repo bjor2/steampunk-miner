@@ -24,7 +24,7 @@ import { containedUnitsOf, containersOn } from './placedContainers'
 
 const CRATE = 'cache_crate'
 const P1 = '1:1'
-const HOLD: Cargo = { ore: { '1': 3, '2': 2 }, coreFragments: 1 }
+const HOLD: Cargo = { ore: { '1': 3n, '2': 2n }, coreFragments: 1 }
 
 const setMoney = { type: 'debug.setMoney', payload: { amount: '1e6' } } as const
 const dock = { type: 'dock', payload: { bay: 'sell' } } as const
@@ -68,10 +68,10 @@ function rejectionOf(events: readonly DomainEvent[]): string | null {
 }
 
 /** Every unit in every hold and every container: what a drop or pickup may never change. */
-function cargoTotalOf(state: AuthorityState): number {
+function cargoTotalOf(state: AuthorityState): bigint {
   const held = Object.values(state.players).reduce(
     (total, player) => total + cargoUnitsOf(player.vehicle.cargo),
-    0,
+    0n,
   )
   return held + containedUnitsOf(placedContainersIn(state))
 }
@@ -107,7 +107,7 @@ describe('cache crate commands (ticket 823)', () => {
         system: '1',
         place: '1',
         containerId: 2,
-        units: 6,
+        units: 6n,
       }),
     )
   })

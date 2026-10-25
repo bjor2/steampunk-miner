@@ -121,7 +121,7 @@ describe('ores: the rarity pickup provider', () => {
     const collected = collectOreUnit(atCap, 'p1', ore)
     const bandTier = oreTier(RARITY_RUN_PLANET, ore.band)
     expect(valueAdded(collected.events)).toBe(toCanonical(oreSalePrice(bandTier)))
-    expect(vehicleOf(collected.state, 'p1').cargo.ore).toEqual({ [String(bandTier)]: 1 })
+    expect(vehicleOf(collected.state, 'p1').cargo.ore).toEqual({ [String(bandTier)]: 1n })
     expect(rarityTripOf(collected.state, 'p1')).toEqual(rarityTripOf(atCap, 'p1'))
   })
 
@@ -157,7 +157,7 @@ describe('ores: the rarity pickup provider', () => {
     const vehicle = vehicleOf(start, 'p1')
     const full = withVehicle(start, 'p1', {
       ...vehicle,
-      cargo: { ...vehicle.cargo, coreFragments: capacityOf(start) },
+      cargo: { ...vehicle.cargo, coreFragments: Number(capacityOf(start)) },
     })
     const collected = collectOreUnit(full, 'p1', oreAt(EPIC_TILE))
     expect(collected.events).toEqual([{ type: 'StorageFull', lostUnits: 1 }])

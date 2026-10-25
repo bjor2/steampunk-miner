@@ -23,6 +23,7 @@ import {
   type BayHeader,
 } from './bayFrame'
 import { KERNEL_ITEMS } from '../registries/kernelItems'
+import { countToJson, smallerCount, type JsonCount } from '../wholeCount'
 import { itemCardOf, SHOP_SOURCE, type ItemCardModel } from './itemCardModel'
 import type { FocusStop } from './menuFocus'
 import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
@@ -38,9 +39,10 @@ import {
 export interface RefineryOreRow {
   tier: number
   iconId: string
-  held: number
+  /** The tier's units, in a count's JSON spelling (ticket 849). */
+  held: JsonCount
   /** What Queue moves into a slot: the held units, at most half the hold. */
-  batchUnits: number
+  batchUnits: JsonCount
   raw: AmountReading
   refined: AmountReading
   queue: ScreenButton
@@ -120,23 +122,25 @@ function oreRowsOf(state: AuthorityState, playerId: string): RefineryOreRow[] {
   const cap = batchCapOf(state, playerId)
   return Object.entries(state.players[playerId].vehicle.cargo.ore)
     .map(([tier, held]) => ({ tier: Number.parseInt(tier, 10), held }))
-    .filter((entry) => entry.held > 0)
+    .filter((entry) => entry.held > 0n)
     .sort((a, b) => b.tier - a.tier)
-    .map((entry) => oreRowOf(state, playerId, entry.tier, entry.held, Math.min(entry.held, cap)))
+    .map((entry) =>
+      oreRowOf(state, playerId, entry.tier, entry.held, smallerCount(entry.held, cap)),
+    )
 }
 
 function oreRowOf(
   state: AuthorityState,
   playerId: string,
   tier: number,
-  held: number,
-  batchUnits: number,
+  held: bigint,
+  batchUnits: bigint,
 ): RefineryOreRow {
   return {
     tier,
     iconId: oreIconIdOf('mixed', tier),
-    held,
-    batchUnits,
+    held: countToJson(held),
+    batchUnits: countToJson(batchUnits),
     raw: amountReading(rawRefineValue(tier, batchUnits)),
     refined: amountReading(refinedValue(tier, batchUnits)),
     queue: withIcon(

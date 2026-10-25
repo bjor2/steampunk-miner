@@ -55,9 +55,12 @@ import { heldArtefactProblems, type HeldArtefact } from './heldArtefact'
 import { isJsonObject, isWholeNumber } from './payloadFields'
 import { isPortableSystem, systemOfPlanet, withSystem, type SessionPlanet } from './planetOfState'
 import { isKnownOreRulesVersion } from '../world/planetParams'
-import { awayCoreBaysProblems, copyAwayCoreBays, withAwayCoreBays } from './planetCoreBays'
-import { isPlatformVisualState, type PlatformState } from './platformState'
-import { copyRefinerySlots, refinerySlotsProblems } from './refinery/refineryBatch'
+import {
+  platformOfPortable,
+  platformProblems,
+  portablePlatformOf,
+  type PortablePlatform,
+} from './platformSnapshot'
 import {
   missingSectionIdsOf,
   portableSectionsOf,
@@ -72,8 +75,8 @@ import {
   portablePremiumLedgerProblems,
 } from './premium/premiumLedgerPortable'
 import { EMPTY_CARGO } from '../vehicle/vehicleState'
+import { cargoOfPortable, isPortableCargo } from '../vehicle/cargoPortable'
 import {
-  isPortableCargo,
   portableVehicleOf,
   portableVehicleProblems,
   portableWorldOf,
@@ -137,7 +140,7 @@ export interface PortableState {
   planet: SessionPlanet
   players: Record<string, PortablePlayer>
   world: PortableWorld
-  platform: PlatformState
+  platform: PortablePlatform
   core: CoreProgress
   combat: PortableCombat
   collapse: CollapseState
@@ -203,7 +206,7 @@ function portableStateOf(state: AuthorityState): PortableState {
       ]),
     ),
     world: portableWorldOf(state.world),
-    platform: copyPlatform(state.platform),
+    platform: portablePlatformOf(state.platform),
     core: { ...state.core },
     combat: portableCombatOf(state.combat),
     collapse: portableCollapseOf(state.collapse),
@@ -272,7 +275,7 @@ function authorityStateOf(portable: PortableState): AuthorityState {
       Object.entries(portable.players).map(([id, player]) => [id, playerStateOf(player)]),
     ),
     world: worldOfPortable(portable.world),
-    platform: copyPlatform(portable.platform),
+    platform: platformOfPortable(portable.platform),
     core: { ...portable.core },
     combat: combatOfPortable(portable.combat),
     collapse: portableCollapseOf(portable.collapse),
@@ -384,23 +387,6 @@ function planetProblems(planet: unknown): string[] {
   ]
 }
 
-function platformProblems(platform: unknown): string[] {
-  const isValid =
-    isJsonObject(platform) &&
-    isWholeNumber(platform.coreBay) &&
-    isPlatformVisualState(platform.visualState)
-  if (!isValid) return ['snapshot.state.platform must hold a whole coreBay and a visual state']
-  return [
-    ...refinerySlotsProblems(platform.refinerySlots, 'snapshot.state.platform.refinerySlots'),
-    ...awayCoreBaysProblems(platform.awayCoreBays, 'snapshot.state.platform.awayCoreBays'),
-  ]
-}
-
-function copyPlatform(platform: PlatformState): PlatformState {
-  const copied = { ...platform, refinerySlots: copyRefinerySlots(platform.refinerySlots) }
-  return withAwayCoreBays(copied, copyAwayCoreBays(platform.awayCoreBays ?? {}))
-}
-
 function playersProblems(players: unknown): string[] {
   if (!isJsonObject(players)) return ['snapshot.state.players must be an object']
   return Object.entries(players).flatMap(([id, player]) => portablePlayerProblems(id, player))
@@ -421,7 +407,7 @@ function portablePlayerProblems(id: string, player: unknown): string[] {
 /** The ledger read against the saved hold, or an empty one where the vehicle check refused it. */
 function premiumLedgerProblemsOf(player: Record<string, unknown>, path: string): string[] {
   const cargo = isJsonObject(player.vehicle) ? player.vehicle.cargo : undefined
-  const hold = isPortableCargo(cargo) ? cargo : EMPTY_CARGO
+  const hold = isPortableCargo(cargo) ? cargoOfPortable(cargo) : EMPTY_CARGO
   return portablePremiumLedgerProblems(player.premiumLedger, hold, path)
 }
 

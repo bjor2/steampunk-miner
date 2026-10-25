@@ -12,7 +12,7 @@ const WALLET = fromCanonical('1000')
 function soldAt(tick: number, value: string, playerId = localPlayer()): DomainEvent {
   return {
     type: 'ResourceSold',
-    items: [{ tier: 1, amount: 5 }],
+    items: [{ tier: 1, amount: 5n }],
     value,
     mode: 'all',
     coinsShown: 10,

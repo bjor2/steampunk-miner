@@ -17,6 +17,7 @@ import {
   mul,
   nthRoot,
   roundToWhole,
+  toBigInt,
   toCanonical,
   toMillionthsNumber,
   toSafeInteger,
@@ -50,12 +51,25 @@ export function perPurchaseAtStep(effect: PerPurchaseEffect, step: number): BigS
 }
 
 /**
- * `round(start * ratio^n)` after `n` purchases, ties to even: the hold's units and the boiler's
- * tank (ticket 553). A plain number past which it throws rather than round: the tank's quanta
- * (240 a unit) stay safe integers to purchase 275 (Systems' range on #553).
+ * `round(start * ratio^n)` after `n` purchases, ties to even: the boiler's tank (ticket 553). A
+ * plain number past which it throws rather than round: the tank's quanta (240 a unit) stay safe
+ * integers to purchase 275 (Systems' range on #553).
  */
 export function wholePerPurchaseAtStep(effect: WholePerPurchaseEffect, step: number): number {
-  return toSafeInteger(roundToWhole(growGeometric(effect.start, effect.ratio, step)))
+  return toSafeInteger(wholeGrowthAtStep(effect, step))
+}
+
+/**
+ * The same `round(start * ratio^n)` as an unbounded count: the hold's units (ticket 849, the TD's
+ * Q4 on #823), capped by the economy only. Exact where the number was, so every hold a level up
+ * to 361 holds reads the same units.
+ */
+export function wholeBigPerPurchaseAtStep(effect: WholePerPurchaseEffect, step: number): bigint {
+  return toBigInt(wholeGrowthAtStep(effect, step))
+}
+
+function wholeGrowthAtStep(effect: WholePerPurchaseEffect, step: number): BigStat {
+  return roundToWhole(growGeometric(effect.start, effect.ratio, step))
 }
 
 /**

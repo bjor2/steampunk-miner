@@ -11,7 +11,7 @@ function saleOf(
   overrides: Partial<BurstSale> = {},
 ): BurstSale {
   return {
-    items: [{ tier: 1, amount: 4 }],
+    items: [{ tier: 1, amount: 4n }],
     credits: fromCanonical(credits),
     coinsShown: 12,
     liningPaid: fromCanonical(liningPaid),
@@ -80,8 +80,8 @@ describe('sell burst chunks', () => {
   it('throws one chunk per unit sold, in the tier of its ore', () => {
     const chunks = chunksOfSale(
       [
-        { tier: 1, amount: 2 },
-        { tier: 4, amount: 1 },
+        { tier: 1, amount: 2n },
+        { tier: 4, amount: 1n },
       ],
       BURST_TIMING.chunks.max,
     )
@@ -95,8 +95,8 @@ describe('sell burst chunks', () => {
   it('collapses a haul of 24 units or more into 24 chunks of mixed sizes, shared by amount', () => {
     const chunks = chunksOfSale(
       [
-        { tier: 1, amount: 30 },
-        { tier: 4, amount: 90 },
+        { tier: 1, amount: 30n },
+        { tier: 4, amount: 90n },
       ],
       24,
     )
@@ -106,7 +106,7 @@ describe('sell burst chunks', () => {
   })
 
   it('throws no chunk once the burst has no room left', () => {
-    expect(chunksOfSale([{ tier: 1, amount: 3 }], 0)).toEqual([])
+    expect(chunksOfSale([{ tier: 1, amount: 3n }], 0)).toEqual([])
   })
 
   it('reads a sale of no units as no chunks', () => {

@@ -21,7 +21,8 @@
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { oreTier, oreValue } from '../../../systems/economy/oreEconomy'
-import { fromSafeInteger, mul, type Money } from '../../../systems/money'
+import { fromBigInt, mul, type Money } from '../../../systems/money'
+import { smallerCount } from '../../../systems/wholeCount'
 import type { IncomeAt, IncomeRate } from '../../../systems/registries/incomeRates'
 import { atLinkStrength } from '../../power-up-core'
 import { lastMarkOf, markStepOf, type MarkStep } from '../../tech-tree'
@@ -54,8 +55,9 @@ export const MOVER_INCOME_RATES: readonly IncomeRate[] = [
 
 /** The ore value a minute of the mover relocates on the band, at most a hold of it. */
 export function relocatedValuePerMinute(mover: MoverAtFullStack, at: IncomeAt): Money {
-  const cells = Math.min(mover.oreCellsPerUse * mover.usesPerMinute, at.cargoCapacity)
-  return mul(fromSafeInteger(cells), oreValue(oreTier(at.planetIndex, at.band) + RICHEST_LEAD))
+  const moved = BigInt(mover.oreCellsPerUse * mover.usesPerMinute)
+  const cells = smallerCount(moved, at.cargoCapacity)
+  return mul(fromBigInt(cells), oreValue(oreTier(at.planetIndex, at.band) + RICHEST_LEAD))
 }
 
 export function shifterAtFullStack(): MoverAtFullStack {

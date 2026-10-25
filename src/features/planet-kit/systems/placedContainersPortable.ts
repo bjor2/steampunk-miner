@@ -1,12 +1,20 @@
 /**
  * The placed containers as a save holds them (ticket 823, the TD's final ruling on #823, point 4):
  * saved with the world, keyed on the stable planet id `s:p`, so they survive a save and load and a
- * jump away and back; an old save has none. The portable form is the state's own shape (integers
- * and strings only), so reading it back is the identity a section's `ofPortable` must be. A
- * container's premium ledger counts (ticket 844) are read against its own cargo.
+ * jump away and back; an old save has none. The portable form is the state's own shape, its
+ * cargo's units in their JSON spelling (ticket 849: a safe integer, decimal text past 2^53), so a
+ * container a hold up to level 361 filled saves the bytes it did, and reading it back restores the
+ * state exactly, as a section's `ofPortable` must. A container's premium ledger counts (ticket 844)
+ * are read against its own cargo.
  */
 import { portablePremiumLedgerProblems } from '../../../systems/authority/premium/premiumLedgerPortable'
-import { cargoUnitsOf, type Cargo } from '../../../systems/vehicle/vehicleState'
+import {
+  cargoOfPortable,
+  portableCargoOf,
+  type PortableCargo,
+} from '../../../systems/vehicle/cargoPortable'
+import { cargoUnitsOf } from '../../../systems/vehicle/vehicleState'
+import { isJsonCount } from '../../../systems/wholeCount'
 import {
   CONTAINER_ACCESS,
   type ContainerAccess,
@@ -28,13 +36,46 @@ export function placedContainersProblems(body: unknown): string[] {
   ])
 }
 
-export function toPortablePlacedContainers(placed: PlacedContainers): PlacedContainers {
-  return placed
+/** A container as a save holds it: its cargo in the hold's save form. */
+export type PortablePlacedContainer = Omit<PlacedContainer, 'cargo'> & { cargo: PortableCargo }
+
+export type PortablePlacedContainers = Readonly<
+  Record<
+    string,
+    { nextContainerId: number; byId: Readonly<Record<string, PortablePlacedContainer>> }
+  >
+>
+
+export function toPortablePlacedContainers(placed: PlacedContainers): PortablePlacedContainers {
+  return mapContainers(placed, (container) => ({
+    ...container,
+    cargo: portableCargoOf(container.cargo),
+  }))
 }
 
-/** The containers typed; call only on a body `placedContainersProblems` accepts. */
+/** The containers read back; call only on a body `placedContainersProblems` accepts. */
 export function placedContainersOf(body: unknown): PlacedContainers {
-  return body as PlacedContainers
+  return mapContainers(body as PortablePlacedContainers, (container) => ({
+    ...container,
+    cargo: cargoOfPortable(container.cargo),
+  }))
+}
+
+function mapContainers<A, B>(
+  placed: Readonly<Record<string, { nextContainerId: number; byId: Readonly<Record<string, A>> }>>,
+  convert: (container: A) => B,
+): Record<string, { nextContainerId: number; byId: Record<string, B> }> {
+  return Object.fromEntries(
+    Object.entries(placed).map(([key, planet]) => [
+      key,
+      {
+        nextContainerId: planet.nextContainerId,
+        byId: Object.fromEntries(
+          Object.entries(planet.byId).map(([id, container]) => [id, convert(container)]),
+        ),
+      },
+    ]),
+  )
 }
 
 function planetProblems(planet: unknown, key: string): string[] {
@@ -98,7 +139,7 @@ function premiumProblems(container: Raw, where: string): string[] {
   if (cargoProblems(container.cargo, where).length > 0) return []
   return portablePremiumLedgerProblems(
     container.premium,
-    container.cargo as unknown as Cargo,
+    cargoOfPortable(container.cargo as unknown as PortableCargo),
     where,
   )
 }
@@ -112,7 +153,7 @@ function cargoProblems(cargo: unknown, where: string): string[] {
   if (!isPlainMap(cargo) || !isPlainMap(cargo.ore))
     return [`${where} must be { ore, coreFragments }`]
   const ore = Object.entries(cargo.ore).flatMap(([tier, units]) =>
-    TIER_KEY.test(tier) && isWholeFrom(units, 1)
+    TIER_KEY.test(tier) && isJsonCount(units) && units !== 0
       ? []
       : [`${where}.ore.${tier} must be units from 1`],
   )
@@ -120,7 +161,8 @@ function cargoProblems(cargo: unknown, where: string): string[] {
     ? []
     : [`${where}.coreFragments must be a whole number`]
   const problems = [...ore, ...fragments, ...unknownFields(cargo, where, ['ore', 'coreFragments'])]
-  return problems.length === 0 && cargoUnitsOf(cargo as unknown as Cargo) === 0
+  return problems.length === 0 &&
+    cargoUnitsOf(cargoOfPortable(cargo as unknown as PortableCargo)) === 0n
     ? [`${where} is empty, so the container should have been removed`]
     : problems
 }

@@ -71,7 +71,7 @@ function holdingOn(planet: number, premium: number, commons: number) {
   const held = continueScriptedSession(
     withVehicle(session.state(), 'p1', {
       ...vehicle,
-      cargo: { ...vehicle.cargo, ore: { [tier]: premium + commons } },
+      cargo: { ...vehicle.cargo, ore: { [tier]: BigInt(premium + commons) } },
     }),
   )
   const counts = { [`${tier}:1:${planet}:${AMBER}`]: String(premium) }
@@ -153,7 +153,7 @@ describe('premium counts in a Cache Crate at g = 1e6', () => {
   const KEY = `1:${G}`
 
   it('pays N·⌊1.25V⌋ + M·V once after the pure drop and pickup', () => {
-    const hold = { ore: { [TIER]: 5 }, coreFragments: 0 }
+    const hold = { ore: { [TIER]: 5n }, coreFragments: 0 }
     const premium = [{ tier: TIER, origin: KEY, speciesId: AMBER, units: '3' }]
     const drop = { planetKey: KEY, kind: CRATE, ownerId: 'p1', access: 'owner' as const }
     const dropped = dropContainer(NO_PLACED_CONTAINERS, {
@@ -169,7 +169,7 @@ describe('premium counts in a Cache Crate at g = 1e6', () => {
       playerId: 'p1',
       containerId: dropped.container.containerId,
       hold: dropped.hold,
-      capacity: 5,
+      capacity: 5n,
     })
     if (!picked.isPickedUp) throw new Error(picked.reason)
     expect(picked.movedPremium).toEqual(premium)
@@ -181,7 +181,7 @@ describe('premium counts in a Cache Crate at g = 1e6', () => {
     const vehicle = vehicleOf(start, 'p1')
     const held = withVehicle(start, 'p1', { ...vehicle, cargo: picked.hold })
     const state = withPremiumLedger(held, 'p1', picked.movedPremium)
-    const sale = withKit(() => tierSaleOf(state, 'p1', { tier: TIER, amount: 5 }))
+    const sale = withKit(() => tierSaleOf(state, 'p1', { tier: TIER, amount: 5n }))
     expect(toCanonical(sale.value)).toBe(goldenValue(TIER, 3, 2))
   })
 })
@@ -194,7 +194,7 @@ describe('premium counts moved with a partial pickup', () => {
   ]
 
   it('moves back per tier at most the units that tier moved, lowest key first', () => {
-    const moved = premiumMovedWith(premium, { ore: { '2': 3 }, coreFragments: 0 })
+    const moved = premiumMovedWith(premium, { ore: { '2': 3n }, coreFragments: 0 })
     expect(moved.taken).toEqual([
       { tier: 2, origin: '1:1', speciesId: AMBER, units: '2' },
       { tier: 2, origin: '1:2', speciesId: LENS, units: '1' },

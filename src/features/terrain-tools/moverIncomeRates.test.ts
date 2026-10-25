@@ -27,7 +27,7 @@ import { markLadderOf } from './systems/terrainItems'
 const AT: IncomeAt = {
   planetIndex: 10,
   band: 3,
-  cargoCapacity: 24,
+  cargoCapacity: 24n,
   drillOrePerMinute: fromCanonical('1000'),
   tripMinutes: fromCanonical('2'),
 }
@@ -82,7 +82,7 @@ describe('mover income rates', () => {
   })
 
   it("relocates no more ore a minute than the hold takes, at the band's richest ore", () => {
-    const smallHold = { ...AT, cargoCapacity: 2 }
+    const smallHold = { ...AT, cargoCapacity: 2n }
     const richest = oreValue(oreTier(AT.planetIndex, AT.band) + 2)
     const value = relocatedValuePerMinute({ oreCellsPerUse: 40, usesPerMinute: 3 }, smallHold)
     expect(toCanonical(value)).toBe(toCanonical(mul(fromSafeInteger(2), richest)))

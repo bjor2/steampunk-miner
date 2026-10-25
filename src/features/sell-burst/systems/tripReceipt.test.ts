@@ -26,11 +26,11 @@ const COMMON: SeenRarity = { lead: 0, rarity: 'common', tint: null, pulse: 0 }
 const unitPriceOf = (tier: number) => fromSafeInteger(10 * tier)
 
 function kind(tier: number, key: string, count: number, rarity: SeenRarity | null): HeldKind {
-  return { tier, key, name: key, rarity, count }
+  return { tier, key, name: key, rarity, count: BigInt(count) }
 }
 
 function saleOf(sold: readonly HeldKind[], liningPaid: string, tick: number): ReceiptSale {
-  const credits = sold.reduce((total, k) => total + 10 * k.tier * k.count, 0)
+  const credits = sold.reduce((total, k) => total + 10 * k.tier * Number(k.count), 0)
   return { sold, credits: fromSafeInteger(credits), liningPaid: fromCanonical(liningPaid), tick }
 }
 
@@ -54,7 +54,7 @@ describe('trip receipt', () => {
       saleOf([kind(3, 'a', 2, null)], '0', 100),
       saleOf([kind(3, 'a', 1, RARE), kind(4, 'c', 1, null)], '0', 130),
     )
-    expect(receipt.lines.map((line) => [line.key, line.count])).toEqual([
+    expect(receipt.lines.map((line) => [line.key, Number(line.count)])).toEqual([
       ['a', 3],
       ['c', 1],
     ])

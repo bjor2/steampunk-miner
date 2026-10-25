@@ -26,7 +26,7 @@ const docked: DomainEvent = {
   ...stamp('p1'),
   type: 'DockEntered',
   bay: 'sell',
-  cargoUnits: 3,
+  cargoUnits: 3n,
   energy: 100,
   hull: '50',
 }

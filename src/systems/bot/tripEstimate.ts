@@ -21,6 +21,7 @@ import { blockHardness, coreHardness } from '../economy/oreEconomy'
 import { boreQuanta, groundHardnessAt, moveQuanta, moveTicks } from './botWorld'
 import { galleryOf, shaftTileAt, type MineLayout } from './mineLayout'
 import { nextRow } from './tripGoal'
+import { countHeldToSafe } from '../wholeCount'
 
 /** What a trip has to work with: the vehicle's stats and the energy in its tank. */
 export interface TripMeans {
@@ -168,7 +169,8 @@ function galleryTripOf(
   return {
     travel,
     gallery,
-    tilesByHold: stats.cargoCapacity / gallery.unitsPerTile,
+    // A plan in doubles (#196): a hold past 2^53 reads as 2^53, far past any tank's reach.
+    tilesByHold: countHeldToSafe(stats.cargoCapacity) / gallery.unitsPerTile,
     tilesByTank: tankLeft / gallery.quantaPerTile,
   }
 }

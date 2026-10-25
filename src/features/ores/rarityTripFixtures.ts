@@ -147,7 +147,7 @@ export interface ModelTrip {
 }
 
 /** The ledger model: each find in turn priced by the pure clamp from a fresh trip. */
-export function modelTripOf(finds: readonly PickupFind[], cargoCapacity: number): ModelTrip {
+export function modelTripOf(finds: readonly PickupFind[], cargoCapacity: bigint): ModelTrip {
   let trip = NEW_RARITY_TRIP
   const values: Money[] = []
   for (const find of finds) {

@@ -19,7 +19,7 @@ describe('mineral drain per minute', () => {
       for (let planet = 1; planet <= LAST_SCHEDULED_PLANET; planet++) {
         for (let band = 1; band <= BAND_COUNT; band++) {
           for (const hold of HOLDS) {
-            const moved = drainForAMinute(drain, planet, band, hold)
+            const moved = drainForAMinute(drain, planet, band, BigInt(hold))
             if (cmp(moved, fifteenPercentOf(planet, band, hold)) > 0) {
               overruns.push(`Mark ${drain.mark} P${planet} band ${band} hold ${hold}`)
             }

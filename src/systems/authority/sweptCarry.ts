@@ -38,7 +38,8 @@ import { chordMmThroughCell } from '../vehicle/cellChord'
 import { carrySubStepsIn, SWEEP_STEP_MM, type SweepPath } from '../vehicle/sweptCut'
 import { aimVectorOfPose } from '../vehicle/aim'
 import { tileOfMillimetres, type VehiclePose } from '../vehicle/vehiclePose'
-import { cargoUnitsOf, statsOfVehicle } from '../vehicle/vehicleState'
+import { cargoRoomOf } from '../vehicle/vehicleState'
+import { countHeldToSafe } from '../wholeCount'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { cellDensitySum, type YieldedCell } from '../world/cellYield'
 import type { PlanetParams } from '../world/planetParams'
@@ -179,11 +180,10 @@ export function carryPurseOf(
 ): CarryPurse {
   const vehicle = vehicleOf(state, playerId)
   const carried = path.isFresh ? 0 : carrySubStepsIn(vehicle.sweptCut, quantum)
-  const room = statsOfVehicle(vehicle).cargoCapacity - cargoUnitsOf(vehicle.cargo)
   return {
     subSteps: quantum + carried,
     tank: vehicle.energy,
-    room: Math.max(0, room),
+    room: countHeldToSafe(cargoRoomOf(vehicle)),
   }
 }
 

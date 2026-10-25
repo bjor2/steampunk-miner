@@ -17,6 +17,7 @@ import { MINERAL_DRAIN } from './extractionContent'
 import { EXTRACTION_ECONOMY } from './extractionEconomy'
 import { markLadderOf } from './extractionItems'
 import { roomUnderCapOf, tripCapAt } from './tripCap'
+import { countHeldToSafe } from '../../../systems/wholeCount'
 
 const MINUTE_TICKS = 60 * TICKS_PER_SECOND
 /** The richest cells a band holds: its ore with the +2 lead (#140). */
@@ -48,7 +49,7 @@ export function drainForAMinute(
   drain: DrainAtMark,
   planet: number,
   band: number,
-  hold: number,
+  hold: bigint,
 ): Money {
   const cap = tripCapAt(planet, band, hold)
   const cells = richestCellsOf(planet, band, drain.cellsPerUse)
@@ -58,7 +59,7 @@ export function drainForAMinute(
     const take = takeDrainCells(cells, {
       maxCells: drain.cellsPerUse,
       room: roomUnderCapOf(moved, cap),
-      holdRoom: hold,
+      holdRoom: countHeldToSafe(hold),
       yieldShare: EXTRACTION_ECONOMY.income.yieldShare,
       yieldCarry: carry,
     })

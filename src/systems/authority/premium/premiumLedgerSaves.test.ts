@@ -12,7 +12,7 @@ function ledgeredState(): AuthorityState {
   const start = createScriptedSession().state()
   const vehicle = vehicleOf(start, 'p1')
   const session = continueScriptedSession(
-    withVehicle(start, 'p1', { ...vehicle, cargo: { ...vehicle.cargo, ore: { 2: 5, 3: 1 } } }),
+    withVehicle(start, 'p1', { ...vehicle, cargo: { ...vehicle.cargo, ore: { 2: 5n, 3: 1n } } }),
   )
   const counts = { '2:1:1:test-amber': '3', '2:1:2:test-lens': '2', '3:1:1:test-amber': '1' }
   session.submit(1, { type: 'debug.setPremiumLedger', payload: { counts } })

@@ -198,6 +198,16 @@ export function integerRatioOf(amount: Money): { num: bigint; den: bigint } {
 }
 
 /**
+ * A whole amount as an unbounded count (the hold's units past the safe integers, ticket 849),
+ * exact digit for digit. A fractional amount throws rather than round.
+ */
+export function toBigInt(amount: Money): bigint {
+  const value = unwrap(amount)
+  if (!value.isInteger()) throw new RangeError(`expected a whole amount, got ${value.toFixed()}`)
+  return BigInt(value.toFixed())
+}
+
+/**
  * A bounded float (a rate or a share in the pacing bot's plan) as money, so the plan multiplies it
  * by a price in Money and never turns the price into a double, which is Infinity past 1.8e308
  * (#196). An authority amount comes from canonical text or a safe integer, never from here.

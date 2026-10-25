@@ -14,6 +14,7 @@ import {
   div,
   floor,
   floorMilli,
+  fromBigInt,
   fromSafeInteger,
   mul,
   sub,
@@ -26,8 +27,8 @@ import { amountsOfTrip, type IncomeTrip } from './incomeTrip'
 
 const PERCENT = fromSafeInteger(100)
 
-export function tripCapAt(planetIndex: number, band: number, cargoCapacity: number): Money {
-  const fullHold = mul(fromSafeInteger(cargoCapacity), oreValue(oreTier(planetIndex, band)))
+export function tripCapAt(planetIndex: number, band: number, cargoCapacity: bigint): Money {
+  const fullHold = mul(fromBigInt(cargoCapacity), oreValue(oreTier(planetIndex, band)))
   return floorMilli(mul(EXTRACTION_ECONOMY.income.tripCapShare, fullHold))
 }
 

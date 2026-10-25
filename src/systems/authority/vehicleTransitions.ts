@@ -17,7 +17,7 @@ import {
 } from '../../constants/balance'
 import { rescueFee } from '../economy/planetCharges'
 import { oreSalePrice } from '../economy/oreEconomy'
-import { add, cmp, fromSafeInteger, mul, sub, toCanonical, ZERO_MONEY, type Money } from '../money'
+import { add, cmp, fromBigInt, mul, sub, toCanonical, ZERO_MONEY, type Money } from '../money'
 import { withoutCutCarry } from '../vehicle/cutCarry'
 import { isAtOrBelowPercent, rescueFloorQuanta } from '../vehicle/energyQuanta'
 import { dockedPoseAt, isInPadZone } from '../vehicle/vehiclePose'
@@ -247,7 +247,7 @@ function dockedPoseOf(state: AuthorityState, vehicle: VehicleState): VehicleStat
 function oreValueOf(cargo: Cargo): Money {
   return Object.entries(cargo.ore).reduce(
     (total, [tier, units]) =>
-      add(total, mul(oreSalePrice(Number.parseInt(tier)), fromSafeInteger(units))),
+      add(total, mul(oreSalePrice(Number.parseInt(tier)), fromBigInt(units))),
     ZERO_MONEY,
   )
 }

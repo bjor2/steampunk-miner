@@ -16,7 +16,8 @@
 import { coreMaterialTier } from '../../economy/oreEconomy'
 import { refineBatchCap, refinerySlotPrice, refinerySlotsMax } from '../../economy/refineryEconomy'
 import { sub, toCanonical, ZERO_MONEY, type Money } from '../../money'
-import { statsOfVehicle, type Cargo } from '../../vehicle/vehicleState'
+import { oreUnitsOf, statsOfVehicle, withoutOreUnits, type Cargo } from '../../vehicle/vehicleState'
+import { countOfJson, smallerCount } from '../../wholeCount'
 import { vehicleOf, withVehicle, withWallet, type AuthorityState } from '../authorityState'
 import {
   chainEffects,
@@ -36,17 +37,17 @@ export const REFINERY_RULES: {
   readonly buyRefinerySlot: CommandRule<'buyRefinerySlot'>
 } = {
   queueRefine: {
-    fields: { resourceTier: 'wholeNumber', units: 'wholeNumber' },
+    fields: { resourceTier: 'wholeNumber', units: 'count' },
     reject: (state, { playerId, payload }) =>
       firstRejection([
         () => atRefineryRejection(state, playerId),
         () => coreFragmentRejection(state, payload.resourceTier),
         () => slotsBusyRejection(state),
         () => nothingToRefineRejection(vehicleOf(state, playerId).cargo, payload.resourceTier),
-        () => noUnitsRejection(payload.units),
+        () => noUnitsRejection(countOfJson(payload.units)),
       ]),
     apply: (state, { playerId, tick, payload }) =>
-      queueBatch(state, playerId, tick, payload.resourceTier, payload.units),
+      queueBatch(state, playerId, tick, payload.resourceTier, countOfJson(payload.units)),
   },
   buyRefinerySlot: {
     fields: {},
@@ -66,7 +67,7 @@ export function nextRefinerySlotPrice(state: AuthorityState): Money | null {
 }
 
 /** The most one batch takes from this player's hold now: half its capacity. */
-export function batchCapOf(state: AuthorityState, playerId: string): number {
+export function batchCapOf(state: AuthorityState, playerId: string): bigint {
   return refineBatchCap(statsOfVehicle(vehicleOf(state, playerId)).cargoCapacity)
 }
 
@@ -88,12 +89,12 @@ function slotsBusyRejection(state: AuthorityState): Rejection | null {
 }
 
 function nothingToRefineRejection(cargo: Cargo, tier: number): Rejection | null {
-  if ((cargo.ore[String(tier)] ?? 0) > 0) return null
+  if (oreUnitsOf(cargo, tier) > 0n) return null
   return rejectionOf('nothing_to_refine', `the hold has no ore of tier ${tier}`)
 }
 
-function noUnitsRejection(units: number): Rejection | null {
-  if (units > 0) return null
+function noUnitsRejection(units: bigint): Rejection | null {
+  if (units > 0n) return null
   return rejectionOf('nothing_to_refine', 'a batch needs at least 1 unit')
 }
 
@@ -113,20 +114,20 @@ function queueBatch(
   playerId: string,
   tick: number,
   tier: number,
-  requestedUnits: number,
+  requestedUnits: bigint,
 ): RuleEffect {
   const units = clampedUnits(state, playerId, tier, requestedUnits)
   return chainEffects(state, [
     (current) => loadBatch(current, playerId, tick, { tier, units, requestedUnits }),
-    (current) => debitPremiumUnits(current, playerId, tier, BigInt(units), 'refined'),
+    (current) => debitPremiumUnits(current, playerId, tier, units, 'refined'),
   ])
 }
 
 /** A queued batch: the tier, the units after the clamp, and the units asked for. */
 interface BatchRequest {
   tier: number
-  units: number
-  requestedUnits: number
+  units: bigint
+  requestedUnits: bigint
 }
 
 function loadBatch(
@@ -153,10 +154,10 @@ function clampedUnits(
   state: AuthorityState,
   playerId: string,
   tier: number,
-  requestedUnits: number,
-): number {
-  const held = vehicleOf(state, playerId).cargo.ore[String(tier)] ?? 0
-  return Math.min(requestedUnits, held, batchCapOf(state, playerId))
+  requestedUnits: bigint,
+): bigint {
+  const held = oreUnitsOf(vehicleOf(state, playerId).cargo, tier)
+  return smallerCount(smallerCount(requestedUnits, held), batchCapOf(state, playerId))
 }
 
 function newBatch(
@@ -164,7 +165,7 @@ function newBatch(
   playerId: string,
   tick: number,
   tier: number,
-  units: number,
+  units: bigint,
 ): RefineryBatch {
   return {
     owner: playerId,
@@ -174,13 +175,6 @@ function newBatch(
     queuedTick: tick,
     queuedPlanet: state.planet.index,
   }
-}
-
-function withoutOreUnits(cargo: Cargo, tier: number, units: number): Cargo {
-  const key = String(tier)
-  const left = (cargo.ore[key] ?? 0) - units
-  const ore = Object.fromEntries(Object.entries(cargo.ore).filter(([held]) => held !== key))
-  return { ...cargo, ore: left > 0 ? { ...ore, [key]: left } : ore }
 }
 
 function withSlot(state: AuthorityState, slot: number, batch: RefineryBatch): AuthorityState {

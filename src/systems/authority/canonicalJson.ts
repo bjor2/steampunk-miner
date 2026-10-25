@@ -1,6 +1,8 @@
 /**
  * Canonical JSON of authority state (decision #11 section 3): object keys sorted, Money as its
- * canonical string, integers as JSON numbers. Anything else that could print differently on two
+ * canonical string, integers as JSON numbers. A bigint count (the hold's units, ticket 849) is a
+ * JSON number of its exact digits, so a count a safe integer held before reads the same bytes
+ * and every digest under it is unchanged. Anything else that could print differently on two
  * machines (floats, unsafe integers, undefined, class instances) is refused, so a digest over
  * this text is the same everywhere. So is anything nested past `MAX_JSON_NESTING_DEPTH` (#100),
  * with a `JsonNestingTooDeepError` instead of a stack overflow.
@@ -19,6 +21,7 @@ function canonicalValue(value: unknown, depth: number): string {
     return JSON.stringify(value)
   }
   if (typeof value === 'number') return canonicalInteger(value)
+  if (typeof value === 'bigint') return value.toString()
   if (Array.isArray(value)) return canonicalArray(value, memberDepthOf(depth))
   if (isPlainObject(value)) return canonicalObject(value, memberDepthOf(depth))
   throw new TypeError(`canonical JSON cannot hold ${describeValue(value)}`)

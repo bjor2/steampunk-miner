@@ -95,7 +95,7 @@ describe('signature ore cells (#232)', () => {
     const twoTierPrice = toCanonical(oreSalePrice(SURFACE_TIER + 1))
     expect(added).toMatchObject({ resourceTier: SURFACE_TIER, value: twoTierPrice })
     expect(added).not.toHaveProperty('saleTier')
-    expect(cargo).toEqual({ [String(SURFACE_TIER + 1)]: 1 })
+    expect(cargo).toEqual({ [String(SURFACE_TIER + 1)]: 1n })
     expect(sold).toMatchObject({ value: twoTierPrice })
   })
 

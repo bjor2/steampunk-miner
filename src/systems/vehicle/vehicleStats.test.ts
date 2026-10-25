@@ -28,7 +28,7 @@ function statValues(stats: VehicleStats): (number | string)[] {
     toCanonical(stats.drillTip),
     toCanonical(stats.hullMax),
     stats.energyMax,
-    stats.cargoCapacity,
+    String(stats.cargoCapacity),
     stats.engine.speedMax,
     stats.engine.accel,
     stats.engine.thrustToWeight,
@@ -56,7 +56,7 @@ describe('vehicle stats from integer levels', () => {
       toCanonical(fromCanonical('1')),
     ])
     expect(stats.hullMax).toEqual(fromCanonical('100'))
-    expect([stats.energyMax, stats.cargoCapacity]).toEqual([150, 10])
+    expect([stats.energyMax, stats.cargoCapacity]).toEqual([150, 10n])
     expect(stats.engine).toEqual({ speedMax: 6, accel: 1, thrustToWeight: 2 })
   })
 
@@ -67,7 +67,7 @@ describe('vehicle stats from integer levels', () => {
     expect(toFixedText(stats.drillPower, 2)).toBe('10.69')
     expect(stats.drillTip).toEqual(fromCanonical('1.2544'))
     expect(stats.hullMax).toEqual(fromCanonical('112'))
-    expect([stats.energyMax, stats.cargoCapacity]).toEqual([389, 26])
+    expect([stats.energyMax, stats.cargoCapacity]).toEqual([389, 26n])
   })
 
   it('gives speed 6 x 1.05^10, accel 1.05^10 and twr 1 + 1.05^10 in millionths at engine step 10', () => {

@@ -10,11 +10,11 @@
 import {
   add,
   cmp,
-  floor,
   floorMilli,
+  fromBigInt,
   fromSafeInteger,
+  integerRatioOf,
   mul,
-  toSafeInteger,
   type Money,
 } from '../money'
 import { bandOrePrice } from './bandOreCost'
@@ -45,19 +45,24 @@ export function refineSeconds(): number {
   return refinery.refineSeconds
 }
 
-/** The most ore one batch takes from a hold of `cargoCapacity` units. */
-export function refineBatchCap(cargoCapacity: number): number {
-  return toSafeInteger(floor(mul(refinery.batchCargoFraction, fromSafeInteger(cargoCapacity))))
+/**
+ * The most ore one batch takes from a hold of `cargoCapacity` units. The hold is unbounded (ticket
+ * 849), so the fraction is applied as its integer ratio: exact to the unit past the 40 digits a
+ * Money holds, and the same floor as before for every hold below them.
+ */
+export function refineBatchCap(cargoCapacity: bigint): bigint {
+  const { num, den } = integerRatioOf(refinery.batchCargoFraction)
+  return (cargoCapacity * num) / den
 }
 
 /** What the batch pays when it is collected at the Sell bay. */
-export function refinedValue(tier: number, units: number): Money {
-  return floorMilli(mul(mul(fromSafeInteger(units), oreValue(tier)), refinery.valueMultiplier))
+export function refinedValue(tier: number, units: bigint): Money {
+  return floorMilli(mul(mul(fromBigInt(units), oreValue(tier)), refinery.valueMultiplier))
 }
 
 /** What the same ore would have sold for raw: `units * floorMilli(V(t))`, the Sell bay's price. */
-export function rawRefineValue(tier: number, units: number): Money {
-  return mul(oreSalePrice(tier), fromSafeInteger(units))
+export function rawRefineValue(tier: number, units: bigint): Money {
+  return mul(oreSalePrice(tier), fromBigInt(units))
 }
 
 /** The price of the next slot for a refinery holding `slots`, or null at `slotsMax`. */

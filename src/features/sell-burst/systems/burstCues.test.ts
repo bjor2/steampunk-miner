@@ -7,7 +7,7 @@ import { burstWithSale, type SellBurst } from './sellBurst'
 
 function saleOf(credits: string, liningPaid: string, coinsShown = 12): BurstSale {
   return {
-    items: [{ tier: 1, amount: 4 }],
+    items: [{ tier: 1, amount: 4n }],
     credits: fromCanonical(credits),
     coinsShown,
     liningPaid: fromCanonical(liningPaid),

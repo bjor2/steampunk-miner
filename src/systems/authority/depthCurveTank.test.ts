@@ -40,7 +40,7 @@ function cellSubStepsByBand(planetIndex: number): number[] {
 function holdFillQuantaByBand(planetIndex: number, densityBp: readonly number[]): number[] {
   const hold = vehicleStatsAt(onCurveSteps(planetIndex)).cargoCapacity
   return cellSubStepsByBand(planetIndex).map((subSteps, at) => {
-    const cells = Math.ceil((hold * BASIS_POINTS) / densityBp[at])
+    const cells = Math.ceil((Number(hold) * BASIS_POINTS) / densityBp[at])
     return cellDigEnergyOf(cells * subSteps)
   })
 }

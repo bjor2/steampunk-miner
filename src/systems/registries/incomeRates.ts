@@ -30,8 +30,8 @@ import { anchorRowProblemOf } from './spendFamilies'
 export interface IncomeAt {
   planetIndex: number
   band: number
-  /** The hold's size in units, as the vehicle's `cargoCapacity` reads. */
-  cargoCapacity: number
+  /** The hold's size in units, as the vehicle's `cargoCapacity` reads (unbounded, ticket 849). */
+  cargoCapacity: bigint
   /** The drill's own ore value a minute on the same patch, for a rate that scales with it. */
   drillOrePerMinute: Money
   /** The minutes the drill takes to fill the hold on the band: one trip (ruling 6167240683). */
@@ -66,7 +66,7 @@ export interface IncomeRate {
 /** The per-trip clamp on income items (#162 4.5); one provider, the extraction slice. */
 export interface TripCapSource {
   id: string
-  tripCapAt(planetIndex: number, band: number, cargoCapacity: number): Money
+  tripCapAt(planetIndex: number, band: number, cargoCapacity: bigint): Money
 }
 
 /** How the caller's run answers an anchor: a schedule row, or the rate's own item. */

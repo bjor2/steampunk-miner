@@ -40,7 +40,7 @@ describe('vehicle stats', () => {
       gateTip: m('1'),
       hullMax: m('100'),
       energyMax: 150,
-      cargoCapacity: 10,
+      cargoCapacity: 10n,
       engine: { speedMax: 6, accel: 1, thrustToWeight: 2 },
     })
   })
@@ -61,7 +61,7 @@ describe('vehicle stats', () => {
 
   it('adds 10% to the tank and the hold a purchase, rounded to whole units (ticket 553)', () => {
     expect([energyMax(0), energyMax(1), energyMax(16)]).toEqual([150, 165, 689])
-    expect([cargoCapacity(0), cargoCapacity(1), cargoCapacity(22)]).toEqual([10, 11, 81])
+    expect([cargoCapacity(0), cargoCapacity(1), cargoCapacity(22)]).toEqual([10n, 11n, 81n])
   })
 
   it('runs the engine at 6 x 1.05^e m/s with no top, accel and lift scaled with it (ticket 553)', () => {

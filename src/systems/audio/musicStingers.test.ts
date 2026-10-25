@@ -8,7 +8,7 @@ const docked = (playerId: string): DomainEvent => ({
   seq: 1,
   type: 'DockEntered',
   bay: 'sell',
-  cargoUnits: 3,
+  cargoUnits: 3n,
   energy: 100,
   hull: '50',
 })

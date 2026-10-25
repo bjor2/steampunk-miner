@@ -266,7 +266,7 @@ function sold(value: string): DomainEventBody {
 }
 
 function docked(): DomainEventBody {
-  return { type: 'DockEntered', bay: 'sell', cargoUnits: 0, energy: 0, hull: '0' }
+  return { type: 'DockEntered', bay: 'sell', cargoUnits: 0n, energy: 0, hull: '0' }
 }
 
 function boughtFuel(units: number, cost: string): DomainEventBody {

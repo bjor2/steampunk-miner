@@ -20,12 +20,14 @@ import {
   type AmountReading,
   type ScreenButton,
 } from './viewParts'
+import { countToJson, type JsonCount } from '../wholeCount'
 
 export interface RefinedLine {
   slot: number
   tier: number
   iconId: string
-  units: number
+  /** In a count's JSON spelling (ticket 849). */
+  units: JsonCount
   value: AmountReading
 }
 
@@ -66,7 +68,7 @@ function refinedLineOf(slot: number, batch: RefineryBatch): RefinedLine {
     slot,
     tier: batch.tier,
     iconId: oreIconIdOf('mixed', batch.tier),
-    units: batch.units,
+    units: countToJson(batch.units),
     value: amountReading(refinedValue(batch.tier, batch.units)),
   }
 }

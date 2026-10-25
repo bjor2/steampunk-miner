@@ -132,7 +132,7 @@ describe('rarity tiers', () => {
       const live = rarityTiers().filter((tier) => isTierLiveIn(tier, planetIndex, BAND_COUNT))
       for (const tier of live) {
         const find = mul(fromSafeInteger(10000 - shareBp), rarityMultiplierOf(tier.tierOffset))
-        const room = fromSafeInteger(shareBp * (hold - 1))
+        const room = fromSafeInteger(shareBp * (Number(hold) - 1))
         expect(cmp(find, room)).toBeLessThanOrEqual(0)
       }
     }

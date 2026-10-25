@@ -13,7 +13,7 @@ function localPlayer(): string {
 function soldAt(tick: number, value: string, playerId = localPlayer()): DomainEvent {
   return {
     type: 'ResourceSold',
-    items: [{ tier: 1, amount: 4 }],
+    items: [{ tier: 1, amount: 4n }],
     value,
     mode: 'all',
     coinsShown: 10,

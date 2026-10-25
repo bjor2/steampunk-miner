@@ -165,7 +165,8 @@ export interface PurchaseChainStamp {
 
 export interface SoldItem {
   tier: number
-  amount: number
+  /** The tier's units sold: unbounded, as the hold's counts are (ticket 849). */
+  amount: bigint
 }
 
 /** The kernel's own domain events: the closed set its projections and rules are written against. */
@@ -460,7 +461,7 @@ export interface KernelDomainEventBodies {
   UpgradeLevelChanged: { upgradeId: string; from: number; to: number }
   VehicleConfigurationChanged: { visualTier: number }
   /** Energy in quanta, hull as a canonical string (#11 amendment 2). */
-  DockEntered: { bay: BayId; cargoUnits: number; energy: number; hull: string }
+  DockEntered: { bay: BayId; cargoUnits: bigint; energy: number; hull: string }
   DockLeft: { bay: BayId; durationTicks: number }
   /** The first core tile of the planet broke (#10). */
   CoreReached: Record<never, never>
@@ -537,14 +538,15 @@ export interface KernelDomainEventBodies {
    * The Refinery bay (#105): a batch queued into `slot` (`units` after the clamp to the hold and
    * half its capacity, `requestedUnits` as asked), ready on the clock for its owner, and collected
    * at the Sell bay: what it pays, what the ore would have sold for raw, how long its money
-   * waited, and the planet it was queued on. A slot bought raises the refinery to `slots`.
+   * waited, and the planet it was queued on. A slot bought raises the refinery to `slots`. The
+   * units are unbounded, as the hold's counts are (ticket 849).
    */
-  RefineQueued: { slot: number; tier: number; units: number; requestedUnits: number }
-  RefineReady: { slot: number; tier: number; units: number }
+  RefineQueued: { slot: number; tier: number; units: bigint; requestedUnits: bigint }
+  RefineReady: { slot: number; tier: number; units: bigint }
   RefineCollected: {
     slot: number
     tier: number
-    units: number
+    units: bigint
     rawValue: string
     value: string
     waitSeconds: number

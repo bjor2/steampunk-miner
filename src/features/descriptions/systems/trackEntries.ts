@@ -16,7 +16,7 @@ import {
   hullMaxAtStep,
   type EngineStats,
 } from '../../../systems/economy/vehicleStats'
-import type { Money } from '../../../systems/money'
+import { fromBigInt, type Money } from '../../../systems/money'
 import { trackItemOf } from '../../../systems/registries/kernelItems'
 import type { DescribedStatLineSpec } from './describedLineSpec'
 import { kernelEntryOf, stepLevelLine, steppedLine, type DescribedEntry } from './kernelEntry'
@@ -40,7 +40,7 @@ export function trackEntries(): readonly DescribedEntry[] {
       trackLine('boiler', 'Energy', energyMaxAtStep),
     ]),
     trackEntry('cargo_hold', 'Wider bins and stouter rivets, so you haul more ore per trip.', [
-      trackLine('cargo_hold', 'Cargo', cargoCapacityAtStep),
+      trackLine('cargo_hold', 'Cargo', (step) => fromBigInt(cargoCapacityAtStep(step))),
     ]),
     trackEntry('hull', 'Thicker riveted plate that shrugs off the knocks the old hull felt.', [
       trackLine('hull', 'Hull', hullMaxAtStep),

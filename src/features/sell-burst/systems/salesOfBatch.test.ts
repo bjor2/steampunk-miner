@@ -35,7 +35,7 @@ const settled = (paid: string): DomainEvent => ({
 
 const sold = (playerId: string): DomainEvent => ({
   type: 'ResourceSold',
-  items: [{ tier: 1, amount: 2 }],
+  items: [{ tier: 1, amount: 2n }],
   value: '2e+1',
   mode: 'all',
   coinsShown: 4,

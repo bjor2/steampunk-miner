@@ -7,9 +7,15 @@
  */
 import { isNestedTooDeep, MAX_JSON_NESTING_DEPTH } from '../systems/jsonNesting'
 import { fromCanonical, toCanonical } from '../systems/money'
+import { isJsonCount } from '../systems/wholeCount'
 
 export type FieldKind =
   | 'integer'
+  /**
+   * A whole count that grows with the economy (the hold's units, ticket 849): a safe-integer JSON
+   * number while it fits, its canonical decimal text past 2^53 (`systems/wholeCount.ts`).
+   */
+  | 'count'
   | 'money'
   | 'text'
   | 'flag'
@@ -33,25 +39,27 @@ export type PayloadFields = { readonly [field: string]: FieldKind }
 
 export type ValueOfKind<K> = K extends 'integer' | 'float'
   ? number
-  : K extends 'money' | 'text'
-    ? string
-    : K extends 'flag'
-      ? boolean
-      : K extends 'jsonArgs'
-        ? Readonly<Record<string, unknown>>
-        : K extends { readonly oneOf: readonly (infer O)[] }
-          ? O
-          : K extends { readonly listOf: infer F }
-            ? readonly PayloadOf<F>[]
-            : K extends { readonly mapOf: infer M }
-              ? Readonly<Record<string, ValueOfKind<M>>>
-              : K extends { readonly tuple: infer T extends readonly unknown[] }
-                ? { readonly [I in keyof T]: ValueOfKind<T[I]> }
-                : K extends { readonly itemsOf: infer I }
-                  ? readonly ValueOfKind<I>[]
-                  : K extends { readonly optional: infer O }
-                    ? ValueOfKind<O>
-                    : never
+  : K extends 'count'
+    ? number | string
+    : K extends 'money' | 'text'
+      ? string
+      : K extends 'flag'
+        ? boolean
+        : K extends 'jsonArgs'
+          ? Readonly<Record<string, unknown>>
+          : K extends { readonly oneOf: readonly (infer O)[] }
+            ? O
+            : K extends { readonly listOf: infer F }
+              ? readonly PayloadOf<F>[]
+              : K extends { readonly mapOf: infer M }
+                ? Readonly<Record<string, ValueOfKind<M>>>
+                : K extends { readonly tuple: infer T extends readonly unknown[] }
+                  ? { readonly [I in keyof T]: ValueOfKind<T[I]> }
+                  : K extends { readonly itemsOf: infer I }
+                    ? readonly ValueOfKind<I>[]
+                    : K extends { readonly optional: infer O }
+                      ? ValueOfKind<O>
+                      : never
 
 /** The fields of `F` declared `{ optional: ... }`. */
 type OptionalFieldNames<F> = {
@@ -111,6 +119,10 @@ const SCALAR_CHECKS: Record<
   { isValid: (value: unknown) => boolean; expected: string }
 > = {
   integer: { isValid: Number.isSafeInteger, expected: 'a safe integer' },
+  count: {
+    isValid: isJsonCount,
+    expected: 'a whole count: a safe integer, or its decimal text past 2^53',
+  },
   money: { isValid: isCanonicalMoneyText, expected: 'a canonical decimal string' },
   text: { isValid: (value) => typeof value === 'string', expected: 'a string' },
   flag: { isValid: (value) => typeof value === 'boolean', expected: 'a boolean' },

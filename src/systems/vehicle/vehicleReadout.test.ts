@@ -9,7 +9,7 @@ describe('vehicle readout', () => {
 
   it('shows hull and cargo as amount over capacity', () => {
     expect(hullGaugeText(fromCanonical('62.7'), fromCanonical('125.44'))).toBe('63 / 125')
-    expect(cargoGaugeText(3, 10)).toBe('3 / 10')
+    expect(cargoGaugeText(3n, 10n)).toBe('3 / 10')
   })
 
   it('shows a hull far past a million in short scientific text', () => {

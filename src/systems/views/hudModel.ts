@@ -62,6 +62,7 @@ import { nextUpgradeChipOf, type NextUpgradeChip } from './nextUpgradeChip'
 import type { TripLedger } from './tripIncome'
 import { returnReserveUnits } from '../vehicle/returnReserve'
 import { upgradeCountsOf, type UpgradeCounts } from './dialBuyCue'
+import { smallerCount } from '../wholeCount'
 
 export interface HudSources {
   state: AuthorityState
@@ -261,13 +262,18 @@ function cargoGaugeOf(vehicle: VehicleState): CargoReading {
   return {
     text: cargoGaugeText(units, capacity),
     exact: String(units),
-    permille: Math.floor((Math.min(units, capacity) * PERMILLE) / capacity),
+    permille: holdPermilleOf(units, capacity),
     iconId: gaugeIconIdOf('cargo'),
     coreFragments,
     coreText: coreFragments > 0 ? `(${formatAmount(coreFragments)} core)` : '',
     isFull: units >= capacity,
     chainLinks: RIG_HOLD_LINKS,
   }
+}
+
+/** The hold's fill in permille, exact for any hold (ticket 849): a capacity is never 0. */
+function holdPermilleOf(units: bigint, capacity: bigint): number {
+  return Number((smallerCount(units, capacity) * BigInt(PERMILLE)) / capacity)
 }
 
 function liningBillOf(vehicle: VehicleState): AmountReading | null {

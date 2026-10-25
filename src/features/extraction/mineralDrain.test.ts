@@ -62,7 +62,7 @@ describe('mineral drain', () => {
       drained.map(() => CELL_KIND.ground),
     )
     expect(units).toBe(Math.floor(cells / 2))
-    expect(cargoUnitsOf(session.vehicle().cargo)).toBe(units)
+    expect(cargoUnitsOf(session.vehicle().cargo)).toBe(BigInt(units))
     expect(ofType(session.events(), 'CargoAdded')).toHaveLength(units)
     expect(chargesLeft(session)).toBe(1)
   })

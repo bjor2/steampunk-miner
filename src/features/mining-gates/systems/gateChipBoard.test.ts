@@ -27,7 +27,7 @@ function dockAt(tick: number): DomainEvent {
   return {
     type: 'DockEntered',
     bay: 'sell',
-    cargoUnits: 0,
+    cargoUnits: 0n,
     energy: 100,
     hull: '100',
     playerId: 'p1',

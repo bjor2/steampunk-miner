@@ -18,7 +18,7 @@ const STACK = { x: -2.5, y: 10 }
 
 function waveOf(liningPaid: string) {
   const sale = {
-    items: [{ tier: 1, amount: 4 }],
+    items: [{ tier: 1, amount: 4n }],
     credits: fromCanonical('400'),
     coinsShown: 12,
     liningPaid: fromCanonical(liningPaid),

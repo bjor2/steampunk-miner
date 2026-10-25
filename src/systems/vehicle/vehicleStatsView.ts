@@ -5,14 +5,16 @@
  */
 import { vehicleStatsTable } from '../economy/economyTables'
 import type { EngineStats, UpgradeLevels, VehicleStats } from '../economy/vehicleStats'
-import { fromCanonical, fromSafeInteger, toCanonical } from '../money'
+import { fromBigInt, fromCanonical, fromSafeInteger, toCanonical } from '../money'
+import { countToJson, type JsonCount } from '../wholeCount'
 
 export interface VehicleStatsView {
   drillPower: string
   drillTip: string
   hullMax: string
   energyMax: number
-  cargoCapacity: number
+  /** In a count's JSON spelling (ticket 849): a number while safe, decimal text past 2^53. */
+  cargoCapacity: JsonCount
   engine: EngineStats
 }
 
@@ -31,7 +33,7 @@ export function vehicleStatsViewOf(stats: VehicleStats): VehicleStatsView {
     drillTip: toCanonical(stats.drillTip),
     hullMax: toCanonical(stats.hullMax),
     energyMax: stats.energyMax,
-    cargoCapacity: stats.cargoCapacity,
+    cargoCapacity: countToJson(stats.cargoCapacity),
     engine: { ...stats.engine },
   }
 }
@@ -47,7 +49,7 @@ export function canonicalStatsOf(stats: VehicleStats): Record<string, string> {
     drillTip: toCanonical(stats.drillTip),
     hullMax: toCanonical(stats.hullMax),
     energyMax: toCanonical(fromSafeInteger(stats.energyMax)),
-    cargoCapacity: toCanonical(fromSafeInteger(stats.cargoCapacity)),
+    cargoCapacity: toCanonical(fromBigInt(stats.cargoCapacity)),
     speedMax: canonicalOfDouble(stats.engine.speedMax),
     accel: canonicalOfDouble(stats.engine.accel),
     thrustToWeight: canonicalOfDouble(stats.engine.thrustToWeight),

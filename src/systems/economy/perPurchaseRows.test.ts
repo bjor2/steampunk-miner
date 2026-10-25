@@ -6,6 +6,7 @@ import {
   div,
   fromCanonical,
   fromFiniteNumber,
+  fromBigInt,
   fromSafeInteger,
   mul,
   powInt,
@@ -71,8 +72,8 @@ function isWithinMillionth(value: number, target: Money): boolean {
 }
 
 /** `|units - law| <= 1/2`: the units are the law rounded to a whole number. */
-function isRoundedLaw(units: number, law: Money): boolean {
-  const off = sub(fromSafeInteger(units), law)
+function isRoundedLaw(units: number | bigint, law: Money): boolean {
+  const off = sub(fromBigInt(BigInt(units)), law)
   return cmp(off, m('0.5')) <= 0 && cmp(off, m('-0.5')) >= 0
 }
 
@@ -83,7 +84,14 @@ describe('hold row per purchase (ticket 553)', () => {
     )
     expect(misses).toEqual([])
     expect(PURCHASES_0_TO_200.slice(0, 8).map((purchase) => cargoCapacity(purchase))).toEqual([
-      10, 11, 12, 13, 15, 16, 18, 19,
+      10n,
+      11n,
+      12n,
+      13n,
+      15n,
+      16n,
+      18n,
+      19n,
     ])
   })
 
@@ -117,8 +125,8 @@ describe('hold row per purchase (ticket 553)', () => {
         stepPrice('cargo_hold', purchase, 1),
       )
       const unitRatio = div(
-        fromSafeInteger(cargoCapacity(purchase + 1)),
-        fromSafeInteger(cargoCapacity(purchase)),
+        fromBigInt(cargoCapacity(purchase + 1)),
+        fromBigInt(cargoCapacity(purchase)),
       )
       return cmp(priceRatio, unitRatio) < 0
     })

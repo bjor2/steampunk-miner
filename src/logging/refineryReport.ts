@@ -10,10 +10,12 @@ import { TICKS_PER_SECOND } from '../constants/physics'
 import { add, fromCanonical, sub, toCanonical, ZERO_MONEY, type Money } from '../systems/money'
 import type { PacingReport } from './pacingReport'
 import type { RunEvent } from './runEvent'
+import { countOfJson, countToJson, type JsonCount } from '../systems/wholeCount'
 
 export interface RefineGain {
   batches: number
-  units: number
+  /** The units refined, in a count's JSON spelling (ticket 849). */
+  units: JsonCount
   rawValue: string
   value: string
   /** `value - rawValue`: what refining added over selling the same ore raw. */
@@ -25,13 +27,13 @@ const PERCENT = 100
 
 /** Planet index (as a string key) to the batches collected there. */
 export function refineGainByPlanet(events: readonly RunEvent[]): Record<string, RefineGain> {
-  const byPlanet: Record<string, { batches: number; units: number; raw: Money; value: Money }> = {}
+  const byPlanet: Record<string, RefineTally> = {}
   for (const event of events) {
     if (event.event !== 'refine_collected') continue
     const data = (event as RunEvent<'refine_collected'>).data
     const entry = (byPlanet[String(event.planet)] ??= emptyGain())
     entry.batches += 1
-    entry.units += data.units
+    entry.units += countOfJson(data.units)
     entry.raw = add(entry.raw, fromCanonical(data.rawValue))
     entry.value = add(entry.value, fromCanonical(data.value))
   }
@@ -66,14 +68,22 @@ export function formatRefineGain(byPlanet: Record<string, RefineGain>): string {
   ].join('\n')
 }
 
-function emptyGain() {
-  return { batches: 0, units: 0, raw: ZERO_MONEY, value: ZERO_MONEY }
+/** A planet's collected batches as the report adds them up. */
+interface RefineTally {
+  batches: number
+  units: bigint
+  raw: Money
+  value: Money
 }
 
-function refineGainOf(entry: { batches: number; units: number; raw: Money; value: Money }) {
+function emptyGain(): RefineTally {
+  return { batches: 0, units: 0n, raw: ZERO_MONEY, value: ZERO_MONEY }
+}
+
+function refineGainOf(entry: RefineTally): RefineGain {
   return {
     batches: entry.batches,
-    units: entry.units,
+    units: countToJson(entry.units),
     rawValue: toCanonical(entry.raw),
     value: toCanonical(entry.value),
     gain: toCanonical(sub(entry.value, entry.raw)),

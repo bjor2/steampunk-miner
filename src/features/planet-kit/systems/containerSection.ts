@@ -7,7 +7,8 @@
  *
  * At its initial value (no container anywhere) the section is out of the state and the digest, so
  * a session that never dropped one saves and digests as before, and an older save restores with
- * none (#224's restored-section path). The portable form is the state's own shape.
+ * none (#224's restored-section path). The portable form is the state's own shape, its cargo's
+ * units in their JSON spelling (ticket 849), so the section stays v1: every body it wrote reads.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { corePlanetKeyOf } from '../../../systems/authority/planetCoreBays'

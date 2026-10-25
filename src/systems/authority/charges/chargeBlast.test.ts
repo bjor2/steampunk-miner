@@ -235,7 +235,7 @@ describe('blasting charges: ore yield (#109 numbers acceptance 1)', () => {
     const inRadiusValue = mul(fromSafeInteger(5), oreSalePrice(tier))
     expect(resolved.oreValueLost).toBe(toCanonical(mul(fromCanonical('0.6'), inRadiusValue)))
     expect(resolved.oreUnits).toBe(2)
-    expect(session.vehicle().cargo.ore).toEqual({ [String(tier)]: 2 })
+    expect(session.vehicle().cargo.ore).toEqual({ [String(tier)]: 2n })
     expect(ofType(session.events(), 'CargoAdded')).toHaveLength(2)
   })
 

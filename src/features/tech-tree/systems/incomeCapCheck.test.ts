@@ -11,6 +11,7 @@ import {
 import {
   div,
   fromCanonical,
+  fromBigInt,
   fromSafeInteger,
   mul,
   ZERO_MONEY,
@@ -90,8 +91,8 @@ const FIFTEEN_PERCENT_TRIP_CAP: TripCapSource = {
 }
 
 /** `cargo x V(t(p, b))`: the full hold the cap was judged against before ticket 449. */
-function nominalHoldOf(planet: number, band: number, hold: number): Money {
-  return mul(fromSafeInteger(hold), oreValue(oreTier(planet, band)))
+function nominalHoldOf(planet: number, band: number, hold: bigint): Money {
+  return mul(fromBigInt(hold), oreValue(oreTier(planet, band)))
 }
 
 function sliceOf(rates: readonly IncomeRate[], tripCap: TripCapSource | null = null) {

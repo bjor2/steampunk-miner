@@ -93,7 +93,7 @@ describe('refinery in co-op', () => {
     const p1Bill = session.vehicle('p1').liningBill
     session.submit(ready + 2, collect, 'p1')
     expect(toCanonical(session.state().players.p1.wallet)).toBe(
-      toCanonical(sub(add(p1Before, refinedValue(TIER, 2)), p1Bill)),
+      toCanonical(sub(add(p1Before, refinedValue(TIER, 2n)), p1Bill)),
     )
   })
 })

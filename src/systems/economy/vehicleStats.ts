@@ -21,6 +21,7 @@ import {
   enginePerPurchaseAtStep,
   geometricAtStep,
   perPurchaseAtStep,
+  wholeBigPerPurchaseAtStep,
   wholePerPurchaseAtStep,
 } from './stepStats'
 import { majorOf, majorsOfSteps, stepOfLevel, type TrackNumbers } from './upgradeSteps'
@@ -54,7 +55,8 @@ export interface VehicleStats {
   gateTip: BigStat
   hullMax: BigStat
   energyMax: number
-  cargoCapacity: number
+  /** The hold's units: unbounded, capped by the economy only (ticket 849). */
+  cargoCapacity: bigint
   engine: EngineStats
 }
 
@@ -82,7 +84,7 @@ export function energyMax(level: number, defs: UpgradeDefs = ECONOMY.upgrades): 
 }
 
 /** The hold after `level` purchases: its level is its stored step (ticket 553). */
-export function cargoCapacity(level: number, defs: UpgradeDefs = ECONOMY.upgrades): number {
+export function cargoCapacity(level: number, defs: UpgradeDefs = ECONOMY.upgrades): bigint {
   return cargoCapacityAtStep(level, defs)
 }
 
@@ -126,8 +128,8 @@ export function energyMaxAtStep(step: number, defs: UpgradeDefs = ECONOMY.upgrad
   return wholePerPurchaseAtStep(wholePerPurchaseEffectOf(defs, 'boiler'), step)
 }
 
-export function cargoCapacityAtStep(step: number, defs: UpgradeDefs = ECONOMY.upgrades): number {
-  return wholePerPurchaseAtStep(wholePerPurchaseEffectOf(defs, 'cargo_hold'), step)
+export function cargoCapacityAtStep(step: number, defs: UpgradeDefs = ECONOMY.upgrades): bigint {
+  return wholeBigPerPurchaseAtStep(wholePerPurchaseEffectOf(defs, 'cargo_hold'), step)
 }
 
 export function engineStatsAtStep(step: number, defs: UpgradeDefs = ECONOMY.upgrades): EngineStats {

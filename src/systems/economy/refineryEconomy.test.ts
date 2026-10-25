@@ -42,14 +42,14 @@ describe('refinery economy', () => {
   })
 
   it('holds a batch of half the hold, rounded down', () => {
-    expect(refineBatchCap(10)).toBe(5)
-    expect(refineBatchCap(13)).toBe(6)
+    expect(refineBatchCap(10n)).toBe(5n)
+    expect(refineBatchCap(13n)).toBe(6n)
   })
 
   it('pays floorMilli(units x V x 1.25) for a batch, against units x floorMilli(V) raw', () => {
     const tier = oreTier(3, 1)
-    expect(refinedValue(tier, 5)).toEqual(m('711.914'))
-    expect(rawRefineValue(tier, 5)).toEqual(m('569.53'))
+    expect(refinedValue(tier, 5n)).toEqual(m('711.914'))
+    expect(rawRefineValue(tier, 5n)).toEqual(m('569.53'))
   })
 
   it('beats selling raw at a 5 minute return and loses at 15, at 2.5% a minute growth', () => {

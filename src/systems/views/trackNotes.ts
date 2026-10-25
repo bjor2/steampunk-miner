@@ -16,7 +16,7 @@ import { formatPercent } from '../displayAmount'
 import type { UpgradeId } from '../economy/economyDefinition'
 import { largestBandOreUnits } from '../economy/planetEconomy'
 import { cargoCapacityAtStep, type UpgradeLevels } from '../economy/vehicleStats'
-import { div, fromSafeInteger, sub, type Money } from '../money'
+import { div, fromBigInt, sub, type Money } from '../money'
 import { cutCapLines } from '../vehicle/cutAxisCaps'
 import { stepLevelText } from './stepLevelText'
 
@@ -39,8 +39,8 @@ export function holdText(step: number): string {
 }
 
 /** `(next - now) / now` of two whole counts, in Money. */
-function shareGainedOf(now: number, next: number): Money {
-  return div(sub(fromSafeInteger(next), fromSafeInteger(now)), fromSafeInteger(now))
+function shareGainedOf(now: bigint, next: bigint): Money {
+  return div(sub(fromBigInt(next), fromBigInt(now)), fromBigInt(now))
 }
 
 /** The track's level text: its step, with the hold's units beside it. */
@@ -67,5 +67,5 @@ export function trackNoteOf(
 export function isHoldPastLargestBand(state: AuthorityState, holdStep: number): boolean {
   const params = planetParamsOf(state.planet)
   if (params === null) return false
-  return cargoCapacityAtStep(holdStep) > largestBandOreUnits(params.radiusTiles)
+  return cargoCapacityAtStep(holdStep) > BigInt(largestBandOreUnits(params.radiusTiles))
 }

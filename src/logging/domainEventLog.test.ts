@@ -104,13 +104,13 @@ const vehicleEvents: DomainEvent[] = [
 ]
 
 const platformEvents: DomainEvent[] = [
-  { ...commandStamp, type: 'DockEntered', bay: 'sell', cargoUnits: 4, energy: 9000, hull: '5e+1' },
+  { ...commandStamp, type: 'DockEntered', bay: 'sell', cargoUnits: 4n, energy: 9000, hull: '5e+1' },
   { ...commandStamp, type: 'CoreBayDeposited', fragments: 3, total: 63, source: 'dock' },
   { ...commandStamp, type: 'PlatformConfigurationChanged', visualState: 'core_drive' },
   {
     ...commandStamp,
     type: 'ResourceSold',
-    items: [{ tier: 1, amount: 4 }],
+    items: [{ tier: 1, amount: 4n }],
     value: '4e+1',
     mode: 'all',
     coinsShown: 8,
@@ -135,14 +135,14 @@ const platformEvents: DomainEvent[] = [
     statsAfter: { hullMax: '1.12e+2', energyMax: '1.5e+2' },
   },
   { ...commandStamp, type: 'CasingUpgraded', from: 1, to: 2, price: '4.8e+1', chain: 0 },
-  { ...commandStamp, type: 'RefineQueued', slot: 0, tier: 7, units: 5, requestedUnits: 9 },
-  { tick: 11000, playerId: 'p1', type: 'RefineReady', slot: 0, tier: 7, units: 5 },
+  { ...commandStamp, type: 'RefineQueued', slot: 0, tier: 7, units: 5n, requestedUnits: 9n },
+  { tick: 11000, playerId: 'p1', type: 'RefineReady', slot: 0, tier: 7, units: 5n },
   {
     ...commandStamp,
     type: 'RefineCollected',
     slot: 0,
     tier: 7,
-    units: 5,
+    units: 5n,
     rawValue: '5.6953e+2',
     value: '7.11914e+2',
     waitSeconds: 180,

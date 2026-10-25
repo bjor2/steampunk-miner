@@ -15,7 +15,7 @@ export function hullGaugeText(hull: BigStat, hullMax: BigStat): string {
   return `${formatAmount(roundToWhole(hull))} / ${formatAmount(roundToWhole(hullMax))}`
 }
 
-export function cargoGaugeText(units: number, capacity: number): string {
+export function cargoGaugeText(units: bigint, capacity: bigint): string {
   return `${formatAmount(units)} / ${formatAmount(capacity)}`
 }
 

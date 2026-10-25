@@ -16,6 +16,7 @@
 import { onCurveSteps, vehicleStatsAt } from '../../../systems/economy/vehicleStats'
 import { oreTier, signatureSaleTier } from '../../../systems/economy/oreEconomy'
 import { fromSafeInteger, mul, toSafeInteger } from '../../../systems/money'
+import { countAsSafeInteger } from '../../../systems/wholeCount'
 import type { PlanetParams } from '../../../systems/world/planetParams'
 import type { ResourceFamily } from '../../../systems/world/worldCell'
 import {
@@ -91,7 +92,7 @@ export function cellValueOf(cell: PaintedCell): number {
 
 /** The hold the on-curve vehicle leaves the planet with: the trip the ledger fills. */
 export function onCurveHoldOf(planetIndex: number): number {
-  return vehicleStatsAt(onCurveSteps(planetIndex)).cargoCapacity
+  return countAsSafeInteger(vehicleStatsAt(onCurveSteps(planetIndex)).cargoCapacity)
 }
 
 function paintedBandOf(

@@ -13,6 +13,7 @@ import { placedContainersIn, sessionPlanetKeyOf } from './containerSection'
 import { shownContainersOn, type PlacedContainer } from './placedContainers'
 import { PLANET_KITS } from './planetKitRows'
 import { kitItemOf } from './planetKitSales'
+import { countToJson, type JsonCount } from '../../../systems/wholeCount'
 
 export interface ContainerRow {
   /** `s:p#containerId`: unique across planets. */
@@ -25,7 +26,8 @@ export interface ContainerRow {
   ownerId: string
   isOwn: boolean
   cell: TilePoint
-  units: number
+  /** In a count's JSON spelling (ticket 849), as a screen model stays JSON. */
+  units: JsonCount
   /** On the session's planet: drawn as a marker, and the only ones a pickup reaches. */
   isHere: boolean
   /** Whether `pickup_container` would move cargo now. */
@@ -62,7 +64,7 @@ function rowOf(
     ownerId: container.ownerId,
     isOwn: container.ownerId === playerId,
     cell: container.cell,
-    units: cargoUnitsOf(container.cargo),
+    units: countToJson(cargoUnitsOf(container.cargo)),
     isHere,
     canTake: isHere && pickupRejectionOf(state, playerId, container.containerId) === null,
   }

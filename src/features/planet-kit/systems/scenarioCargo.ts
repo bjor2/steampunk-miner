@@ -18,7 +18,7 @@ export function scenarioCargoOf(
   ore: Readonly<Record<string, string>>,
   coreFragments: number,
 ): Cargo {
-  const units = Object.entries(ore).map(([tier, text]) => [tier, Number.parseInt(text, 10)])
+  const units = Object.entries(ore).map(([tier, text]) => [tier, BigInt(text)])
   return { ore: Object.fromEntries(units), coreFragments }
 }
 
@@ -28,6 +28,7 @@ function oreEntryProblems(tier: string, units: string): string[] {
   return []
 }
 
+/** Any whole count from 1 (ticket 849): a scenario may fill a hold past the safe integers. */
 function isWholeUnitsText(units: string): boolean {
-  return UNITS_TEXT.test(units) && Number.isSafeInteger(Number.parseInt(units, 10))
+  return UNITS_TEXT.test(units)
 }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { loadSlices, withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
-import { fromCanonical, fromSafeInteger, mul, toCanonical } from '../money'
+import { fromBigInt, fromCanonical, mul, toCanonical } from '../money'
 import {
   incomeCapRowsOf,
   milestoneIncomeCapRowsOf,
@@ -21,7 +21,7 @@ import { createRegistrySet, swapRegistrySet } from './seal'
 const AT: IncomeAt = {
   planetIndex: 10,
   band: 3,
-  cargoCapacity: 24,
+  cargoCapacity: 24n,
   drillOrePerMinute: fromCanonical('1000'),
   tripMinutes: fromCanonical('2'),
 }
@@ -41,7 +41,7 @@ function tripCapOf(perUnit: string): TripCapSource {
   return {
     id: 'fake.trip_cap',
     tripCapAt: (_planet, _band, cargoCapacity) =>
-      mul(fromSafeInteger(cargoCapacity), fromCanonical(perUnit)),
+      mul(fromBigInt(cargoCapacity), fromCanonical(perUnit)),
   }
 }
 

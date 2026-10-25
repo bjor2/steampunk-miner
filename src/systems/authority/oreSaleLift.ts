@@ -78,13 +78,13 @@ export function plainUnitPriceOf(state: AuthorityState, playerId: string, tier: 
 export function tierSaleOf(state: AuthorityState, playerId: string, item: SoldItem): TierSale {
   const query = { state, playerId, tier: item.tier }
   const home = homePremiumCountsOf(state, playerId, item.tier)
-  const premiumUnits = smallerOf(sumOf(home), BigInt(item.amount))
+  const premiumUnits = smallerOf(sumOf(home), item.amount)
   const premium = oreSaleLift(query, 'premium')
   const plainPrice = liftedSalePrice(item.tier, oreSaleLift(query, 'every').lift)
   return {
     value: add(
       mul(liftedSalePrice(item.tier, premium.lift), fromBigInt(premiumUnits)),
-      mul(plainPrice, fromBigInt(BigInt(item.amount) - premiumUnits)),
+      mul(plainPrice, fromBigInt(item.amount - premiumUnits)),
     ),
     lifted: saleLiftedEventsOf(item.tier, home, premium),
   }

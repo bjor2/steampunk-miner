@@ -8,7 +8,7 @@ import { refineryBayLookOf, refineryBayOffsetOf, refineryBayQuadsOf } from './re
 const batch = (readyAtTick: number): RefineryBatch => ({
   owner: 'p1',
   tier: 7,
-  units: 5,
+  units: 5n,
   readyAtTick,
   queuedTick: 0,
   queuedPlanet: 3,

@@ -52,7 +52,7 @@ function playTrip(random: SeededRandom, row: TripRow, weightsBp: readonly number
   for (let unit = 0; unit < holdOn(row.planetIndex); unit++) {
     const lead = drawLead(random, weightsBp)
     const find = { ...row, tierAboveBand: lead, saleTier: bandTier + lead }
-    const paid = paidRarityFind(trip, { ...find, cargoCapacity: holdOn(row.planetIndex) })
+    const paid = paidRarityFind(trip, { ...find, cargoCapacity: BigInt(holdOn(row.planetIndex)) })
     const paidValue = 1.5 ** (paid.saleTier - bandTier)
     totals.unclamped += 1.5 ** lead
     totals.paid += paidValue

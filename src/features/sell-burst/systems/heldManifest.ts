@@ -9,6 +9,7 @@
  */
 import type { SoldItem } from '../../../systems/authority/domainEvent'
 import type { SeenRarity } from '../../../systems/render/seenRarity'
+import { smallerCount } from '../../../systems/wholeCount'
 
 /** One unit into the hold as the receipt names it. */
 export interface HeldUnit {
@@ -23,7 +24,8 @@ export interface HeldUnit {
 }
 
 export interface HeldKind extends HeldUnit {
-  count: number
+  /** Unbounded, as the hold's counts are (ticket 849): a sale's unnamed remainder can be a hold. */
+  count: bigint
 }
 
 /** The hold's kinds in the order they first came in. */
@@ -33,22 +35,22 @@ export const EMPTY_MANIFEST: HeldManifest = []
 
 export function manifestWithUnit(manifest: HeldManifest, unit: HeldUnit): HeldManifest {
   const at = manifest.findIndex((kind) => isSameKind(kind, unit))
-  if (at < 0) return [...manifest, { ...unit, count: 1 }]
+  if (at < 0) return [...manifest, { ...unit, count: 1n }]
   return manifest.map((kind, index) => (index === at ? withOneMore(kind, unit) : kind))
 }
 
 /** The tally cut back to what the hold holds of each tier: the latest kinds of a tier go first. */
 export function manifestWithinHold(
   manifest: HeldManifest,
-  ore: Readonly<Record<string, number>>,
+  ore: Readonly<Record<string, bigint>>,
 ): HeldManifest {
-  const room = new Map<number, number>()
+  const room = new Map<number, bigint>()
   const kept: HeldKind[] = []
   for (const kind of manifest) {
-    const left = room.get(kind.tier) ?? ore[String(kind.tier)] ?? 0
-    const count = Math.min(kind.count, left)
+    const left = room.get(kind.tier) ?? ore[String(kind.tier)] ?? 0n
+    const count = smallerCount(kind.count, left)
     room.set(kind.tier, left - count)
-    if (count > 0) kept.push(count === kind.count ? kind : { ...kind, count })
+    if (count > 0n) kept.push(count === kind.count ? kind : { ...kind, count })
   }
   return kept
 }
@@ -69,11 +71,11 @@ function soldKindsOfItem(manifest: HeldManifest, item: SoldItem): HeldKind[] {
     manifest.filter((kind) => kind.tier === item.tier),
     { [String(item.tier)]: item.amount },
   )
-  const missed = item.amount - named.reduce((total, kind) => total + kind.count, 0)
-  return missed > 0 ? [...named, unnamedKindOf(item.tier, missed)] : [...named]
+  const missed = item.amount - named.reduce((total, kind) => total + kind.count, 0n)
+  return missed > 0n ? [...named, unnamedKindOf(item.tier, missed)] : [...named]
 }
 
-function unnamedKindOf(tier: number, count: number): HeldKind {
+function unnamedKindOf(tier: number, count: bigint): HeldKind {
   return { tier, key: `tier:${tier}`, name: null, rarity: null, count }
 }
 
@@ -87,5 +89,5 @@ function isSameKind(kind: HeldKind, unit: HeldUnit): boolean {
 
 /** A rarity seen on a later unit of the kind names the whole kind. */
 function withOneMore(kind: HeldKind, unit: HeldUnit): HeldKind {
-  return { ...kind, count: kind.count + 1, rarity: kind.rarity ?? unit.rarity }
+  return { ...kind, count: kind.count + 1n, rarity: kind.rarity ?? unit.rarity }
 }

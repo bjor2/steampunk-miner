@@ -24,6 +24,7 @@ import {
 } from '../scriptedSession'
 import { stateDigest } from '../stateDigest'
 import { premiumLedgerOf } from './premiumLedgerState'
+import { oreUnitsFrom } from '../../vehicle/cargoFixtures'
 
 // The premium ledger's routes (ticket 844): counted at `collectOreUnit` when the premium seam names
 // the unit's species, debited on every route that takes ore out without a sale (a tow's lost
@@ -59,7 +60,10 @@ function uncommonOre(kindSlot: number): MinedOre {
 
 function withHold(state: AuthorityState, ore: Record<number, number>): AuthorityState {
   const vehicle = vehicleOf(state, 'p1')
-  return withVehicle(state, 'p1', { ...vehicle, cargo: { ...vehicle.cargo, ore } })
+  return withVehicle(state, 'p1', {
+    ...vehicle,
+    cargo: { ...vehicle.cargo, ore: oreUnitsFrom(ore) },
+  })
 }
 
 const setLedger = (counts: Record<string, string>) =>
@@ -101,7 +105,7 @@ describe('premium ledger: collecting', () => {
     const vehicle = vehicleOf(state, 'p1')
     const full = withVehicle(state, 'p1', {
       ...vehicle,
-      cargo: { ...vehicle.cargo, coreFragments: statsOfVehicle(vehicle).cargoCapacity },
+      cargo: { ...vehicle.cargo, coreFragments: Number(statsOfVehicle(vehicle).cargoCapacity) },
     })
     const collected = withPremium(() => collectOreUnit(full, 'p1', uncommonOre(AMBER_SLOT)))
     expect(premiumLedgerOf(collected.state, 'p1')).toEqual([])

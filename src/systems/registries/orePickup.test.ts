@@ -42,7 +42,7 @@ function withFullHold(state: AuthorityState): AuthorityState {
   const capacity = statsOfVehicle(vehicle).cargoCapacity
   return withVehicle(state, 'p1', {
     ...vehicle,
-    cargo: { ...vehicle.cargo, coreFragments: capacity },
+    cargo: { ...vehicle.cargo, coreFragments: Number(capacity) },
   })
 }
 
@@ -64,7 +64,7 @@ describe('ore pickup seam', () => {
   it('keeps the unit at its own sale tier and the state untouched with no provider', () => {
     const ore = epicOre()
     const collected = withRegistrations([], () => collectOreUnit(startState(), 'p1', ore))
-    expect(vehicleOf(collected.state, 'p1').cargo.ore).toEqual({ [String(ore.saleTier)]: 1 })
+    expect(vehicleOf(collected.state, 'p1').cargo.ore).toEqual({ [String(ore.saleTier)]: 1n })
     expect(collected.events).toEqual([
       expect.objectContaining({
         type: 'CargoAdded',
@@ -84,7 +84,7 @@ describe('ore pickup seam', () => {
       { planetIndex: PLANET, band: ore.band, tierAboveBand: EPIC_LEAD, saleTier: ore.saleTier },
     ])
     expect(collected.state.tick).toBe(1)
-    expect(vehicleOf(collected.state, 'p1').cargo.ore).toEqual({ [String(kept)]: 1 })
+    expect(vehicleOf(collected.state, 'p1').cargo.ore).toEqual({ [String(kept)]: 1n })
     expect(collected.events).toEqual([
       expect.objectContaining({ type: 'CargoAdded', value: toCanonical(oreSalePrice(kept)) }),
     ])

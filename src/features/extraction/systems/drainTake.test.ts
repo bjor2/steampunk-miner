@@ -98,7 +98,7 @@ describe('drain take', () => {
     for (let planet = 1; planet <= 40; planet++) {
       for (let band = 1; band <= 5; band++) {
         const moved = drainUntilRefused(planet, band)
-        if (cmp(moved, tripCapAt(planet, band, 24)) > 0) overruns.push(`P${planet} band ${band}`)
+        if (cmp(moved, tripCapAt(planet, band, 24n)) > 0) overruns.push(`P${planet} band ${band}`)
       }
     }
     expect(overruns).toEqual([])
@@ -110,7 +110,7 @@ describe('drain take', () => {
  * trip from use to use until a use takes nothing, and answers what the trip moved.
  */
 function drainUntilRefused(planet: number, band: number): Money {
-  const cap = tripCapAt(planet, band, 24)
+  const cap = tripCapAt(planet, band, 24n)
   const tiers = [0, 2, 1, 0, 2, 0].map((lead) => oreTier(planet, band) + lead)
   const cells = tiers.map((tier, tx) => ({ tile: { tx, ty: 0 }, ore: oreOfTier(tier) }))
   let moved = ZERO_MONEY

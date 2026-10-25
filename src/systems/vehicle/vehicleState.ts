@@ -34,8 +34,12 @@ export const VEHICLE_MODES = ['docked', 'active', 'stranded', 'destroyed'] as co
 export type VehicleMode = (typeof VEHICLE_MODES)[number]
 
 export interface Cargo {
-  /** Units held per ore tier, keyed by the tier written as a decimal integer. */
-  ore: Readonly<Record<string, number>>
+  /**
+   * Units held per ore tier, keyed by the tier written as a decimal integer. Unbounded counts
+   * (ticket 849): the hold grows with the economy only, past the safe integers from level 362.
+   */
+  ore: Readonly<Record<string, bigint>>
+  /** Bounded by the core's tiles (#10), so a plain count. */
   coreFragments: number
 }
 
@@ -217,17 +221,45 @@ export function energyMaxQuantaOf(vehicle: VehicleState): number {
   return quantaOfUnits(statsOfVehicle(vehicle).energyMax)
 }
 
-export function cargoUnitsOf(cargo: Cargo): number {
-  return Object.values(cargo.ore).reduce((total, units) => total + units, cargo.coreFragments)
+/** Every unit the hold holds, ore and core fragments alike (#10: they share the capacity). */
+export function cargoUnitsOf(cargo: Cargo): bigint {
+  return Object.values(cargo.ore).reduce(
+    (total, units) => total + units,
+    BigInt(cargo.coreFragments),
+  )
+}
+
+/** The units the hold still takes, never below 0. */
+export function cargoRoomOf(vehicle: VehicleState): bigint {
+  const room = statsOfVehicle(vehicle).cargoCapacity - cargoUnitsOf(vehicle.cargo)
+  return room > 0n ? room : 0n
 }
 
 export function hasCargoRoom(vehicle: VehicleState): boolean {
   return cargoUnitsOf(vehicle.cargo) < statsOfVehicle(vehicle).cargoCapacity
 }
 
+/** The hold's units of one ore tier, 0 when it holds none. */
+export function oreUnitsOf(cargo: Cargo, tier: number | string): bigint {
+  return cargo.ore[String(tier)] ?? 0n
+}
+
 export function withOreUnit(cargo: Cargo, tier: number): Cargo {
+  return withOreUnits(cargo, tier, 1n)
+}
+
+/** The hold with `units` more of the tier. */
+export function withOreUnits(cargo: Cargo, tier: number, units: bigint): Cargo {
   const key = String(tier)
-  return { ...cargo, ore: { ...cargo.ore, [key]: (cargo.ore[key] ?? 0) + 1 } }
+  return { ...cargo, ore: { ...cargo.ore, [key]: oreUnitsOf(cargo, key) + units } }
+}
+
+/** The hold with `units` fewer of the tier; an emptied tier leaves the map. */
+export function withoutOreUnits(cargo: Cargo, tier: number, units: bigint): Cargo {
+  const key = String(tier)
+  const left = oreUnitsOf(cargo, key) - units
+  const ore = Object.fromEntries(Object.entries(cargo.ore).filter(([held]) => held !== key))
+  return { ...cargo, ore: left > 0n ? { ...ore, [key]: left } : ore }
 }
 
 export function isVehicleActive(vehicle: VehicleState): boolean {

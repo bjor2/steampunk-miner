@@ -61,7 +61,7 @@ describe('drill gates', () => {
   it('collects the ore cell into the hold when no gate check is registered', () => {
     const mined = mineOreWith([])
     expect(mined.types).toEqual(expect.arrayContaining(['TileDestroyed', 'CargoAdded']))
-    expect(Object.values(mined.cargo)).toEqual([1])
+    expect(Object.values(mined.cargo)).toEqual([1n])
   })
 
   it('takes the same path when every gate check cuts the cell', () => {

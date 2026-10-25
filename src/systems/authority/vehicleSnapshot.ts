@@ -1,7 +1,7 @@
 /**
  * The vehicle and world parts of the session snapshot (#11 section 5): the same plain JSON as the
  * state, with the hull BigStat, the lining bill and the visit's lining payment as canonical
- * strings, and the loadout as its versioned `loadout` section (K4). Reading checks the shape so a malformed snapshot is refused with listed problems before
+ * strings, the hold's units in their JSON spelling (ticket 849), and the loadout as its versioned `loadout` section (K4). Reading checks the shape so a malformed snapshot is refused with listed problems before
  * anything is built from it; the digest check in `sessionSnapshot.ts` then catches any value that does not match.
  */
 import { BASIS_POINTS } from '../../constants/balance'
@@ -22,7 +22,13 @@ import {
 } from '../vehicle/vehicleFuel'
 import { isPortableJumpDrive } from '../vehicle/vehicleJumpDrive'
 import { upgradeLevelsProblems } from '../vehicle/vehicleStats'
-import type { Cargo, VehicleMode, VehicleState } from '../vehicle/vehicleState'
+import type { VehicleMode, VehicleState } from '../vehicle/vehicleState'
+import {
+  cargoOfPortable,
+  isPortableCargo,
+  portableCargoOf,
+  type PortableCargo,
+} from '../vehicle/cargoPortable'
 import { isCasingValue, type ChunkDelta } from '../world/chunkDelta'
 import { CHUNK_SAMPLES } from '../world/sampleGrid'
 import { CHUNK_SIZE } from '../world/tileGrid'
@@ -38,9 +44,11 @@ import { isJsonObject, isWholeNumber } from './payloadFields'
 
 export type PortableVehicle = Omit<
   VehicleState,
-  'hull' | 'liningBill' | 'liningPaidThisVisit' | 'loadout' | 'fuel'
+  'hull' | 'liningBill' | 'liningPaidThisVisit' | 'loadout' | 'fuel' | 'cargo'
 > & {
   hull: string
+  /** Each tier's units in their JSON spelling (ticket 849). */
+  cargo: PortableCargo
   liningBill: string
   liningPaidThisVisit: string | null
   loadout: PortableSection
@@ -69,6 +77,7 @@ export function portableVehicleOf(vehicle: VehicleState): PortableVehicle {
     liningBill: toCanonical(vehicle.liningBill),
     liningPaidThisVisit: canonicalOrNull(vehicle.liningPaidThisVisit),
     loadout: portableLoadoutOf(vehicle.loadout),
+    cargo: portableCargoOf(vehicle.cargo),
     ...portableFuelField(fuel),
   }
 }
@@ -82,6 +91,7 @@ export function vehicleOfPortable(vehicle: PortableVehicle): VehicleState {
     liningPaidThisVisit:
       vehicle.liningPaidThisVisit === null ? null : fromCanonical(vehicle.liningPaidThisVisit),
     loadout: loadoutOfPortable(vehicle.loadout),
+    cargo: cargoOfPortable(vehicle.cargo),
     ...fuelFieldOfPortable(fuel),
   }
 }
@@ -380,16 +390,6 @@ function isPortableLining(lining: unknown): boolean {
     owned.includes(STANDARD_LINING_TYPE) &&
     isLiningType(lining.active) &&
     owned.includes(lining.active)
-  )
-}
-
-/** Whether a saved hold holds whole units per tier and whole core fragments. */
-export function isPortableCargo(cargo: unknown): cargo is Cargo {
-  return (
-    isJsonObject(cargo) &&
-    isWholeNumber(cargo.coreFragments) &&
-    isJsonObject(cargo.ore) &&
-    Object.values(cargo.ore).every(isWholeNumber)
   )
 }
 

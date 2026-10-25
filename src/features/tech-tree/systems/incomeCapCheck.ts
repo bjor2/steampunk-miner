@@ -37,6 +37,7 @@ import {
   cmp,
   div,
   floorMilli,
+  fromBigInt,
   fromSafeInteger,
   mul,
   toSafeInteger,
@@ -193,7 +194,7 @@ export function drillTripOf(
   const ticksPerCell = bandDigTicks(planetIndex, levels, band)
   if (ticksPerCell === null) return null
   const cellsPerMinute = div(MINUTE_TICKS, fromSafeInteger(ticksPerCell))
-  const hold = fromSafeInteger(vehicleStatsAt(levels).cargoCapacity)
+  const hold = fromBigInt(vehicleStatsAt(levels).cargoCapacity)
   const ore = oreValue(oreTier(planetIndex, band))
   const nominalHoldValue = mul(hold, ore)
   return {
