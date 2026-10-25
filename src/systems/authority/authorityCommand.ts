@@ -513,8 +513,17 @@ import type { JsonCount } from '../wholeCount'
  *    counts of `ResourceSold`, `DockEntered`, the Refinery's events and a Cache Crate's moves cross
  *    JSON as a safe integer, or as canonical decimal text past 2^53; every command before 112 still
  *    reads, and a hold up to cargo level 361 digests as it did, so no run moves a digest.
+ * 113: the dynamite ladder's 12 rows and the blast's disc record (ticket 860, D1 of #647): sizes
+ *    11 and 12 (30 and 37 tiles, plunger-only) join the ladder, each row with its charge type and
+ *    `breaksGate[]`; a blast carries the planter's Blast Radius level (0 until D9) and the session's
+ *    `blastSeq` (the optional `blastSeq` counter, absent before the first blast), its ground disc is
+ *    the integer r² `(2 L_i)² (16 + L)` met at the planet's diameter while the self hit and the
+ *    interlock keep the rung's own radius, its front is walked a slice a tick with a visit cap, and
+ *    `BlastStarted` says the record beside `ChargeDetonated`. At level 0 a blast clears the same
+ *    tiles in the same ticks, so a run that blasts moves only by the counter and a run that never
+ *    blasts moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 112
+export const AUTHORITY_PROTOCOL_VERSION = 113
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
