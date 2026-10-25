@@ -19,6 +19,8 @@ const CORE_BAY_STEP = { version: 'snapshotVersion', from: 24, to: 25 }
 const AIM_STEP = { version: 'snapshotVersion', from: 25, to: 26 }
 /** Ticket 844: every fixture was written before the premium ledger. */
 const PREMIUM_STEP = { version: 'snapshotVersion', from: 26, to: 27 }
+/** Ticket 849: every fixture was written before the bignum hold. */
+const BIGNUM_HOLD_STEP = { version: 'snapshotVersion', from: 27, to: 28 }
 
 function restoredState(file: unknown): AuthorityState {
   const reading = readMigratedSaveSlot(file)
@@ -62,6 +64,7 @@ describe('save migration: snapshot 21 -> 22, the star map (ticket 755)', () => {
       CORE_BAY_STEP,
       AIM_STEP,
       PREMIUM_STEP,
+      BIGNUM_HOLD_STEP,
     ])
     expect(reading.state).toEqual(state)
     expect(stateDigest(reading.state)).toBe(stateDigest(state))

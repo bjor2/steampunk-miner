@@ -53,6 +53,7 @@ describe('save migration: snapshot 25 -> 26, the drill aim (ticket 791)', () => 
     expect(reading.migrations).toEqual([
       { version: 'snapshotVersion', from: 25, to: 26 },
       { version: 'snapshotVersion', from: 26, to: 27 },
+      { version: 'snapshotVersion', from: 27, to: 28 },
     ])
     expect(reading.state).toEqual(state)
     expect(stateDigest(reading.state)).toBe(stateDigest(state))

@@ -40,7 +40,7 @@ export type FieldKind =
   /**
    * A whole count from 0 in its JSON spelling (ticket 849): a safe integer, or its canonical
    * decimal text past 2^53, as a Refinery batch of an unbounded hold asks for its units. Every
-   * command before protocol 111 wrote a safe integer, so it still reads.
+   * command before protocol 112 wrote a safe integer, so it still reads.
    */
   | 'count'
 

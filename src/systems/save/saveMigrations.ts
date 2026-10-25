@@ -44,6 +44,11 @@
  * unit, the absent key of this build. So the old digest is checked and the state is kept as saved;
  * a build from before the ledger refuses a save that holds counts it would drop.
  *
+ * Snapshot 27 -> 28 (ticket 849, the bignum hold): a save from before it holds every count of the
+ * hold, of a Refinery batch and of a Cache Crate as a safe integer, which is this build's spelling
+ * of a count below 2^53. So the old digest is checked and the state is kept as saved; a build from
+ * before the bignum hold refuses a save that holds a count past 2^53 it could not read.
+ *
  * Generator 5 -> 6 (#175): the pad grew to -8..+12 under the two shop buildings, so the chunk edits
  * of every chunk the old or new pad and its cleared air touch are dropped and regenerate under the
  * new stamp, every vehicle is put on the Sell bay's rest pose, and the params are recomputed from
@@ -204,6 +209,7 @@ const SAVE_MIGRATION_STEPS: readonly SaveMigrationStep[] = [
   { version: 'snapshotVersion', from: 24, to: 25, migrate: keepBayOnSavedPlanet },
   { version: 'snapshotVersion', from: 25, to: 26, migrate: keepFacingsAsAims },
   { version: 'snapshotVersion', from: 26, to: 27, migrate: keepHoldsWithoutPremium },
+  { version: 'snapshotVersion', from: 27, to: 28, migrate: keepSafeHoldCounts },
   { version: 'generatorVersion', from: 5, to: 6, migrate: regeneratePadArea },
   { version: 'generatorVersion', from: 6, to: 7, migrate: keepEditsUnderOreLeads },
   { version: 'generatorVersion', from: 7, to: 8, migrate: keepEditsUnderOreMix },
@@ -344,6 +350,11 @@ function keepFacingsAsAims(file: MigratingFile): MigratingFile | null {
 /** Snapshot 26 -> 27: no premium ledger is the absent key, so the state is kept. */
 function keepHoldsWithoutPremium(file: MigratingFile): MigratingFile | null {
   return reshapedFile(file, 27, (state) => state)
+}
+
+/** Snapshot 27 -> 28: a safe-integer count is a count's spelling below 2^53, so the state is kept. */
+function keepSafeHoldCounts(file: MigratingFile): MigratingFile | null {
+  return reshapedFile(file, 28, (state) => state)
 }
 
 /** Generator 5 -> 6: the state is read as saved (the digest must hold), then moved off the pad. */

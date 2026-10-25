@@ -508,8 +508,13 @@ import type { JsonCount } from '../wholeCount'
  *    species is the premium ore of the merchant trading on its planet (Honey Amber on P1 to
  *    Chromite on P5), and pays those units 5/4 of V(t) at that merchant, the beacon's lift instead
  *    where it pays more. A run that mines no premium ore on P1 to P5 moves no digest.
+ * 112: the bignum hold (ticket 849, the TD's Q4 on #823): the hold's capacity and every count of
+ *    its units are bigint, so cargo is capped by the economy only. `queueRefine`'s `units` and the
+ *    counts of `ResourceSold`, `DockEntered`, the Refinery's events and a Cache Crate's moves cross
+ *    JSON as a safe integer, or as canonical decimal text past 2^53; every command before 112 still
+ *    reads, and a hold up to cargo level 361 digests as it did, so no run moves a digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 111
+export const AUTHORITY_PROTOCOL_VERSION = 112
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

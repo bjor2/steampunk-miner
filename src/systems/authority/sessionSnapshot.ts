@@ -88,6 +88,9 @@ import {
 } from './vehicleSnapshot'
 
 /**
+ * 28: the bignum hold (ticket 849): a hold's units per tier, a Refinery batch's units and a Cache
+ * Crate's cargo are written as a safe integer, or as canonical decimal text past 2^53 (older saves
+ * hold safe integers only, which read as they are, `saveMigrations.ts`);
  * 27: the premium ledger (ticket 844): each player's counts of premium units under
  * `premiumLedger`, absent while empty (older saves count none, the absent key, `saveMigrations.ts`);
  * 26: the drill's aim (ticket 791): a vehicle's pose and its swept cut's cursor hold `aim` off the
@@ -119,7 +122,7 @@ import {
  * vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
  * progress (#24); 3 the platform (#23).
  */
-export const SNAPSHOT_VERSION = 27
+export const SNAPSHOT_VERSION = 28
 
 export interface SessionSnapshot {
   snapshotVersion: number

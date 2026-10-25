@@ -839,6 +839,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/assaySale.test.ts` | 4 | 4 |
 | `src/systems/authority/authorityReactions.test.ts` | 7 | 7 |
 | `src/systems/authority/autoMode/autoMode.test.ts` | 4 | 4 |
+| `src/systems/authority/bignumHold.test.ts` | 7 | 7 |
 | `src/systems/authority/bore/boreAim.test.ts` | 14 | 14 |
 | `src/systems/authority/bore/boreAuto.test.ts` | 30 | 21 |
 | `src/systems/authority/bore/boreAutoAim.test.ts` | 7 | 7 |
@@ -1239,7 +1240,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/registries/runEvents.test.ts` | 4 | 4 |
 | `src/logging/reportCapsuleOffGolden.test.ts` | 19 | 3 |
 | `src/logging/reportRows.test.ts` | 4 | 4 |
-| `src/logging/runEventSchema.test.ts` | 19 | 19 |
+| `src/logging/runEventSchema.test.ts` | 20 | 20 |
 | `src/logging/runLayout.test.ts` | 7 | 7 |
 | `src/logging/runLog.test.ts` | 3 | 3 |
 | `src/logging/runMetadata.test.ts` | 2 | 2 |
@@ -1476,6 +1477,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/systems/save/aimOldSaves.test.ts` | 4 | 4 |
+| `src/systems/save/bignumHoldSaves.test.ts` | 2 | 2 |
 | `src/systems/save/byteCodecs.test.ts` | 20 | 12 |
 | `src/systems/save/carriedCursors.test.ts` | 3 | 3 |
 | `src/systems/save/chunkDiffSave.test.ts` | 11 | 11 |
@@ -1638,6 +1640,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/startScenarioCommands.test.ts` | 6 | 6 |
 | `src/systems/tickDilation.test.ts` | 7 | 7 |
 | `src/systems/touchSheetGuard.test.ts` | 13 | 13 |
+| `src/systems/wholeCount.test.ts` | 5 | 5 |
 
 ### `tooling-ci`
 
