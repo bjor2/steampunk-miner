@@ -8,12 +8,14 @@
  * dielectric bit as a shock shield. KeyF and KeyC press the flank and collar sockets, and the
  * Upgrade bay sells each item (ticket 248's seller). The lane's P16 fork (ticket 268) registers
  * its Wide and Deep branches and their cut on the same drill gear read. Wide is drill throughput,
- * not income, so it registers no income rate (GD ruling on #385). No side effects at import; the
+ * not income, so it registers no income rate (GD ruling on #385). The width Marks and Wide are the
+ * lane's levels on the kernel's one bore width (ticket 749). No side effects at import; the
  * loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { drillGearDebugActions } from './debug'
 import { DRILL_GEAR_PROJECTIONS, DRILL_GEAR_RUN_EVENTS } from './logging'
+import { DRILL_GEAR_WIDTH_SOURCE } from './systems/boreWidthLevels'
 import { CUTTERS_AND_BOOM_SOURCE } from './systems/cuttersAndBoom'
 import { DRILL_GEAR_SECTION } from './systems/cuttersHold'
 import { DIELECTRIC_BIT_SHIELD } from './systems/dielectricBit'
@@ -46,6 +48,7 @@ export const slice: SliceDefinition = {
     r.drillGear(CUTTERS_AND_BOOM_SOURCE)
     r.drillGear(TWIN_BIT_SOURCE)
     r.drillGear(DRILL_GEAR_FORK_SOURCE)
+    r.boreWidth(DRILL_GEAR_WIDTH_SOURCE)
     r.shockShield(DIELECTRIC_BIT_SHIELD)
     r.clockStep(SPOIL_AUGER_STEP)
     DRILL_SOCKET_REACTIONS.forEach((reaction) => r.inputReaction(reaction))

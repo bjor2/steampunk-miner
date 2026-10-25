@@ -17,12 +17,11 @@ import { REACH_BOOM_ID, SIDE_CUTTERS_ID } from './cuttersAndBoom'
 import { DRILL_GEAR_FORK, PLUNGE_CROWN_ID } from './drillGearFork'
 import {
   drillGearItemOf,
-  gearValueOf,
   markLadderOf,
   SHIPPED_DRILL_GEAR,
   type DrillGearItem,
 } from './drillGearItems'
-import { cardOfMark, SIDE_CUTTER_MARKS } from './sideCutterMarks'
+import { cardOfMark, SIDE_CUTTER_MARKS, SIDE_CUTTERS_MARK } from './sideCutterMarks'
 import { TWIN_BIT_ID } from './twinBit'
 
 const FIRST_MARK = 1
@@ -57,11 +56,9 @@ function cardOf(item: DrillGearItem): ItemDescriptionEntry {
   }
 }
 
-/** The side cutters' bore width and ore gain at their own side cells (ticket 621); none for others. */
+/** The side cutters' bore width and ore gain at their width Mark 1 (tickets 621, 749); none for others. */
 function widthLinesOf(item: DrillGearItem): DescribedStatLineSpec[] {
-  return item.itemId === SIDE_CUTTERS_ID
-    ? widthLineSpecsOf(gearValueOf(SIDE_CUTTERS_ID, 'sideCells'))
-    : []
+  return item.itemId === SIDE_CUTTERS_ID ? widthLineSpecsOf(SIDE_CUTTERS_MARK) : []
 }
 
 /**

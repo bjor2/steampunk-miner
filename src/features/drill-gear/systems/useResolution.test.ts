@@ -1,3 +1,4 @@
+import { widthLevelOf } from '../../../systems/registries/boreWidth'
 import { describe, expect, it } from 'vitest'
 import type { AuthorityCommand, CommandIntent } from '../../../systems/authority/authorityCommand'
 import { createAuthorityState } from '../../../systems/authority/authorityState'
@@ -284,13 +285,11 @@ describe("drill-gear Mark milestones (#276): the side cutters' hold, a toggle", 
     expect(runs3.map((run) => usedLinesOf(run.events).slice(-1))).toEqual(
       runs3.map(() => [{ milestone: 'hold', toggledOn: true }]),
     )
-    // The miner faced right before the hold: that push seeds the faced side.
+    // Since ticket 749 the hold folds only the cutters' look: the drill is asked for nothing and the
+    // width stays the owned Mark's.
     for (const run of runs3) {
-      expect(askOf(run.state)).toMatchObject({
-        sideCells: 1,
-        sideAim: 'drive',
-        sideSeed: { x: 1, y: 0 },
-      })
+      expect(askOf(run.state)).toBeNull()
+      expect(widthLevelOf(run.state, 'p1')).toBe(1)
     }
 
     const atMark2 = cuttersFollowedUp(
@@ -301,30 +300,29 @@ describe("drill-gear Mark milestones (#276): the side cutters' hold, a toggle", 
     expect(runs2.map((run) => rejectionsOf(run.events))).toEqual(
       runs2.map(() => ['power-up-core.no_milestone']),
     )
-    for (const run of runs2) expect(askOf(run.state)).toEqual(askOf(runs2[0].state))
-    expect(askOf(runs2[0].state)).not.toHaveProperty('sideAim')
-    expect(askOf(runs2[0].state)?.sideCells).toBeGreaterThan(0)
+    for (const run of runs2) expect(widthLevelOf(run.state, 'p1')).toBe(1)
   })
 
-  it('stays switched on after its hold, and a plain switch-on afterwards cuts both sides again', () => {
+  it('stays switched on after its hold, and switching off or on again leaves the width alone', () => {
     const held = cuttersFollowedUp(
       { researchedThrough: MARK_3_PLANET },
       intentToHoldSlot('drill.flank'),
     )
     expect(isToggleEngaged(held.state(), 'p1', CUTTERS)).toBe(true)
     held.submit(40, press('drill.flank'))
-    expect(askOf(held.state())).toBeNull()
+    expect(widthLevelOf(held.state(), 'p1')).toBe(1)
     held.submit(41, press('drill.flank'))
-    expect(askOf(held.state())).not.toHaveProperty('sideAim')
+    expect(askOf(held.state())).toBeNull()
+    expect(widthLevelOf(held.state(), 'p1')).toBe(1)
   })
 
-  it('held at M3 on a planet short of side_drills, cuts the faced side only (ticket 624)', () => {
+  it('held at M3 on a planet short of side_drills, takes the hold (ticket 624)', () => {
     const early = cuttersFollowedUp(
       { researchedThrough: MARK_3_PLANET, onPlanet: SIDE_DRILLS_PLANET - 1 },
       intentToHoldSlot('drill.flank'),
     )
     expect(usedLinesOf(early.events()).slice(-1)).toEqual([{ milestone: 'hold', toggledOn: true }])
-    expect(askOf(early.state())).toMatchObject({ sideCells: 1, sideAim: 'drive' })
+    expect(widthLevelOf(early.state(), 'p1')).toBe(1)
   })
 
   it('asks nothing for a hold without the cutters owned', () => {

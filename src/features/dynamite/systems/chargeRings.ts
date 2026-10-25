@@ -5,7 +5,6 @@
  * blast. The ring art is D7's (#866); this is what it is drawn at. And the rack's soft mark: a size
  * whose ground disc is narrower than the bore the rig already cuts clears nothing the drill does not.
  */
-import { MM_PER_METRE } from '../../../constants/physics'
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import {
   groundRadiusMmOf,
@@ -13,8 +12,8 @@ import {
 } from '../../../systems/authority/charges/blastDisc'
 import { planetParamsOf } from '../../../systems/authority/planetOfState'
 import { chargeRadiusMm } from '../../../systems/economy/chargeSizes'
-import { drillGearOf } from '../../../systems/registries/drillGear'
-import { drillStampRadiusMm } from '../../../systems/vehicle/drillBore'
+import { widthLevelOf } from '../../../systems/registries/boreWidth'
+import { boreRadiusMmAt } from '../../../systems/vehicle/drillBore'
 
 /** A live charge's two rings round its tile's centre, in whole mm. */
 export interface ChargeRings {
@@ -56,8 +55,7 @@ export function isSmallerThanCut(state: AuthorityState, playerId: string, size: 
   return reachMm < cutHalfWidthMm(state, playerId)
 }
 
-/** Half the bore: the drill's stamp and the side cutters' cells past its rim (ticket 234). */
+/** Half the bore: the stamp at the rig's width level, the kernel's one width (ticket 749). */
 function cutHalfWidthMm(state: AuthorityState, playerId: string): number {
-  const sideCells = drillGearOf(state, playerId)?.sideCells ?? 0
-  return drillStampRadiusMm() + sideCells * MM_PER_METRE
+  return boreRadiusMmAt(widthLevelOf(state, playerId))
 }

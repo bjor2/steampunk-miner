@@ -14,6 +14,7 @@ import { oreValue } from '../../../systems/economy/oreEconomy'
 import { paceScale } from '../../../systems/economy/planetEconomy'
 import { ceilMilli, fromSafeInteger, mul } from '../../../systems/money'
 import { contentOf } from '../../../systems/registries/content'
+import { widthLevelOf } from '../../../systems/registries/boreWidth'
 import { drillGearOf } from '../../../systems/registries/drillGear'
 import { vehicleItemOfferOf } from '../../../systems/registries/vehicleItemSales'
 import { setPlanetCommand } from '../../../systems/startScenarioCommands'
@@ -30,9 +31,9 @@ import {
   sideCutterMarkOf,
 } from './sideCutterMarks'
 
-// The side cutters' width Mark 2 (GD lock on #308, ticket 620): an owned part that widens the
-// switched-on cutters to two side cells a side, Wide's reamers on top to three, priced by money
-// alone at the anchor a_n = 13 + 3(n - 1).
+// The side cutters' width Mark 2 (GD lock on #308, ticket 620): an owned part priced by money alone
+// at the anchor a_n = 13 + 3(n - 1). Since ticket 749 the widest Mark owned is the rig's width
+// level on the kernel's one bore width (the cutters alone level 1), Wide's reamers one more.
 
 const PLAYER = 'p1'
 const MARK_2 = sideCutterMarkOf(SIDE_CUTTERS_MARK_2_ID)!
@@ -136,27 +137,25 @@ describe('side cutters width Marks', () => {
     )
   })
 
-  it('cuts one side cell a side with the cutters alone, and two once Mark 2 is owned', () => {
-    const bare = cuttersOnOwning([])
-    expect(drillGearOf(bare.state(), 'p1')).toMatchObject({ sideCells: 1, offSideCells: 1 })
-    const widened = cuttersOnOwning([SIDE_CUTTERS_MARK_2_ID])
-    expect(drillGearOf(widened.state(), 'p1')).toMatchObject({
-      sideCells: 2,
-      offSideCells: 2,
-      sideEnergyShareBp: 10000,
-    })
+  it('widens the bore one level with the cutters alone, and two once Mark 2 is owned (ticket 749)', () => {
+    expect(widthLevelOf(cuttersOnOwning([]).state(), PLAYER)).toBe(1)
+    expect(widthLevelOf(cuttersOnOwning([SIDE_CUTTERS_MARK_2_ID]).state(), PLAYER)).toBe(2)
   })
 
-  it('asks nothing with Mark 2 owned while the cutters are switched off', () => {
+  it('keeps the width with the cutters switched off: owned, never switched', () => {
     const session = cuttersOnOwning([SIDE_CUTTERS_MARK_2_ID])
     session.submit(3, press('drill.flank'))
     expect(CUTTERS_AND_BOOM_SOURCE.gearOf(session.state(), 'p1')).toBeNull()
+    expect(widthLevelOf(session.state(), PLAYER)).toBe(2)
   })
 
-  it("cuts three side cells a side with Wide's reamers on top of Mark 2", () => {
-    const session = wideCuttersOnOwning([SIDE_CUTTERS_MARK_2_ID])
-    expect(drillGearOf(session.state(), PLAYER)).toMatchObject({ sideCells: 3, offSideCells: 3 })
-    const markOne = wideCuttersOnOwning([])
-    expect(drillGearOf(markOne.state(), PLAYER)).toMatchObject({ sideCells: 2 })
+  it("adds Wide's level on top of the widest Mark owned", () => {
+    expect(widthLevelOf(wideCuttersOnOwning([SIDE_CUTTERS_MARK_2_ID]).state(), PLAYER)).toBe(3)
+    expect(widthLevelOf(wideCuttersOnOwning([]).state(), PLAYER)).toBe(2)
+    expect(drillGearOf(wideCuttersOnOwning([]).state(), PLAYER)).toBeNull()
+  })
+
+  it('leaves a rig owning no width part at the bare level', () => {
+    expect(widthLevelOf(createScriptedSession().state(), PLAYER)).toBe(0)
   })
 })

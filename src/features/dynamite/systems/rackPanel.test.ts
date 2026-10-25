@@ -5,9 +5,9 @@ import {
   poseOnTile,
   sizedBlasterOn,
 } from '../../../systems/authority/charges/chargeFixtures'
-import { drillGearOf } from '../../../systems/authority/gatedBiteFixtures'
 import { createScriptedSession } from '../../../systems/authority/scriptedSession'
 import { withRegistrations } from '../../../registries/registrar'
+import type { SliceDefinition } from '../../../registries/sliceDefinition'
 import { KEYBOARD_PROMPTS, TOUCH_PROMPTS } from '../../../systems/input/promptFixtures'
 import { rackPanelOf } from './rackPanel'
 
@@ -61,7 +61,11 @@ describe('dynamite rack panel', () => {
 
   it('marks a size whose ground is narrower than the bore the rig cuts, and only as a hint', () => {
     const { session } = sizedBlasterOn(16, 4, 1)
-    const reamed = drillGearOf({ aheadCells: 0, sideCells: 3 })
+    // Width level 6: a 6.9 m body, its stamp 3.6 m round, past size 1's 2.5 m ground.
+    const reamed: SliceDefinition = {
+      id: 'width-probe',
+      register: (r) => r.boreWidth({ id: 'width-probe.levels', widthLevelsOf: () => 6 }),
+    }
     const atSize = (size: number) =>
       withRegistrations([reamed], () => panelOn(session.state(), size)?.cutText)
     expect(atSize(4)).toBeNull()

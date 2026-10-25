@@ -1,10 +1,12 @@
 /**
  * The side cutters' width Marks (GD lock on #308, ticket 620, on the TD's shape and Systems' price
  * rows): Mark 1 is the side cutters themselves (`sideCells` 1); each later Mark is a part the
- * vehicle owns, with no slot of its own, that widens the switched-on cutters to its `sideCells`
- * (Mark 2: 2, so Wide's reamers on top make 3). Width is yield and clearing, never speed: each side
- * cell pays the kernel's side ore share and its whole energy and heat. A further Mark is one more
- * row here and in `items.balance`.
+ * vehicle owns, with no slot of its own. Since the GD lock on #662 Part B (ticket 749) the widest
+ * Mark owned is the vehicle's width level on the kernel's one bore width (`boreWidthLevels.ts`):
+ * the body grows a metre a level and the stamp with it, owned, never switched. `sideCells` is the
+ * cells a metre each level adds past the bare bore, which the cards read. Width is yield and
+ * clearing, never speed: each width cell pays the kernel's side ore share and its whole energy and
+ * heat. A further Mark is one more row here and in `items.balance`.
  *
  * Priced by money alone: Mark n is the lane's one-off, `15 V(3(a_n - 1) + 5) paceScale(a_n)` with
  * the price anchor `a_n = 13 + 3(n - 1)` (Mark 2 at 16), never a planet lock (#411) and no cap on
@@ -27,6 +29,8 @@ export const SIDE_CUTTERS_MARK_2_ID = 'gear.side_cutters_mark_2'
 
 /** The side cutters' own item and node, which every width Mark widens and needs. */
 const SIDE_CUTTERS_ITEM_ID = 'gear.side_cutters'
+/** The side cutters are the ladder's Mark 1: width level 1 (ticket 749). */
+export const SIDE_CUTTERS_MARK = 1
 const SIDE_CUTTERS_NODE_ID = 'tech.drill_gear.side_cutters'
 
 /** One width Mark past the cutters' own: an owned part, priced at its node's anchor. */
@@ -58,15 +62,19 @@ export const SIDE_CUTTER_MARKS: readonly SideCutterMark[] = [
   },
 ]
 
-/** The side cells the widest width Mark the vehicle owns asks; null while it owns none. */
-export function ownedSideCutterCellsOf(loadout: VehicleLoadout): number | null {
+/**
+ * The widest width Mark the vehicle owns (ticket 749): a sold Mark's number, 1 for the side cutters
+ * alone, 0 with neither. It is the vehicle's width level from this lane (`boreWidthLevels.ts`).
+ */
+export function ownedWidthMarkOf(loadout: VehicleLoadout): number {
   const owned = SIDE_CUTTER_MARKS.filter((mark) => isItemOwned(loadout, mark.itemId))
-  return owned.length === 0 ? null : Math.max(...owned.map(sideCellsOfMark))
+  const cutters = isItemOwned(loadout, SIDE_CUTTERS_ITEM_ID) ? [SIDE_CUTTERS_MARK] : []
+  return Math.max(0, ...cutters, ...owned.map((mark) => mark.mark))
 }
 
-/** The side cells of the widest width Mark the lane sells. */
-export function widestSideCutterCells(): number {
-  return Math.max(...SIDE_CUTTER_MARKS.map(sideCellsOfMark))
+/** The widest width Mark the lane sells: its width level. */
+export function widestWidthMark(): number {
+  return Math.max(...SIDE_CUTTER_MARKS.map((mark) => mark.mark))
 }
 
 /** The width Mark sold as `itemId`, or null for any other item. */
@@ -121,11 +129,7 @@ export function cardOfMark(mark: SideCutterMark): ItemDescriptionEntry {
     id: `drill-gear.${mark.itemId.slice('gear.'.length)}`,
     matches: { kind: 'vehicle-item', id: mark.itemId },
     flavour: mark.description,
-    statLines: [
-      sideCellsLineOf(mark),
-      ...widthLineSpecsOf(sideCellsOfMark(mark)),
-      priceLineOf(mark),
-    ],
+    statLines: [sideCellsLineOf(mark), ...widthLineSpecsOf(mark.mark), priceLineOf(mark)],
   }
 }
 

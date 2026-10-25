@@ -20,11 +20,13 @@ function engaged(...itemIds: string[]) {
   return (itemId: string) => itemIds.includes(itemId)
 }
 
-/** The side cutters' ask on the kernel's drill gear read, as if switched on. */
-const CUTTERS_ON: SliceDefinition = {
+/**
+ * A bore two width levels wide (ticket 749: the cutters' Mark 2 owned), the stamp 1.6 m round, so
+ * the ore beside the bit's tile lies inside it.
+ */
+const WIDE_BORE: SliceDefinition = {
   id: 'drill-gear',
-  register: (r) =>
-    r.drillGear({ id: 'drill-gear.probe', gearOf: () => drillGearAskOf(engaged(SIDE_CUTTERS_ID)) }),
+  register: (r) => r.boreWidth({ id: 'drill-gear.probe', widthLevelsOf: () => 2 }),
 }
 
 /** A #142 gate of `gateKind` on one ore tile, refusing the drill there. */
@@ -65,35 +67,29 @@ describe('side cutters and reach boom', () => {
     expect(drillGearAskOf(engaged())).toBeNull()
   })
 
-  it('side cutters ask one cell each side at a whole share of the drill energy', () => {
-    expect(drillGearAskOf(engaged(SIDE_CUTTERS_ID))).toEqual({
-      sideCells: 1,
-      sideEnergyShareBp: 10000,
-    })
+  it('side cutters ask nothing of the drill: their switch leaves the width alone (ticket 749)', () => {
+    expect(drillGearAskOf(engaged(SIDE_CUTTERS_ID))).toBeNull()
   })
 
   it('the reach boom asks one cell past the bit', () => {
     expect(drillGearAskOf(engaged(REACH_BOOM_ID))).toEqual({ aheadCells: 1 })
   })
 
-  it('both switched on ask for both', () => {
-    expect(drillGearAskOf(engaged(SIDE_CUTTERS_ID, REACH_BOOM_ID))).toEqual({
-      sideCells: 1,
-      sideEnergyShareBp: 10000,
-      aheadCells: 1,
-    })
+  it('both switched on ask for the boom’s cell alone', () => {
+    expect(drillGearAskOf(engaged(SIDE_CUTTERS_ID, REACH_BOOM_ID))).toEqual({ aheadCells: 1 })
   })
 
   it('widens the bore round an ungated ore cell and collects it', () => {
     const { ore, target } = oreBesideBore()
-    const cut = drillDownWith([CUTTERS_ON], target)
+    const cut = drillDownWith([WIDE_BORE], target)
     expect(cut.events).toContainEqual(expect.objectContaining({ type: 'TileDestroyed', ...ore }))
   })
 
-  // #205 acceptance 1 with #142 acceptance 5: side_drills never frees a gated cell.
+  // #205 acceptance 1 with #142 acceptance 5: side_drills never frees a gated cell, nor does the
+  // wider bore its Marks cut (ticket 749, the HS condition on #662 Part B).
   it.each(['rig', 'dynamite'])('leaves a %s-gated cell beside the bore untouched', (gateKind) => {
     const { ore, target } = oreBesideBore()
-    const cut = drillDownWith([CUTTERS_ON, gateOn(ore, gateKind)], target)
+    const cut = drillDownWith([WIDE_BORE, gateOn(ore, gateKind)], target)
     expect(cellDensitySum(cut.world, PARAMS, ore)).toBe(cellDensitySum(EMPTY_WORLD, PARAMS, ore))
     expect(kindOfCell(cellAt(cut.world, PARAMS, ore))).toBe(CELL_KIND.ore)
     expect(cut.events).toContainEqual(

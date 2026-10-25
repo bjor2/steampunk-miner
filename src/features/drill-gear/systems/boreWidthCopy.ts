@@ -1,23 +1,26 @@
 /**
- * The width cards' copy (GD lock on #308, ticket 621): the side cutters, their width Mark 2 and
- * Wide's reamers on top of the widest Mark each read their bore's width. Width is yield and
+ * The width cards' copy (GD lock on #308, ticket 621, on the kernel's one bore width since the GD
+ * lock on #662 Part B, ticket 749): a width level grows the body a metre and the bore with it, so
+ * the side cutters (Mark 1) read "Bore width 2.2 m", their width Mark 2 "3.2 m", and Wide's reamers
+ * "2.2 m" alone and "4.2 m" with the widest Mark owned (`vehicle/drillBore.ts`). Width is yield and
  * clearing, never speed, so the cards show the ore a metre it adds and say the drill is no faster.
- * The drill types (Wide, Deep, the twin bit, the reach boom) read as one-off sidegrades: the drill's
- * own cut formula, no level track (the VS on #308).
+ * The drill types (Wide, Deep, the twin bit, the reach boom) read as one-off sidegrades: the
+ * drill's own cut formula, no level track (the VS on #308).
  *
- * The width is the real bore's, from data (ticket 663, re-baselining #621 on the 1.2 m bore): the
- * stamp's diameter (the body plus the bore row's clearance a side, `drillBore.ts`) plus `s` side
- * cells of a metre on each flank (`drillGearCells.ts`), so 1.2 m bare, 3.2 m with one side cell.
- * The ore a metre follows the #316 width bench: a level metre opens b + s cells (b the bare bore's
- * `BARE_BORE_CELLS_PER_METRE`), each side cell paying the kernel's `sideOreShareBp` of its ore, so
- * the ore a metre grows by `s * share / b`.
+ * A level adds one cell a metre past the bare bore's b (`boreCellsPerMetreAt`; b is the #316 width
+ * bench's `BARE_BORE_CELLS_PER_METRE`, 1 on the 1.2 m bore since ticket 663), and each such width
+ * cell pays the kernel's `sideOreShareBp` of its ore, so the ore a metre grows by `level * share / b`.
  */
 import { BARE_BORE_CELLS_PER_METRE } from '../../../constants/balance'
 import { MM_PER_METRE } from '../../../constants/physics'
 import { formatAmount } from '../../../systems/displayAmount'
 import { ECONOMY } from '../../../systems/economy/economy'
 import { div, fromSafeInteger, type Money } from '../../../systems/money'
-import { drillStampRadiusMm } from '../../../systems/vehicle/drillBore'
+import {
+  BARE_WIDTH_LEVEL,
+  boreCellsPerMetreAt,
+  boreWidthMmAt,
+} from '../../../systems/vehicle/drillBore'
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
 
 const PERCENT_OF_BASIS_POINTS = 100
@@ -26,10 +29,9 @@ export const WIDER_NOT_FASTER_NOTE =
   'a wider bore, not a faster one: each side cell costs its full energy and heat'
 export const SIDEGRADE_NOTE = 'a one-off sidegrade: no level track, and drill speed is unchanged'
 
-/** The bore's width in metres with `sideCells` side cells on each flank. */
-export function boreWidthMOf(sideCells: number): Money {
-  const widthMm = 2 * (drillStampRadiusMm() + sideCells * MM_PER_METRE)
-  return div(fromSafeInteger(widthMm), fromSafeInteger(MM_PER_METRE))
+/** The bore's width in metres at `widthLevel`: the body and its clearance either side. */
+export function boreWidthMOf(widthLevel: number): Money {
+  return div(fromSafeInteger(boreWidthMmAt(widthLevel)), fromSafeInteger(MM_PER_METRE))
 }
 
 /** The side cells' ore share as a percent of a whole cell's ore. */
@@ -37,40 +39,45 @@ export function sideOreSharePercent(): Money {
   return percentOf(ECONOMY.drillGearCaps.sideOreShareBp)
 }
 
-/** How much more ore a metre the bore takes with `sideCells` side cells, as a percent. */
-export function oreGainPercentOf(sideCells: number): Money {
-  const gainBp = sideCells * ECONOMY.drillGearCaps.sideOreShareBp
+/** How much more ore a metre the bore takes at `widthLevel`, as a percent. */
+export function oreGainPercentOf(widthLevel: number): Money {
+  const gainBp = widthCellsPerMetreOf(widthLevel) * ECONOMY.drillGearCaps.sideOreShareBp
   return div(percentOf(gainBp), fromSafeInteger(BARE_BORE_CELLS_PER_METRE))
 }
 
-/** A width part's card lines at `sideCells`: its bore width, its ore gain and the speed note. */
-export function widthLineSpecsOf(sideCells: number): DescribedStatLineSpec[] {
+/** The width cells a metre of bore opens past the bare bore's at `widthLevel`. */
+function widthCellsPerMetreOf(widthLevel: number): number {
+  return boreCellsPerMetreAt(widthLevel) - boreCellsPerMetreAt(BARE_WIDTH_LEVEL)
+}
+
+/** A width part's card lines at `widthLevel`: its bore width, its ore gain and the speed note. */
+export function widthLineSpecsOf(widthLevel: number): DescribedStatLineSpec[] {
   return [
-    fixedLineSpecOf('Bore width (m)', boreWidthMOf(sideCells)),
-    fixedLineSpecOf('Ore a metre (+%)', oreGainPercentOf(sideCells)),
+    fixedLineSpecOf('Bore width (m)', boreWidthMOf(widthLevel)),
+    fixedLineSpecOf('Ore a metre (+%)', oreGainPercentOf(widthLevel)),
     noteLineSpecOf(WIDER_NOT_FASTER_NOTE),
   ]
 }
 
 /**
- * Wide's card notes: its bore with the reamers alone and with the widest width Mark's cutters
- * switched on beside them, the ore that widest bore adds, and the sidegrade line. The #255 guard
- * keeps the cutters' name off the card, so they read as flank cutters.
+ * Wide's card notes: its bore at its own width levels and with the widest width Mark owned beside
+ * them, the ore that widest bore adds, and the sidegrade line. The #255 guard keeps the cutters'
+ * name off the card, so they read as flank cutters.
  */
-export function wideBranchNotesOf(reamerCells: number, widestCutterCells: number): string[] {
-  const widest = reamerCells + widestCutterCells
-  return [wideWidthNoteOf(reamerCells, widest), wideOreNoteOf(widest), SIDEGRADE_NOTE]
+export function wideBranchNotesOf(wideLevels: number, widestMarkLevels: number): string[] {
+  const widest = wideLevels + widestMarkLevels
+  return [wideWidthNoteOf(wideLevels, widest), wideOreNoteOf(widest), SIDEGRADE_NOTE]
 }
 
-function wideWidthNoteOf(reamerCells: number, widestCells: number): string {
-  const reamed = formatAmount(boreWidthMOf(reamerCells))
-  const widest = formatAmount(boreWidthMOf(widestCells))
-  return `bore width ${reamed} m, ${widest} m with the widest flank cutters on`
+function wideWidthNoteOf(wideLevels: number, widestLevels: number): string {
+  const bare = formatAmount(boreWidthMOf(wideLevels))
+  const widest = formatAmount(boreWidthMOf(widestLevels))
+  return `bore width ${bare} m, ${widest} m with the widest flank cutters owned`
 }
 
-function wideOreNoteOf(widestCells: number): string {
+function wideOreNoteOf(widestLevels: number): string {
   const share = formatAmount(sideOreSharePercent())
-  return `side cells pay ${share}% of their ore: up to +${formatAmount(oreGainPercentOf(widestCells))}% ore a metre`
+  return `side cells pay ${share}% of their ore: up to +${formatAmount(oreGainPercentOf(widestLevels))}% ore a metre`
 }
 
 /** A line of words labelled "Note", the same at every Mark (#351: no comma before the colon). */

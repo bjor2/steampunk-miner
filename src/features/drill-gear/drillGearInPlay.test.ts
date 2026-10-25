@@ -89,12 +89,12 @@ describe('drill-gear toggles', () => {
     expect(isEngaged(session, CUTTERS)).toBe(false)
   })
 
-  it('widens the bore round the ore beside it only while the cutters are on', () => {
+  it('cuts the same bore with the cutters on or off: owned, they widen it either way (ticket 749)', () => {
     const { ore, target } = oreBesideBore()
     const off = sessionWith({ 'drill.flank': CUTTERS }, target, FACING.down)
-    expect(isOreBesideCut(off, ore, target)).toBe(false)
     const on = sessionWith({ 'drill.flank': CUTTERS }, target, FACING.down)
     on.submit(2, press('drill.flank'))
+    expect(isOreBesideCut(off, ore, target)).toBe(true)
     expect(isOreBesideCut(on, ore, target)).toBe(true)
   })
 

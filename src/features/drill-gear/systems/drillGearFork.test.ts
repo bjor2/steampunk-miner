@@ -8,6 +8,7 @@ import { foldDrillGear } from '../../../systems/economy/drillGearCaps'
 import { ECONOMY } from '../../../systems/economy/economy'
 import { onCurveStep } from '../../../systems/economy/vehicleStats'
 import { cmp } from '../../../systems/money'
+import { widthLevelOf } from '../../../systems/registries/boreWidth'
 import { drillGearOf } from '../../../systems/registries/drillGear'
 import { contentOf } from '../../../systems/registries/content'
 import { setPlanetCommand } from '../../../systems/startScenarioCommands'
@@ -26,13 +27,14 @@ import {
   DRILL_GEAR_FORK,
   WIDE_BRANCH,
   WIDE_LEANED_ROW,
-  widenedFlanksOf,
+  WIDE_WIDTH_LEVELS,
 } from './drillGearFork'
 import { drillGearItemOf, gearValueOf } from './drillGearItems'
 import { TWIN_BIT_ID } from './twinBit'
 
 // The drill-gear lane's P16 fork (GD lock on #255, build 3, ticket 268): Wide cuts the flanks,
-// Deep the cell below the bit, each only while it is the lane's active branch.
+// as one level on the kernel's bore width since ticket 749, Deep the cell below the bit, each only
+// while it is the lane's active branch.
 
 const PLAYER = 'p1'
 const SEED = 83921
@@ -116,34 +118,19 @@ describe('drill-gear fork: Wide and Deep', () => {
     expect(gearFacing(null, FACING.right)).toBeNull()
   })
 
-  it('Wide cuts one flank cell on each side at a whole energy share, whatever the facing', () => {
+  it('Wide asks the drill for no flank cell: it widens the bore one level instead (ticket 749)', () => {
     for (const facing of [FACING.down, FACING.right]) {
-      expect(gearFacing(WIDE_BRANCH, facing)).toMatchObject({
-        sideCells: 1,
-        offSideCells: 1,
-        sideEnergyShareBp: 10000,
-        aheadCells: 0,
-      })
+      expect(gearFacing(WIDE_BRANCH, facing)).toBeNull()
     }
+    expect(widthLevelOf(sessionOnForkPlanet(WIDE_BRANCH).state(), PLAYER)).toBe(WIDE_WIDTH_LEVELS)
+    expect(widthLevelOf(sessionOnForkPlanet(DEEP_BRANCH).state(), PLAYER)).toBe(0)
   })
 
-  it('Wide adds its flank cell to the switched-on side cutters, keeping their held side', () => {
-    expect(widenedFlanksOf(null)).toEqual({ sideCells: 1, sideEnergyShareBp: 10000 })
-    const cutters = drillGearAskOf((itemId) => itemId === SIDE_CUTTERS_ID)
-    expect(widenedFlanksOf(cutters)).toEqual({ sideCells: 2, sideEnergyShareBp: 10000 })
-    const held = {
-      ...cutters,
-      sideAim: 'drive' as const,
-      sideSeed: { x: 1 as const, y: 0 as const },
-    }
-    expect(widenedFlanksOf(held)).toMatchObject({ sideCells: 2, sideAim: 'drive' })
-  })
-
-  it('Wide cuts its flanks on a planet short of its side_drills row, a price anchor only', () => {
+  it('Wide widens the bore on a planet short of its side_drills row, a price anchor only', () => {
     const session = sessionOnForkPlanet(WIDE_BRANCH)
     session.submit(1, setPlanetCommand(featurePricePlanetOf(WIDE_LEANED_ROW)! - 1))
     session.submit(2, poseAbove(TARGET_16, FACING.down))
-    expect(drillGearOf(session.state(), PLAYER)).toMatchObject({ sideCells: 1, offSideCells: 1 })
+    expect(widthLevelOf(session.state(), PLAYER)).toBe(WIDE_WIDTH_LEVELS)
   })
 
   it('Deep cuts the cell past the bit facing down, and nothing facing any other way', () => {
@@ -166,10 +153,12 @@ describe('drill-gear fork: Wide and Deep', () => {
     expect(folded).toMatchObject({ aheadCells: 1, facingAheadCells: 1 })
   })
 
-  it('a Wide cut takes more of both flanks than the bare bore, a Deep cut only the cell below', () => {
+  it('a Wide cut takes more of both flanks than the bare bore, a Deep cut only the cell below it', () => {
     const bit = TARGET_16.tx
     const wide = tilesCutBeyondBare(WIDE_BRANCH)
-    expect(wide.map((tile) => tile.tx).sort()).toEqual([bit - 1, bit + 1])
+    // A report's disc one level wider takes both flanks and, with no front to hold it, a row more
+    // below the bit as well (the kill-switch path; the live swept cut's front holds the reach).
+    expect([...new Set(wide.map((tile) => tile.tx))].sort()).toEqual([bit - 1, bit, bit + 1])
     expect(tilesCutBeyondBare(DEEP_BRANCH)).toEqual([{ tx: bit, ty: TARGET_16.ty - 1 }])
   })
 
