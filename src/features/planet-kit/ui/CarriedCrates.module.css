@@ -1,0 +1,22 @@
+/*
+ * Ticket 850: bottom right, above the item heat gauge (`aetheric/ui/ItemHeatGauge.module.css`, at
+ * 9.5rem), the bore gun's panel and the dynamite rack, clear of the kernel gauges (top left), the
+ * position panel (top right) and the prompts (bottom centre). Never catches the pointer.
+ */
+.panel {
+  position: absolute;
+  right: var(--space-3);
+  bottom: calc(var(--space-3) + 13rem);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  pointer-events: none;
+}
+
+.count {
+  color: var(--color-brass);
+}

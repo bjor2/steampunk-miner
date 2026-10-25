@@ -4,16 +4,24 @@
  * the list grows with the containers at 360 px and 1280+ and never caps. A card names the kind,
  * says where it waits and whose it is, and shows its units; its one verb takes the cargo back into
  * the hold, greyed while the container is out of reach, elsewhere or not the player's to open.
- * The tab shows once any container does.
+ * While the player carries a Cache Crate (ticket 850) the list leads with the drop: the crates
+ * carried, and a verb that drops the hold as one here, greyed while the drop would be refused.
+ * The tab shows once any container does, or a crate is carried.
  */
 import { submitCommand } from '../../../store/authorityLink'
 import { useGameStore } from '../../../store/gameStore'
+import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { SheetCard, type SheetCardText } from '../../../ui/kit/SheetCard'
 import type { SheetTab } from '../../../ui/registries/sheetTabs'
 import { useScreenModel } from '../../../ui/useScreenModel'
 import { pickupContainerIntent } from '../systems/containerRules'
-import { containerRowsOf, type ContainerRow } from '../systems/containerViews'
-import { readContainerRows } from '../store/containerReads'
+import {
+  containerRowsOf,
+  crateDropOf,
+  type ContainerRow,
+  type CrateDrop,
+} from '../systems/containerViews'
+import { dropCarriedCrate, readContainerRows, readCrateDrop } from '../store/containerReads'
 import { PLANET_KIT_TEST_IDS } from './testIds'
 import styles from './ContainersTab.module.css'
 
@@ -26,18 +34,37 @@ export const CONTAINERS_TAB: SheetTab = {
   id: CONTAINERS_TAB_ID,
   title: 'Cache Crates',
   order: CONTAINERS_TAB_ORDER,
-  isShownOn: (state, playerId) => containerRowsOf(state, playerId).length > 0,
+  isShownOn: (state, playerId) => isListed(state, playerId),
   Panel: ContainersPanel,
 }
 
 function ContainersPanel() {
   const rows = useScreenModel(readContainerRows)
+  const drop = useScreenModel(readCrateDrop)
   return (
     <div className={styles.cards}>
+      {drop !== null && <DropCard drop={drop} />}
       {rows.map((row) => (
         <ContainerCard key={row.key} row={row} />
       ))}
     </div>
+  )
+}
+
+function DropCard({ drop }: { drop: CrateDrop }) {
+  return (
+    <SheetCard
+      text={{
+        id: `${CONTAINERS_TAB_ID}.drop`,
+        title: `Drop ${drop.name}`,
+        line: 'Leaves your whole hold here for later.',
+      }}
+      onAct={() => dropCarriedCrate(drop.kind)}
+      figure={`×${drop.carried}`}
+      figureNote="Carried"
+      isMuted={!drop.canDrop}
+      testId={PLANET_KIT_TEST_IDS.dropCrate}
+    />
   )
 }
 
@@ -52,6 +79,11 @@ function ContainerCard({ row }: { row: ContainerRow }) {
       testId={PLANET_KIT_TEST_IDS.containerCard}
     />
   )
+}
+
+/** Listed once a container shows or a crate is carried. */
+function isListed(state: AuthorityState, playerId: string): boolean {
+  return crateDropOf(state, playerId) !== null || containerRowsOf(state, playerId).length > 0
 }
 
 /** A title of the kind's name and one line of where it waits and whose it is. */

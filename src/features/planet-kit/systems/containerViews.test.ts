@@ -5,10 +5,10 @@ import {
 } from '../../../systems/authority/scriptedSession'
 import { tileOfPose, type VehiclePose } from '../../../systems/vehicle/vehiclePose'
 import type { TilePoint } from '../../../systems/world/tileGrid'
-import { containerMarkersOf, containerRowsOf } from './containerViews'
+import { containerMarkersOf, containerRowsOf, crateDropOf } from './containerViews'
 
 // What the markers and the list show of the placed containers (ticket 823, the TD's final ruling
-// on #823, points 7 and 8).
+// on #823, points 7 and 8), and the drop the list leads with while a crate is carried (ticket 850).
 
 function placeAt(cell: TilePoint, ownerId: string) {
   return {
@@ -59,5 +59,20 @@ describe('placed container views (ticket 823)', () => {
     session.submit(1, placeAt(cellOf(session), 'departed'))
     const rows = containerRowsOf(session.state(), 'p1')
     expect(rows.map((row) => [row.ownerId, row.isOwn])).toEqual([['p1', true]])
+  })
+
+  it('leads with the drop only while a crate is carried, saying whether it would land', () => {
+    const session = createScriptedSession()
+    expect(crateDropOf(session.state(), 'p1')).toBeNull()
+    session.submit(1, { type: 'debug.planet-kit.grantKitItem', payload: { itemId: 'cache_crate' } })
+    expect(crateDropOf(session.state(), 'p1')).toEqual({
+      kind: 'cache_crate',
+      name: 'Cache Crate',
+      carried: '1',
+      canDrop: false,
+    })
+    session.submit(2, placeAt(cellOf(session), 'p1'))
+    session.submit(3, { type: 'planet-kit.pickup_container', payload: { containerId: 1 } })
+    expect(crateDropOf(session.state(), 'p1')?.canDrop).toBe(true)
   })
 })

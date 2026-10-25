@@ -944,14 +944,14 @@
           "children": [
             {
               "title": "Specialist merchants",
-              "description": "A merchant in the shops of each of planets 1 to 5 with its own stock and a premium on one home ore, selling that planet's kit item: the Cache Crate on planet 1, the Scree Plough, Damp Flask, Shard Tongs and Vent Vane on planets 2 to 5. The Sell bay shows the planet's merchant, the ore it pays extra for and its stock with prices; that ore mined there sells for a quarter more at its merchant, never on top of the assay beacon. Each merchant's frontage dresses the Assay & Exchange in its planet's colour with its trade on a shingle, and each tool has its part on the rig. Buying the kit items is not built yet.",
+              "description": "A merchant in the shops of each of planets 1 to 5 with its own stock and a premium on one home ore, selling that planet's kit item: the Cache Crate on planet 1, the Scree Plough, Damp Flask, Shard Tongs and Vent Vane on planets 2 to 5. The Sell bay shows the planet's merchant, the ore it pays extra for and its stock with prices; that ore mined there sells for a quarter more at its merchant, never on top of the assay beacon. Each merchant's frontage dresses the Assay & Exchange in its planet's colour with its trade on a shingle, and each tool has its part on the rig. Each line has a Buy: a tool is owned for good, a consumable is carried up to 3, and a line says Owned or Carrying the most once you can buy no more. The four tools do nothing yet: their verbs on the hazards are not built.",
               "status": "partial",
               "issues": [80, 647, 821, 850],
               "planet": 1,
               "children": [
                 {
                   "title": "Cache Crate containers",
-                  "description": "Drop your whole hold as a crate at your cell and pick it up later, only you; at most 3 per planet. Crates stay through saves and jumps, show as markers on the map and in the Cache Crates list on the base sheet. Buying and carrying a crate comes with the merchants.",
+                  "description": "Drop your whole hold as a crate at your cell and pick it up later, only you; at most 3 per planet. Crates stay through saves and jumps, show as markers on the map and in the Cache Crates list on the base sheet. A crate is bought at the Hearthmoor merchant and carried, up to 3, counted on the HUD; the list's first card drops your hold as one, spending it. The pacing bot never uses crates yet.",
                   "status": "partial",
                   "issues": [823, 850],
                   "planet": 1

@@ -1775,6 +1775,11 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   `e2e/browser/merchantPanel.spec.ts` (ticket 821) draws the planet's real merchant at the same two
   sizes: planet 1's name, premium tag and Cache Crate, each of planet 5's three tools reached
   inside the bay, no sideways scroll, and no merchant on planet 6. Box Tester only.
+  `e2e/browser/kitBuying.spec.ts` (ticket 850) buys at the same two sizes through each line's Buy:
+  three Cache Crates on planet 1 until the line shows "Carrying the most." and 3/3 with no Buy, a
+  Scree Plough on planet 2 locked as "Owned.", and a granted crate counted on the HUD (attached
+  only: the compact HUD folds the gauges into its tray). Box Tester only. The buy rules themselves
+  are `planet-kit/systems/kitBuyRules.test.ts` and `kitHoldings.test.ts`.
 - **Sale receipt** (ticket 717, spec #678): the rules are pure in the sell-burst slice. The hold's
   kinds are tallied as units come in (`systems/heldManifest.ts`, read by `heldUnits.ts` as the pickup
   popup reads a species and rarity) and cut back to the authority's hold every batch; the trip's

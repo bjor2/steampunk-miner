@@ -25,6 +25,7 @@ import { kitItemEntriesOf } from './systems/kitItemContent'
 import { MERCHANT_ORE_PREMIUM, MERCHANT_PREMIUM_LIFT } from './systems/merchantPremium'
 import { PLANET_KITS } from './systems/planetKitRows'
 import { MERCHANT_FACILITY } from './systems/sessionMerchant'
+import { CarriedCrates } from './ui/CarriedCrates'
 import { planetKitArtAssets } from './systems/planetKitArt'
 import { CONTAINER_MARKER_PRIORITY, ContainerMarkers } from './ui/ContainerMarkers'
 import { CONTAINERS_TAB } from './ui/ContainersTab'
@@ -49,6 +50,7 @@ export const slice: SliceDefinition = {
       priority: CONTAINER_MARKER_PRIORITY,
       Panel: ContainerMarkers,
     })
+    r.hudPanel({ id: 'planet-kit.carried-crates', slot: 'gauges', Panel: CarriedCrates })
     r.sheetTab(CONTAINERS_TAB)
     r.bayPanelKind(MERCHANT_PANEL_KIND)
     r.bayPanelRow(MERCHANT_PANEL_ROW)

@@ -3,12 +3,15 @@
  * points 7 and 8): one row per container the session shows, the session planet's first, then the
  * other planets by their stable id, each in id order. A departed owner's containers stay hidden
  * until they come back. The map markers draw this planet's rows at their cells; the list draws
- * every row, so it grows with the containers and never caps.
+ * every row, so it grows with the containers and never caps. While the player carries a crate
+ * (ticket 850), the list leads with the drop: how many are carried, and whether a drop would land.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import { cargoUnitsOf } from '../../../systems/vehicle/vehicleState'
-import { pickupRejectionOf } from './containerRules'
+import { dropRejectionOf, pickupRejectionOf } from './containerRules'
+import { heldCountOf } from './kitHoldings'
+import { kitHoldingsOf } from './kitHoldingsSection'
 import { placedContainersIn, sessionPlanetKeyOf } from './containerSection'
 import { shownContainersOn, type PlacedContainer } from './placedContainers'
 import { PLANET_KITS } from './planetKitRows'
@@ -32,6 +35,31 @@ export interface ContainerRow {
   isHere: boolean
   /** Whether `pickup_container` would move cargo now. */
   canTake: boolean
+}
+
+/** The drop the list leads with while crates are carried. */
+export interface CrateDrop {
+  kind: string
+  name: string
+  /** Crates carried, as decimal text. */
+  carried: string
+  /** Whether `drop_container` would land now. */
+  canDrop: boolean
+}
+
+/** The kit item a drop control spends: the Cache Crate. */
+export const DROPPED_KIND = 'cache_crate'
+
+/** The drop while the player carries a crate; null while none is carried. */
+export function crateDropOf(state: AuthorityState, playerId: string): CrateDrop | null {
+  const carried = heldCountOf(kitHoldingsOf(state, playerId), DROPPED_KIND)
+  if (carried === 0n) return null
+  return {
+    kind: DROPPED_KIND,
+    name: kitItemOf(PLANET_KITS, DROPPED_KIND)?.name ?? DROPPED_KIND,
+    carried: carried.toString(),
+    canDrop: dropRejectionOf(state, playerId, DROPPED_KIND) === null,
+  }
 }
 
 export function containerRowsOf(state: AuthorityState, playerId: string): ContainerRow[] {

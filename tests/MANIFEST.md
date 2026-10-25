@@ -421,19 +421,19 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/rarityTripShare.test.ts` | 3 | 3 |
 | `src/features/ores/systems/slotDraws.test.ts` | 4 | 4 |
 
-### `planet-kit`: 18 files, 183 tests
+### `planet-kit`: 18 files, 188 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/planet-kit/logging.test.ts` | 3 | 3 |
 | `src/features/planet-kit/systems/containerPremium.test.ts` | 7 | 6 |
 | `src/features/planet-kit/systems/containerRules.test.ts` | 12 | 12 |
-| `src/features/planet-kit/systems/containerViews.test.ts` | 4 | 4 |
+| `src/features/planet-kit/systems/containerViews.test.ts` | 5 | 5 |
 | `src/features/planet-kit/systems/kitBuyRules.test.ts` | 9 | 9 |
 | `src/features/planet-kit/systems/kitHoldings.test.ts` | 5 | 5 |
 | `src/features/planet-kit/systems/kitSockets.test.ts` | 11 | 11 |
 | `src/features/planet-kit/systems/merchantArt.test.ts` | 10 | 10 |
-| `src/features/planet-kit/systems/merchantPanel.test.ts` | 6 | 6 |
+| `src/features/planet-kit/systems/merchantPanel.test.ts` | 8 | 8 |
 | `src/features/planet-kit/systems/merchantPremium.test.ts` | 16 | 16 |
 | `src/features/planet-kit/systems/merchantVariant.test.ts` | 7 | 7 |
 | `src/features/planet-kit/systems/placedContainers.test.ts` | 15 | 16 |
@@ -442,7 +442,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/planet-kit/systems/planetKitRows.test.ts` | 25 | 25 |
 | `src/features/planet-kit/systems/planetKitSales.test.ts` | 7 | 7 |
 | `src/features/planet-kit/systems/render/kitSocketLook.test.ts` | 22 | 8 |
-| `src/features/planet-kit/ui/merchantPanel.test.ts` | 4 | 4 |
+| `src/features/planet-kit/ui/merchantPanel.test.ts` | 6 | 6 |
 
 ### `planet-mix`: 24 files, 146 tests
 

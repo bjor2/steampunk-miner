@@ -10,6 +10,9 @@
  * and `.kitSockets()` lists the sockets with their assets and what they show. `.merchant()` reads
  * the merchant the Sell bay draws on this planet (ticket 821), `merchant: null` where none trades;
  * `.merchantFrontage()` reads the frontage drawn on this planet's Assay & Exchange, or null.
+ * `.grantKitItem(itemId)` holds a kit item as if bought here (ticket 850) through
+ * `debug.planet-kit.grantKitItem`, spending nothing; `.kitHoldings()` reads what the local player
+ * owns and carries.
  */
 import type { DebugAction } from '../../debug/debugActionRegistry'
 import type { DebugResult } from '../../debug/debugScreens'
@@ -20,6 +23,7 @@ import { vehicleOf } from '../../systems/authority/authorityState'
 import { tileOfPose } from '../../systems/vehicle/vehiclePose'
 import type { TilePoint } from '../../systems/world/tileGrid'
 import { readContainerRows } from './store/containerReads'
+import { kitHoldingsOf } from './systems/kitHoldingsSection'
 import { readMerchantFrontageDrawn } from './store/merchantArtReads'
 import { hideKitSockets, showKitSockets, useKitSocketStore } from './store/kitSocketStore'
 import { readMerchantPanel } from './store/merchantReads'
@@ -81,6 +85,11 @@ function oreTextOf(ore: Readonly<Record<string, number | string>>): Record<strin
   return Object.fromEntries(Object.entries(ore).map(([tier, units]) => [tier, String(units)]))
 }
 
+function grantKitItem(itemId: unknown): DebugResult {
+  if (typeof itemId !== 'string') return { ok: false, problems: ['grantKitItem takes an item id'] }
+  return submitSliceDebugCommand({ type: 'debug.planet-kit.grantKitItem', payload: { itemId } })
+}
+
 function okAfter(act: () => void): DebugResult {
   act()
   return { ok: true }
@@ -131,4 +140,9 @@ export const planetKitDebugActions: Readonly<Record<string, DebugAction>> = {
     sockets: KIT_SOCKETS.map(({ itemId, attach, assetId }) => ({ itemId, attach, assetId })),
   }),
   merchant: () => ({ ok: true, merchant: readMerchantPanel() }),
+  grantKitItem,
+  kitHoldings: () => ({
+    ok: true,
+    holdings: kitHoldingsOf(readAuthorityState(), localPlayerId()),
+  }),
 }
