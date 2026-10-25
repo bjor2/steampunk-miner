@@ -9,8 +9,12 @@ describe('dynamite-visuals debug reads', () => {
   it('reports the front budget it declares beside what it drew', () => {
     expect(dynamiteVisualsDebugActions.getFront()).toMatchObject({
       ok: true,
-      budget: { drawCalls: 3, instances: 513 },
+      budget: { drawCalls: 4, instances: 514 },
       peak: { drawCalls: 0, instances: 0 },
+      blastsPlayed: 0,
+      showcasesPlayed: 0,
+      fallsPlayed: 0,
+      banner: null,
     })
   })
 
@@ -29,5 +33,13 @@ describe('dynamite-visuals debug reads', () => {
       problems: ['size must be 1 to 12, got 13'],
     })
     expect(dynamiteVisualsDebugActions.previewBlast(10)).toEqual({ ok: true })
+  })
+
+  it('previews the showcase variant on request and refuses any other word (D8 #868)', () => {
+    expect(dynamiteVisualsDebugActions.previewBlast(6, 'showcase')).toEqual({ ok: true })
+    expect(dynamiteVisualsDebugActions.previewBlast(6, 'loud')).toEqual({
+      ok: false,
+      problems: ['variant must be plain or showcase, got loud'],
+    })
   })
 })

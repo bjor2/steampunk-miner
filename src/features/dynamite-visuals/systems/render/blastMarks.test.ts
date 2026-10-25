@@ -78,12 +78,15 @@ describe('crater marks', () => {
     ])
     expect(crater.decals[0].tint).toBe(casingGradeLookOf(2).plate.colour)
     expect(craterDecalCount([crater])).toBe(DECALS_PER_CRATER)
+    // The rim glows from the blast's tick (D8 ticket 868); a bare crater never glows.
+    expect(crater.isCased).toBe(true)
+    expect(cratersAfter([], [blastStarted(0, 0, 10)], bare)[0].isCased).toBe(false)
   })
 
   it('leaves no crater for a blast off any planet, and ignores every other event', () => {
     const offPlanet: BlastAnswers = { ...bare, groundRadiusMmOf: () => null }
     expect(cratersAfter([], [blastStarted(0, 0, 1)], offPlanet)).toEqual([])
-    const kept: CraterMark[] = [{ x: 1, y: 1, turn: 0, decals: [] }]
+    const kept: CraterMark[] = [{ x: 1, y: 1, turn: 0, decals: [], tick: 0, isCased: false }]
     const other: DomainEvent = {
       type: 'BlastFront',
       tick: 2,

@@ -1,7 +1,8 @@
 /**
  * The fuse sparks (D7, ticket 866; "each type has its own fuse sparks"): a point pool per charge
  * type in its spark colour, fed every frame by each live fused charge from its lamp, out along the
- * planet's radial up, at the fuse row's rate; a remote charge has no fuse and throws none. Each pool
+ * planet's radial up, at the fuse row's rate, building over the fuse's last seconds (D8, ticket
+ * 868); a remote charge has no fuse and throws none. Each pool
  * is one draw call however full; emitting, stepping and uploading never allocate.
  */
 import { AdditiveBlending, BufferAttribute, BufferGeometry, Points, PointsMaterial } from 'three'
@@ -27,6 +28,7 @@ import {
 } from '../systems/render/blastLookConstants'
 import { chargeTypes, fuseSparksOf, type FuseSparks } from '../systems/render/chargeTypeLook'
 import { dynamiteSizes } from '../systems/render/dynamiteArt'
+import { fuseBuildOf } from '../systems/render/fuseBuild'
 import { fuseTicksLeftOf, plantedLampQuadsOf } from '../systems/render/plantedDynamiteLook'
 import { SPARK_Z } from './BlastMarksLayer'
 
@@ -97,10 +99,12 @@ function throwFromCharge(
   tick: number,
   dt: number,
 ): void {
-  if (!Number.isFinite(fuseTicksLeftOf(charge, tick))) return
+  const ticksLeft = fuseTicksLeftOf(charge, tick)
+  if (!Number.isFinite(ticksLeft)) return
   const typeAt = chargeTypes().indexOf(chargeTypeOf(charge.size))
   const look = sparks.looks[typeAt]
-  const due = particlesDue(sparks.carries[slot], look.sparksPerSecond, dt)
+  const rate = look.sparksPerSecond * fuseBuildOf(ticksLeft)
+  const due = particlesDue(sparks.carries[slot], rate, dt)
   if (due === 0) return
   aimAtLamp(sparks, charge, look)
   sprayParticles(sparks.pools[typeAt], sparks.random, sparks.spray, due)

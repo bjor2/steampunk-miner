@@ -1,22 +1,16 @@
 /**
- * The blast front's fixed pools (#215; looks from #153 and the #154 budget): fire and dust riding
- * the clearing's edge as two point pools, and the flash sprite over the clearing. The debris thrown
- * out of the front goes to the kernel's spray layer at high priority (ticket 348), which took this
- * slice's debris pool at the same count. Each pool is one draw call however full; emitting,
- * stepping and uploading never allocate. Presentation only, on the render delta with its own seed.
+ * The blast front's fixed pools (#215; looks from #153 and the #154 budget; the explosion pass of
+ * D8, ticket 868): fire and dust riding the clearing's edge as two coloured point pools that also
+ * carry the stages' fireball sparks, embers, plume, smoke and chips; the flash-and-fireball disc
+ * over the clearing; and the shockwave ring. The debris thrown out of the front goes to the
+ * kernel's spray layer at high priority (ticket 348). Each pool is one draw call however full;
+ * emitting, stepping and uploading never allocate. Presentation only, on the render delta: a blast
+ * draws from its own seeded random (`blastSeededRandoms.ts`), a front from its blast's.
  */
-import {
-  AdditiveBlending,
-  BufferAttribute,
-  BufferGeometry,
-  CircleGeometry,
-  Mesh,
-  MeshBasicMaterial,
-  PointsMaterial,
-} from 'three'
 import { MM_PER_METRE } from '../../../constants/physics'
 import {
   COLLAPSE_DUST_COLOUR,
+  COLLAPSE_DUST_FALL_SPEED,
   COLLAPSE_DUST_LIFE_SECONDS,
   COLLAPSE_DUST_SIZE_PIXELS,
   SPARK_CAPACITY,
@@ -24,22 +18,14 @@ import {
   SPARK_LIFE_SECONDS,
   SPARK_SIZE_PIXELS,
   SPARK_SPEED,
-  COLLAPSE_DUST_FALL_SPEED,
 } from '../../../constants/scene'
 import { requestSpray, type SprayRequest } from '../../../store/sprayRequests'
 import { writeChargePlacement, type ChargePlacement } from '../../../systems/render/chargePlacement'
+import { rgbOfHex, type Rgb } from '../../../systems/render/colour'
+import type { Spray } from '../../../systems/render/particles'
+import type { SeededRandom } from '../../../systems/seededRandom'
+import type { QueuedFront } from '../systems/render/blastEventQueue'
 import {
-  createParticlePool,
-  sprayParticles,
-  stepParticles,
-  type ParticlePool,
-  type Spray,
-} from '../../../systems/render/particles'
-import { createSeededRandom, type SeededRandom } from '../../../systems/seededRandom'
-import type { QueuedFlash, QueuedFront } from '../systems/render/blastEventQueue'
-import { blastFrontPresence } from './blastFrontPresence'
-import {
-  flashSpriteOf,
   frontLayerDrawOf,
   frontSprayOf,
   raisePeak,
@@ -47,138 +33,169 @@ import {
 } from '../systems/render/blastFrontLook'
 import {
   BLAST_FRONT_SEED,
-  FLASH_SPRITE_COLOUR,
   FRONT_DUST_CAPACITY,
   RING_DUST_SPREAD_RADIANS,
   RING_FIRE_SPREAD_RADIANS,
+  SEEDED_BLAST_SLOTS,
 } from '../systems/render/blastLookConstants'
+import {
+  createBlastRandoms,
+  randomOfBlastAt,
+  type BlastRandoms,
+} from '../systems/render/blastSeededRandoms'
+import { blastFrontPresence } from './blastFrontPresence'
+import { createFlashball, drawFlashball, stepFlashball, type Flashball } from './blastFlashball'
+import { createShockwave, drawShockwave, stepShockwave, type Shockwave } from './blastShockwave'
+import {
+  createColouredPointPool,
+  sprayColoured,
+  stepColoured,
+  uploadColoured,
+  type ColouredPointPool,
+} from './colouredPointPool'
 
 /** Over the drill sparks (0.3): the front is the louder effect. */
-const FIRE_Z = 0.31
-const DUST_Z = 0.31
-const FLASH_Z = 0.33
+export const FIRE_Z = 0.31
+export const DUST_Z = 0.31
+/** The shockwave rides between the dust and the flash. */
+export const SHOCKWAVE_Z = 0.32
+export const FLASH_Z = 0.33
 const FULL_TURN = Math.PI * 2
 
 /**
- * The three pools draw a call each; the capacities are what the layer declares (#213). The debris
- * pool's call and 96 instances moved to the kernel's `SPRAY_LAYER_BUDGET` (ticket 348).
+ * The pools draw a call each: the fire and dust points, the flash-and-fireball disc and the
+ * shockwave ring (#213). The debris pool's call and 96 instances moved to the kernel's
+ * `SPRAY_LAYER_BUDGET` (ticket 348).
  */
 export const BLAST_FRONT_BUDGET = {
-  drawCalls: 3,
-  instances: SPARK_CAPACITY + FRONT_DUST_CAPACITY + 1,
+  drawCalls: 4,
+  instances: SPARK_CAPACITY + FRONT_DUST_CAPACITY + 2,
 }
 
 /** How one kind of piece leaves the front. */
-interface RingThrow {
-  pool: ParticlePool
+export interface RingThrow {
+  pool: ColouredPointPool
   speed: number
   spreadRadians: number
   lifeSeconds: number
+  colour: Rgb
 }
 
 export interface BlastFrontPools {
   fire: RingThrow
   dust: RingThrow
-  random: SeededRandom
+  flashball: Flashball
+  shockwave: Shockwave
+  randoms: BlastRandoms
   /** Scratch: one piece's spray, the blast's centre, one debris piece's request to the kernel. */
   spray: Spray
   centre: ChargePlacement
   debris: SprayRequest
   counts: FrontPoolCounts
-  fireGeometry: BufferGeometry
-  dustGeometry: BufferGeometry
-  fireMaterial: PointsMaterial
-  dustMaterial: PointsMaterial
-  flashMesh: Mesh<CircleGeometry, MeshBasicMaterial>
-  flashFramesLeft: number
 }
 
 export function createBlastFrontPools(): BlastFrontPools {
   return {
-    fire: ringThrowOf(SPARK_CAPACITY, SPARK_SPEED, RING_FIRE_SPREAD_RADIANS, SPARK_LIFE_SECONDS),
+    fire: ringThrowOf(
+      createColouredPointPool(SPARK_CAPACITY, SPARK_SIZE_PIXELS, true),
+      SPARK_SPEED,
+      RING_FIRE_SPREAD_RADIANS,
+      SPARK_LIFE_SECONDS,
+      SPARK_COLOUR,
+    ),
     dust: ringThrowOf(
-      FRONT_DUST_CAPACITY,
+      createColouredPointPool(FRONT_DUST_CAPACITY, COLLAPSE_DUST_SIZE_PIXELS, false),
       COLLAPSE_DUST_FALL_SPEED,
       RING_DUST_SPREAD_RADIANS,
       COLLAPSE_DUST_LIFE_SECONDS,
+      COLLAPSE_DUST_COLOUR,
     ),
-    random: createSeededRandom(BLAST_FRONT_SEED),
+    flashball: createFlashball(),
+    shockwave: createShockwave(SHOCKWAVE_Z),
+    randoms: createBlastRandoms(SEEDED_BLAST_SLOTS, BLAST_FRONT_SEED),
     spray: { x: 0, y: 0, dirX: 0, dirY: 1, speed: 0, spreadRadians: 0, lifeSeconds: 0 },
     centre: { x: 0, y: 0, turn: 0 },
     debris: { kind: 'debris', x: 0, y: 0, dirX: 0, dirY: 1, count: 1, priority: 'high' },
-    counts: { fire: 0, dust: 0, isFlashShown: false },
-    fireGeometry: createPointGeometry(SPARK_CAPACITY),
-    dustGeometry: createPointGeometry(FRONT_DUST_CAPACITY),
-    fireMaterial: createFireMaterial(),
-    dustMaterial: createDustMaterial(),
-    flashMesh: createFlashMesh(),
-    flashFramesLeft: 0,
+    counts: { fire: 0, dust: 0, isFlashShown: false, isShockwaveShown: false },
   }
 }
 
 /** What the pools hold on the GPU, for `useDisposeEachOnRelease`. */
 export function gpuResourcesOf(pools: BlastFrontPools) {
   return [
-    pools.fireGeometry,
-    pools.dustGeometry,
-    pools.fireMaterial,
-    pools.dustMaterial,
-    pools.flashMesh.geometry,
-    pools.flashMesh.material,
+    pools.fire.pool.geometry,
+    pools.dust.pool.geometry,
+    pools.fire.pool.material,
+    pools.dust.pool.material,
+    pools.flashball.mesh.geometry,
+    pools.flashball.mesh.material,
+    ...pools.shockwave.resources,
   ]
 }
 
 /** Throws a slice's fire, dust and debris across the ring it uncovered, outward. */
 export function throwFront(pools: BlastFrontPools, front: QueuedFront): void {
   const counts = frontSprayOf(front.rInnerMm, front.rOuterMm)
+  const random = randomOfBlastAt(pools.randoms, front.tx, front.ty)
   writeChargePlacement(front, pools.centre)
-  throwAcrossRing(pools, pools.fire, front, counts.fire)
-  throwAcrossRing(pools, pools.dust, front, counts.dust)
-  throwDebrisAcrossRing(pools, front, counts.debris)
+  throwAcrossRing(pools, pools.fire, front, counts.fire, random)
+  throwAcrossRing(pools, pools.dust, front, counts.dust, random)
+  throwDebrisAcrossRing(pools, front, counts.debris, random)
   blastFrontPresence.frontsThrown++
 }
 
-/** Lights the flash sprite over the clearing for its frames; a size with no flash shows none. */
-export function lightFlash(pools: BlastFrontPools, flash: QueuedFlash): void {
-  const sprite = flashSpriteOf(flash.size, flash.radiusMm)
-  if (sprite.opacity === 0) return
-  const centre = writeChargePlacement(flash, pools.centre)
-  pools.flashMesh.position.set(centre.x, centre.y, FLASH_Z)
-  pools.flashMesh.scale.set(sprite.radiusM, sprite.radiusM, 1)
-  pools.flashMesh.material.opacity = sprite.opacity
-  pools.flashFramesLeft = sprite.frames
-  blastFrontPresence.flashesLit++
-}
-
 export function stepBlastFrontPools(pools: BlastFrontPools, dt: number): void {
-  stepParticles(pools.fire.pool, dt)
-  stepParticles(pools.dust.pool, dt)
+  stepColoured(pools.fire.pool, dt)
+  stepColoured(pools.dust.pool, dt)
+  stepFlashball(pools.flashball, dt)
+  stepShockwave(pools.shockwave, dt)
 }
 
-/** Uploads this frame's pieces, counts the flash down a frame and records what it drew. */
+/** Uploads this frame's pieces, draws the disc and the ring, and records what it drew. */
 export function drawBlastFrontPools(pools: BlastFrontPools): void {
-  uploadPoints(pools.fire.pool, pools.fireGeometry, FIRE_Z)
-  uploadPoints(pools.dust.pool, pools.dustGeometry, DUST_Z)
-  pools.flashMesh.visible = pools.flashFramesLeft > 0
-  pools.flashFramesLeft = Math.max(0, pools.flashFramesLeft - 1)
+  uploadColoured(pools.fire.pool, FIRE_Z)
+  uploadColoured(pools.dust.pool, DUST_Z)
+  pools.counts.isFlashShown = drawFlashball(pools.flashball)
+  pools.counts.isShockwaveShown = drawShockwave(pools.shockwave)
   recordFrameDraw(pools)
+}
+
+/** Aims the spray scratch from `x, y` along a unit direction with a kind's motion. */
+export function aimSpray(
+  spray: Spray,
+  x: number,
+  y: number,
+  dirX: number,
+  dirY: number,
+  speed: number,
+  spreadRadians: number,
+  lifeSeconds: number,
+): Spray {
+  spray.x = x
+  spray.y = y
+  spray.dirX = dirX
+  spray.dirY = dirY
+  spray.speed = speed
+  spray.spreadRadians = spreadRadians
+  spray.lifeSeconds = lifeSeconds
+  return spray
 }
 
 function recordFrameDraw(pools: BlastFrontPools): void {
   const { counts } = pools
-  counts.fire = pools.fire.pool.count
-  counts.dust = pools.dust.pool.count
-  counts.isFlashShown = pools.flashMesh.visible
+  counts.fire = pools.fire.pool.pool.count
+  counts.dust = pools.dust.pool.pool.count
   raisePeak(blastFrontPresence.peak, frontLayerDrawOf(counts))
 }
 
 function ringThrowOf(
-  capacity: number,
+  pool: ColouredPointPool,
   speed: number,
   spreadRadians: number,
   lifeSeconds: number,
+  colour: string,
 ): RingThrow {
-  return { pool: createParticlePool(capacity), speed, spreadRadians, lifeSeconds }
+  return { pool, speed, spreadRadians, lifeSeconds, colour: rgbOfHex(colour) }
 }
 
 function throwAcrossRing(
@@ -186,31 +203,30 @@ function throwAcrossRing(
   ring: RingThrow,
   front: QueuedFront,
   count: number,
+  random: SeededRandom,
 ): void {
-  aimSprayAt(pools.spray, ring)
-  for (let thrown = 0; thrown < count; thrown++) throwOnePiece(pools, ring.pool, front)
-}
-
-function aimSprayAt(spray: Spray, ring: RingThrow): void {
-  spray.speed = ring.speed
-  spray.spreadRadians = ring.spreadRadians
-  spray.lifeSeconds = ring.lifeSeconds
-}
-
-/** One piece somewhere on the slice's ring, flying straight out from the blast's centre. */
-function throwOnePiece(pools: BlastFrontPools, pool: ParticlePool, front: QueuedFront): void {
-  pickRingPoint(pools, front)
-  sprayParticles(pool, pools.random, pools.spray, 1)
+  for (let thrown = 0; thrown < count; thrown++) {
+    pickRingPoint(pools, front, random, ring)
+    sprayColoured(ring.pool, random, pools.spray, 1, ring.colour)
+  }
 }
 
 /** Debris goes to the kernel spray at high priority: a held gun's tracer never takes its room. */
-function throwDebrisAcrossRing(pools: BlastFrontPools, front: QueuedFront, count: number): void {
-  for (let thrown = 0; thrown < count; thrown++) throwOneDebrisPiece(pools, front)
+function throwDebrisAcrossRing(
+  pools: BlastFrontPools,
+  front: QueuedFront,
+  count: number,
+  random: SeededRandom,
+): void {
+  for (let thrown = 0; thrown < count; thrown++) {
+    pickRingPoint(pools, front, random, pools.dust)
+    requestDebrisAtSpray(pools)
+  }
 }
 
-function throwOneDebrisPiece(pools: BlastFrontPools, front: QueuedFront): void {
+/** One kernel debris piece from where the spray scratch points. */
+export function requestDebrisAtSpray(pools: BlastFrontPools): void {
   const { spray, debris } = pools
-  pickRingPoint(pools, front)
   debris.x = spray.x
   debris.y = spray.y
   debris.dirX = spray.dirX
@@ -219,62 +235,25 @@ function throwOneDebrisPiece(pools: BlastFrontPools, front: QueuedFront): void {
 }
 
 /** Aims the spray scratch at a random point on the slice's ring, pointing out from the centre. */
-function pickRingPoint(pools: BlastFrontPools, front: QueuedFront): void {
-  const { random, spray, centre } = pools
+function pickRingPoint(
+  pools: BlastFrontPools,
+  front: QueuedFront,
+  random: SeededRandom,
+  ring: RingThrow,
+): void {
+  const { centre } = pools
   const angle = random.nextFloat() * FULL_TURN
   const reachMm = front.rInnerMm + random.nextFloat() * (front.rOuterMm - front.rInnerMm)
-  spray.dirX = Math.cos(angle)
-  spray.dirY = Math.sin(angle)
-  spray.x = centre.x + (spray.dirX * reachMm) / MM_PER_METRE
-  spray.y = centre.y + (spray.dirY * reachMm) / MM_PER_METRE
-}
-
-function uploadPoints(pool: ParticlePool, geometry: BufferGeometry, z: number): void {
-  const position = geometry.getAttribute('position') as BufferAttribute
-  for (let at = 0; at < pool.count; at++) position.setXYZ(at, pool.x[at], pool.y[at], z)
-  position.needsUpdate = true
-  geometry.setDrawRange(0, pool.count)
-}
-
-function createPointGeometry(capacity: number): BufferGeometry {
-  const geometry = new BufferGeometry()
-  geometry.setAttribute('position', new BufferAttribute(new Float32Array(capacity * 3), 3))
-  geometry.setDrawRange(0, 0)
-  return geometry
-}
-
-/** Fire glows like the drill's sparks. */
-function createFireMaterial(): PointsMaterial {
-  return new PointsMaterial({
-    color: SPARK_COLOUR,
-    size: SPARK_SIZE_PIXELS,
-    sizeAttenuation: false,
-    transparent: true,
-    blending: AdditiveBlending,
-    depthWrite: false,
-  })
-}
-
-/** Dust hangs dull like the collapse dust. */
-function createDustMaterial(): PointsMaterial {
-  return new PointsMaterial({
-    color: COLLAPSE_DUST_COLOUR,
-    size: COLLAPSE_DUST_SIZE_PIXELS,
-    sizeAttenuation: false,
-    transparent: true,
-    depthWrite: false,
-  })
-}
-
-function createFlashMesh(): Mesh<CircleGeometry, MeshBasicMaterial> {
-  const material = new MeshBasicMaterial({
-    color: FLASH_SPRITE_COLOUR,
-    transparent: true,
-    blending: AdditiveBlending,
-    depthWrite: false,
-  })
-  const mesh = new Mesh(new CircleGeometry(1, 48), material)
-  mesh.visible = false
-  mesh.frustumCulled = false
-  return mesh
+  const dirX = Math.cos(angle)
+  const dirY = Math.sin(angle)
+  aimSpray(
+    pools.spray,
+    centre.x + (dirX * reachMm) / MM_PER_METRE,
+    centre.y + (dirY * reachMm) / MM_PER_METRE,
+    dirX,
+    dirY,
+    ring.speed,
+    ring.spreadRadians,
+    ring.lifeSeconds,
+  )
 }

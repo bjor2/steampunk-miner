@@ -14,6 +14,7 @@ import { useDisposeEachOnRelease } from '../../../scene/disposeOnRelease'
 import { SHIPPED_ART } from '../../../scene/shippedArt'
 import { listenForDomainEvents } from '../../../store/domainEventBroadcast'
 import { readLiveChargesInto } from '../../../store/chargeReads'
+import { readCollapse } from '../../../store/collapseReads'
 import type { AtlasMaps } from '../../../systems/art/assetLook'
 import type { PlantedCharge } from '../../../systems/vehicle/vehicleCharges'
 import { createRingMarks, hearBlastMarks, readRingMarksInto } from '../store/blastMarkFeed'
@@ -83,7 +84,8 @@ function CraterDecals({ maps }: { maps: AtlasMaps }) {
   const map = useAtlasAlbedo(maps)
   const decals = useMemo(() => createDecalPool(map), [map])
   useDisposeEachOnRelease(useMemo(() => decals.resources, [decals]))
-  useFrame(() => recordDecalDraw(drawDecals(decals)))
+  // A cased rim glows on the authority's clock (D8 ticket 868): the tick, read without React.
+  useFrame(() => recordDecalDraw(drawDecals(decals, readCollapse().tick)))
   return <primitive object={decals.pool.mesh} />
 }
 

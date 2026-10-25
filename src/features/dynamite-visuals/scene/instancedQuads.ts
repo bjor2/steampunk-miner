@@ -84,7 +84,8 @@ export function createRingMaterial(dashes: number, opacity: number): ShaderMater
   })
 }
 
-const PLACE_VERTEX = /* glsl */ `
+/** The placing every quad shader shares: `aPlace` as (xy, width, turn); the blast shockwave reuses it. */
+export const PLACE_VERTEX = /* glsl */ `
 attribute vec4 aPlace;
 vec4 placed(vec2 corner) {
   float c = cos(aPlace.w);

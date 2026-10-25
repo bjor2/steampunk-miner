@@ -20,6 +20,7 @@ import {
 import { DYNAMITE_BLAST_CUE } from './systems/render/blastCueProvider'
 import { dynamiteArtAssets } from './systems/render/dynamiteArt'
 import { RACK_ATTACH_USE } from './systems/render/rackLook'
+import { BlastShowcaseBanner } from './ui/BlastShowcaseBanner'
 
 export const slice: SliceDefinition = {
   id: 'dynamite-visuals',
@@ -33,10 +34,16 @@ export const slice: SliceDefinition = {
       Layer: PlantedDynamiteLayer,
       budget: PLANTED_DYNAMITE_BUDGET,
     })
-    // The ring and flash of every blast, following its BlastFront slices (K6); debris is sprayed.
+    // Every blast's explosion stages and its front, following its BlastFront slices (K6); debris is sprayed.
     r.sceneLayer({ id: BLAST_FRONT_LAYER_ID, Layer: BlastFrontLayer, budget: BLAST_FRONT_BUDGET })
     // Each type's crater decal, the rings round a live charge and its fuse sparks (D7, #866).
     r.sceneLayer({ id: BLAST_MARKS_LAYER_ID, Layer: BlastMarksLayer, budget: BLAST_MARKS_BUDGET })
+    // The charge's name over the first blast after its first purchase (D8 ticket 868, GD 04:53).
+    r.hudPanel({
+      id: 'dynamite-visuals.showcase-banner',
+      slot: 'banner',
+      Panel: BlastShowcaseBanner,
+    })
     r.chargeBlastCue(DYNAMITE_BLAST_CUE)
     // steampunkDebug.features['dynamite-visuals'].getRack()
     r.debugActions(dynamiteVisualsDebugActions)

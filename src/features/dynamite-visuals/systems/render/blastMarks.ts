@@ -21,9 +21,14 @@ import { CRATER_MARKS, DECALS_PER_CRATER, FUSE_SPARKS_PER_TYPE } from './blastLo
 
 export type { CraterDecal }
 
-/** One blast's crater: where it stands, turned to the planet's radial up, and its decals. */
+/**
+ * One blast's crater: where it stands, turned to the planet's radial up, its decals, the tick it
+ * blew and whether casing lines it (its rim glows as the smoke clears, D8 ticket 868).
+ */
 export interface CraterMark extends ChargePlacement {
   decals: CraterDecal[]
+  tick: number
+  isCased: boolean
 }
 
 /** A live charge's rings, in metres from the charge tile's centre. */
@@ -100,5 +105,8 @@ function cratersAfterEvent(
     { chargeType: event.chargeType, groundRadiusMm, casingLaid: event.casingLaid },
     answers.casingOf(),
   )
-  return [...craters, { ...chargePlacementOf(event), decals }].slice(-CRATER_MARKS)
+  const isCased = event.casingLaid && answers.casingOf() !== null
+  return [...craters, { ...chargePlacementOf(event), decals, tick: event.tick, isCased }].slice(
+    -CRATER_MARKS,
+  )
 }

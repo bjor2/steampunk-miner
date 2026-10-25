@@ -25,12 +25,14 @@ describe('dynamite-visuals scene layers', () => {
     expect(sceneLayersBudget(layers).drawCalls).toBeLessThanOrEqual(SCENE_LAYER_LINE.drawCalls)
   })
 
-  it('draws the front in three pooled calls, its debris in the kernel spray at the same count (#213 pin)', () => {
+  it('draws the front in four pooled calls, its debris in the kernel spray at the same count (#213 pin)', () => {
     const front = withRegistrations([slice], sceneLayers).find((layer) =>
       layer.id.endsWith('.front'),
     )
-    // The dust pool is the fire pool's size since D7 (ticket 866) carved the marks from its 64.
-    expect(front?.budget).toEqual({ drawCalls: 3, instances: 256 + 256 + 1 })
+    // The dust pool is the fire pool's size since D7 (ticket 866) carved the marks from its 64;
+    // the explosion pass (D8, ticket 868) adds the shockwave ring's call and instance beside the
+    // flash-and-fireball disc, out of the line's headroom.
+    expect(front?.budget).toEqual({ drawCalls: 4, instances: 256 + 256 + 2 })
     expect(KERNEL_SCENE_LAYER_BUDGET).toEqual({ drawCalls: 1, instances: 96 })
   })
 

@@ -127,19 +127,23 @@ export interface LayerDraw {
   instances: number
 }
 
-/** The pieces the front's pools hold this frame, and whether the flash sprite shows. */
+/**
+ * The pieces the front's pools hold this frame, and whether the flash-and-fireball disc and the
+ * shockwave ring show (D8, ticket 868).
+ */
 export interface FrontPoolCounts {
   fire: number
   dust: number
   isFlashShown: boolean
+  isShockwaveShown: boolean
 }
 
 export function frontLayerDrawOf(counts: FrontPoolCounts): LayerDraw {
-  const flash = counts.isFlashShown ? 1 : 0
+  const sprites = (counts.isFlashShown ? 1 : 0) + (counts.isShockwaveShown ? 1 : 0)
   const pools = [counts.fire, counts.dust]
   return {
-    drawCalls: pools.filter((count) => count > 0).length + flash,
-    instances: counts.fire + counts.dust + flash,
+    drawCalls: pools.filter((count) => count > 0).length + sprites,
+    instances: counts.fire + counts.dust + sprites,
   }
 }
 

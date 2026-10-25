@@ -134,14 +134,16 @@ describe('blast flash sprite', () => {
 
 describe('blast front layer draw', () => {
   it('draws a call per pool holding any piece, and the flash sprite while it shows', () => {
-    expect(frontLayerDrawOf({ fire: 0, dust: 0, isFlashShown: false })).toEqual({
-      drawCalls: 0,
-      instances: 0,
-    })
-    expect(frontLayerDrawOf({ fire: 40, dust: 12, isFlashShown: true })).toEqual({
-      drawCalls: 3,
-      instances: 53,
-    })
+    expect(
+      frontLayerDrawOf({ fire: 0, dust: 0, isFlashShown: false, isShockwaveShown: false }),
+    ).toEqual({ drawCalls: 0, instances: 0 })
+    expect(
+      frontLayerDrawOf({ fire: 40, dust: 12, isFlashShown: true, isShockwaveShown: false }),
+    ).toEqual({ drawCalls: 3, instances: 53 })
+    // The shockwave ring is the fourth call (D8 ticket 868).
+    expect(
+      frontLayerDrawOf({ fire: 40, dust: 12, isFlashShown: true, isShockwaveShown: true }),
+    ).toEqual({ drawCalls: 4, instances: 54 })
   })
 
   it('keeps the highest draw seen', () => {

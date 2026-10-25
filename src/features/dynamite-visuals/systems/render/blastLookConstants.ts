@@ -162,3 +162,6 @@ export const FUSE_BUILD_SECONDS = 3
 export const SEEDED_BLAST_SLOTS = 4
 /** Collapse falls waiting for the next frame. */
 export const QUEUED_FALLS = 16
+/** Chips fly this long; the collapse fall's dust takes the dust colour darkened to this share. */
+export const CHIP_SECONDS = 0.8
+export const FALL_CHIP_SHADE = 0.6
