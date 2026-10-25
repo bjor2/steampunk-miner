@@ -147,7 +147,10 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   bot does not land); for the premium ledger (ticket 844), `setPremiumLedger(counts)` (the
   `debug.setPremiumLedger` command: counts keyed `tier:s:p:speciesId`, each a decimal count from 1,
   refused whole when one is malformed or a tier counts more than the hold holds) and the unlogged
-  read `premiumLedger()`.
+  read `premiumLedger()`; for the hazards' contact effects (ticket 848), `placeHazard(kind, tx, ty)`
+  (the `debug.placeHazard` command: a hazard of a kind with a contact-effect row, `rockfall`,
+  `firedamp`, `spinecrystal` or `steamvent`, in one cell on any planet, read before the planet's
+  own pockets; a kind no row plays is refused and nothing is placed).
   Premium ledger specs (ticket 844) fill the hold with `withVehicle` (cargo has no scenario field
   yet) and set the counts through `debug.setPremiumLedger`; the premium species and the merchant's
   premium row are a probe slice inside `withRegistrations`, since no slice registers `orePremium` or
@@ -547,6 +550,22 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   5 show no hazard line, and a magnetic planet keeps its class card alone.
   `e2e/browser/planetCard.spec.ts` (box Tester) reads each line through `steampunkDebug.ui` and
   checks the card and its texts stay inside a 360 px window.
+- **Hazard contact effects and tool trade-offs** (ticket 848, spec #647; the GD lock on #823
+  Q1/Q2): `src/systems/authority/hazards/hazardContacts.test.ts` plays each of the four effects on
+  planet 1 through `debug.placeHazard` (the loaded `ores` rows): a spinecrystal bite once a cell
+  (a frontal hit, a quarter of the share), a rockfall refill farthest from the rig first with its
+  crush and no second yield, a vent's shove as a glide up an open shaft (input locked) and none into
+  rubble, a firedamp drain per command down to the 25% floor, and a contact on the cutting rig
+  alone. Its factor-0 spec registers a probe pocket provider and rows on planet 2 inside
+  `withRegistrations`: every factor at 0 replays byte-identical to no rows at all, and a tool hook
+  scales a bite, the smallest hook winning. `economy/hazardContactLaw.test.ts` pins the hull law at
+  g = 1 and 1e6 and the arc multipliers; `hazards/hazardDive.test.ts` the dock reset and the
+  snapshot; `registries/contactEffects.test.ts` and `registries/toolTradeOffs.test.ts` the
+  registries' guards, the acting-only trade-off and byte-identical driving with no tool acting;
+  `logging/hazardContactLines.test.ts` the NDJSON lines; `bot/botHazardRubble.test.ts` the bot
+  boring rockfall rubble out. The bare bot over P2 to P5 (22 to 30 min, money per minute within 5%
+  of #551, hazards at most 5% of the sales to the core) is the R3 lane,
+  `src/logging/radiusRebaseline.lane.test.ts` (box Tester).
 - **Hazard pockets in the ground** (ticket 652): `src/features/ores/systems/hazardPockets.test.ts`
   reads the pockets through the kernel's `hazardPockets` seam on generated cells. On each of the
   pacing seeds 83921, 31415 and 27182, each of planets 2 to 5 holds a pocket of its own row's kind

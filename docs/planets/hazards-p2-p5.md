@@ -74,6 +74,36 @@ seeds 83921, 31415 and 27182 every one of P2–P5 holds a pocket within 20 colum
 point (72 to 277 pocket tiles in those 41 columns, the nearest in column 0 or 1).
 The contact reaction (the four effects above) and each kind's look are not part of ticket 652.
 
+**As built (ticket 848, the GD lock on #823 Q1/Q2).** The four effects are rows of the kernel's
+contact-effect registry, keyed by hazard kind (`src/systems/registries/contactEffects.ts`); the
+`ores` slice registers each kind of `planets.hazards` as a row, so a new hazard is a new kind in
+the table. What changed against the table above:
+
+- **Factors.** Every kind carries `factorBp`, the scale on all of its numbers (10000 shipped). A
+  factor of 0 plays nothing and logs nothing, so a replay with every factor at 0 is byte-identical.
+  A tool or consumable answers a factor hook for a kind (`contactFactors`); the smallest answer
+  applies on top, never stacked.
+- **Hull law at g.** Crush, bite and scald are a share of the planet's on-curve hull (never V(t)),
+  weighed by the arc the cell lies in with enemy contact's multipliers (front 0.25, side 1, rear 2),
+  so a frontal hit takes less than a side or rear one. A dive's hazard hits stop at the caps'
+  `diveHullCapBp` (2500), counted on the vehicle until the dock.
+- **Rockfall.** `refillShareBp` (10000) of the cut refills, farthest from the rig first; a rig is
+  never buried (the collapse refill's clearance). The crush plays only when rubble fell. The cell
+  stays yielded, so the rubble is cut again for no ore and no second contact.
+- **Firedamp.** The drain plays while the rig stands in a cut pocket, settled on each of its
+  commands: `energyShareBp` of the owned energy track every `ticks`, never below `floorBp` (2500, the
+  rescue tow's quarter of the tank), so it never strands the rig. Breaching the pocket costs
+  nothing by itself.
+- **Steam vents.** The shove runs along the vent's normal, the direction from the vent to the rig,
+  through open cells only (air at most half dense), as a glide over `ticks`: input locked, the
+  drill at rest, never into ground.
+- **Logs and scenarios.** `hazard_refill`, `hazard_bite`, `hazard_shove` and `hazard_drain`;
+  `debug.placeHazard {kind, tx, ty}` (`steampunkDebug.placeHazard`) places any kind in any cell.
+
+Every hazard can be passed with no tool: no effect takes money directly, the drain keeps a quarter
+of the tank and the shove never pushes into rock. The R3 lane holds the bare bot to 22 to 30 minutes
+a planet with hazard repairs and recharges at most 5% of the sales to the core.
+
 ## The card line
 
 The planet card (ticket 343) reads the tag and the arrival line keyed by the planet row (ticket

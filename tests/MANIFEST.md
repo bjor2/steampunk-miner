@@ -382,7 +382,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ore-visuals/systems/oreGradeChannels.test.ts` | 7 | 7 |
 | `src/features/ore-visuals/systems/render/oreLookProvider.test.ts` | 21 | 10 |
 
-### `ores`: 31 files, 254 tests
+### `ores`: 32 files, 256 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -398,6 +398,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/gemRows.test.ts` | 7 | 7 |
 | `src/features/ores/systems/gemTiers.test.ts` | 6 | 6 |
 | `src/features/ores/systems/hazardCardSource.test.ts` | 5 | 5 |
+| `src/features/ores/systems/hazardContactRows.test.ts` | 1 | 1 |
 | `src/features/ores/systems/hazardNearDock.test.ts` | 2 | 2 |
 | `src/features/ores/systems/hazardPockets.test.ts` | 7 | 7 |
 | `src/features/ores/systems/kernelOreAliases.test.ts` | 2 | 2 |
@@ -407,7 +408,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/oreCensus.test.ts` | 4 | 4 |
 | `src/features/ores/systems/oreRows.test.ts` | 3 | 3 |
 | `src/features/ores/systems/oreTypeProvider.test.ts` | 6 | 6 |
-| `src/features/ores/systems/planetHazards.test.ts` | 14 | 14 |
+| `src/features/ores/systems/planetHazards.test.ts` | 15 | 15 |
 | `src/features/ores/systems/planetLooks.test.ts` | 12 | 12 |
 | `src/features/ores/systems/planetNames.test.ts` | 10 | 10 |
 | `src/features/ores/systems/planetRows.test.ts` | 14 | 14 |
@@ -909,6 +910,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/featureUnlocks.test.ts` | 11 | 11 |
 | `src/systems/authority/groundDrill.test.ts` | 3 | 3 |
 | `src/systems/authority/gunRules.test.ts` | 12 | 12 |
+| `src/systems/authority/hazards/hazardContacts.test.ts` | 11 | 11 |
+| `src/systems/authority/hazards/hazardDive.test.ts` | 4 | 4 |
 | `src/systems/authority/heatCapReadings.test.ts` | 18 | 18 |
 | `src/systems/authority/heatRun.test.ts` | 13 | 13 |
 | `src/systems/authority/heatWorkUncapped.test.ts` | 10 | 10 |
@@ -1013,6 +1016,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/botDownCutRule.test.ts` | 5 | 5 |
 | `src/systems/bot/botGearLava.test.ts` | 3 | 3 |
 | `src/systems/bot/botGuns.test.ts` | 4 | 4 |
+| `src/systems/bot/botHazardRubble.test.ts` | 2 | 2 |
 | `src/systems/bot/botHeat.test.ts` | 10 | 10 |
 | `src/systems/bot/botMarginalOffers.test.ts` | 2 | 2 |
 | `src/systems/bot/botMoneyLint.test.ts` | 6 | 3 |
@@ -1056,6 +1060,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/debug/debugMaterialPop.test.ts` | 3 | 3 |
 | `src/debug/debugMemory.test.ts` | 4 | 4 |
 | `src/debug/debugOverlay.test.ts` | 2 | 2 |
+| `src/debug/debugPlaceHazard.test.ts` | 2 | 2 |
 | `src/debug/debugPremiumLedger.test.ts` | 3 | 3 |
 | `src/debug/debugSaves.test.ts` | 5 | 5 |
 | `src/debug/debugScreens.test.ts` | 36 | 35 |
@@ -1095,8 +1100,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/enemyStats.test.ts` | 30 | 28 |
 | `src/systems/economy/fuelTank.test.ts` | 4 | 4 |
 | `src/systems/economy/gunStats.test.ts` | 9 | 9 |
+| `src/systems/economy/hazardContactLaw.test.ts` | 4 | 4 |
 | `src/systems/economy/heatEconomy.test.ts` | 11 | 11 |
-| `src/systems/economy/itemEffectCaps.test.ts` | 6 | 6 |
+| `src/systems/economy/itemEffectCaps.test.ts` | 7 | 7 |
 | `src/systems/economy/itemHookCaps.test.ts` | 8 | 8 |
 | `src/systems/economy/jumpFuel.test.ts` | 9 | 9 |
 | `src/systems/economy/magnetCaps.test.ts` | 5 | 5 |
@@ -1205,6 +1211,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/gateRouteStalls.test.ts` | 2 | 2 |
 | `src/logging/gemHaulPace.test.ts` | 2 | 2 |
 | `src/logging/goldenSliceSections.test.ts` | 4 | 4 |
+| `src/logging/hazardContactLines.test.ts` | 1 | 1 |
 | `src/logging/heatReport.test.ts` | 2 | 2 |
 | `src/logging/heatWorkUncappedGolden.test.ts` | 27 | 3 |
 | `src/logging/knownRed.test.ts` | 12 | 9 |
@@ -1221,7 +1228,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/planetOneDrillPace.test.ts` | 6 | 6 |
 | `src/logging/purchaseChains.test.ts` | 7 | 7 |
 | `src/logging/radiusRebaseline.lane.test.ts` | 2 | 2 |
-| `src/logging/radiusRebaseline.test.ts` | 15 | 15 |
+| `src/logging/radiusRebaseline.test.ts` | 17 | 17 |
 | `src/logging/refineryReport.test.ts` | 5 | 5 |
 | `src/logging/registries/runEvents.test.ts` | 4 | 4 |
 | `src/logging/reportCapsuleOffGolden.test.ts` | 19 | 3 |
@@ -1333,6 +1340,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/chargeBlastCue.test.ts` | 5 | 5 |
 | `src/systems/registries/clockSteps.test.ts` | 4 | 4 |
 | `src/systems/registries/commandRules.test.ts` | 4 | 4 |
+| `src/systems/registries/contactEffects.test.ts` | 5 | 5 |
 | `src/systems/registries/content.test.ts` | 4 | 4 |
 | `src/systems/registries/discovery.test.ts` | 2 | 2 |
 | `src/systems/registries/dockFacilities.test.ts` | 5 | 5 |
@@ -1363,6 +1371,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/seal.test.ts` | 12 | 12 |
 | `src/systems/registries/soundCues.test.ts` | 2 | 2 |
 | `src/systems/registries/spendFamilies.test.ts` | 11 | 11 |
+| `src/systems/registries/toolTradeOffs.test.ts` | 9 | 9 |
 | `src/systems/registries/vehicleLoadout.test.ts` | 14 | 14 |
 
 ### `render`
