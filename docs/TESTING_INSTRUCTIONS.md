@@ -1381,17 +1381,17 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   prints the blast trade (`blastTrade.ts`: per band of planets 7 to 10, drill time over the floor,
   ore money a minute drilling against blasting, and 3 tiles of shaft either way, for the on-curve
   drill and one 12 levels behind), then the size guard (`chargeSizeTrade.ts`, #143 guard 1: every
-  size on its unlock planet and planet 40, every band, at 24 and 45 ticks a tile, a blast's net ore
-  money a minute against the drill's at the band's density and centred on a full patch), then the
-  payoff guard (`chargePayoff.ts`, #143 guard 2 as the GD lock on K8 #218 wrote it: one `minCharge`
-  on a +1 or +2 dynamite-gated lead patch in bands 3 to 5 of planets 7 to 40 and 50, the patch cells
+  size on planets 1 and 40, as every size is sold from planet 1 since D4 #863, every band, at 24
+  and 45 ticks a tile, a blast's net ore money a minute against the drill's at the band's density
+  and centred on a full patch), then the payoff guard (`chargePayoff.ts`, #143 guard 2 as the GD
+  lock on K8 #218 wrote it: the smallest charge whose type breaks the gate tier (D4 #863) of a +1
+  or +2 dynamite-gated lead patch in bands 3 to 5 of planets 7 to 40 and 50, the patch cells
   inside the radius at the lead tier over the charge's price, expected at 2 or more, with #142's 15%
   share cap beside it for information; #148 gates the bot's `gate_cleared` medians), then the same
-  guard under #142's share model (`chargeSharePayoff.ts`, ticket 247: every open size up to the
-  band, in each band the seed's gate table gives dynamite-gated lead cells on planets 7 to 40 and
-  50, the gated value one charge frees capped by the 15% guard over its price; the table's shape
-  is the snapshot in `logging/chargeSharePayoffReport.test.ts`), then plays
-  the bot scenario to planet 40's core on each pacing seed blasting (the bot's default) and never,
+  guard under #142's share model (`chargeSharePayoff.ts`, ticket 247: every size, in each band the
+  seed's gate table gives dynamite-gated lead cells on planets 7 to 40 and 50, the gated value one
+  charge frees capped by the 15% guard over its price; the table's shape is the snapshot in
+  `logging/chargeSharePayoffReport.test.ts`), then plays the bot scenario to planet 40's core on each pacing seed blasting (the bot's default) and never,
   and prints both median core times per planet, the blasts and whether each is inside C4: planets 7
   to 10 judged, 13 to 34 and 40 diagnostic until #148. Last, the dynamite gate (GD lock on #148,
   ticket 236, the GD ruling on ticket 237): the shells each seed's blasting bot freed
@@ -1415,7 +1415,7 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   `features/mining-gates/systems/botShaftJog.test.ts`). The tally and the tables are
   `logging/gateClearTally.ts`, `gateClearTables.ts` and `gateRouteStalls.ts`, with their specs. Reported, never gated; the one lever is the price per charge. The band-density guard is also a spec (`bot/chargeSizeTrade.test.ts`). Charge
   specs stand in band-2 rock with `charges/chargeFixtures.ts`, and the size specs in solid rock of
-  the planet their size opens on (`sizedBlasterOn`); the bot's blasting run starts on planet 7 with
+  the planet they name (`sizedBlasterOn`; every size is sold on every planet since D4 #863); the bot's blasting run starts on planet 7 with
   a stocked rack and a lagging drill (`bot/botBlasting.test.ts`). The bot buys charges only on a
   planet where it met a tile it would blast with none in stock (#129, `bot/botChargeNeed.test.ts`:
   an on-curve run plays exactly like `chargePolicy: 'never'`); the stuck rule buys size 1 and the
@@ -1427,7 +1427,11 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   touched and waited out, then bored or entered (`mining-gates/systems/botExtractors.test.ts`);
   the verbs themselves are specced on generated cells with `extractorFixtures.ts`. Gate
   specs name a gate-table entry as a cell at a tile of its band, or scan the generated world for
-  one (`mining-gates/systems/gateFixtures.ts`).
+  one (`mining-gates/systems/gateFixtures.ts`). Blast-only rock is never the only route to a core
+  (D4 #863): `mining-gates/systems/coreRoute.test.ts` walks a 17-column strip of the generated
+  ground from above the surface to the core of every planet of systems 2, 3, 40 and 1e6 on the
+  three pacing seeds, passing all but core and the tier-3 rock type-1 and type-2 charges leave
+  standing (about 15 s), beside a band shelled in tier-3 rock that only type 3 opens.
 - **Heat** (#113 acceptance 4): `npm run balance:heat` plays the bot scenario to planet 10's core
   and prints planets 8 to 10 (`heatPlanetLines`): each core time against the campaign's 45 to 60
   minutes (C4), when refractory was unlocked, the refractory laid, the throttle and heat-damage
