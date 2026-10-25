@@ -2,11 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { ceilMilli, cmp, fromCanonical, mul, toCanonical, type BigStat } from '../money'
 import { bandOrePriceAt, bandOreWorthAt } from './bandOreCost'
 import {
+  breaksGateOf,
   chargeCostOf,
   chargePrice,
   chargeRadiusMm,
   chargeSizeCount,
   chargeSpec,
+  chargeTypeOf,
   fuseTicksOf,
   isInChargeRadius,
   isInLethalCore,
@@ -25,7 +27,7 @@ import economyFile from './economy.json'
 import { oreTier, oreValue } from './oreEconomy'
 import { paceScale } from './planetEconomy'
 
-const SIZES = Array.from({ length: 10 }, (_, at) => at + 1)
+const SIZES = Array.from({ length: 12 }, (_, at) => at + 1)
 
 function textOf(amount: BigStat): string {
   return toCanonical(amount)
@@ -46,21 +48,41 @@ function economyWithSizes(sizes: Record<string, unknown>) {
   return { ...economyFile, blastingCharges: { ...charges, sizes: { ...charges.sizes, ...sizes } } }
 }
 
+function economyWithRadiusTrack(radiusTrack: Record<string, unknown>) {
+  const charges = economyFile.blastingCharges
+  return { ...economyFile, blastingCharges: { ...charges, radiusTrack } }
+}
+
 describe('charge size ladder', () => {
-  it('has ten sizes on the one radius ladder 2.5, 3.5, 4.5, 6, 8, 10, 13, 16, 20 and 24 tiles', () => {
-    expect(chargeSizeCount()).toBe(10)
+  it('has twelve sizes on the one radius ladder 2.5 to 37 tiles, the shipped ten unchanged', () => {
+    expect(chargeSizeCount()).toBe(12)
     expect(SIZES.map(chargeRadiusMm)).toEqual([
-      2500, 3500, 4500, 6000, 8000, 10000, 13000, 16000, 20000, 24000,
+      2500, 3500, 4500, 6000, 8000, 10000, 13000, 16000, 20000, 24000, 30000, 37000,
     ])
   })
 
-  it('opens size n on planet 7 + 3(n - 1), size 10 on planet 34', () => {
-    expect(SIZES.map(sizeUnlockPlanet)).toEqual([7, 10, 13, 16, 19, 22, 25, 28, 31, 34])
+  it('makes sizes 1 to 4 type 1, 5 to 8 type 2 and 9 to 12 type 3', () => {
+    expect(SIZES.map(chargeTypeOf)).toEqual([1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3])
   })
 
-  it('names the largest open size of a planet, none before planet 7 and 10 from planet 34 on', () => {
-    expect([6, 7, 9, 10, 22, 33, 34, 40, 500].map(largestSizeOn)).toEqual([
-      0, 1, 1, 2, 6, 9, 10, 10, 10,
+  it('lets type 1 break gate tier 1, type 2 tiers 1 and 2, and type 3 every tier', () => {
+    expect([1, 4, 5, 8, 9, 12].map(breaksGateOf)).toEqual([
+      [1],
+      [1],
+      [1, 2],
+      [1, 2],
+      [1, 2, 3],
+      [1, 2, 3],
+    ])
+  })
+
+  it('opens size n on planet 7 + 3(n - 1), size 12 on planet 40', () => {
+    expect(SIZES.map(sizeUnlockPlanet)).toEqual([7, 10, 13, 16, 19, 22, 25, 28, 31, 34, 37, 40])
+  })
+
+  it('names the largest open size of a planet, none before planet 7 and 12 from planet 40 on', () => {
+    expect([6, 7, 9, 10, 22, 33, 34, 39, 40, 500].map(largestSizeOn)).toEqual([
+      0, 1, 1, 2, 6, 9, 10, 11, 12, 12,
     ])
   })
 
@@ -71,12 +93,25 @@ describe('charge size ladder', () => {
     expect(isSizeLockedOn(1, 1)).toBe(false)
   })
 
-  it('takes 1, 1, 1, 2, 2, 3, 4, 5, 6 and 8 rack slots, so a size 10 fills a full rack', () => {
-    expect(SIZES.map(rackSlotsOf)).toEqual([1, 1, 1, 2, 2, 3, 4, 5, 6, 8])
+  it('takes 1, 1, 1, 2, 2, 3, 4, 5, 6, 8, 8 and 8 rack slots, so sizes 10 to 12 fill a full rack', () => {
+    expect(SIZES.map(rackSlotsOf)).toEqual([1, 1, 1, 2, 2, 3, 4, 5, 6, 8, 8, 8])
   })
 
-  it('fuses sizes 1 to 6 at 120, 120, 120, 150, 180 and 210 ticks and leaves 7 to 10 to the plunger', () => {
-    expect(SIZES.map(fuseTicksOf)).toEqual([120, 120, 120, 150, 180, 210, null, null, null, null])
+  it('fuses sizes 1 to 6 at 120, 120, 120, 150, 180 and 210 ticks and leaves 7 to 12 to the plunger', () => {
+    expect(SIZES.map(fuseTicksOf)).toEqual([
+      120,
+      120,
+      120,
+      150,
+      180,
+      210,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+    ])
     expect(remoteDisarmTicks()).toBe(3600)
   })
 
@@ -126,6 +161,8 @@ describe('charge size ladder', () => {
       true,
       true,
       true,
+      true,
+      true,
     ])
   })
 
@@ -139,6 +176,8 @@ describe('charge size ladder', () => {
   it('reads one spec per size from the table, priced for one charge', () => {
     expect(chargeSpec(7, 25)).toEqual({
       size: 7,
+      type: 2,
+      breaksGate: [1, 2],
       radiusMm: 13000,
       unlockPlanet: 25,
       price: chargePrice(7, 1, 25),
@@ -150,7 +189,7 @@ describe('charge size ladder', () => {
 
   it('refuses a size outside the ladder', () => {
     expect(() => chargeRadiusMm(0)).toThrow(RangeError)
-    expect(() => rackSlotsOf(11)).toThrow(RangeError)
+    expect(() => rackSlotsOf(13)).toThrow(RangeError)
     expect(() => keptFractionOf(1.5)).toThrow(RangeError)
   })
 })
@@ -166,7 +205,7 @@ describe('minCharge of a dynamite-gated cell', () => {
     expect(minChargeFor({ lead: 2, band: 5 }, 13)).toBe(3)
   })
 
-  it('never asks more than the cell band, so sizes 6 to 10 are never a toll', () => {
+  it('never asks more than the cell band, so sizes 6 to 12 are never a toll', () => {
     expect(minChargeFor({ lead: 2, band: 5 }, 40)).toBe(5)
     expect(minChargeFor({ lead: 2, band: 4 }, 40)).toBe(4)
     expect(minChargeFor({ lead: 1, band: 1 }, 40)).toBe(1)
@@ -189,7 +228,7 @@ describe('charge size ladder data', () => {
   })
 
   it('refuses a size that would not fit a full rack', () => {
-    const rackSlots = [1, 1, 1, 2, 2, 3, 4, 5, 6, 9]
+    const rackSlots = [1, 1, 1, 2, 2, 3, 4, 5, 6, 8, 8, 9]
     const problems = readEconomy(economyWithSizes({ rackSlots })).problems
     expect(problems).toContain('blastingCharges.sizes.rackSlots must fit 1 to rackMax')
   })
@@ -197,5 +236,38 @@ describe('charge size ladder data', () => {
   it('keeps every fuse a whole number of ticks above zero', () => {
     const problems = readEconomy(economyWithSizes({ fuseTicks: [120, 0] })).problems
     expect(problems).toContain('blastingCharges.sizes.fuseTicks must be at least 1')
+  })
+
+  it('refuses a radius that is not a whole number of half-tiles', () => {
+    const radius = [...economyFile.blastingCharges.sizes.radius]
+    radius[11] = '37.25'
+    const problems = readEconomy(economyWithSizes({ radius })).problems
+    expect(problems).toContain('blastingCharges.sizes.radius must be whole half-tiles')
+  })
+
+  it('refuses a type list that skips a type or steps back', () => {
+    const type = [1, 1, 1, 1, 3, 3, 3, 3, 2, 2, 2, 2]
+    const problems = readEconomy(economyWithSizes({ type })).problems
+    expect(problems).toContain(
+      'blastingCharges.sizes.type must run from 1 up to every type, never down',
+    )
+  })
+
+  it('refuses a type that breaks no gate tier', () => {
+    const problems = readEconomy(
+      economyWithSizes({ breaksGateByType: [[1], [], [1, 2, 3]] }),
+    ).problems
+    expect(problems).toContain(
+      'blastingCharges.sizes.breaksGateByType must list at least one gate tier from 1 per type',
+    )
+  })
+
+  it('refuses a radius track whose root is not the square root the integer r² needs', () => {
+    const problems = readEconomy(
+      economyWithRadiusTrack({ levelDivisor: 16, exponent: '0.6' }),
+    ).problems
+    expect(problems).toContain(
+      'blastingCharges.radiusTrack.exponent must be 0.5: r² is an integer only then',
+    )
   })
 })

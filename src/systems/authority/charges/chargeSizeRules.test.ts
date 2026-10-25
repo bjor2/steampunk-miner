@@ -40,7 +40,7 @@ describe('charge sizes: planting (K8 #218)', () => {
 
   it('refuses a size off the ladder', () => {
     const { session, stand, wall } = sizedBlasterOn(16, 1)
-    expect(plantSized(session, { stand, wall }, 11, 1)).toMatchObject([{ reason: 'out_of_range' }])
+    expect(plantSized(session, { stand, wall }, 13, 1)).toMatchObject([{ reason: 'out_of_range' }])
   })
 })
 

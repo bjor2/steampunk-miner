@@ -15,9 +15,9 @@ describe('dynamite-visuals debug reads', () => {
   })
 
   it('refuses to preview a size the ladder does not list, applying nothing', () => {
-    expect(dynamiteVisualsDebugActions.previewBlast(11)).toEqual({
+    expect(dynamiteVisualsDebugActions.previewBlast(13)).toEqual({
       ok: false,
-      problems: ['size must be 1 to 10, got 11'],
+      problems: ['size must be 1 to 12, got 13'],
     })
     expect(dynamiteVisualsDebugActions.previewBlast(10)).toEqual({ ok: true })
   })

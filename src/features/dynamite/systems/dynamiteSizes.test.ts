@@ -7,10 +7,10 @@ import { chargeSpec, minChargeFor } from '../index'
 describe('dynamite sizes: content', () => {
   it('registers one size entry per rung of the kernel ladder, each with its own icon', () => {
     const sizes = contentOf('dynamite-size')
-    expect(sizes.map((entry) => entry.size)).toEqual([1, 10, 2, 3, 4, 5, 6, 7, 8, 9])
-    expect(sizes.map((entry) => entry.id)).toContain('dynamite.size_10')
+    expect(sizes.map((entry) => entry.size)).toEqual([1, 10, 11, 12, 2, 3, 4, 5, 6, 7, 8, 9])
+    expect(sizes.map((entry) => entry.id)).toContain('dynamite.size_12')
     expect(sizes.filter((entry) => iconUrlOf(entry.iconId) === null)).toEqual([])
-    expect(new Set(sizes.map((entry) => entry.iconId)).size).toBe(10)
+    expect(new Set(sizes.map((entry) => entry.iconId)).size).toBe(12)
   })
 
   it('ships the remote_detonator schedule row from the first plunger-only size', () => {

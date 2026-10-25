@@ -18,11 +18,11 @@ export interface PlantedCharge {
   ty: number
   size: number
   plantedTick: number
-  /** Null for a remote charge (sizes 7 to 10): only the plunger fires it (#149). */
+  /** Null for a remote charge (sizes 7 to 12): only the plunger fires it (#149). */
   detonateTick: number | null
 }
 
-/** Charges carried by size, keyed `"1"` to `"10"`; a size with none has no key. */
+/** Charges carried by size, keyed `"1"` to `"12"`; a size with none has no key. */
 export type CarriedBySize = Readonly<Record<string, number>>
 
 export interface VehicleCharges {

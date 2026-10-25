@@ -127,7 +127,7 @@ describe('charge sizes at the Upgrade bay (K8 #218)', () => {
 
   it('refuses a size off the ladder and a buy of no charges', () => {
     const shop = shopOn(40)
-    expect(shop.submit(restock(11, 1))).toMatchObject([{ reason: 'out_of_range' }])
+    expect(shop.submit(restock(13, 1))).toMatchObject([{ reason: 'out_of_range' }])
     expect(shop.submit(restock(0, 1))).toMatchObject([{ reason: 'out_of_range' }])
     expect(shop.submit(restock(1, 0))).toMatchObject([{ reason: 'out_of_range' }])
   })

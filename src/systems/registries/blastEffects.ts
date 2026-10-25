@@ -13,7 +13,7 @@ export interface BlastEvent {
   ty: number
   radiusMm: number
   /**
-   * The rung on the dynamite ladder (#153, numbers on #143), 1 to 10; `radiusMm` is that rung's
+   * The rung on the dynamite ladder (#153, numbers on #143), 1 to 12; `radiusMm` is that rung's
    * radius. The shipped charge is size 1.
    */
   size: number

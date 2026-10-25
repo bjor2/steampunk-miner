@@ -1,15 +1,19 @@
 /**
  * The dynamite size ladder (#143 numbers with amendments 2 and 3, #153 design and amendments, the
- * Game Director, Technical Director and Systems locks on #149, K8 #218). Sizes run from 1 to
- * `chargeSizeCount()`; size 1 is the shipped `blasting_charges` charge (#109) with all its numbers.
+ * Game Director, Technical Director and Systems locks on #149, K8 #218; 12 rows of 3 types, D1
+ * #860 with the D6 radii of #865). Sizes run from 1 to `chargeSizeCount()`; size 1 is the shipped
+ * `blasting_charges` charge (#109) with all its numbers.
  *
- *   radius        `sizes.radius[n - 1]` tiles: 2.5 3.5 4.5 6 8 10 13 16 20 24, the only ladder
- *   unlock        planet 7 + 3 (n - 1); largest size s(p) = min(10, 1 + floor((p - 7) / 3))
+ *   radius        `sizes.radius[n - 1]` tiles: 2.5 3.5 4.5 6 | 8 10 13 16 | 20 24 30 37, the
+ *                 only ladder, in whole half-tiles so the disc's r² is an integer (`blastDisc.ts`)
+ *   type          1 (breaking) sizes 1-4, 2 (deep) 5-8, 3 (biggest) 9-12: types are verbs, sizes
+ *                 scale; each type's `breaksGate[]` names the gate tiers its blast breaks
+ *   unlock        planet 7 + 3 (n - 1); largest size s(p) = min(12, 1 + floor((p - 7) / 3))
  *   price         ceilMilli(count * 2 * 1.8^(n - 1) * V(t(p, 5)) * paceScale(p)), through
  *                 `bandOrePriceAt`, never its raw worth (Systems on #218)
  *   kept          0.4 * 0.8^(n - 1) of the ordinary ore the blast breaks
- *   rack slots    1 1 1 2 2 3 4 5 6 8
- *   fuse          120 120 120 150 180 210 ticks; sizes 7-10 are remote, fired by the plunger
+ *   rack slots    1 1 1 2 2 3 4 5 6 8 8 8 (a full rack holds 8)
+ *   fuse          120 120 120 150 180 210 ticks; sizes 7-12 are remote, fired by the plunger
  *                 (#149) and disarmed 3600 ticks after planting (#153)
  *   self hit      selfHit(p) * r(n) / r(1); from size 4 the inner half of the radius wrecks
  *   minCharge     clamp(s(p) - 2 + lead, 1, band) for a dynamite-gated cell (#143 amendment 2)
@@ -37,6 +41,10 @@ const MM_PER_TILE = fromSafeInteger(MM_PER_METRE)
 /** One size of the ladder as #143 reads it (`chargeSpec(n, p)`), priced for one charge on `p`. */
 export interface ChargeSpec {
   size: number
+  /** The charge type, a verb (D1 #860): 1 breaking, 2 deep, 3 biggest. */
+  type: number
+  /** The gate tiers its blast breaks (`breaksGate[]`). */
+  breaksGate: readonly number[]
   radiusMm: number
   unlockPlanet: number
   price: Money
@@ -55,6 +63,8 @@ export interface DynamiteGatedCell {
 export function chargeSpec(size: number, planetIndex: number): ChargeSpec {
   return {
     size,
+    type: chargeTypeOf(size),
+    breaksGate: breaksGateOf(size),
     radiusMm: chargeRadiusMm(size),
     unlockPlanet: sizeUnlockPlanet(size),
     price: chargePrice(size, 1, planetIndex),
@@ -101,6 +111,16 @@ export function largestSizeOn(planetIndex: number): number {
  */
 export function isSizeLockedOn(size: number, planetIndex: number): boolean {
   return size > 1 && planetIndex < sizeUnlockPlanet(size)
+}
+
+/** The size's charge type, 1 to the last type listed. */
+export function chargeTypeOf(size: number): number {
+  return sizes.type[indexOfSize(size)]
+}
+
+/** The gate tiers a blast of this size breaks: its type's `breaksGate[]`. */
+export function breaksGateOf(size: number): readonly number[] {
+  return sizes.breaksGateByType[chargeTypeOf(size) - 1]
 }
 
 /** The blast's radius in whole millimetres, rounded out. */

@@ -4,7 +4,7 @@
  * The numbers stay in the kernel's `blastingCharges.sizes` (GD and TD locks on #149): an entry
  * carries only its size, read through `chargeSpec(size, planet)`, never a copy of a number.
  *
- * Labels (#143 Systems): the size ladder is vertical; sizes 2 to 10 extend `blasting_charges` and
+ * Labels (#143 Systems): the size ladder is vertical; sizes 2 to 12 extend `blasting_charges` and
  * stay `both`, with no Schedule C rows of their own (#153 amendment 2). The remote detonator is
  * horizontal and is the one row this slice ships: the first size that only the plunger fires
  * (size 7) claims `remote_detonator`, whose row opens the plunger three planets earlier, at P22.
@@ -13,7 +13,7 @@ import { chargeSizeCount, chargeSizesUpTo } from '../../../systems/economy/charg
 import type { ContentEntry } from '../../../systems/registries/content'
 
 export interface DynamiteSize extends ContentEntry {
-  /** The rung of `blastingCharges.sizes`, 1 to 10. */
+  /** The rung of `blastingCharges.sizes`, 1 to 12. */
   size: number
 }
 

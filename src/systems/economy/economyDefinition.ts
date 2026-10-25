@@ -357,8 +357,22 @@ export interface BlastingChargeRules {
   hardnessCapBand: number
   /** The bot blasts a tile whose drill time would be over this many ticks (4x the old 24-tick floor). */
   botBlastThresholdTicks: number
+  radiusTrack: BlastRadiusTrack
   sizes: ChargeSizeLadder
 }
+
+/**
+ * The Blast Radius track's growth (D6 rows on #865, TD on #860): a blast at owned level L clears
+ * ground out to `L_i * (1 + L / levelDivisor)^exponent`. The kernel squares it into the integer
+ * r² `(2 L_i)² (levelDivisor + L)`, which holds only for a square root, so `exponent` must be 0.5.
+ */
+export interface BlastRadiusTrack {
+  levelDivisor: number
+  exponent: BigStat
+}
+
+/** A charge type (D1 #860): the gate tiers its blast breaks; the types are verbs, sizes scale. */
+export type ChargeGateTiers = readonly number[]
 
 /**
  * The dynamite size ladder (#143 numbers with amendments 2 and 3, #153 design, the #149 locks):
@@ -371,8 +385,12 @@ export interface BlastingChargeRules {
  * cell of lead `newestSizeLead` asks the newest open size, one of a lower lead that many sizes less.
  */
 export interface ChargeSizeLadder {
-  /** The one radius ladder (Systems pin on #149): no formula and no second copy. */
+  /** The one radius ladder (Systems pin on #149, 12 rows D6 #865): whole half-tiles, no formula. */
   radius: readonly BigStat[]
+  /** Each size's charge type, 1 to `breaksGateByType.length` (D1 #860: 3 types of 4 sizes). */
+  type: readonly number[]
+  /** Per type, the gate tiers its blast breaks (`breaksGate[]`, D4 #863 reads it). */
+  breaksGateByType: readonly ChargeGateTiers[]
   unlockFrom: number
   unlockEvery: number
   oreUnitsBand: number

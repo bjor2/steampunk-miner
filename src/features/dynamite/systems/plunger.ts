@@ -3,7 +3,7 @@
  *
  * - Before the row opens, Detonate is not offered and every fuse runs as before.
  * - Once open, the plunger fires the caller's live charge: early for a fused size 1 to 6 (its fuse
- *   still blows it if nobody presses), and the only way to fire a remote size 7 to 10.
+ *   still blows it if nobody presses), and the only way to fire a remote size 7 to 12.
  * - The interlock: fired from within the blast's radius + 1 tile, the plunger clunks
  *   (`in_radius`) and the charge stays live.
  * - Fired, the blast is the kernel's (`detonatePlantedCharge`, `by: plunger`); its ground was

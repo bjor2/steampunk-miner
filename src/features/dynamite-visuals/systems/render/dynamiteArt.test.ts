@@ -9,7 +9,9 @@ import {
   DYNAMITE_RACK_ASSET_ID,
   dynamiteArtAssets,
   dynamiteSizes,
+  lampPartIdOf,
   PLANTED_DYNAMITE_ASSET_ID,
+  plantedPartIdOf,
 } from './dynamiteArt'
 
 const partsOf = (assetId: string) =>
@@ -19,8 +21,9 @@ const exportedPartsOf = (assetId: string) =>
   (exportedSidecarOf(SHIPPED_ART, assetId)?.parts ?? []).map((part) => part.id).sort()
 
 describe('dynamite art', () => {
-  it('registers a stick and a planted body and lamp for exactly the sizes the economy lists', () => {
-    expect(dynamiteSizes()).toHaveLength(chargeSizeCount())
+  it('registers a stick and a planted body and lamp for the ten modelled sizes of the economy', () => {
+    expect(dynamiteSizes()).toHaveLength(10)
+    expect(chargeSizeCount()).toBeGreaterThan(10)
     expect(partsOf(DYNAMITE_RACK_ASSET_ID)).toEqual([
       'rack-frame',
       ...dynamiteSizes().map((size) => `stick-${size}`),
@@ -29,7 +32,12 @@ describe('dynamite art', () => {
     expect(partsOf(PLANTED_DYNAMITE_ASSET_ID)).toEqual(
       dynamiteSizes().flatMap((size) => [`planted-${size}`, `lamp-${size}`]),
     )
-    expect(partsOf(PLANTED_DYNAMITE_ASSET_ID)).not.toContain(`planted-${chargeSizeCount() + 1}`)
+    expect(partsOf(PLANTED_DYNAMITE_ASSET_ID)).not.toContain('planted-11')
+  })
+
+  it('dresses a size past the modelled ten in size 10 until its own art lands (#866)', () => {
+    expect([plantedPartIdOf(11), lampPartIdOf(12)]).toEqual(['planted-10', 'lamp-10'])
+    expect(plantedPartIdOf(3)).toBe('planted-3')
   })
 
   it('ships the exported rack and prop with the registered parts and no others', () => {

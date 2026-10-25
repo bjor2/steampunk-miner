@@ -4,7 +4,7 @@
  * - `PlantCharge {size}`: an active vehicle with a charge of that size in its rack and none live
  *   plants one on the wall its last reported pose faces (the drill's nose tile). A fused size blows
  *   its size's `fuseTicks` later on the authority's clock (`chargeDetonation.ts`); a remote one
- *   (sizes 7 to 10) waits for the plunger (#149) and is disarmed if nobody fires it
+ *   (sizes 7 to 12) waits for the plunger (#149) and is disarmed if nobody fires it
  *   (`chargeDisarm.ts`). A size not open on this planet is refused `size_locked`, one the rack does
  *   not hold `no_charge_of_size`. Logs `charge_planted`, or `remote_charge_planted`.
  * - `debug.setCharges`: a scenario's mounted rack, its slots and the charges of one size in it, no
