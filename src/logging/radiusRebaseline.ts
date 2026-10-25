@@ -4,7 +4,8 @@
  * bot run's steps beside the drill pace tally (`drillPace.ts`), which already holds the planet
  * minutes, the felt speed and the drill + tip majors. Per planet: the sales from arrival to the
  * core (money per minute, the basis of p*), the wallet at core harvest (the travel fee share), and
- * the trip and climb ticks (G&V: the climb from a trip's deepest point back to the dock). Per hop:
+ * the trip and climb ticks (G&V: the climb from a trip's deepest point back to the dock), and what
+ * hazard contacts cost to the core (ticket 848, `hazardCost.ts`). Per hop:
  * the charge `travel_started` logged and the wallet it was paid from (the #648 clamp's rows); since
  * the star map (ticket 756) a jump's charge is the fuel bought for it on the planet it left, and
  * its list fee that fuel's price at the shop, which the clamp judges it against.
@@ -14,8 +15,9 @@ import type { DomainEvent } from '../systems/authority/domainEvent'
 import { planetParamsOf } from '../systems/authority/planetOfState'
 import { fuelPriceOf } from '../systems/economy/jumpFuel'
 import { travelFee } from '../systems/economy/planetCharges'
-import { add, fromCanonical, ZERO_MONEY, type Money } from '../systems/money'
+import { add, cmp, fromCanonical, ZERO_MONEY, type Money } from '../systems/money'
 import { depthTilesOfPose } from '../systems/vehicle/vehiclePose'
+import { hazardCostOf } from './hazardCost'
 
 /** One planet's money and trips in one run. */
 export interface PlanetRadiusPace {
@@ -30,6 +32,11 @@ export interface PlanetRadiusPace {
   tripTicks: number
   /** Ticks of those trips from their deepest point back to the dock. */
   climbTicks: number
+  /**
+   * What hazard contacts cost from arrival to the core, repairs and recharges (ticket 848); absent
+   * while they cost nothing.
+   */
+  hazardCostToCore?: Money
 }
 
 /** One hop: what it charged, its fee before the #648 clamp and the wallet it was charged from. */
@@ -125,6 +132,18 @@ function tallyEvent(
   if (event.type === 'DockEntered') closeTrip(tally, planet, state.tick)
   if (event.type === 'FuelBought') tallyFuelForHop(tally, state.planet.index, event)
   if (event.type === 'TravelStarted') tallyHop(tally, state, playerId, event)
+  tallyHazardCost(planet, state, playerId, event)
+}
+
+function tallyHazardCost(
+  planet: PlanetRadiusPace,
+  state: AuthorityState,
+  playerId: string,
+  event: DomainEvent,
+): void {
+  const cost = hazardCostOf(state, playerId, event)
+  if (planet.coreTick !== null || cmp(cost, ZERO_MONEY) === 0) return
+  planet.hazardCostToCore = add(planet.hazardCostToCore ?? ZERO_MONEY, cost)
 }
 
 type FuelBoughtEvent = Extract<DomainEvent, { type: 'FuelBought' }>

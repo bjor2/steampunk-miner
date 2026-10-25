@@ -12,7 +12,9 @@
  *           the trip on P2-P10, the travel fee at most 15% of the wallet at core harvest on each
  *           P1->P5 hop, every P1->P5 hop paid in full (the next planet affordable, the next
  *           on-curve drill or tip still affordable after it), no seed left behind after a core
- *           (travel never blocks), and every seed through P5's core (five planets open)
+ *           (travel never blocks), every seed through P5's core (five planets open), and the
+ *           hazards' repairs and recharges at most 5% of the sales to the core on each planet
+ *           (ticket 848, the GD lock on #823 Q1: drains at or under 5% of income)
  *   printed the p* and rate of each step, total money per planet, the sold ore step (amber, never
  *           gated: the ore value bar is the generated pool's), drill + tip amber at 7, the
  *           measured minutes for the planet rows and the paceScale the miss asks to retune first
@@ -48,6 +50,7 @@ export const RADIUS_REBASELINE_BARS = {
   openingHopLastFrom: 4,
   feeShareBpMax: 1500,
   openPlanets: 5,
+  hazardShareBpMax: 500,
 } as const
 
 const PLANETS = Array.from({ length: RADIUS_REBASELINE_BARS.lastPlanet }, (_, at) => at + 1)
@@ -83,7 +86,14 @@ export function gatedRadiusRebaselineProblemsOf(runs: readonly RadiusRebaselineR
     ...hops.flatMap(unaffordableHopProblems),
     ...runs.flatMap(blockedTravelProblems),
     ...runs.flatMap(closedPlanetProblems),
+    ...rows.flatMap(hazardShareProblems),
   ]
+}
+
+function hazardShareProblems({ radius }: PlanetRow): string[] {
+  const share = radius.hazardShareBp
+  if (share === null || share <= RADIUS_REBASELINE_BARS.hazardShareBpMax) return []
+  return [`planet ${radius.planet} hazards cost ${share} bp of the sales to the core, bar 500`]
 }
 
 function minutesProblems({ pace }: PlanetRow): string[] {

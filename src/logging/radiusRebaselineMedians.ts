@@ -36,6 +36,8 @@ export interface PlanetRadiusMedians {
   /** Sales from arrival to the core. */
   salesToCore: Money | null
   climbShareBp: number | null
+  /** Hazard costs to the core over its sales, in basis points (ticket 848). */
+  hazardShareBp: number | null
 }
 
 export interface HopMedians {
@@ -65,6 +67,7 @@ export function planetRadiusMediansOf(
       moneyPerMinute: medianMoneyOf(rates),
       salesToCore: medianMoneyOf(paces.map(salesToCoreOrNull)),
       climbShareBp: medianOf(paces.map(climbShareBpOrNull)),
+      hazardShareBp: medianOf(paces.map(hazardShareBpOrNull)),
     }
   })
 }
@@ -82,6 +85,15 @@ function moneyPerMinuteOf(run: RadiusRebaselineRun, planet: number): Money | nul
 
 function salesToCoreOrNull(pace: PlanetRadiusPace | null): Money | null {
   return pace?.coreTick == null ? null : pace.salesToCore
+}
+
+/** Hazard costs over sales to a core reached; a core reached with no sales costs it all. */
+function hazardShareBpOrNull(pace: PlanetRadiusPace | null): number | null {
+  if (pace?.coreTick == null) return null
+  if (pace.hazardCostToCore === undefined) return 0
+  if (cmp(pace.salesToCore, ZERO_MONEY) === 0) return WHOLE_SHARE_BP
+  const share = div(mul(pace.hazardCostToCore, fromSafeInteger(BASIS_POINTS)), pace.salesToCore)
+  return toSafeInteger(floor(share))
 }
 
 function climbShareBpOrNull(pace: PlanetRadiusPace | null): number | null {

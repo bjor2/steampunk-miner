@@ -5,6 +5,8 @@ import type { DomainEvent, DomainEventBody } from '../systems/authority/domainEv
 import { fuelPriceOf } from '../systems/economy/jumpFuel'
 import { travelFee } from '../systems/economy/planetCharges'
 import {
+  add,
+  cmp,
   fromCanonical,
   fromFiniteNumber,
   fromSafeInteger,
@@ -18,6 +20,7 @@ import { FACING } from '../systems/vehicle/vehiclePose'
 import { freshPlanetParamsFor } from '../systems/world/planetParams'
 import { surfaceRowOfColumn } from '../systems/world/tileGrid'
 import { emptyDrillPaceTally, type PlanetDrillPace } from './drillPace'
+import { hazardCostOf } from './hazardCost'
 import {
   emptyRadiusRebaselineTally,
   tallyRadiusRebaselineStep,
@@ -88,6 +91,25 @@ describe('radius re-baseline tally (ticket 644)', () => {
     expect(toCanonical(tally.hops[0].listFee)).toBe(toCanonical(fuelPriceOf(1, 5)))
     expect(toFixedText(tally.hops[0].walletBefore, 0)).toBe('500')
     expect(isHopClamped(tally.hops[0])).toBe(true)
+  })
+
+  it("prices hazard contacts to the core at the dock's repair and recharge (ticket 848)", () => {
+    const tally = emptyRadiusRebaselineTally()
+    step(tally, stateAt(0, 2, 0, '0'), [])
+    step(tally, stateAt(100, 2, 10, '0'), [bitten(50)])
+    step(tally, stateAt(200, 2, 10, '0'), [drained(5400)])
+    step(tally, stateAt(300, 2, 0, '0'), [{ type: 'CoreCompleted', durationTicks: 0 }])
+    step(tally, stateAt(400, 2, 10, '0'), [bitten(50)])
+
+    const state = stateAt(0, 2, 0, '0')
+    const cost = add(
+      hazardCostOf(state, PLAYER, { tick: 0, ...bitten(50) } as DomainEvent),
+      hazardCostOf(state, PLAYER, { tick: 0, ...drained(5400) } as DomainEvent),
+    )
+    expect(cmp(cost, ZERO_MONEY)).toBe(1)
+    expect(toCanonical(tally.planets.get(2)?.hazardCostToCore ?? ZERO_MONEY)).toBe(
+      toCanonical(cost),
+    )
   })
 
   it('counts a jump on fuel already in the tank as paid in full', () => {
@@ -173,6 +195,19 @@ describe('radius re-baseline bars (ticket 644)', () => {
     )
   })
 
+  it('fails hazards costing a planet more than 5% of its sales to the core (ticket 848)', () => {
+    const runs = threeSeeds(onBars)
+    runs.forEach((run) => {
+      const pace = run.radius.planets.get(3) as PlanetRadiusPace
+      pace.hazardCostToCore = mul(pace.salesToCore, fromCanonical('0.06'))
+      const passing = run.radius.planets.get(4) as PlanetRadiusPace
+      passing.hazardCostToCore = mul(passing.salesToCore, fromCanonical('0.04'))
+    })
+    const problems = gatedRadiusRebaselineProblemsOf(runs)
+    expect(problems).toContain('planet 3 hazards cost 600 bp of the sales to the core, bar 500')
+    expect(problems.some((line) => line.startsWith('planet 4 hazards'))).toBe(false)
+  })
+
   it('prints each planet row with its radius and measured minutes', () => {
     const lines = printedRadiusRebaselineLinesOf(threeSeeds(onBars))
     expect(lines).toContain('planet 5 row: radius 582, measured 26.0 min')
@@ -213,6 +248,14 @@ function stateAt(tick: number, planet: number, depthTiles: number, wallet: strin
       [PLAYER]: { ...player, wallet: fromCanonical(wallet), vehicle: { ...player.vehicle, pose } },
     },
   }
+}
+
+function bitten(hullBp: number): DomainEventBody {
+  return { type: 'HazardBit', kind: 'spinecrystal', tx: 0, ty: 0, hullBp, arc: 'front' }
+}
+
+function drained(quanta: number): DomainEventBody {
+  return { type: 'HazardDrained', kind: 'firedamp', tx: 0, ty: 0, ticks: 180, quanta }
 }
 
 function sold(value: string): DomainEventBody {

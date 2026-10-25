@@ -11,15 +11,17 @@ import { scriptedGearCellsOf } from '../authority/scriptedGearCells'
 import { effectiveTravelSpeedOf } from '../authority/travelSpeed'
 import type { AuthorityState } from '../authority/authorityState'
 import { hardnessOfTile, subStepsPerCellAt } from '../authority/groundDrill'
+import { hazardKindAtTile } from '../authority/hazards/hazardCells'
 import { scratchFloorOfCell } from '../authority/signatureCells'
 import type { BigStat } from '../money'
 import { canScratch, type DrillStats } from '../vehicle/drillRule'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
+import { cellDensitySum, YIELD_SUM } from '../world/cellYield'
 import { isInsidePlanet } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
 import type { TilePoint } from '../world/tileGrid'
 import { CELL_KIND, GROUND_CELL, isAirCell, isRemovableCell, kindOfCell } from '../world/worldCell'
-import { cellAt } from '../world/worldState'
+import { cellAt, isTileYielded, materialCellAt } from '../world/worldState'
 import { botPoseAt, facingTowards } from './botPose'
 
 export type BotTileKind = 'open' | 'ground' | 'ore' | 'core' | 'pad' | 'lava'
@@ -39,7 +41,7 @@ export function paramsOfSession(state: AuthorityState): PlanetParams {
 }
 
 export function tileKindAt(state: AuthorityState, tile: TilePoint): BotTileKind {
-  const kind = kindOfCell(cellAt(state.world, paramsOfSession(state), tile))
+  const kind = kindOfCell(cellOfTile(state, tile))
   if (kind === CELL_KIND.ore) return 'ore'
   if (kind === CELL_KIND.core) return 'core'
   // The cache drills like rock and yields nothing (#46); the bot never opens it.
@@ -88,8 +90,24 @@ export function isInsideWorld(state: AuthorityState, tile: TilePoint): boolean {
   return isInsidePlanet(paramsOfSession(state), tile.tx, tile.ty)
 }
 
+/**
+ * The cell the bot reads a tile as: the world's, a yielded cell open ground; but a hazard cell a
+ * rockfall filled back past half with rubble (ticket 848) is its material again, so the bot bores
+ * the rubble out before it enters, as a player must, and the pace rows count the refill.
+ */
 export function cellOfTile(state: AuthorityState, tile: TilePoint): number {
-  return cellAt(state.world, paramsOfSession(state), tile)
+  const params = paramsOfSession(state)
+  if (isHazardRubble(state, params, tile)) return materialCellAt(state.world, params, tile)
+  return cellAt(state.world, params, tile)
+}
+
+/** A yielded cell of a hazard kind whose density stands above the yield's half again. */
+function isHazardRubble(state: AuthorityState, params: PlanetParams, tile: TilePoint): boolean {
+  return (
+    isTileYielded(state.world, tile) &&
+    cellDensitySum(state.world, params, tile) > YIELD_SUM &&
+    hazardKindAtTile(state, params, tile) !== null
+  )
 }
 
 /** The planner prices a shaft row as plain ground of its band, before it knows what lies there. */
