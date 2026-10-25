@@ -3,8 +3,10 @@
  * hung at the base vehicle's attach point (feature-slices.md 3.11), so no offset lives in code,
  * every part in a group at its pivot turned to its pose, the flasks up to the held count and the
  * shard only while the tongs act. Drawn in the body frame, so it turns and mirrors with the car; it
- * never touches the colliders or the drill tip. Shown while `features['planet-kit'].showKitSockets()`
- * holds it on, until #850 lets a player own a kit tool; while on the car each asset shows in
+ * never touches the colliders or the drill tip. Since ticket 883 the car hangs the tools the local
+ * player owns, each deployed while it acts (its tail included), and the flask rack while a flask
+ * is carried or open (`kitSocketShows.ts`); `features['planet-kit'].showKitSockets()` overrides
+ * that with every socket for the eye check. While on the car each asset shows in
  * `steampunkDebug.vehicleParts().mounted`.
  */
 import { useEffect, useMemo } from 'react'
@@ -12,6 +14,8 @@ import { PartQuadMesh } from '../../../scene/PartQuadMesh'
 import { showMountedParts } from '../../../scene/mountedPartsPresence'
 import { SHIPPED_ART } from '../../../scene/shippedArt'
 import { atlasMapsOf, type AtlasMaps } from '../../../systems/art/assetLook'
+import { useScreenModel } from '../../../ui/useScreenModel'
+import { readKitSocketsShown } from '../store/kitSocketReads'
 import { useKitSocketStore } from '../store/kitSocketStore'
 import {
   kitSocketQuadsOf,
@@ -27,11 +31,27 @@ const MOUNTED_Z = 0.1
 
 export function KitSocketParts() {
   const areShown = useKitSocketStore((state) => state.areShown)
+  return areShown ? <DebugShownSockets /> : <OwnedSockets />
+}
+
+/** Every socket as the debug call asked, for the eye check and the screen suite. */
+function DebugShownSockets() {
   const show = useKitSocketStore((state) => state.show)
-  if (!areShown) return null
   return (
     <>
       {KIT_SOCKETS.map((socket) => (
+        <KitSocketPart key={socket.itemId} socket={socket} show={show} />
+      ))}
+    </>
+  )
+}
+
+/** The local player's kit on the car, deployed while it acts. */
+function OwnedSockets() {
+  const shown = useScreenModel(readKitSocketsShown)
+  return (
+    <>
+      {shown.map(({ socket, show }) => (
         <KitSocketPart key={socket.itemId} socket={socket} show={show} />
       ))}
     </>

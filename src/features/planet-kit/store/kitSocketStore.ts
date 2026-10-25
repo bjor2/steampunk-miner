@@ -1,8 +1,9 @@
 /**
- * What the kit sockets show on the car (tickets 823 and 825). Presentation only, like the example's
- * test piece (feature-slices.md 3.18): no player owns a kit tool before #850, so the debug actions
- * flip it for the eye check and the screen suite, with the flasks held and whether the tools act;
- * it is never saved, logged or part of `GameState`. #850 drives it from the owned and stack state.
+ * The debug override of the kit sockets on the car (tickets 823 and 825). Presentation only, like
+ * the example's test piece (feature-slices.md 3.18): the debug actions hang every socket for the
+ * eye check and the screen suite, with the flasks held and whether the tools act; it is never
+ * saved, logged or part of `GameState`. Without it the car shows what the local player owns, read
+ * from the replica (ticket 883, `kitSocketReads.ts`).
  */
 import { create } from 'zustand'
 import { KIT_SOCKET_ALL_SHOWN, type KitSocketShow } from '../systems/render/kitSocketLook'

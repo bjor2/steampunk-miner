@@ -7,7 +7,9 @@
  * cargo to none: ore units per tier, as numbers or decimal text). `.containers()` reads the rows the markers and the list draw.
  * `.showKitSockets({ heldFlasks, isActing })` / `.hideKitSockets()` hang the kit tools' parts on
  * the car (by default every flask held and the tools acting) and take them off (presentation only),
- * and `.kitSockets()` lists the sockets with their assets and what they show. `.merchant()` reads
+ * and `.kitSockets()` lists the sockets with their assets and what they show, with `owned`: the
+ * sockets the local player's kit hangs on the car, each with whether it is deployed (ticket 883).
+ * `.merchant()` reads
  * the merchant the Sell bay draws on this planet (ticket 821), `merchant: null` where none trades;
  * `.merchantFrontage()` reads the frontage drawn on this planet's Assay & Exchange, or null.
  * `.grantKitItem(itemId)` holds a kit item as if bought here (ticket 850) through
@@ -27,6 +29,7 @@ import { kitResultOf } from './kitDebugReads'
 import { readContainerRows } from './store/containerReads'
 import { kitHoldingsOf } from './systems/kitHoldingsSection'
 import { readMerchantFrontageDrawn } from './store/merchantArtReads'
+import { readKitSocketsShown } from './store/kitSocketReads'
 import { hideKitSockets, showKitSockets, useKitSocketStore } from './store/kitSocketStore'
 import { readMerchantPanel } from './store/merchantReads'
 import { KIT_SOCKET_ALL_SHOWN, type KitSocketShow } from './systems/render/kitSocketLook'
@@ -140,6 +143,7 @@ export const planetKitDebugActions: Readonly<Record<string, DebugAction>> = {
     areShown: useKitSocketStore.getState().areShown,
     show: useKitSocketStore.getState().show,
     sockets: KIT_SOCKETS.map(({ itemId, attach, assetId }) => ({ itemId, attach, assetId })),
+    owned: readKitSocketsShown().map(({ socket, show }) => ({ itemId: socket.itemId, ...show })),
   }),
   merchant: () => ({ ok: true, merchant: readMerchantPanel() }),
   grantKitItem,
