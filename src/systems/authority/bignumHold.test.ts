@@ -21,6 +21,11 @@ import {
 } from './scriptedSession'
 import { readSnapshot, takeSnapshot } from './sessionSnapshot'
 import { stateDigest } from './stateDigest'
+import { KEYBOARD_PROMPTS } from '../input/promptFixtures'
+import { holdSheetOf } from '../views/holdSheet'
+import { selectHudModel } from '../views/hudModel'
+import { selectRefineryBayModel } from '../views/refineryBayModel'
+import { selectSellBayModel } from '../views/sellBayModel'
 
 // The bignum hold (ticket 849, the TD's Q4 on #823): the hold's capacity and every per-tier count
 // are bigint, so cargo is capped by the economy only. Levels 1, 99 and 1e6 are the VS's goldens,
@@ -148,6 +153,26 @@ describe('bignum hold (ticket 849)', () => {
     const saved = savedAndRead(session.state())
     expect(saved.text).toContain(`"units":"${half}"`)
     expect(saved.state).toEqual(session.state())
+  })
+
+  it('builds the HUD, the hold and both bays of a 1e6 hold as plain JSON the screens compare', () => {
+    const tier = oreTier(3, 1)
+    const capacity = cargoCapacity(LEVEL_1E6)
+    const session = continueScriptedSession(
+      holding(sessionOnPlanet(3).state(), LEVEL_1E6, tier, capacity),
+    )
+    dockAtBayOf(session, 1, REFINERY_SITE, 'refinery')
+    session.submit(2, { type: 'queueRefine', payload: { resourceTier: tier, units: 5 } })
+    const state = session.state()
+    const ui = { isQuickServiceHighlighted: false, focusedId: null, installingUpgradeId: null }
+    const screens = [
+      selectHudModel({ state, playerId: 'p1', depthTiles: 0, prompts: KEYBOARD_PROMPTS }),
+      holdSheetOf(state, 'p1'),
+      selectSellBayModel(state, 'p1', ui),
+      selectRefineryBayModel(state, 'p1'),
+    ]
+    screens.forEach((screen) => expect(() => JSON.stringify(screen)).not.toThrow())
+    expect(holdSheetOf(state, 'p1').tiers[0].amount).toBe(String(capacity - 5n))
   })
 
   it('carries a hold past 2^53 through a save and load to the unit, never as a float', () => {

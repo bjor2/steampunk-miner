@@ -839,7 +839,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/assaySale.test.ts` | 4 | 4 |
 | `src/systems/authority/authorityReactions.test.ts` | 7 | 7 |
 | `src/systems/authority/autoMode/autoMode.test.ts` | 4 | 4 |
-| `src/systems/authority/bignumHold.test.ts` | 7 | 7 |
+| `src/systems/authority/bignumHold.test.ts` | 8 | 8 |
 | `src/systems/authority/bore/boreAim.test.ts` | 14 | 14 |
 | `src/systems/authority/bore/boreAuto.test.ts` | 30 | 21 |
 | `src/systems/authority/bore/boreAutoAim.test.ts` | 7 | 7 |
