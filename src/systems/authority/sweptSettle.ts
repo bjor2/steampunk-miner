@@ -13,6 +13,7 @@
  * and carry count in the tick's drill quantum, which it keeps when above the base (ticket 558).
  */
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
+import { aimOfPose } from '../vehicle/aim'
 import type { CutAxis } from '../vehicle/casingTrail'
 import { isCutGateOpen } from '../vehicle/cutGate'
 import {
@@ -98,13 +99,18 @@ function withRingsOffShare(
  * The cut's own centre line (the GD and TD rulings on #662 Q2): the line its stamp's centre cut
  * along, from the cursor or a fresh path's one disc, pulled back along the aim by the stamp's
  * offset onto the body's line, never the swept stamp centres; the ring lag is still measured from
- * where the stamp reached.
+ * where the stamp reached. Its rings are laid round the cut along the step's aim (ticket 833).
  */
 function cutAxisOf({ path, stamp, aheadMm, step }: Sweep, reached: StampPoint): CutAxis {
   const onBodyLine = (point: StampPoint) =>
     stampBodyPointOf({ stamp: { ...stamp, ...point }, aheadMm }, step.pose)
   const from = path.isFresh ? reached : path.from
-  return { from: onBodyLine(from), to: onBodyLine(reached), stampReach: reached }
+  return {
+    from: onBodyLine(from),
+    to: onBodyLine(reached),
+    stampReach: reached,
+    aim: aimOfPose(step.pose),
+  }
 }
 
 /** A fresh path that could cut nothing stays at its start: the body. */

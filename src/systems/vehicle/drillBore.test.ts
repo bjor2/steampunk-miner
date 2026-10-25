@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
   BODY_HALF_SIZE_MM,
-  CASING_LINING_WIDTH_MM,
   DRILL_BORE_ROWS,
   DRILL_SIDE_CLEARANCE_RANGE_MM,
+  STANDARD_CASING_KIND,
 } from '../../constants/balance'
 import { AIM_STEPS_PER_TURN, VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import { casingRingAround } from '../world/casingLining'
@@ -15,6 +15,8 @@ import {
   boreRadiusMmAlongAt,
   boreRadiusMmAt,
   casingRingLagMm,
+  casingRingLagMmAlong,
+  casingRingLagMmAlongAt,
   casingRingLagMmAt,
   drillStampLiftMm,
   drillStampRadiusMm,
@@ -45,8 +47,11 @@ describe('drill bore', () => {
 
   it('lines the ring from the bore wall’s full-weight edge to a quarter metre past the wall', () => {
     const ring = casingRingAround(0, 0)
-    expect(ring.clearMm).toBe(drillStampRadiusMm() - CASING_LINING_WIDTH_MM)
-    expect(ring.clearMm + ring.widthMm).toBe(drillStampRadiusMm() + CASING_LINING_WIDTH_MM)
+    expect(ring.clearMm).toBe(drillStampRadiusMm() - STANDARD_CASING_KIND.ringInsideMm)
+    expect(ring.clearMm + ring.widthMm).toBe(
+      drillStampRadiusMm() + STANDARD_CASING_KIND.ringOutsideMm,
+    )
+    expect(ring.clearMm + ring.widthMm).toBe(850)
   })
 
   it('widens the bore across a diagonal aim to the body’s corners plus the clearance (ticket 791)', () => {
@@ -90,6 +95,21 @@ describe('drill bore', () => {
 
   it('lays a ring once the stamp is its radius plus the ring’s outer radius past it', () => {
     withDrillSideClearance(150, () => expect(casingRingLagMm()).toBe(600 + 600 + 250))
+  })
+
+  it('lays a diagonal ring once the stamp is the cut’s radius along its aim plus its ring past it', () => {
+    expect(casingRingLagMmAlong(AIM.down)).toBe(casingRingLagMm())
+    expect(casingRingLagMmAlong(8)).toBe(787 + 787 + 250)
+    withDrillSideClearance(200, () => expect(casingRingLagMmAlong(8)).toBe(837 + 837 + 250))
+  })
+
+  it('lays a wide rig’s diagonal ring once the stamp is twice its own r(aim) and the band past it', () => {
+    expect(casingRingLagMmAlongAt(AIM.down, 1)).toBe(casingRingLagMmAt(1))
+    const wideDiagonalMm = boreRadiusMmAlongAt(8, 1)
+    expect(wideDiagonalMm).toBeGreaterThan(boreRadiusMmAt(1))
+    expect(casingRingLagMmAlongAt(8, 1)).toBe(
+      wideDiagonalMm + wideDiagonalMm + STANDARD_CASING_KIND.ringOutsideMm,
+    )
   })
 })
 
@@ -137,6 +157,14 @@ describe('drill bore width levels (ticket 749)', () => {
   })
 
   it('lays the ring a level’s widening further behind the stamp', () => {
-    expect(casingRingLagMmAt(1)).toBe(1_100 + 1_100 + CASING_LINING_WIDTH_MM)
+    expect(casingRingLagMmAt(1)).toBe(1_100 + 1_100 + STANDARD_CASING_KIND.ringOutsideMm)
+  })
+
+  it('lays a wide rig’s diagonal ring once the stamp is its own r(aim) twice and the band past it', () => {
+    expect(casingRingLagMmAlongAt(AIM.down, 1)).toBe(casingRingLagMmAt(1))
+    const wideDiagonalMm = boreRadiusMmAlongAt(8, 1)
+    expect(casingRingLagMmAlongAt(8, 1)).toBe(
+      2 * wideDiagonalMm + STANDARD_CASING_KIND.ringOutsideMm,
+    )
   })
 })

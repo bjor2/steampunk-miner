@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { AIM } from './aim'
 import { casingRingLagMm } from './drillBore'
 import { EMPTY_CASING_TRAIL, followCasingTrail, type CasingTrail } from './casingTrail'
 
@@ -26,7 +27,7 @@ function reversalRingsAt(strideMm: number, interval: number): ReversalRings {
   let trail: CasingTrail = EMPTY_CASING_TRAIL
   let rings: ReversalRings = { closestMm: Infinity, overflowRings: 0 }
   for (const x of reportedCentresOf(strideMm, interval)) {
-    const step = followCasingTrail(trail, { xMm: x, yMm: 0 }, true)
+    const step = followCasingTrail(trail, { xMm: x, yMm: 0 }, true, AIM.right)
     trail = step.trail
     rings = step.due.reduce((sum, point) => withRing(sum, Math.abs(point.xMm - x)), rings)
   }

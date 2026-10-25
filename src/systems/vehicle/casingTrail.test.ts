@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { CASING_RING_SPACING_MM } from '../../constants/balance'
-import { casingRingLagMm } from './drillBore'
+import { AIM } from './aim'
+import { casingRingLagMm, casingRingLagMmAlong } from './drillBore'
 import {
   EMPTY_CASING_TRAIL,
   followCasingTrail,
@@ -17,7 +18,7 @@ function followAlongX(xs: readonly number[], isCutting = true, start = EMPTY_CAS
   let trail: CasingTrail = start
   const duePoints: AxisPoint[] = []
   for (const x of xs) {
-    const step = followCasingTrail(trail, { xMm: x, yMm: 0 }, isCutting)
+    const step = followCasingTrail(trail, { xMm: x, yMm: 0 }, isCutting, AIM.right)
     trail = step.trail
     duePoints.push(...step.due)
   }
@@ -51,7 +52,7 @@ describe('casing trail', () => {
     let trail: CasingTrail = EMPTY_CASING_TRAIL
     const rings: { xMm: number; fromMm: number }[] = []
     for (const x of stepsTo(5000, 100)) {
-      const step = followCasingTrail(trail, { xMm: x, yMm: 0 }, true)
+      const step = followCasingTrail(trail, { xMm: x, yMm: 0 }, true, AIM.right)
       trail = step.trail
       step.due.forEach((point, index) => {
         expect(step.stretchStarts[index].yMm).toBe(0)
@@ -66,7 +67,7 @@ describe('casing trail', () => {
     let trail = followAlongX(stepsTo(1000, 100)).trail
     const rings: { xMm: number; fromMm: number }[] = []
     for (const x of [-500, -2200]) {
-      const step = followCasingTrail(trail, { xMm: x, yMm: 0 }, false)
+      const step = followCasingTrail(trail, { xMm: x, yMm: 0 }, false, AIM.right)
       trail = step.trail
       step.due.forEach((point, index) =>
         rings.push({ xMm: point.xMm, fromMm: step.stretchStarts[index].xMm }),
@@ -143,6 +144,7 @@ describe('casing trail along the swept cut (ticket 330)', () => {
     from: { xMm: Math.max(0, x - stepMm), yMm: 0 },
     to: { xMm: x, yMm: 0 },
     stampReach: { xMm: x, yMm: 0 },
+    aim: AIM.right,
   })
 
   /** The x of each ring due, cutting along x at `stepMm` a tick to `toMm`. */
@@ -186,7 +188,12 @@ describe('casing trail along the swept cut (ticket 330)', () => {
     let trail: CasingTrail = EMPTY_CASING_TRAIL
     const due: { xMm: number; yMm: number }[] = []
     for (let step = 0; step <= 100; step++) {
-      const cut = { from: diagonalAt(step - 1), to: diagonalAt(step), stampReach: diagonalAt(step) }
+      const cut = {
+        from: diagonalAt(step - 1),
+        to: diagonalAt(step),
+        stampReach: diagonalAt(step),
+        aim: AIM.right,
+      }
       const followed = followCasingTrailAlongCut(trail, cut, true)
       trail = followed.trail
       due.push(...followed.due)
@@ -225,7 +232,7 @@ describe('casing trail at a report every tick (ticket 514)', () => {
     const laid: { xMm: number; stampMm: number }[] = []
     let mostWaiting = 0
     for (const x of xs) {
-      const step = followCasingTrail(trail, { xMm: x, yMm: 0 }, isCutting)
+      const step = followCasingTrail(trail, { xMm: x, yMm: 0 }, isCutting, AIM.right)
       trail = step.trail
       laid.push(...step.due.map((point) => ({ xMm: point.xMm, stampMm: x })))
       mostWaiting = Math.max(mostWaiting, trail.unlined.length)
@@ -239,7 +246,7 @@ describe('casing trail at a report every tick (ticket 514)', () => {
       let trail: CasingTrail = EMPTY_CASING_TRAIL
       let charged = 0
       for (const x of stepsTo(8000, strideMm)) {
-        const step = followCasingTrail(trail, { xMm: x, yMm: 0 }, true)
+        const step = followCasingTrail(trail, { xMm: x, yMm: 0 }, true, AIM.right)
         charged += step.trail.unlined
           .filter((point) => !trail.unlined.includes(point))
           .reduce((sum, point) => sum + point.lengthMm, 0)
@@ -265,5 +272,46 @@ describe('casing trail at a report every tick (ticket 514)', () => {
     const backedOut = laidAlong(backing, false, cut.trail)
     expect(backedOut.trail.unlined).toEqual([])
     expect(backedOut.laid.every((ring) => ring.xMm - ring.stampMm >= casingRingLagMm())).toBe(true)
+  })
+})
+
+describe('casing trail along the cut’s aim (ticket 833)', () => {
+  const DOWN_RIGHT = 56
+  /** A swept cut down-right at 45 degrees to `step` half metres, aimed at `aim`. */
+  const diagonalCut = (step: number, aim: number) => {
+    const at = (k: number) => ({ xMm: k * 354, yMm: -k * 354 })
+    return { from: at(Math.max(0, step - 1)), to: at(step), stampReach: at(step), aim }
+  }
+
+  it('keeps a diagonal cut’s aim on every point it records, and none along a facing', () => {
+    let diagonal: CasingTrail = EMPTY_CASING_TRAIL
+    let straight: CasingTrail = EMPTY_CASING_TRAIL
+    for (let step = 0; step <= 3; step++) {
+      diagonal = followCasingTrailAlongCut(diagonal, diagonalCut(step, DOWN_RIGHT), true).trail
+      straight = followCasingTrailAlongCut(straight, diagonalCut(step, AIM.down), true).trail
+    }
+    expect(diagonal.unlined.length).toBeGreaterThan(1)
+    expect(diagonal.unlined.every((point) => point.aim === DOWN_RIGHT)).toBe(true)
+    expect(straight.unlined.every((point) => !('aim' in point))).toBe(true)
+  })
+
+  it('holds a 45 degree point until the stamp is its own lag past it, whatever the drill aims at then', () => {
+    const recorded = followCasingTrail(EMPTY_CASING_TRAIL, { xMm: 0, yMm: 0 }, true, DOWN_RIGHT)
+    const pastFacingLag = followCasingTrail(
+      recorded.trail,
+      { xMm: casingRingLagMm(), yMm: 0 },
+      false,
+      AIM.right,
+    )
+    expect(pastFacingLag.due).toEqual([])
+    const pastOwnLag = followCasingTrail(
+      recorded.trail,
+      { xMm: casingRingLagMmAlong(DOWN_RIGHT), yMm: 0 },
+      false,
+      AIM.right,
+    )
+    expect(pastOwnLag.due).toEqual([
+      { xMm: 0, yMm: 0, lengthMm: CASING_RING_SPACING_MM, aim: DOWN_RIGHT },
+    ])
   })
 })

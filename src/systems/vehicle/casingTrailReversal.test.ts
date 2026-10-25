@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { CASING_RING_SPACING_MM, MAX_CASING_TRAIL_POINTS } from '../../constants/balance'
+import { AIM } from './aim'
 import { casingRingLagMm } from './drillBore'
 import { WIDE_BORE_CLEARANCE_MM, withDrillSideClearance } from './drillBoreFixtures'
 import {
@@ -43,9 +44,10 @@ interface ReversalRun {
 
 type FollowTrail = (trail: CasingTrail, from: RingPoint, to: RingPoint) => TrailStep
 
-const byPoseReport: FollowTrail = (trail, _from, to) => followCasingTrail(trail, to, true)
+const byPoseReport: FollowTrail = (trail, _from, to) =>
+  followCasingTrail(trail, to, true, AIM.right)
 const bySweptCut: FollowTrail = (trail, from, to) =>
-  followCasingTrailAlongCut(trail, { from, to, stampReach: to }, true)
+  followCasingTrailAlongCut(trail, { from, to, stampReach: to, aim: AIM.right }, true)
 
 function cutForwardAndBack(follow: FollowTrail, strideMm: number, interval: number): ReversalRun {
   let trail: CasingTrail = EMPTY_CASING_TRAIL
@@ -88,7 +90,8 @@ describe('casing trail of a rig cutting back over its own trail (#538)', () => {
 
   it('holds a point every half metre of the ring lag behind a straight cut, well under the cap', () => {
     let trail: CasingTrail = EMPTY_CASING_TRAIL
-    for (let x = 0; x <= FORWARD_MM; x += 25) trail = followCasingTrail(trail, at(x, 0), true).trail
+    for (let x = 0; x <= FORWARD_MM; x += 25)
+      trail = followCasingTrail(trail, at(x, 0), true, AIM.right).trail
     expect(trail.unlined).toHaveLength(Math.floor(casingRingLagMm() / CASING_RING_SPACING_MM) + 1)
   })
 })
@@ -146,9 +149,9 @@ describe('casing trail of a rig looping inside its own lag (#538)', () => {
       atBore(clearanceMm, () => {
         const centres = circleCentres(3)
         let trail: CasingTrail = EMPTY_CASING_TRAIL
-        for (const to of centres) trail = followCasingTrail(trail, to, true).trail
+        for (const to of centres) trail = followCasingTrail(trail, to, true, AIM.right).trail
         const oldest = trail.unlined[0]
-        const away = followCasingTrail(trail, at(5000, 0), false)
+        const away = followCasingTrail(trail, at(5000, 0), false, AIM.right)
         expect(oldest).toMatchObject(centres[0])
         expect(away.due).toEqual(trail.unlined)
       }))
@@ -157,7 +160,7 @@ describe('casing trail of a rig looping inside its own lag (#538)', () => {
   it('fills the cap with a loop inside #36’s 2.15 m lag', () =>
     withDrillSideClearance(WIDE_BORE_CLEARANCE_MM, () => {
       let trail: CasingTrail = EMPTY_CASING_TRAIL
-      for (const to of circleCentres(3)) trail = followCasingTrail(trail, to, true).trail
+      for (const to of circleCentres(3)) trail = followCasingTrail(trail, to, true, AIM.right).trail
       expect(trail.unlined).toHaveLength(MAX_CASING_TRAIL_POINTS)
     }))
 })

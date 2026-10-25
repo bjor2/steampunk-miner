@@ -9,6 +9,7 @@ import { isChargeSize } from '../economy/chargeSizes'
 import type { AheadBearing, BoreSide } from '../economy/drillGearCaps'
 import { STANDARD_LINING_TYPE } from '../economy/heatEconomy'
 import { fromCanonical, isNonNegativeMoneyText, toCanonical, type Money } from '../money'
+import { isAim, isCardinalAim } from '../vehicle/aim'
 import { isLiftedDrillQuantum } from '../vehicle/drillQuantum'
 import { BORE_SIDES } from '../vehicle/facedSide'
 import { aimProblemsOf, isFacing, type VehiclePose } from '../vehicle/vehiclePose'
@@ -124,7 +125,7 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(isPortableCasingTrail(vehicle.casingTrail)
       ? []
       : [
-          `${path}.casingTrail must hold safe-integer xMm and yMm points (and lengthMm on unlined ones)`,
+          `${path}.casingTrail must hold safe-integer xMm and yMm points (and lengthMm on unlined ones, and an aim off the four facings or none)`,
         ]),
     ...(isPortableGun(vehicle.gun) ? [] : [`${path}.gun must hold a whole level and a gun mode`]),
     ...(isPortableCharges(vehicle.charges)
@@ -230,7 +231,16 @@ function isPortableCasingTrail(trail: unknown): boolean {
 }
 
 function isAxisPoint(point: unknown): boolean {
-  return isRingPoint(point) && isWholeNumber((point as { lengthMm: unknown }).lengthMm)
+  return (
+    isRingPoint(point) &&
+    isWholeNumber((point as { lengthMm: unknown }).lengthMm) &&
+    isAxisPointAim((point as { aim?: unknown }).aim)
+  )
+}
+
+/** An axis point's aim rides along only off the four facings (ticket 833), as a pose's does. */
+function isAxisPointAim(aim: unknown): boolean {
+  return aim === undefined || (isAim(aim) && !isCardinalAim(aim))
 }
 
 function isRingPoint(point: unknown): boolean {

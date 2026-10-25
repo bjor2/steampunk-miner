@@ -28,7 +28,7 @@
  * Never refused: a grade too low for the band still lines (#41). The dock pad is never lined, as it
  * is never carved. A player grade above 15 lines at 15, the most a sample holds.
  */
-import { CASING_LINING_WIDTH_MM, DRILL_BORE_ROWS } from '../../constants/balance'
+import { DRILL_BORE_ROWS, STANDARD_CASING_KIND } from '../../constants/balance'
 import { UP_VECTOR_SCALE } from '../../constants/physics'
 import { drillStampLiftMm, drillStampRadiusMm } from '../vehicle/drillBore'
 import { cellSampleIndices } from './cellYield'
@@ -78,43 +78,47 @@ interface RingLining {
 type RingStep = 'line' | 'retype' | 'reline' | 'skip'
 
 /**
- * The drill's ring round a point of the tunnel axis, read from the live stamp's radius: `stampR -
- * 0.25 m <= d < stampR + 0.25 m`, from the bore wall's full-weight edge (`stampShape.ts`) to the
- * rock just outside it. The TD's release check on #662 found the ring that started at `stampR`
- * left the rock behind a wall sample cut just under the iso unlined (24 samples on L20's down leg);
- * starting a sample inside, as #36's ring did round its own bore, lines it. A wider rig's ring is
- * read round its own bore's radius (ticket 749), so it lines the wall its stamp cut.
+ * The drill's ring round a point of the tunnel axis, read from the live stamp's radius along a
+ * facing: `stampR - 0.25 m <= d < stampR + 0.25 m`, from the bore wall's full-weight edge
+ * (`stampShape.ts`) to the rock just outside it. The TD's release check on #662 found the ring that
+ * started at `stampR` left the rock behind a wall sample cut just under the iso unlined (24 samples
+ * on L20's down leg); starting a sample inside, as #36's ring did round its own bore, lines it. A
+ * wider rig's ring is read round its own bore's radius (ticket 749), so it lines the wall its stamp
+ * cut.
  */
 export function casingRingAround(
   xMm: number,
   yMm: number,
   boreRadiusMm: number = drillStampRadiusMm(),
 ): CasingRing {
-  return {
-    xMm,
-    yMm,
-    clearMm: boreRadiusMm - CASING_LINING_WIDTH_MM,
-    widthMm: 2 * CASING_LINING_WIDTH_MM,
-  }
+  return { xMm, yMm, ...ringBandRoundCut(boreRadiusMm) }
 }
 
 /**
  * The drill trail's ring for the stretch of axis from `stretchFromMm` to `(xMm, yMm)`, swept by
  * the stamp's offset `sweepMm` in the cut of the tick it fell due (the TD's Q1 and the GD's (e)
- * rulings on #662, `casingRingBand.ts`): the same band as `casingRingAround`, measured from the
- * hole that tick cut, so between two points the band holds the wall's rock at `stampR + 0.25 m`
- * where the circles round them pulled in to 0.81 m (the scallop on the 1.2 m bore), and a wall the
- * slanted stamp stands past the body's line is lined from where it stands. A pose report's ring
- * has no sweep (`NO_RING_SWEEP`). Debug, gnaw and breach rings stay circles.
+ * rulings on #662, `casingRingBand.ts`), round `cutRadiusMm`, the cut's r(aim) along the aim its
+ * point was cut at (ticket 833) round the rig's bore: the same band as `casingRingAround` along a
+ * facing, and round r(aim) between them, so a diagonal shaft's wall, 0.787 m out at 45 degrees, is lined as a straight one's is.
+ * Measured from the hole that tick cut, so between two points the band holds the wall's rock at
+ * `r + 0.25 m` where the circles round them pulled in (the scallop on the 1.2 m bore), and a wall
+ * the slanted stamp stands past the body's line is lined from where it stands. A pose report's
+ * ring has no sweep (`NO_RING_SWEEP`). Debug, gnaw and breach rings stay circles.
  */
 export function casingRingAlong(
   xMm: number,
   yMm: number,
   stretchFromMm: MmPoint,
   sweepMm: MmPoint,
-  boreRadiusMm: number = drillStampRadiusMm(),
+  cutRadiusMm: number = drillStampRadiusMm(),
 ): CasingRing {
-  return { ...casingRingAround(xMm, yMm, boreRadiusMm), stretchFromMm, sweepMm }
+  return { ...casingRingAround(xMm, yMm, cutRadiusMm), stretchFromMm, sweepMm }
+}
+
+/** The casing kind's band round a cut of radius `cutRadiusMm`: inside it to past the wall. */
+export function ringBandRoundCut(cutRadiusMm: number): { clearMm: number; widthMm: number } {
+  const { ringInsideMm, ringOutsideMm } = STANDARD_CASING_KIND
+  return { clearMm: cutRadiusMm - ringInsideMm, widthMm: ringInsideMm + ringOutsideMm }
 }
 
 /** Lines one ring at the player's `grade`, in the lining type `typeIndex` (the standard one by default). */
@@ -221,10 +225,11 @@ function isInFloorBox(ring: CasingRing, up: PlanetUp, sx: number, sy: number): b
 
 /**
  * Half the side of the body whose bore the ring lines (ticket 750): its bore's radius, which the
- * ring is read round (`casingRingAround`), less the side clearance; the bare body's on a bare ring.
+ * ring is read round (`casingRingAround`), less the side clearance; the bare body's on a bare ring,
+ * and the body's reach across the aim on a ring laid along a diagonal (ticket 833).
  */
 function ringBodyHalfMmOf(ring: CasingRing): number {
-  return ring.clearMm + CASING_LINING_WIDTH_MM - DRILL_BORE_ROWS.sideClearanceMm
+  return ring.clearMm + STANDARD_CASING_KIND.ringInsideMm - DRILL_BORE_ROWS.sideClearanceMm
 }
 
 /**

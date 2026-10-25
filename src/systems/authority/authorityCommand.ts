@@ -589,8 +589,14 @@ import type { JsonCount } from '../wholeCount'
  *    dynamite-gated cell carries a gate tier its blast opens only for a type whose `breaksGate[]`
  *    holds it; its `DrillGated` says `required: type:<t>` and `have: owned` or `price:<money>`.
  *    A run with no charge and no gated cell moves no digest.
+ * 123: the casing ring follows the cut's aim (ticket 833, the TD's shape on #833): a drill trail's
+ *    axis point keeps the aim its cut ran along, as an optional `aim` off the four facings, and its
+ *    ring lines `r(aim) - 0.25 m <= d < r(aim) + 0.25 m` and falls due at `2 r(aim) + 0.25 m`,
+ *    `r(aim)` the stamp's own radius along that aim round the rig's bore at its width level now
+ *    (0.787 m at 45 degrees on the bare rig). A point with no aim, every one before, is laid along
+ *    its facing as it was, so a straight dig moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 122
+export const AUTHORITY_PROTOCOL_VERSION = 123
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

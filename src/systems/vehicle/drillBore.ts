@@ -17,22 +17,25 @@
  *   and the tunnel is as tight above the rig as beside it.
  * - Along an aim between the four facings (ticket 791) the body's square is wider across its path,
  *   its corners' reach (1.27 m at 45 degrees), so the stamp's radius there is half that width plus
- *   the clearance (`drillStampRadiusMmAlong`): the body and its clearance fit the cut at every aim,
- *   as the TD's ruling on #662 asks of every tick. Along a facing it is the radius above, which the
- *   lift, the casing ring and its lag read.
- * - The **ring lag** (#41, #56 Q2: `2 x stampR + 0.25 m`) is the stamp's radius plus the casing
- *   ring's outer radius: a ring is laid once the stamp's centre is that far past its axis point, so
- *   on a straight cut no later stamp reaches it.
+ *   the clearance: the body and its clearance fit the cut at every aim, as the TD's ruling on #662
+ *   asks of every tick. Along a facing it is the radius above, which the lift reads.
+ * - That radius is **r(aim)** (`cutRadiusMmAlong`, the TD's shape on #833): the body's reach across
+ *   the aim, from the integer aim's cosine table, plus the clearance, with the body's half side an
+ *   input and never a stored width. The stamp and the casing ring both read it, so a diagonal
+ *   shaft is lined to its wall (0.787 m at 45 degrees) and a drill change moves both at once.
+ * - The **ring lag** (#41, #56 Q2: `2 x stampR + 0.25 m`) is the cut's radius plus the casing
+ *   ring's outer radius, both along the ring's aim: a ring is laid once the stamp's centre is that
+ *   far past its axis point, so on a straight cut no later stamp reaches it.
  */
 import {
   BARE_BORE_CELLS_PER_METRE,
   BODY_HALF_SIZE_MM,
-  CASING_LINING_WIDTH_MM,
   DRILL_BORE_ROWS,
+  STANDARD_CASING_KIND,
 } from '../../constants/balance'
 import { AIM_STEPS_PER_TURN, MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
 import { MM_PER_SAMPLE } from '../world/sampleGrid'
-import { aimDirectionOf, type Aim } from './aim'
+import { AIM, aimDirectionOf, type Aim } from './aim'
 
 /** The bare body's width level: no width Mark owned. */
 export const BARE_WIDTH_LEVEL = 0
@@ -58,7 +61,7 @@ export function bodyGrowthMmAt(widthLevel: number): number {
 
 /** The stamp's radius along a facing at `widthLevel`: half the body plus the clearance. */
 export function boreRadiusMmAt(widthLevel: number): number {
-  return bodyHalfMmAt(widthLevel) + DRILL_BORE_ROWS.sideClearanceMm
+  return boreRadiusMmAlongAt(AIM.down, widthLevel)
 }
 
 /** The bore's width along a facing at `widthLevel`: the body and its clearance either side. */
@@ -68,7 +71,7 @@ export function boreWidthMmAt(widthLevel: number): number {
 
 /** The stamp's radius along `aim` at `widthLevel`: half the body across it plus the clearance. */
 export function boreRadiusMmAlongAt(aim: Aim, widthLevel: number): number {
-  return squareReachMmAlong(aim, bodyHalfMmAt(widthLevel)) + DRILL_BORE_ROWS.sideClearanceMm
+  return cutRadiusMmAlong(aim, bodyHalfMmAt(widthLevel))
 }
 
 /**
@@ -86,9 +89,18 @@ export function drillStampRadiusMm(): number {
   return boreRadiusMmAt(BARE_WIDTH_LEVEL)
 }
 
-/** The stamp's radius along `aim`: half the body's width across it plus the clearance. */
+/** The stamp's radius along `aim` round the bare 0.9 m body: `r(aim)` at its half side. */
 export function drillStampRadiusMmAlong(aim: Aim): number {
   return boreRadiusMmAlongAt(aim, BARE_WIDTH_LEVEL)
+}
+
+/**
+ * r(aim) (the TD's shape on #833): the cut's radius along `aim` round a square body of half side
+ * `bodyHalfMm`, its half width across the aim plus the drill's clearance. The one copy the stamp
+ * and the casing ring read, at every width level.
+ */
+export function cutRadiusMmAlong(aim: Aim, bodyHalfMm: number): number {
+  return squareReachMmAlong(aim, bodyHalfMm) + DRILL_BORE_ROWS.sideClearanceMm
 }
 
 /**
@@ -121,11 +133,26 @@ export function drillStampLiftMm(): number {
   return Math.max(0, DRILL_BORE_ROWS.sideClearanceMm - MM_PER_SAMPLE)
 }
 
+/** The ring lag along one of the four facings. */
 export function casingRingLagMm(): number {
   return casingRingLagMmAt(BARE_WIDTH_LEVEL)
 }
 
-/** The ring lag round the bore of `widthLevel`: its radius plus the casing ring's outer radius. */
+/** The ring lag round the bore of `widthLevel` along a facing. */
 export function casingRingLagMmAt(widthLevel: number): number {
-  return boreRadiusMmAt(widthLevel) + boreRadiusMmAt(widthLevel) + CASING_LINING_WIDTH_MM
+  return casingRingLagMmAlongAt(AIM.down, widthLevel)
+}
+
+/** The ring lag of a bare ring laid along `aim`. */
+export function casingRingLagMmAlong(aim: Aim): number {
+  return casingRingLagMmAlongAt(aim, BARE_WIDTH_LEVEL)
+}
+
+/**
+ * The ring lag of a ring laid along `aim` round the bore of `widthLevel`: twice its r(aim) and the
+ * casing kind's band outside it.
+ */
+export function casingRingLagMmAlongAt(aim: Aim, widthLevel: number): number {
+  const cutRadiusMm = boreRadiusMmAlongAt(aim, widthLevel)
+  return cutRadiusMm + cutRadiusMm + STANDARD_CASING_KIND.ringOutsideMm
 }

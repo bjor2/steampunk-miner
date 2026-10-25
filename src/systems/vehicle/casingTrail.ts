@@ -34,13 +34,19 @@
  * waiting or lined, and charging it again would be a second first lining. Past
  * `MAX_CASING_TRAIL_POINTS` the newest waiting points are dropped the same way; nothing is laid
  * before the stamp is the ring lag past it, so no ring is ever laid under or ahead of the stamp.
+ *
+ * Each point keeps the aim its cut ran along (ticket 833), so its ring is laid round that cut's
+ * radius and falls due at that aim's lag, whatever the drill aims at when it does: a diagonal
+ * leg's last rings, laid as the rig turns or backs out, still line its wall. The aim rides along
+ * only off the four facings, as a pose's does, so a straight dig's trail keeps its shape and digest.
  */
 import {
   CASING_CUT_CONTINUE_MM,
   CASING_RING_SPACING_MM,
   MAX_CASING_TRAIL_POINTS,
 } from '../../constants/balance'
-import { casingRingLagMm } from './drillBore'
+import { AIM, isCardinalAim, type Aim } from './aim'
+import { BARE_WIDTH_LEVEL, casingRingLagMmAlongAt } from './drillBore'
 
 /** A point in world mm: where a casing ring is centred. */
 export interface RingPoint {
@@ -51,6 +57,8 @@ export interface RingPoint {
 /** A recorded axis point and the stretch of tunnel axis its ring lines, in mm. */
 export interface AxisPoint extends RingPoint {
   lengthMm: number
+  /** The aim its cut ran along (ticket 833); absent along the four facings. */
+  aim?: Aim
 }
 
 export interface CasingTrail {
@@ -71,27 +79,38 @@ export interface TrailStep {
 export const EMPTY_CASING_TRAIL: CasingTrail = { lastAxisPoint: null, unlined: [] }
 
 /**
- * The trail after the stamp's centre reached `stampCentre`; `isCutting` records a new point. A
- * point falls due `ringLagMm` behind the stamp: the bare bore's lag, or a wider rig's (ticket 749).
+ * The trail after the stamp's centre reached `stampCentre` cutting along `aim`; `isCutting`
+ * records a new point. A point falls due its aim's lag behind the stamp round the bore of
+ * `widthLevel`: the bare bore's, or a wider rig's (ticket 749).
  */
 export function followCasingTrail(
   trail: CasingTrail,
   stampCentre: RingPoint,
   isCutting: boolean,
-  ringLagMm: number = casingRingLagMm(),
+  aim: Aim,
+  widthLevel: number = BARE_WIDTH_LEVEL,
 ): TrailStep {
-  const recorded = isCutting ? recordAxisPoint(trail, stampCentre) : trail
-  return splitDuePoints(recorded, stampCentre, ringLagMm)
+  const recorded = isCutting ? recordAxisPoint(trail, stampCentre, aim) : trail
+  return splitDuePoints(recorded, stampCentre, widthLevel)
 }
 
 /**
- * Where one swept cut ran: its centre line from its sweep's start to where the cut reached, and
- * where its stamp's centre reached, which the ring lag is measured from.
+ * Where one swept cut ran: its centre line from its sweep's start to where the cut reached, where
+ * its stamp's centre reached, which the ring lag is measured from, and the aim it cut along.
  */
 export interface CutAxis {
   from: RingPoint
   to: RingPoint
   stampReach: RingPoint
+  aim: Aim
+}
+
+/**
+ * The aim a point's ring is laid along: its own, or a facing's where it carries none (every point
+ * before ticket 833), all four of which cut the same radius.
+ */
+export function ringAimOf(point: AxisPoint): Aim {
+  return point.aim ?? AIM.down
 }
 
 /** The trail after the swept cut's stamp centre ran along `axis`, recording at fixed spacing. */
@@ -99,19 +118,19 @@ export function followCasingTrailAlongCut(
   trail: CasingTrail,
   axis: CutAxis,
   isCutting: boolean,
-  ringLagMm: number = casingRingLagMm(),
+  widthLevel: number = BARE_WIDTH_LEVEL,
 ): TrailStep {
   const recorded = isCutting ? recordAxisPointsAlong(trail, axis) : trail
-  return splitDuePoints(recorded, axis.stampReach, ringLagMm)
+  return splitDuePoints(recorded, axis.stampReach, widthLevel)
 }
 
 /** One point per whole spacing from the last point toward the cut's end; a new cut starts as before. */
-function recordAxisPointsAlong(trail: CasingTrail, { from, to }: CutAxis): CasingTrail {
+function recordAxisPointsAlong(trail: CasingTrail, { from, to, aim }: CutAxis): CasingTrail {
   const last = trail.lastAxisPoint
   if (last === null || squaredDistance(last, from) > squared(CASING_CUT_CONTINUE_MM)) {
-    return recordAxisPoint(trail, to)
+    return recordAxisPoint(trail, to, aim)
   }
-  const points = spacedPointsBetween(last, to)
+  const points = spacedPointsBetween(last, to, aim)
   if (points.length === 0) return trail
   return {
     lastAxisPoint: pointOnly(points[points.length - 1]),
@@ -133,7 +152,7 @@ function pointsClearOfWaiting(
   return points.filter((point) => !isNearAnyPoint(others, point))
 }
 
-function spacedPointsBetween(from: RingPoint, to: RingPoint): AxisPoint[] {
+function spacedPointsBetween(from: RingPoint, to: RingPoint, aim: Aim): AxisPoint[] {
   const length = Math.floor(Math.sqrt(squaredDistance(from, to)))
   const count = Math.floor(length / CASING_RING_SPACING_MM)
   return Array.from({ length: count }, (_, index) => {
@@ -142,18 +161,24 @@ function spacedPointsBetween(from: RingPoint, to: RingPoint): AxisPoint[] {
       xMm: from.xMm + Math.floor(((to.xMm - from.xMm) * along) / length),
       yMm: from.yMm + Math.floor(((to.yMm - from.yMm) * along) / length),
       lengthMm: CASING_RING_SPACING_MM,
+      ...aimFieldOf(aim),
     }
   })
+}
+
+/** The point's aim field: the aim off the four facings, none along them. */
+function aimFieldOf(aim: Aim): { aim?: Aim } {
+  return isCardinalAim(aim) ? {} : { aim }
 }
 
 function pointOnly({ xMm, yMm }: RingPoint): RingPoint {
   return { xMm, yMm }
 }
 
-function recordAxisPoint(trail: CasingTrail, stampCentre: RingPoint): CasingTrail {
+function recordAxisPoint(trail: CasingTrail, stampCentre: RingPoint, aim: Aim): CasingTrail {
   const last = trail.lastAxisPoint
   if (last !== null && isWithinSpacing(last, stampCentre)) return trail
-  const point = { ...stampCentre, lengthMm: stretchSince(last, stampCentre) }
+  const point = { ...stampCentre, lengthMm: stretchSince(last, stampCentre), ...aimFieldOf(aim) }
   return { lastAxisPoint: stampCentre, unlined: withSpacedPoint(trail.unlined, point) }
 }
 
@@ -182,9 +207,12 @@ function stretchSince(last: RingPoint | null, stampCentre: RingPoint): number {
   return Math.round(Math.sqrt(squaredStretch))
 }
 
-/** Only points past the lag fall due; past `MAX_CASING_TRAIL_POINTS` the newest left are dropped. */
-function splitDuePoints(trail: CasingTrail, stampCentre: RingPoint, ringLagMm: number): TrailStep {
-  const isDue = (point: AxisPoint) => squaredDistance(point, stampCentre) >= squared(ringLagMm)
+/**
+ * Only points past their aim's lag round the bore of `widthLevel` fall due; past
+ * `MAX_CASING_TRAIL_POINTS` the newest left are dropped.
+ */
+function splitDuePoints(trail: CasingTrail, stampCentre: RingPoint, widthLevel: number): TrailStep {
+  const isDue = (point: AxisPoint) => isPastLag(point, stampCentre, widthLevel)
   const waiting = trail.unlined.filter((point) => !isDue(point))
   const dueIndices = trail.unlined.flatMap((point, index) => (isDue(point) ? [index] : []))
   return {
@@ -233,6 +261,11 @@ function trailHeadingAt(
 
 function differenceOf(to: RingPoint, from: RingPoint): RingPoint {
   return { xMm: to.xMm - from.xMm, yMm: to.yMm - from.yMm }
+}
+
+function isPastLag(point: AxisPoint, stampCentre: RingPoint, widthLevel: number): boolean {
+  const lagMm = casingRingLagMmAlongAt(ringAimOf(point), widthLevel)
+  return squaredDistance(point, stampCentre) >= squared(lagMm)
 }
 
 function squaredDistance(a: RingPoint, b: RingPoint): number {

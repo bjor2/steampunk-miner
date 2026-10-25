@@ -147,13 +147,26 @@ export const CUT_FACE_MARGIN_MM = 50
 export const CARRY_RELEASE_MARGIN_SAMPLES = 3
 
 /**
+ * A casing kind's ring band row (`STANDARD_CASING_KIND`): how far inside and outside the cut's
+ * radius along its aim, `r(aim)` (`vehicle/drillBore.ts`), a ring lines.
+ */
+export interface CasingKindRows {
+  readonly ringInsideMm: number
+  readonly ringOutsideMm: number
+}
+
+/**
  * Casing lining (#41 Placement rule as amended on 5 Oct, #56 Q1, moved into the wall by the GD lock
  * on #661): a ring is centred on the tunnel axis, where the drill stamp's centre passed, and lines
- * the annulus `stampR <= d < stampR + 0.25 m`, one 0.25 m sample thick in the rock just outside the
- * wall the drill cut, so the lining never narrows the bore. One ring every 0.5 m the stamp cuts.
- * The Gameplay & Vehicle Designer owns the numbers as data.
+ * the band `r(aim) - 0.25 m <= d < r(aim) + 0.25 m`, from the bore wall's full-weight edge to one
+ * 0.25 m sample into the rock just outside the wall the drill cut, so the lining never narrows the
+ * bore. The band is data on the casing kind, the cut's clearance on the drill (`DRILL_BORE_ROWS`),
+ * so a later casing kind changes its band with no code and a drill change moves the stamp and the
+ * ring together (the TD's reading of the HS on #833). Every lining type lays the standard kind's
+ * band today. The Gameplay & Vehicle Designer owns the numbers as data.
  */
-export const CASING_LINING_WIDTH_MM = 250
+export const STANDARD_CASING_KIND: CasingKindRows = { ringInsideMm: 250, ringOutsideMm: 250 }
+/** One ring every 0.5 m the stamp cuts. */
 export const CASING_RING_SPACING_MM = 500
 /**
  * A cut continues the casing trail while its sweep starts within this of the trail's last point,
@@ -166,8 +179,9 @@ export const CASING_CUT_CONTINUE_MM = 2150
 /**
  * Axis points waiting for their ring, a safety net that keeps the save small (ticket 538, the TD
  * ruling 6228998310 on #538: 6 to 9): waiting points lie at least `CASING_RING_SPACING_MM` apart
- * and within the ring lag (`casingRingLagMm`), so a straight cut holds at most lag / 500 of them
- * and a line through the stamp `2 x lag / 500 + 1`: 9 at #36's 1.9 m bore, 6 at the 1.2 m one.
+ * and within the ring lag (`casingRingLagMmAlong`), so a straight cut holds at most lag / 500 of
+ * them and a line through the stamp `2 x lag / 500 + 1`: 9 at #36's 1.9 m bore, 6 at the 1.2 m
+ * one along a facing, 8 along its 45 degree aim (a 1.82 m lag, ticket 833).
  * Only a tight loop fills it; the newest point past it is dropped, never the oldest laid inside
  * the lag.
  */
