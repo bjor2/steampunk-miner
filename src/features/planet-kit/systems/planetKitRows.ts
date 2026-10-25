@@ -102,6 +102,7 @@ function planetKitsOf(
     premiumTag: file.premiumTag as string,
     premiumLiftBp: economy.premiumLiftBp,
     awayMarkup: economy.awayMarkup,
+    heldFromSale: economy.heldFromSale,
     merchants: (file.merchants as Raw[]).map((row) => merchantOf(row, context)),
     items: (file.items as Raw[]).map((row) => kitItemOf(row, economy)),
   }

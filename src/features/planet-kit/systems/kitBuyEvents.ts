@@ -43,6 +43,7 @@ declare module '../../../systems/authority/domainEvent' {
     'planet-kit.not_sold_here': true
     'planet-kit.kit_tool_owned': true
     'planet-kit.stack_full': true
+    'planet-kit.held_from_sale': true
     'planet-kit.no_crate': true
   }
 }

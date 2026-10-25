@@ -532,8 +532,9 @@ import type { JsonCount } from '../wholeCount'
  *    the Sell bay, answered by `planet-kit.KitItemBought`, keeps a tool owned and a consumable in a
  *    stack pinned to the g it was bought at in the player's `planet-kit.holdings` section;
  *    `planet-kit.drop_container` spends one carried Cache Crate and is refused `no_crate` without
- *    one; `debug.planet-kit.grantKitItem` holds an item for a scenario. A run that buys nothing
- *    moves no digest.
+ *    one; `debug.planet-kit.grantKitItem` holds an item for a scenario. The four hazard tools
+ *    are refused `held_from_sale` until their verbs land (the GD's ship rule, #882). A run that
+ *    buys nothing moves no digest.
  */
 export const AUTHORITY_PROTOCOL_VERSION = 115
 

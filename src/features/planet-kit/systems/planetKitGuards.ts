@@ -64,6 +64,7 @@ export function kitTableProblems(
     ...items.flatMap(itemSaleProblems),
     ...items.flatMap((item) => itemStackProblems(item, economy)),
     ...consumablePriceProblems(items, economy),
+    ...heldFromSaleProblems(items, economy),
     ...items.flatMap((item) => itemHazardProblems(item, context)),
     ...merchants.flatMap((merchant) => stockProblems(merchant, items)),
     ...behaviourProblems(items, context),
@@ -169,6 +170,14 @@ function consumablePriceProblems(items: readonly KitItem[], economy: PlanetKitEc
       .filter((id) => !consumables.includes(id))
       .map((id) => `consumables.runValueShare.${id} names no consumable kit item`),
   ]
+}
+
+/** Every item held from sale is a kit item. */
+function heldFromSaleProblems(items: readonly KitItem[], economy: PlanetKitEconomy): string[] {
+  const ids = items.map((item) => item.id)
+  return [...economy.heldFromSale]
+    .filter((id) => !ids.includes(id))
+    .map((id) => `heldFromSale.${id} names no kit item`)
 }
 
 /** The item hooks on its home planet's hazard, or on none where the planet has none. */

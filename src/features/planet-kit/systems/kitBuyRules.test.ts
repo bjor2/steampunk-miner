@@ -20,7 +20,8 @@ import { PLANET_KITS } from './planetKitRows'
 import { kitItemOf } from './planetKitSales'
 
 // Buying a kit item at the merchant (ticket 850, PK4b): at the Sell bay, for money alone, a tool
-// owned for good and a consumable stacked at the g it was bought at, up to its carry limit.
+// owned for good and a consumable stacked at the g it was bought at, up to its carry limit. The
+// four hazard tools are held from sale until their verbs land (the GD's ship rule on #850, #882).
 
 const grantMoney: CommandIntent = { type: 'debug.grantMoney', payload: { amount: '1e12' } }
 const setPlanet = (planetIndex: number): CommandIntent => ({
@@ -53,6 +54,8 @@ function savedAndLoaded(session: ScriptedSession): ScriptedSession {
   return continueScriptedSession(restored.state)
 }
 
+const grantKitItem = (itemId: string): CommandIntent =>
+  ({ type: 'debug.planet-kit.grantKitItem', payload: { itemId } }) as CommandIntent
 const itemOf = (id: string) => kitItemOf(PLANET_KITS, id)!
 const planetOf = (planet: number) => ({ system: '1', planet: String(planet) })
 
@@ -95,36 +98,33 @@ describe('buying kit items (ticket 850)', () => {
     expect(stateDigest(session.state())).toBe(before)
   })
 
-  it('pins a Damp Flask to the g of planet 3, where it is sold', () => {
-    const session = dockedOn(3)
-    session.submit(1, buyKitItemIntent('damp_flask'))
-    expect(kitHoldingsOf(session.state(), 'p1').stacks).toEqual([
-      { itemId: 'damp_flask', g: '3', count: '1' },
-    ])
+  it('holds the four hazard tools from sale at every merchant that stocks them, spending nothing', () => {
+    const stocked: readonly [number, string][] = [
+      [2, 'scree_plough'],
+      [3, 'damp_flask'],
+      [4, 'scree_plough'],
+      [4, 'shard_tongs'],
+      [5, 'vent_vane'],
+    ]
+    for (const [planet, itemId] of stocked) {
+      const session = dockedOn(planet)
+      const before = stateDigest(session.state())
+      expect(rejectionOf(session.submit(1, buyKitItemIntent(itemId)))).toBe(
+        'planet-kit.held_from_sale',
+      )
+      expect(stateDigest(session.state())).toBe(before)
+    }
   })
 
-  it('owns a tool for good: a second buy is refused and it stays through a jump, save and load', () => {
+  it('keeps a granted tool for good: a buy is refused as owned, through a jump, save and load', () => {
     let session = dockedOn(2)
-    const price = kitItemPriceAt(itemOf('scree_plough'), planetOf(2))
-    const events = session.submit(1, buyKitItemIntent('scree_plough'))
-    expect(events).toContainEqual(
-      expect.objectContaining({ itemId: 'scree_plough', kind: 'tool', price: toCanonical(price) }),
-    )
+    session.submit(1, grantKitItem('scree_plough'))
     expect(rejectionOf(session.submit(2, buyKitItemIntent('scree_plough')))).toBe(
       'planet-kit.kit_tool_owned',
     )
     session = savedAndLoaded(session)
     session.submit(3, setPlanet(5))
     expect(kitHoldingsOf(session.state(), 'p1').tools).toEqual(['scree_plough'])
-  })
-
-  it('sells a tool at its home g at a later merchant, no markup', () => {
-    const session = dockedOn(4)
-    const events = session.submit(1, buyKitItemIntent('scree_plough'))
-    const homePrice = kitItemPriceAt(itemOf('scree_plough'), planetOf(2))
-    expect(events).toContainEqual(
-      expect.objectContaining({ itemId: 'scree_plough', g: '4', price: toCanonical(homePrice) }),
-    )
   })
 
   it('refuses what this merchant does not stock: a later tool, or a consumable away from home', () => {
@@ -150,10 +150,9 @@ describe('buying kit items (ticket 850)', () => {
 
   it('refuses a buy the wallet cannot pay, spending nothing', () => {
     const session = createScriptedSession()
-    session.submit(0, setPlanet(5))
     session.submit(0, teleportToDock('sell'))
     const before = stateDigest(session.state())
-    expect(rejectionOf(session.submit(1, buyKitItemIntent('vent_vane')))).toBe('money_short')
+    expect(rejectionOf(session.submit(1, buyKitItemIntent('cache_crate')))).toBe('money_short')
     expect(stateDigest(session.state())).toBe(before)
   })
 

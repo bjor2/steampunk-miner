@@ -5,7 +5,9 @@
  * not pace-scaled, with one carry limit for all. The premium lift is in basis points and may never
  * pass +25% (VS row 4). `awayMarkup` is recorded as Systems' fallback and applied by nothing.
  * `containers` holds the placed containers' caps per kind, per player and per planet, and the
- * access a new one is placed with (the TD's final ruling on #823, points 1 and 5).
+ * access a new one is placed with (the TD's final ruling on #823, points 1 and 5). `heldFromSale`
+ * lists the kit items no merchant sells yet (the GD's ship rule on #850: a hazard tool is held
+ * until its verb lands, #882).
  */
 import { fromCanonical, isNonNegativeMoneyText, type Money } from '../../../systems/money'
 import { CONTAINER_ACCESS, type ContainerAccess } from './placedContainers'
@@ -35,6 +37,8 @@ export interface PlanetKitEconomy {
   containerCaps: ReadonlyMap<string, number>
   /** The access a container is placed with. */
   containerDefaultAccess: ContainerAccess
+  /** The kit item ids no merchant sells yet, though stocked. */
+  heldFromSale: ReadonlySet<string>
 }
 
 /** VS row 4: the ore premium is at most +25%. */
@@ -47,6 +51,7 @@ const FIELDS: readonly string[] = [
   'tools',
   'consumables',
   'containers',
+  'heldFromSale',
 ]
 const CONSUMABLE_FIELDS: readonly string[] = [
   'carryLimit',
@@ -64,6 +69,7 @@ export function planetKitEconomyProblems(economy: unknown): string[] {
     ...toolsProblems(economy.tools),
     ...consumablesProblems(economy.consumables),
     ...containersProblems(economy.containers),
+    ...heldFromSaleProblems(economy.heldFromSale),
     ...unknownFields(economy, '', FIELDS),
   ]
 }
@@ -85,6 +91,7 @@ export function planetKitEconomyOf(economy: Raw): PlanetKitEconomy {
       number
     >,
     containerDefaultAccess: containers.defaultAccess as ContainerAccess,
+    heldFromSale: new Set(economy.heldFromSale as string[]),
   }
 }
 
@@ -165,6 +172,16 @@ function containerCapsProblems(caps: unknown): string[] {
     ...(isWholeFrom(cap, 1)
       ? []
       : [`containers.capPerPlayerPerPlanet.${kind} must be a whole number from 1`]),
+  ])
+}
+
+function heldFromSaleProblems(held: unknown): string[] {
+  if (!Array.isArray(held)) return ['heldFromSale must list item ids']
+  return held.flatMap((id, at) => [
+    ...(typeof id === 'string' && SNAKE_ID.test(id)
+      ? []
+      : [`heldFromSale[${at}] is not a snake_case item id`]),
+    ...(held.indexOf(id) === at ? [] : [`heldFromSale[${at}] lists ${String(id)} again`]),
   ])
 }
 

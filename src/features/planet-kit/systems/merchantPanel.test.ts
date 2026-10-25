@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
+import type { CommandIntent } from '../../../systems/authority/authorityCommand'
 import { createAuthorityState } from '../../../systems/authority/authorityState'
 import { isFeatureUnlocked } from '../../../systems/authority/featureUnlocks'
 import { createScriptedSession, WORLD_SEED } from '../../../systems/authority/scriptedSession'
 import { buyKitItemIntent } from './kitBuyRules'
 import {
   CARRIED_FULL_LOCK_REASON,
+  HELD_FROM_SALE_LOCK_REASON,
   isMerchantTradingHere,
   merchantPanelOf,
   OWNED_LOCK_REASON,
@@ -14,7 +16,7 @@ import { MERCHANTS_ROW_ID, sessionPlanetIdOf } from './sessionMerchant'
 
 // The merchant the Sell bay draws (ticket 821, PK2): the variant trading at the session's planet
 // once the `merchants` row is open, its premium tag and its id-keyed stock with #681 prices, and
-// what each line's Buy would meet (ticket 850).
+// what each line's Buy would meet (ticket 850), the hazard tools held from sale (the GD's ship rule).
 
 /** Docked at the Sell bay of planet `planetIndex` with `money`. */
 function dockedSession(planetIndex: number, money: string) {
@@ -78,7 +80,10 @@ describe('merchant panel (ticket 821)', () => {
 
   it('locks a tool’s line once owned and a consumable’s once carried to its limit', () => {
     const plough = dockedSession(2, '1e12')
-    plough.submit(1, buyKitItemIntent('scree_plough'))
+    plough.submit(1, {
+      type: 'debug.planet-kit.grantKitItem',
+      payload: { itemId: 'scree_plough' },
+    } as CommandIntent)
     const [ploughLine] = merchantPanelOf(PLANET_KITS, plough.state(), 'p1')!.stock
     expect(ploughLine).toMatchObject({ lockReason: OWNED_LOCK_REASON, carriedText: null })
     const crates = dockedSession(1, '1e12')
@@ -92,9 +97,24 @@ describe('merchant panel (ticket 821)', () => {
   })
 
   it('turns a price the wallet cannot pay red, leaving Buy open', () => {
-    const [vane] = merchantPanelOf(PLANET_KITS, dockedSession(5, '0').state(), 'p1')!.stock.slice(2)
-    expect(vane).toMatchObject({ itemId: 'vent_vane', isMoneyShort: true, lockReason: null })
-    const [rich] = merchantPanelOf(PLANET_KITS, dockedSession(5, '1e12').state(), 'p1')!.stock
+    const [poor] = merchantPanelOf(PLANET_KITS, dockedSession(1, '0').state(), 'p1')!.stock
+    expect(poor).toMatchObject({ itemId: 'cache_crate', isMoneyShort: true, lockReason: null })
+    const [rich] = merchantPanelOf(PLANET_KITS, dockedSession(1, '1e12').state(), 'p1')!.stock
     expect(rich.isMoneyShort).toBe(false)
+  })
+
+  it('locks every hazard tool’s line as not on sale yet, the GD’s ship rule until their verbs land', () => {
+    const lines = merchantPanelOf(PLANET_KITS, dockedSession(5, '1e12').state(), 'p1')!.stock
+    expect(lines.map((line) => [line.itemId, line.lockReason])).toEqual([
+      ['scree_plough', HELD_FROM_SALE_LOCK_REASON],
+      ['shard_tongs', HELD_FROM_SALE_LOCK_REASON],
+      ['vent_vane', HELD_FROM_SALE_LOCK_REASON],
+    ])
+    const [flask] = merchantPanelOf(
+      PLANET_KITS,
+      dockedSession(3, '1e12').state(),
+      'p1',
+    )!.stock.slice(1)
+    expect(flask).toMatchObject({ itemId: 'damp_flask', lockReason: HELD_FROM_SALE_LOCK_REASON })
   })
 })

@@ -113,6 +113,15 @@ describe('planet kits (ticket 820)', () => {
     ])
   })
 
+  it('holds the four hazard tools from sale and sells the crate (the GD’s ship rule on #850)', () => {
+    expect([...PLANET_KITS.heldFromSale].sort()).toEqual([
+      'damp_flask',
+      'scree_plough',
+      'shard_tongs',
+      'vent_vane',
+    ])
+  })
+
   it('registers nothing: no planet-kit id reaches the content registries before PK4', () => {
     const kinds = ['vehicle-item', 'power-up', 'tech-node'] as const
     const ids = kinds.flatMap((kind) => contentOf(kind).map((entry) => entry.id))
@@ -250,6 +259,15 @@ describe('planet kit guards (ticket 820)', () => {
     expect(problemsOf(kitsFile, stray)).toEqual([
       'consumables.runValueShare.vent_vane names no consumable kit item',
     ])
+  })
+
+  it('refuses an item held from sale that names no kit item, or one listed twice', () => {
+    const stray = economyCopy()
+    stray.heldFromSale = ['scree_hood', 'vent_vane', 'vent_vane']
+    expect(problemsOf(kitsFile, stray)).toEqual(['heldFromSale[2] lists vent_vane again'])
+    const unknown = economyCopy()
+    unknown.heldFromSale = ['scree_hood']
+    expect(problemsOf(kitsFile, unknown)).toEqual(['heldFromSale.scree_hood names no kit item'])
   })
 
   it('lists every problem at once rather than stopping at the first', () => {

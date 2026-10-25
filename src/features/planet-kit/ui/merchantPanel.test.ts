@@ -58,6 +58,9 @@ describe('merchant panel on the Sell bay', () => {
     expect(markup).toContain('Boilerhouse')
     expect(markup).toContain('Pays extra for Chromite.')
     expect(markup).toContain('Vent Vane')
+    // The GD's ship rule on #850: the hazard tools are listed, held from sale until their verbs land.
+    expect(markup).toContain('Not on sale yet.')
+    expect(markup).not.toContain('planet-kit-merchant-buy-vent_vane')
     expect(unregisteredTextsOf(markup)).toEqual([])
     expect(registeredUiTexts().flatMap(uiTextProblemsOf)).toEqual([])
   })

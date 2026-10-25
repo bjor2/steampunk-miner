@@ -69,6 +69,8 @@ export interface PlanetKits {
   premiumLiftBp: number
   /** Systems' fallback for a tool sold away from home; recorded, applied by nothing. */
   awayMarkup: Money
+  /** The item ids no merchant sells yet (the GD's ship rule on #850). */
+  heldFromSale: ReadonlySet<string>
   /** Planet 1 first. */
   merchants: readonly MerchantRow[]
   /** In home-planet order. */

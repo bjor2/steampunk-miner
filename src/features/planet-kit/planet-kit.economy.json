@@ -1,5 +1,5 @@
 {
-  "source": "Ticket 820 (PK1, spec #647), the GD lock of 24 Oct 15:22 with its final lock ~15:30 and the Systems rows for the locked HS kits: a tool costs 1·R(g_home)·paceScale(g_home) at every merchant, no markup; a consumable is priced at the buyer's g from its runValueShare of R (Cache Crate 0.1·R(1), Damp Flask 0.2·R(3), the TD ruling on #823: the crate is sold on P1 only, so the two readings coincide) with a carry limit of 3; the trader premium is +25% on the planet's own ores, once per ore, never stacked with the assay beacon's lift (a sale gets the larger of the two). awayMarkup is Systems' fallback only, recorded and not applied. R(g) is runValueOf in jumpFuel.ts and paceScale is planetEconomy.ts's; #681 rounds every price up. containers is the TD's final ruling on #823 (comment 6384924632, points 1 and 5): a placed container's cap per kind, per player and per planet (cache_crate 3, flat, no global cap) and the access a new container is placed with (owner; crew sharing is a later data flip).",
+  "source": "Ticket 820 (PK1, spec #647), the GD lock of 24 Oct 15:22 with its final lock ~15:30 and the Systems rows for the locked HS kits: a tool costs 1·R(g_home)·paceScale(g_home) at every merchant, no markup; a consumable is priced at the buyer's g from its runValueShare of R (Cache Crate 0.1·R(1), Damp Flask 0.2·R(3), the TD ruling on #823: the crate is sold on P1 only, so the two readings coincide) with a carry limit of 3; the trader premium is +25% on the planet's own ores, once per ore, never stacked with the assay beacon's lift (a sale gets the larger of the two). awayMarkup is Systems' fallback only, recorded and not applied. R(g) is runValueOf in jumpFuel.ts and paceScale is planetEconomy.ts's; #681 rounds every price up. containers is the TD's final ruling on #823 (comment 6384924632, points 1 and 5): a placed container's cap per kind, per player and per planet (cache_crate 3, flat, no global cap) and the access a new container is placed with (owner; crew sharing is a later data flip). heldFromSale is the GD's ship rule on #850 (25 Oct, the split into #881 and #882): the four hazard tools are listed and bought nowhere until T2 (#882) lands their visible verbs and empties the list, so no kit ships without its verb; a debug grant still holds one.",
   "premium": {
     "liftBp": 2500
   },
@@ -23,5 +23,6 @@
       "cache_crate": 3
     },
     "defaultAccess": "owner"
-  }
+  },
+  "heldFromSale": ["damp_flask", "scree_plough", "shard_tongs", "vent_vane"]
 }

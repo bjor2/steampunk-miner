@@ -9,7 +9,9 @@
  * In order it is refused when the id is no kit item (`unknown_kit_item`), the vehicle is not
  * docked at the Sell bay, no merchant trades on this planet (`no_merchant`), this merchant does not
  * stock it (`not_sold_here`), the player already owns the tool (`kit_tool_owned`) or carries the
- * most of the consumable (`stack_full`), or the wallet is short. A refused command changes nothing.
+ * most of the consumable (`stack_full`), the item is held from sale (`held_from_sale`: the GD's ship
+ * rule on #850 keeps the four hazard tools off sale until their verbs land, #882), or the wallet is
+ * short. A refused command changes nothing.
  * It is answered by `planet-kit.KitItemBought`.
  *
  * `debug.planet-kit.grantKitItem {itemId}` holds the item as if bought here, spending nothing; it
@@ -81,6 +83,7 @@ export function kitBuyRejectionOf(
     () => noMerchantRejection(state),
     () => notSoldHereRejection(item as KitItem, sessionPlanetIdOf(state)),
     () => holdingRejection(state, playerId, item as KitItem),
+    () => heldFromSaleRejection(item as KitItem),
     () => moneyShortRejection(state.players[playerId].wallet, priceHere(state, item as KitItem)),
   ])
 }
@@ -136,6 +139,11 @@ function notSoldHereRejection(item: KitItem, planet: PlanetId): Rejection | null
     'planet-kit.not_sold_here',
     `${item.id} is not sold on planet ${planet.system}:${planet.planet}`,
   )
+}
+
+function heldFromSaleRejection(item: KitItem): Rejection | null {
+  if (!PLANET_KITS.heldFromSale.has(item.id)) return null
+  return rejectionOf('planet-kit.held_from_sale', `${item.id} is not on sale until its verb lands`)
 }
 
 function holdingRejection(state: AuthorityState, playerId: string, item: KitItem) {
