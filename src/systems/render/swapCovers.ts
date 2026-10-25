@@ -30,10 +30,7 @@ export function isCoveringSwap(swap: PartSwapRequest): boolean {
  * Every item the showing swaps cover, sorted, each once, written over `into` (kept by the fold so
  * a step allocates nothing) and returned.
  */
-export function coveredItemIdsOf(
-  swaps: readonly PartSwapRequest[],
-  into: string[] = [],
-): string[] {
+export function coveredItemIdsOf(swaps: readonly PartSwapRequest[], into: string[] = []): string[] {
   into.length = 0
   for (const swap of swaps) appendNew(into, coversOf(swap))
   return into.sort()
