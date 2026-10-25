@@ -485,8 +485,17 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    `debug.planet-kit.placeContainer` places one for a scenario. The containers live in the
  *    `planet-kit.containers` session section keyed by `s:p`, absent while none is placed, so a
  *    run that places none moves no digest.
+ * 109: the premium ledger and the sale-lift provider (ticket 844, the TD ruling on #821 as
+ *    amended): each player counts the hold's units of a planet's premium species by origin `s:p`
+ *    (`premiumLedger`, absent while empty), counted at `collectOreUnit` through the `orePremium`
+ *    seam and debited by a tow, a Refinery batch and the tiers a sale sells, answered by
+ *    `OrePremiumLedgerChanged`; a Cache Crate moves the counts with its cargo. The Sell bay prices
+ *    through `oreSaleLift`, the largest lift of a data list (the beacon first), the counted units
+ *    at their origin's merchant taking premium rows too, said in `OreSaleLifted`;
+ *    `debug.setPremiumLedger` sets the ledger for a scenario. With no premium seam registered no
+ *    unit is counted, so a run moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 108
+export const AUTHORITY_PROTOCOL_VERSION = 109
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
