@@ -785,7 +785,13 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   and lining paid 12-20% of everything bought on each of P1-P5, travel excluded; the next grade at
   most 25% of the money held on each jump in; collapses printed) are the lane
   `src/logging/casingPrice.lane.test.ts`, its tally and bars unit-specced in `casingSpend.test.ts`
-  and `casingPriceBars.test.ts`. `src/logging/pacingGate.test.ts` fails on a
+  and `casingPriceBars.test.ts`. The P3-P5 pacing diagnosis of ticket 907 is the lane
+  `src/logging/economyTrace.lane.test.ts`: the three pacing seeds to planet 5's core under
+  kitPolicy off and on, folded into the per-planet economy trace (money on arrival, income per
+  minute, the next useful upgrade and its wait, upgrades bought, deaths by cause, each trip's sale
+  by its deepest band). It gates nothing and writes `balance-report/economy-trace.ndjson` and
+  `economy-trace.md`, which replaces the baseline `docs/economy/economy-trace-p1-p5.md`; the fold
+  is unit-specced in `economyTrace.test.ts` and the rows in `economyTraceReport.test.ts`. `src/logging/pacingGate.test.ts` fails on a
   missed pacing target (`src/constants/pacingTargets.ts`), an unregistered event or field, a broken
   #2 sequence or core events and commands in the first hour over 1.3x the bytes ticket 420
   measured with drill spans folded (about 2.4 MB, never above #11 am. 2's 4 MB; it prints the bytes

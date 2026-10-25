@@ -13,6 +13,11 @@ final balance. Nothing here is game code.
   on planets 1 to 5, both skipping every merchant and with merchants on, plus drill and tip buys,
   fuel share, money per minute, and each planet's kit decision. The PK7 lane writes it. It replaced
   #146's planets 1 to 10 baseline, which is in the file's history.
+- `economy-trace-p1-p5.md`: the P1-P5 economy trace of ticket 907, the baseline #908 re-measures
+  against. Per planet it gives money on arrival, income per minute, the next useful upgrade and how
+  long it took to afford, upgrades bought, deaths by cause, and each trip's sale by its deepest band.
+  It covers the three pacing seeds with kitPolicy off and on. The lane
+  `src/logging/economyTrace.lane.test.ts` writes it.
 - `drill-ladder.md`: the drill-speed ladder (#409), the time a 50-cell planet 1 column takes at
   drill_power 1, 5, 10, 15 and 20, measured by the authority's cut, to tune the drill curve against. It also
   holds the starting rigs' cut-follow speed per stored step 0 to 30 and why it reads flat (#431).

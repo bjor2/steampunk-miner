@@ -1271,6 +1271,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/drillSpanGate.test.ts` | 2 | 2 |
 | `src/logging/driveBoundReport.test.ts` | 3 | 3 |
 | `src/logging/dynamiteDryRuns.test.ts` | 4 | 4 |
+| `src/logging/economyTrace.lane.test.ts` | 1 | 1 |
+| `src/logging/economyTrace.test.ts` | 11 | 11 |
+| `src/logging/economyTraceReport.test.ts` | 6 | 6 |
 | `src/logging/eventNames.test.ts` | 6 | 6 |
 | `src/logging/eventSink.test.ts` | 10 | 10 |
 | `src/logging/exactCarryOnGolden.test.ts` | 20 | 4 |
