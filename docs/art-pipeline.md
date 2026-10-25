@@ -654,28 +654,35 @@ from then on the `.blend` files are the sources. The part table and the review r
 
 The art half of the boiler line of the rig look ladder
 ([#576](https://github.com/bjor2/steampunk-miner/issues/576), built by
-[#582](https://github.com/bjor2/steampunk-miner/issues/582) and grown to six authored steps by
-[#810](https://github.com/bjor2/steampunk-miner/issues/810), LK2): a Blender source for the
+[#582](https://github.com/bjor2/steampunk-miner/issues/582), grown to six authored steps by
+[#810](https://github.com/bjor2/steampunk-miner/issues/810), LK2, and authored to about P40 by
+[#873](https://github.com/bjor2/steampunk-miner/issues/873), LK10): a Blender source for the
 `boiler` track's look steps, `art/blender/vehicle-look-boiler/`, with the base look beside them.
 Each part is authored with the track's attach slot, `hull.boiler`, at the origin, fills the
 footprint of the rig's own `t1-boiler` dome and stands in its place: `kettle-boiler` is that dome
 piece for piece, `twin-drum-boiler` the first step on the band edge of 5 that LK1
 ([#809](https://github.com/bjor2/steampunk-miner/issues/809)) froze, and then, on each next edge,
-the twin-drum boiler with one more part fitted in a socket (GD lock on #810: a new outline or an
-added part, never a recolour): `gauged-boiler` (10, a pressure gauge on the right drum's head),
-`whistle-boiler` (15, a lever safety valve and three whistles), `manifold-boiler` (20, a header
-pipe with handwheels), `steam-drum-boiler` (25, a third drum over the column) and `firebox-boiler`
-(30, a hooded riveted firebox door with a glowing port). Every look keeps to the dome's own
-silhouette, so the rig outline, the drawn drill tip and the collider never move. The rig-look seam
-([#640](https://github.com/bjor2/steampunk-miner/issues/640)) registers the asset through
-`r.artAssets` from `rigLook.json`'s `lookAssets` and exports it to `public/assets/vehicle/` (7
-parts, 2048x256); each step row names its part with `asset: "vehicle-look-boiler"`, the track's
-`replaces: "boiler"` hides the rig's dome under it, and the look parts join the track's glow slots
-so the finish tail above the top step paints them. `docs/art/rig-look-boiler/author_boiler_looks.py`
-wrote the first version of the `.blend`, and `author_boiler_steps.py` fitted the LK2 parts into it;
-from then on the file is the source. The part table, the outline check at tiers 1 and 3 and the
-review renders, at desktop and at a 360 px phone's size, are in
-[docs/art/rig-look-boiler/](art/rig-look-boiler/README.md).
+the boiler with one more part fitted in a socket (GD lock on #810 and #873: a new outline or an
+added part, never a recolour): the five LK2 parts on 10 to 30 (`gauged-boiler`, a pressure gauge on
+the right drum's head; `whistle-boiler`, a lever safety valve and three whistles;
+`manifold-boiler`, a header pipe with handwheels; `steam-drum-boiler`, a third drum over the
+column; `firebox-boiler`, a hooded riveted firebox door with a glowing port), then the seventeen
+LK10 cooling fittings on 35 to 115, the boiler being the cooling line: water jackets round the
+drum heads, sight glasses, a feed pump, blow-down cocks with drip trays, cooling fins round the
+steam drum, a radiator grille, a blower fan, a feedwater tank, condenser coils, a thermometer
+dial, a brass hoop rail along the dome's outline, frost rime, then the ice-blue aether chill glows
+(cryo coils, chill lenses, an aether chiller halo, frost lines, aether frost rings). Every look
+keeps to the dome's own silhouette, so the rig outline, the drawn drill tip and the collider never
+move. The rig-look seam ([#640](https://github.com/bjor2/steampunk-miner/issues/640)) registers
+the asset through `r.artAssets` from `rigLook.json`'s `lookAssets` and exports it to
+`public/assets/vehicle/` (24 parts, 1024x2048); each step row names its part with
+`asset: "vehicle-look-boiler"`, the track's `replaces: "boiler"` hides the rig's dome under it, and
+the look parts join the track's glow slots so the finish tail above the top step paints them.
+`docs/art/rig-look-boiler/author_boiler_looks.py` wrote the first version of the `.blend`,
+`author_boiler_steps.py` fitted the LK2 parts into it and `author_boiler_p40_steps.py` the LK10
+parts (both re-runnable); from then on the file is the source. The part table, the sockets, the
+outline check at tiers 1 and 3 and the review renders, at desktop and at a 360 px phone's size,
+are in [docs/art/rig-look-boiler/](art/rig-look-boiler/README.md).
 
 ## Rig-look parts: the hull
 

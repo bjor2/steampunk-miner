@@ -1,5 +1,5 @@
 """
-The review sheets cut from render_boiler_looks.py's renders (tickets 582 and 810): every look
+The review sheets cut from render_boiler_looks.py's renders (tickets 582, 810 and 873): every look
 alone, the rig at tiers 1 and 3 with each look on the slot, each row resampled to a 1080p screen's
 90 px/m at the default 12 m zoom (#39) and to a 360 px wide phone's 30 px/m over the same zoom
 (the width the #576 ladder is judged at), the phone copy enlarged 8x with no smoothing so each
@@ -46,6 +46,8 @@ RIG_TIERS = (1, 3)
 GLOW_TIER = 1
 # A phone pixel counts as changed when a channel moves by more than this (of 255).
 CHANGED_THRESHOLD = 24
+# Twenty-four looks (ticket 873) no longer fit one row.
+SHEET_COLUMNS = 6
 
 
 def main():
@@ -92,10 +94,16 @@ def labelled(tile, label):
 
 
 def laid_out(tiles):
-    width, height = tiles[0].size
-    sheet = Image.new('RGB', (len(tiles) * width, height), BACKGROUND)
+    """Equal cells on a grid of SHEET_COLUMNS, row by row, each tile centred in its cell: the parts
+    differ in size, the rig tiles do not."""
+    width, height = max(tile.width for tile in tiles), max(tile.height for tile in tiles)
+    columns = min(SHEET_COLUMNS, len(tiles))
+    rows = (len(tiles) + columns - 1) // columns
+    sheet = Image.new('RGB', (columns * width, rows * height), BACKGROUND)
     for index, tile in enumerate(tiles):
-        sheet.paste(tile, (index * width, 0))
+        left = (index % columns) * width + (width - tile.width) // 2
+        top = (index // columns) * height + (height - tile.height) // 2
+        sheet.paste(tile, (left, top))
     return sheet
 
 
@@ -199,7 +207,7 @@ def part_bounds(part):
 
 def report_about(table, lit, glow):
     return {
-        'about': 'Tickets 582 and 810: at a 360 px wide phone (%g px/m over the 12 m zoom, and %g px/m over the '
+        'about': 'Tickets 582, 810 and 873: at a 360 px wide phone (%g px/m over the 12 m zoom, and %g px/m over the '
                  'closest %g m zoom the sweep spec judges at), the pixels of the %s footprint that change between '
                  'each look and the one before it (a channel moving more than %d of 255), and the brightest '
                  'pixel (Rec. 709 luminance, 0-255) of the drill nose against the boiler for each look, the nose lit '

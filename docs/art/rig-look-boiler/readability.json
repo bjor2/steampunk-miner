@@ -1,5 +1,5 @@
 {
-  "about": "Tickets 582 and 810: at a 360 px wide phone (30 px/m over the 12 m zoom, and 45 px/m over the closest 8 m zoom the sweep spec judges at), the pixels of the t1-boiler footprint that change between each look and the one before it (a channel moving more than 24 of 255), and the brightest pixel (Rec. 709 luminance, 0-255) of the drill nose against the boiler for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_boiler_looks.py. The nose must stay the brightest glow.",
+  "about": "Tickets 582, 810 and 873: at a 360 px wide phone (30 px/m over the 12 m zoom, and 45 px/m over the closest 8 m zoom the sweep spec judges at), the pixels of the t1-boiler footprint that change between each look and the one before it (a channel moving more than 24 of 255), and the brightest pixel (Rec. 709 luminance, 0-255) of the drill nose against the boiler for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_boiler_looks.py. The nose must stay the brightest glow.",
   "lit": {
     "tier-1": {
       "phonePxPerM": 30.0,
@@ -27,6 +27,74 @@
         "steam-drum-boiler->firebox-boiler": {
           "changed": 8,
           "of": 176
+        },
+        "firebox-boiler->jacketed-boiler": {
+          "changed": 5,
+          "of": 176
+        },
+        "jacketed-boiler->sight-glass-boiler": {
+          "changed": 5,
+          "of": 176
+        },
+        "sight-glass-boiler->pumped-boiler": {
+          "changed": 7,
+          "of": 176
+        },
+        "pumped-boiler->cocked-boiler": {
+          "changed": 3,
+          "of": 176
+        },
+        "cocked-boiler->finned-boiler": {
+          "changed": 7,
+          "of": 176
+        },
+        "finned-boiler->radiator-boiler": {
+          "changed": 6,
+          "of": 176
+        },
+        "radiator-boiler->blower-boiler": {
+          "changed": 3,
+          "of": 176
+        },
+        "blower-boiler->feed-tank-boiler": {
+          "changed": 2,
+          "of": 176
+        },
+        "feed-tank-boiler->condenser-boiler": {
+          "changed": 2,
+          "of": 176
+        },
+        "condenser-boiler->thermometer-boiler": {
+          "changed": 5,
+          "of": 176
+        },
+        "thermometer-boiler->hooped-boiler": {
+          "changed": 10,
+          "of": 176
+        },
+        "hooped-boiler->rimed-boiler": {
+          "changed": 2,
+          "of": 176
+        },
+        "rimed-boiler->cryo-coil-boiler": {
+          "changed": 8,
+          "of": 176
+        },
+        "cryo-coil-boiler->chill-lens-boiler": {
+          "changed": 6,
+          "of": 176
+        },
+        "chill-lens-boiler->chiller-boiler": {
+          "changed": 0,
+          "of": 176
+        },
+        "chiller-boiler->frost-line-boiler": {
+          "changed": 19,
+          "of": 176
+        },
+        "frost-line-boiler->aether-frost-boiler": {
+          "changed": 2,
+          "of": 176
         }
       },
       "closestZoomPxPerM": 45.0,
@@ -53,6 +121,74 @@
         },
         "steam-drum-boiler->firebox-boiler": {
           "changed": 21,
+          "of": 345
+        },
+        "firebox-boiler->jacketed-boiler": {
+          "changed": 16,
+          "of": 345
+        },
+        "jacketed-boiler->sight-glass-boiler": {
+          "changed": 10,
+          "of": 345
+        },
+        "sight-glass-boiler->pumped-boiler": {
+          "changed": 17,
+          "of": 345
+        },
+        "pumped-boiler->cocked-boiler": {
+          "changed": 12,
+          "of": 345
+        },
+        "cocked-boiler->finned-boiler": {
+          "changed": 18,
+          "of": 345
+        },
+        "finned-boiler->radiator-boiler": {
+          "changed": 12,
+          "of": 345
+        },
+        "radiator-boiler->blower-boiler": {
+          "changed": 7,
+          "of": 345
+        },
+        "blower-boiler->feed-tank-boiler": {
+          "changed": 7,
+          "of": 345
+        },
+        "feed-tank-boiler->condenser-boiler": {
+          "changed": 10,
+          "of": 345
+        },
+        "condenser-boiler->thermometer-boiler": {
+          "changed": 11,
+          "of": 345
+        },
+        "thermometer-boiler->hooped-boiler": {
+          "changed": 35,
+          "of": 345
+        },
+        "hooped-boiler->rimed-boiler": {
+          "changed": 10,
+          "of": 345
+        },
+        "rimed-boiler->cryo-coil-boiler": {
+          "changed": 19,
+          "of": 345
+        },
+        "cryo-coil-boiler->chill-lens-boiler": {
+          "changed": 15,
+          "of": 345
+        },
+        "chill-lens-boiler->chiller-boiler": {
+          "changed": 6,
+          "of": 345
+        },
+        "chiller-boiler->frost-line-boiler": {
+          "changed": 50,
+          "of": 345
+        },
+        "frost-line-boiler->aether-frost-boiler": {
+          "changed": 14,
           "of": 345
         }
       },
@@ -84,6 +220,74 @@
         "firebox-boiler": {
           "nose": 203,
           "boiler": 215
+        },
+        "jacketed-boiler": {
+          "nose": 203,
+          "boiler": 215
+        },
+        "sight-glass-boiler": {
+          "nose": 203,
+          "boiler": 208
+        },
+        "pumped-boiler": {
+          "nose": 203,
+          "boiler": 209
+        },
+        "cocked-boiler": {
+          "nose": 203,
+          "boiler": 208
+        },
+        "finned-boiler": {
+          "nose": 203,
+          "boiler": 208
+        },
+        "radiator-boiler": {
+          "nose": 203,
+          "boiler": 207
+        },
+        "blower-boiler": {
+          "nose": 203,
+          "boiler": 207
+        },
+        "feed-tank-boiler": {
+          "nose": 203,
+          "boiler": 207
+        },
+        "condenser-boiler": {
+          "nose": 203,
+          "boiler": 208
+        },
+        "thermometer-boiler": {
+          "nose": 203,
+          "boiler": 217
+        },
+        "hooped-boiler": {
+          "nose": 203,
+          "boiler": 219
+        },
+        "rimed-boiler": {
+          "nose": 203,
+          "boiler": 219
+        },
+        "cryo-coil-boiler": {
+          "nose": 203,
+          "boiler": 214
+        },
+        "chill-lens-boiler": {
+          "nose": 203,
+          "boiler": 249
+        },
+        "chiller-boiler": {
+          "nose": 203,
+          "boiler": 249
+        },
+        "frost-line-boiler": {
+          "nose": 203,
+          "boiler": 250
+        },
+        "aether-frost-boiler": {
+          "nose": 203,
+          "boiler": 249
         }
       }
     },
@@ -107,11 +311,79 @@
           "of": 176
         },
         "manifold-boiler->steam-drum-boiler": {
-          "changed": 11,
+          "changed": 12,
           "of": 176
         },
         "steam-drum-boiler->firebox-boiler": {
-          "changed": 9,
+          "changed": 10,
+          "of": 176
+        },
+        "firebox-boiler->jacketed-boiler": {
+          "changed": 5,
+          "of": 176
+        },
+        "jacketed-boiler->sight-glass-boiler": {
+          "changed": 5,
+          "of": 176
+        },
+        "sight-glass-boiler->pumped-boiler": {
+          "changed": 7,
+          "of": 176
+        },
+        "pumped-boiler->cocked-boiler": {
+          "changed": 3,
+          "of": 176
+        },
+        "cocked-boiler->finned-boiler": {
+          "changed": 7,
+          "of": 176
+        },
+        "finned-boiler->radiator-boiler": {
+          "changed": 6,
+          "of": 176
+        },
+        "radiator-boiler->blower-boiler": {
+          "changed": 3,
+          "of": 176
+        },
+        "blower-boiler->feed-tank-boiler": {
+          "changed": 2,
+          "of": 176
+        },
+        "feed-tank-boiler->condenser-boiler": {
+          "changed": 2,
+          "of": 176
+        },
+        "condenser-boiler->thermometer-boiler": {
+          "changed": 5,
+          "of": 176
+        },
+        "thermometer-boiler->hooped-boiler": {
+          "changed": 10,
+          "of": 176
+        },
+        "hooped-boiler->rimed-boiler": {
+          "changed": 2,
+          "of": 176
+        },
+        "rimed-boiler->cryo-coil-boiler": {
+          "changed": 8,
+          "of": 176
+        },
+        "cryo-coil-boiler->chill-lens-boiler": {
+          "changed": 5,
+          "of": 176
+        },
+        "chill-lens-boiler->chiller-boiler": {
+          "changed": 0,
+          "of": 176
+        },
+        "chiller-boiler->frost-line-boiler": {
+          "changed": 19,
+          "of": 176
+        },
+        "frost-line-boiler->aether-frost-boiler": {
+          "changed": 3,
           "of": 176
         }
       },
@@ -139,6 +411,74 @@
         },
         "steam-drum-boiler->firebox-boiler": {
           "changed": 21,
+          "of": 345
+        },
+        "firebox-boiler->jacketed-boiler": {
+          "changed": 16,
+          "of": 345
+        },
+        "jacketed-boiler->sight-glass-boiler": {
+          "changed": 10,
+          "of": 345
+        },
+        "sight-glass-boiler->pumped-boiler": {
+          "changed": 16,
+          "of": 345
+        },
+        "pumped-boiler->cocked-boiler": {
+          "changed": 12,
+          "of": 345
+        },
+        "cocked-boiler->finned-boiler": {
+          "changed": 18,
+          "of": 345
+        },
+        "finned-boiler->radiator-boiler": {
+          "changed": 13,
+          "of": 345
+        },
+        "radiator-boiler->blower-boiler": {
+          "changed": 7,
+          "of": 345
+        },
+        "blower-boiler->feed-tank-boiler": {
+          "changed": 7,
+          "of": 345
+        },
+        "feed-tank-boiler->condenser-boiler": {
+          "changed": 10,
+          "of": 345
+        },
+        "condenser-boiler->thermometer-boiler": {
+          "changed": 11,
+          "of": 345
+        },
+        "thermometer-boiler->hooped-boiler": {
+          "changed": 35,
+          "of": 345
+        },
+        "hooped-boiler->rimed-boiler": {
+          "changed": 10,
+          "of": 345
+        },
+        "rimed-boiler->cryo-coil-boiler": {
+          "changed": 19,
+          "of": 345
+        },
+        "cryo-coil-boiler->chill-lens-boiler": {
+          "changed": 16,
+          "of": 345
+        },
+        "chill-lens-boiler->chiller-boiler": {
+          "changed": 6,
+          "of": 345
+        },
+        "chiller-boiler->frost-line-boiler": {
+          "changed": 50,
+          "of": 345
+        },
+        "frost-line-boiler->aether-frost-boiler": {
+          "changed": 14,
           "of": 345
         }
       },
@@ -170,6 +510,74 @@
         "firebox-boiler": {
           "nose": 253,
           "boiler": 215
+        },
+        "jacketed-boiler": {
+          "nose": 253,
+          "boiler": 216
+        },
+        "sight-glass-boiler": {
+          "nose": 253,
+          "boiler": 208
+        },
+        "pumped-boiler": {
+          "nose": 253,
+          "boiler": 208
+        },
+        "cocked-boiler": {
+          "nose": 253,
+          "boiler": 208
+        },
+        "finned-boiler": {
+          "nose": 253,
+          "boiler": 208
+        },
+        "radiator-boiler": {
+          "nose": 253,
+          "boiler": 207
+        },
+        "blower-boiler": {
+          "nose": 253,
+          "boiler": 207
+        },
+        "feed-tank-boiler": {
+          "nose": 253,
+          "boiler": 207
+        },
+        "condenser-boiler": {
+          "nose": 253,
+          "boiler": 208
+        },
+        "thermometer-boiler": {
+          "nose": 253,
+          "boiler": 217
+        },
+        "hooped-boiler": {
+          "nose": 253,
+          "boiler": 219
+        },
+        "rimed-boiler": {
+          "nose": 253,
+          "boiler": 219
+        },
+        "cryo-coil-boiler": {
+          "nose": 253,
+          "boiler": 214
+        },
+        "chill-lens-boiler": {
+          "nose": 253,
+          "boiler": 249
+        },
+        "chiller-boiler": {
+          "nose": 253,
+          "boiler": 249
+        },
+        "frost-line-boiler": {
+          "nose": 253,
+          "boiler": 250
+        },
+        "aether-frost-boiler": {
+          "nose": 253,
+          "boiler": 249
         }
       }
     }
@@ -202,6 +610,74 @@
     "firebox-boiler": {
       "nose": 247,
       "boiler": 152
+    },
+    "jacketed-boiler": {
+      "nose": 247,
+      "boiler": 152
+    },
+    "sight-glass-boiler": {
+      "nose": 247,
+      "boiler": 150
+    },
+    "pumped-boiler": {
+      "nose": 247,
+      "boiler": 150
+    },
+    "cocked-boiler": {
+      "nose": 247,
+      "boiler": 151
+    },
+    "finned-boiler": {
+      "nose": 247,
+      "boiler": 150
+    },
+    "radiator-boiler": {
+      "nose": 247,
+      "boiler": 150
+    },
+    "blower-boiler": {
+      "nose": 247,
+      "boiler": 150
+    },
+    "feed-tank-boiler": {
+      "nose": 247,
+      "boiler": 150
+    },
+    "condenser-boiler": {
+      "nose": 247,
+      "boiler": 149
+    },
+    "thermometer-boiler": {
+      "nose": 247,
+      "boiler": 148
+    },
+    "hooped-boiler": {
+      "nose": 247,
+      "boiler": 149
+    },
+    "rimed-boiler": {
+      "nose": 247,
+      "boiler": 148
+    },
+    "cryo-coil-boiler": {
+      "nose": 247,
+      "boiler": 156
+    },
+    "chill-lens-boiler": {
+      "nose": 247,
+      "boiler": 163
+    },
+    "chiller-boiler": {
+      "nose": 247,
+      "boiler": 159
+    },
+    "frost-line-boiler": {
+      "nose": 246,
+      "boiler": 162
+    },
+    "aether-frost-boiler": {
+      "nose": 246,
+      "boiler": 163
     }
   }
 }
