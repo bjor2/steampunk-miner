@@ -1999,7 +1999,7 @@ Drill width B1 under the GD lock on #662 Part B (HS, VS, TD and G&V input record
 
 ### 3.101 Every planet after P5 draws its generated pool, and each planet keeps its ore rules stamp (ticket 888)
 
-Spec #878, M1 of the GD's Materials Expansion lock of 25 Oct (HS: one keyed path, no stats id, P40 stays 68; TD: the storage, bump and test rows; VS: value keys on g only). Ore rules 14, generator 18, snapshot 30, protocol 119.
+Spec #878, M1 of the GD's Materials Expansion lock of 25 Oct (HS: one keyed path, no stats id, P40 stays 68; TD: the storage, bump and test rows; VS: value keys on g only). Ore rules 14, generator 18, snapshot 30, protocol 120.
 
 - **Pools for system 1** (`solar-systems` `firstSystemPools.ts`): the #777 generator (3.91) on system 1's P6 on, families from the planet's act through its own mix, no new-content slot, ids `system1-p<p>-<slot>`. The look walk runs over the act's run of planets from P6 (`lookGroupOf`: P6-P7, P8-P16, ..., one planet each from P41), so no pair repeats within an act and the walk stays bounded. `materialPoolAt(worldSeed, s, p, oreRulesVersion)` is the one read for any address; a pool is cut from the mix under the planet's own stamp.
 - **Least kinds per run** (`poolRuns.ts`): before the split to `kindsTarget`, a run holds `ceil` of its cell's patch weight and value share of every band it paints over the VS's bounds (`commonKindTripCapBp` 5000, `kindTripCapBp` 1500, the roster's `perCommonKindMaxOfBandTrip` and `perNonCommonKindMax`, held equal by `rosterGuard.test.ts`). A swapped band 3's fossil common splits in two; a pool may then hold 16 or 17 kinds, never past the cap.

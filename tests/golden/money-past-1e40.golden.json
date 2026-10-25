@@ -1,8 +1,8 @@
 {
   "name": "money-past-1e40",
   "description": "Planet 80 ore sold for more than 1e40, then a hull step bought for more than 1e40 (#5, #11, 553).",
-  "generatorVersion": 17,
-  "authorityProtocolVersion": 119,
+  "generatorVersion": 18,
+  "authorityProtocolVersion": 120,
   "logSchemaVersion": 7,
   "numberFormatVersion": 1,
   "sliceSections": {
@@ -215,17 +215,17 @@
     {
       "tick": 124,
       "scope": "dock",
-      "digest": "6b582d1a5ffd09fd"
+      "digest": "466602f216bd5561"
     },
     {
       "tick": 166,
       "scope": "dock",
-      "digest": "ebdc4792b4f7760a"
+      "digest": "4ca26c15c1217b5e"
     },
     {
       "tick": 2000,
       "scope": "end",
-      "digest": "cf31e6a017b4fdcd"
+      "digest": "f147aff4aeee5379"
     }
   ],
   "minedOrder": [
