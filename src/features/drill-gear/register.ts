@@ -32,6 +32,7 @@ import { SPOIL_AUGER_STEP } from './systems/spoilAuger'
 import { DIAGONAL_CUT_REACTION, TWIN_BIT_SOURCE } from './systems/twinBit'
 import { SOFT_GROUND_LINK_REACTION } from './systems/softGroundLink'
 import { VIBRATORY_CRUMBLE_REACTION } from './systems/vibratoryCrumble'
+import { widthReportRows } from './widthReportRows'
 
 export const slice: SliceDefinition = {
   id: 'drill-gear',
@@ -54,6 +55,7 @@ export const slice: SliceDefinition = {
     DRILL_SOCKET_REACTIONS.forEach((reaction) => r.inputReaction(reaction))
     r.eventProjections(DRILL_GEAR_PROJECTIONS)
     r.runEvents(DRILL_GEAR_RUN_EVENTS)
+    r.reportRows(widthReportRows)
     // steampunkDebug.features['drill-gear'].getEngaged() / .getTwinBit() / .getDielectricBit() /
     // .statPreview(itemId, mark, planet)
     r.debugActions(drillGearDebugActions)
