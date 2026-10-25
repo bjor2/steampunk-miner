@@ -25,6 +25,10 @@
  * and p95 logged per row. Logged, never gated here: a width that fails the TD's bar goes back to
  * the TD and the VS, never to a clamp on width (that would be a speed cap).
  *
+ * Ticket 663: W keeps #36's base of 2 cells a metre as a label, so the #514 bars and the perf
+ * history keep their rows; on the 1.2 m bore (#662) a row with s side cells opens
+ * `BARE_BORE_CELLS_PER_METRE` + s, one fewer than its label.
+ *
  * Ticket 420: the W = 7 cut again with each step logged as the game logs it, the drill span writer
  * on (`w7Logged`); its p50 must stay within noise of the bare `wide` row, since a span only adds to
  * a fixed accumulator a tick.

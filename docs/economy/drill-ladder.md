@@ -13,7 +13,8 @@ Bjor's order of 18 Oct (level 20 about 50x today's) as the GD ruled it on #551: 
 - **Stat:** `D(0) = 1.5`, `D(n) = 1.5 x 1.12^(1/18) x 1.243^(n - 1)` (economy.json
   `upgrades[drill_power].effect`, family `perPurchase`). Purchase 1 keeps today's 1.5095 (the old
   first pip); every purchase after it is +24.3%. D(10) = 10.69, D(20) = 94.1 cells/s on band-1
-  rock (83.9 m/s down at the bench's 0.891), D(50) = 6.43e4, D(100) = 3.4e9; D(20) / D(1) = 62.4.
+  rock (83.9 m/s down at the bench's 0.891, `DRILL_DESCENT_PER_CUT`), D(50) = 6.43e4, D(100) =
+  3.4e9; D(20) / D(1) = 62.4.
 - **Price:** `price(0) = 1`, `price(n) = ceil(20 x 1.48^(n - 1)) x paceScale` (cost curve family
   `perPurchase`), so p/s = 1.19: 20, 30, 44, 96 at n = 1, 2, 3, 5, 682 at 10, 34.4k at 20.
 - **The bar (#463, replacing 1.12 +-5% a level):** every purchase from 2 on gains 1.181 to 1.305
@@ -66,6 +67,14 @@ quicker (the stored-step table below).
 |          20 |    55 |   0.917 |  54.545 |      2.836 |          2.967 |
 
 At ticket 552 the same column read 2969, 1244, 419, 141 and 48 ticks.
+
+**Re-measured on the 1.2 m bore (ticket 663).** #662 narrowed the stamp to the body plus 0.15 m a
+side. The same column now reads 2696, 1263, 443, 157 and 56 ticks (1.113, 2.375, 6.772, 19.108 and
+53.571 cells/s). L10 is unchanged and L5, L15 and L20 are a tick apart; L1 is 9% quicker, in band 2
+and the cave, not in band 1. The band-1 cut the felt speed is read on is unchanged: the stored-step
+table below reads the same ticks at every step on both bores (`descentPerCut.test.ts`), because the
+law counts a cell as a metre of the column whatever the stamp's width. So the cells to m/s mapping
+keeps 0.891 and L20 stays 83.9 m/s at the bench, 2.0% under through the quantum's rounding.
 
 - **cells/s** is the column's average, 50 cells over its time. Band 2 is slower than band 1.
 - **x previous** is how many times faster this level cut the column than the row above.

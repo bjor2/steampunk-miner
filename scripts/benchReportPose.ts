@@ -23,6 +23,10 @@
  * Ticket 620: `-- --width-ladder` times the side cutters' widths instead (W = 2 + s, s = 0 to 3,
  * and W = 7) at 84, 840 and 8400 m/s, judging only W = 7 at 84 m/s against the 1.2 ms p50 bar.
  *
+ * Ticket 663: W keeps #36's base of 2 cells a metre as a label, so the #514 bars and the perf
+ * history keep their rows; on the 1.2 m bore (#662) a row with s side cells opens
+ * `BARE_BORE_CELLS_PER_METRE` + s, one fewer than its label.
+ *
  * The command log's volume (Systems' ask on #441) is the reports' `commands.ndjson` bytes a second
  * while drilling, as the run log writes them (run-coded since #522). The cells a tick changed are
  * counted on a warm-up pass, never on a timed one.

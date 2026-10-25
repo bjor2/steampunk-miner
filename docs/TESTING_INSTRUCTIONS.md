@@ -943,6 +943,18 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   rows go to `balance-report/drill-ladder-steps.ndjson`, which the Tester's
   `pushTestMetrics.sh` appends to `drill-ladder.ndjson` on `test-metrics` for the status page's
   Drill speed panel ([loop-status.md](loop-status.md#drill-speed-panel-ticket-434)). About 2 s.
+- **The 1.2 m bore's re-baseline** (ticket 663, the VS on #661: felt speed fixed, yield restored
+  through paceScale first): `src/systems/authority/descentPerCut.test.ts` cuts the stored-step
+  ladder's band-1 column at L1, L10 and L20 on #36's 1.9 m bore and the shipped one, holds them to
+  the same ticks, and holds L20 through the one cells to m/s mapping (`DRILL_DESCENT_PER_CUT`,
+  0.891) to the VS's 83.9 m/s within -2.7% and +0.5% (`L20_FELT_DESCENT`, which the browser
+  anchor reads too). `src/systems/bot/botBoreYield.test.ts` bores a 40-cell shaft the pacing bot's
+  way at both bores and finds the same tiles and ore, which is why no paceScale row moved: the
+  bot never cut the disc. `src/systems/authority/sideCellsPerMetre.test.ts` (the #316 bench) and
+  the drill-gear `boreWidthCopy.test.ts` read the bench's base `BARE_BORE_CELLS_PER_METRE` (1);
+  the cards print the real bore from the bore row (1.2 m plus a metre a side cell a flank). The
+  pacing bars themselves (P1-P10 22-30 min, p*, the #551 money rate, the climb share) stay the R3
+  lane's.
 - **Cut-follow at the starting drill** (ticket 430): `src/physics/cutFollowStartingRigs.test.ts`
   plays 8 s legs down, level and up in the live loop with `drill.sweptCut` on, at stored
   drill_power 1 and 2 (tip 0; purchases since ticket 552, 1.50 and 1.86 m/s, the old stored 1 and 20) and #400's two rigs, and holds a down cut to the drill's speed
