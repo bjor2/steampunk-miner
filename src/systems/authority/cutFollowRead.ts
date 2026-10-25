@@ -42,13 +42,9 @@ import { groundReaderOf } from '../world/groundReader'
 import type { PlanetParams } from '../world/planetParams'
 import type { DiscStamp } from '../world/stampShape'
 import type { TilePoint } from '../world/tileGrid'
-import { materialCellAt } from '../world/worldState'
 import { vehicleOf, type AuthorityState } from './authorityState'
 import { gravityRampedFrontStepMmAt } from './downCutFront'
-import { openDrillGates } from './drillGates'
-import { subStepClockOf } from './groundDrill'
-import { heatThrottledDrill } from './heatRules'
-import { shockTicksFor } from './magnetic/electrifiedShock'
+import { gatedCellTimeReader, lawStepMmOf } from './lineCutStep'
 import { planetParamsOf } from './planetOfState'
 import { drillQuantumAt, travelStampAheadMmAt, stepBoundsAt } from './stepBoundRead'
 
@@ -80,6 +76,7 @@ export interface CutFollow {
 /** The slab a step drives into, with what reading its cells needs and the aim it cuts along. */
 interface SlabRead {
   params: PlanetParams
+  pose: VehiclePose
   slab: LeadingSlab
   aim: Aim
 }
@@ -121,7 +118,7 @@ function slabReadOf(state: AuthorityState, playerId: string, step: CutFollowStep
   const aimWith = (stamp: DiscStamp) => ({ centreMm: pose, facing: aimVectorOfPose(pose), stamp })
   const front = leadingSlabOf(reader, aimWith(sweptDrillStampOf(pose, step.isLifting, aheadMm)))
   const reach = leadingSlabOf(reader, aimWith(stepReachStampOf(pose, step.isLifting, aheadMm)))
-  return { params, slab: slabOfStep(front, reach), aim: aimOfPose(pose) }
+  return { params, pose, slab: slabOfStep(front, reach), aim: aimOfPose(pose) }
 }
 
 /**
@@ -154,9 +151,7 @@ export function frontStepMmAt(
 function uncappedFrontStepMmOf(state: AuthorityState, playerId: string, read: SlabRead): number {
   const { cuttingMm } = stepBoundsAt(state, playerId)
   if (isSlabClear(read.slab)) return cuttingMm
-  const leadSubSteps = slowestCuttableSubStepsOf(state, playerId, read.params, read.slab.uncutTiles)
-  if (leadSubSteps === null) return 0
-  return Math.min(cuttingMm, cutStepMmOf(leadSubSteps, drillQuantumAt(state, playerId)))
+  return Math.min(cuttingMm, cutStepThroughSlabMmOf(state, playerId, read))
 }
 
 /** The cursor's gate idled to this tick, then this tick's slab, or one more idle tick. */
@@ -236,10 +231,19 @@ function isSpanStoppedAt(state: AuthorityState, playerId: string, read: SlabRead
  * can cut none. A cell it cannot cut stops the cut's walk where the front meets it (ticket 570),
  * so the body drives on up to its face instead of waiting a slab short of it.
  */
-function cutSpeedOf(state: AuthorityState, playerId: string, { params, slab }: SlabRead): number {
-  const leadSubSteps = slowestCuttableSubStepsOf(state, playerId, params, slab.uncutTiles)
+function cutSpeedOf(state: AuthorityState, playerId: string, read: SlabRead): number {
+  return metresPerSecondOfStep(cutStepThroughSlabMmOf(state, playerId, read))
+}
+
+/**
+ * The drill law's step through the slab's slowest uncut cell the drill can cut, or past a cell a
+ * tick along the front's line (ticket 733, `lineCutStep.ts`); 0 when it can cut none.
+ */
+function cutStepThroughSlabMmOf(state: AuthorityState, playerId: string, read: SlabRead): number {
+  const leadSubSteps = slowestCuttableSubStepsOf(state, playerId, read.params, read.slab.uncutTiles)
   if (leadSubSteps === null) return 0
-  return metresPerSecondOfStep(cutStepMmOf(leadSubSteps, drillQuantumAt(state, playerId)))
+  const leadStepMm = cutStepMmOf(leadSubSteps, drillQuantumAt(state, playerId))
+  return lawStepMmOf(state, playerId, read, leadStepMm)
 }
 
 /** The cells' sub-step drill times as the drill's gates answer them: null for one it cannot cut. */
@@ -249,11 +253,7 @@ function cellSubStepsOf(
   params: PlanetParams,
   tiles: readonly TilePoint[],
 ): (number | null)[] {
-  const drill = heatThrottledDrill(params.planetIndex, vehicleOf(state, playerId))
-  const clock = subStepClockOf(drillQuantumAt(state, playerId))
-  const cellTimes = clock.cellTimesOf(params, drill, shockTicksFor(state, playerId))
-  const gates = openDrillGates(state, playerId, params, cellTimes)
-  return tiles.map((tile) => gates.drillTicksOf(tile, materialCellAt(state.world, params, tile), 0))
+  return tiles.map(gatedCellTimeReader(state, playerId, params))
 }
 
 /** `nLead`: the largest sub-step drill time of the cells, or null when one cannot be cut. */

@@ -274,9 +274,11 @@ function workPerMetreOf(cut: LegCut): WorkPerMetre {
 }
 
 const BASE_RIG = rigAt(44)
-/** The rigs held to the work floor: 240 and 300 m/s are reachable, at about L25-26 (VS, #662). */
-const FLOORED_SPEEDS = [78, 240, 300]
-const FASTER_RIGS = [...FLOORED_SPEEDS, 3600].map(rigAt)
+/**
+ * The rigs held to the work floor: 240 and 300 m/s are reachable, at about L25-26 (VS, #662), and
+ * 3600 m/s, about L37, since its step walks each cell it crosses (ticket 733).
+ */
+const FASTER_RIGS = [78, 240, 300, 3600].map(rigAt)
 
 /** Each faster rig's cells and work a metre down the column over the 44 m/s rig's. */
 function ratiosToBaseRig(): { speed: number; cells: number; work: number }[] {
@@ -310,20 +312,13 @@ describe('cells and work per metre at any speed (ticket 439, VS ruling)', () => 
   // Since ticket 570 the bore is the stamp's (1.2 m since ticket 662) at every speed and the front
   // bites each cell as its work pays, each bite's price drop rounded up: a faster rig opens the
   // same cells a metre and spends within the rounding of the same work on them.
-  // At 3600 m/s the whole window is one tick, which cuts in front mode on the 1.2 m bore and stops
-  // at the law's 50 m where #36's bore travelled 55 m: that one tick's end alone puts it at 0.87.
-  // #733 (high-speed precision) owns holding it to the floor (VS and TD rulings on #662).
-  it('opens at least the 44 m/s rig cells and work a metre at 78, 240 and 300 m/s: no free cells', () => {
-    const fewer = ratios.filter(
-      ({ speed, cells, work }) =>
-        FLOORED_SPEEDS.includes(speed) && (cells < 1 || work < 1 - BITE_ROUNDING),
-    )
+  // At 3600 m/s a tick crosses some 50 cells. Priced all at the slowest one its slab read, its
+  // front stopped at 40 m on the window's second tick where its work paid 50, a quarter of that
+  // tick unspent: 0.87. Its step now walks each cell at its own time (ticket 733): 1.01.
+  it('opens at least the 44 m/s rig cells and work a metre at 78, 240, 300 and 3600 m/s: no free cells', () => {
+    const fewer = ratios.filter(({ cells, work }) => cells < 1 || work < 1 - BITE_ROUNDING)
     expect(fewer).toEqual([])
   })
-
-  it.todo(
-    'opens at least the 44 m/s rig cells and work a metre at 3600 m/s, where one tick cuts the whole window (#733)',
-  )
 
   it('opens at most 1.20x the 44 m/s rig cells and 1.30x its work a metre at 78, 240, 300 and 3600 m/s (a regression ratchet until #441)', () => {
     const over = ratios.filter(({ cells, work }) => cells > RATCHET_CELLS || work > RATCHET_WORK)

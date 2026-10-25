@@ -1037,7 +1037,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/sweptChargeExact.lane.test.ts` | 168 | 1 |
 | `src/systems/authority/sweptChargeExact.test.ts` | 39 | 8 |
 | `src/systems/authority/sweptCutAtSpeed.test.ts` | 8 | 8 |
-| `src/systems/authority/sweptFreshCarve.test.ts` | 46 | 16 |
+| `src/systems/authority/sweptFreshCarve.test.ts` | 46 | 15 |
 | `src/systems/authority/sweptGateSpeeds.test.ts` | 24 | 2 |
 | `src/systems/authority/sweptLawCharge.test.ts` | 8 | 8 |
 | `src/systems/authority/sweptLawSlab.lane.test.ts` | 170 | 5 |
@@ -1864,6 +1864,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/heldCut.test.ts` | 13 | 13 |
 | `src/systems/vehicle/kinematicSweep.test.ts` | 6 | 6 |
 | `src/systems/vehicle/leadingSlab.test.ts` | 8 | 8 |
+| `src/systems/vehicle/lineCellStep.test.ts` | 6 | 6 |
 | `src/systems/vehicle/motionEffects.test.ts` | 13 | 13 |
 | `src/systems/vehicle/motionGlide.test.ts` | 8 | 7 |
 | `src/systems/vehicle/poseReport.test.ts` | 19 | 19 |
