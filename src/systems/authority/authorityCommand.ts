@@ -542,8 +542,16 @@ import type { JsonCount } from '../wholeCount'
  *    (v2), answered by `planet-kit.FlaskUncorked` or refused `no_flask` / `flask_open`; a debug
  *    grant answers `planet-kit.KitItemGranted` with its home price. A player who owns no tool and
  *    carries no flask reads and changes nothing new, so no run moves a digest.
+ * 117: each hazard tool's outcome while it acts (ticket 882, PK4c T2): the slices' shove aims turn
+ *    a vent's shove outward from the core, never more cells than along its normal, and their
+ *    hazard clears hold a kind off cells (`hazardKindOfCell`); planet-kit's plough queues the
+ *    scree ahead of the bit one tile aside through the terrain edit queue (`ScreeShoved`), its
+ *    tongs answer a bite with `ShardLooted`, its vane a vaned shove with `VaneRidden`, and an
+ *    uncorked flask keeps its cell as `flaskAt` in `planet-kit.holdings` (v3) and clears firedamp
+ *    within 2 tiles of it while open (`FlaskUncorked.at`). The four tools are on sale. A player
+ *    with no tool and no open flask meets none of it, so no run moves a digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 116
+export const AUTHORITY_PROTOCOL_VERSION = 117
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
