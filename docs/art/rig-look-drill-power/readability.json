@@ -1,0 +1,585 @@
+{
+  "about": "Ticket 875: at a 360 px wide phone (30 px/m over the 12 m zoom, and 45 px/m over the closest 8 m zoom the sweep spec judges at), the pixels of the drill_power look box [0.26, -0.2, 0.37, 0.04] (the housing drum's face the armour and the headlamp leave open) that change from each look to the next (a channel moving more than 24 of 255), the bare rig first, and the brightest pixel (Rec. 709 luminance, 0-255) of the drill nose against the look box and the rest of the rig for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_drill_power_looks.py. The nose must stay the brightest glow.",
+  "lit": {
+    "tier-1": {
+      "phonePxPerM": 30.0,
+      "lookBoxPx": {
+        "rig -> gauged-housing": {
+          "changed": 2,
+          "of": 40
+        },
+        "gauged-housing -> valved-housing": {
+          "changed": 2,
+          "of": 40
+        },
+        "valved-housing -> piped-housing": {
+          "changed": 0,
+          "of": 40
+        },
+        "piped-housing -> finned-housing": {
+          "changed": 3,
+          "of": 40
+        },
+        "finned-housing -> clamped-housing": {
+          "changed": 2,
+          "of": 40
+        },
+        "clamped-housing -> flywheel-housing": {
+          "changed": 0,
+          "of": 40
+        },
+        "flywheel-housing -> bolted-housing": {
+          "changed": 0,
+          "of": 40
+        },
+        "bolted-housing -> ribbed-housing": {
+          "changed": 1,
+          "of": 40
+        },
+        "ribbed-housing -> coiled-housing": {
+          "changed": 0,
+          "of": 40
+        },
+        "coiled-housing -> lensed-housing": {
+          "changed": 0,
+          "of": 40
+        },
+        "lensed-housing -> haloed-housing": {
+          "changed": 1,
+          "of": 40
+        },
+        "haloed-housing -> aether-housing": {
+          "changed": 1,
+          "of": 40
+        }
+      },
+      "closestZoomPxPerM": 45.0,
+      "closestZoomLookBoxPx": {
+        "rig -> gauged-housing": {
+          "changed": 6,
+          "of": 72
+        },
+        "gauged-housing -> valved-housing": {
+          "changed": 5,
+          "of": 72
+        },
+        "valved-housing -> piped-housing": {
+          "changed": 4,
+          "of": 72
+        },
+        "piped-housing -> finned-housing": {
+          "changed": 4,
+          "of": 72
+        },
+        "finned-housing -> clamped-housing": {
+          "changed": 4,
+          "of": 72
+        },
+        "clamped-housing -> flywheel-housing": {
+          "changed": 3,
+          "of": 72
+        },
+        "flywheel-housing -> bolted-housing": {
+          "changed": 0,
+          "of": 72
+        },
+        "bolted-housing -> ribbed-housing": {
+          "changed": 6,
+          "of": 72
+        },
+        "ribbed-housing -> coiled-housing": {
+          "changed": 0,
+          "of": 72
+        },
+        "coiled-housing -> lensed-housing": {
+          "changed": 2,
+          "of": 72
+        },
+        "lensed-housing -> haloed-housing": {
+          "changed": 2,
+          "of": 72
+        },
+        "haloed-housing -> aether-housing": {
+          "changed": 3,
+          "of": 72
+        }
+      },
+      "brightest": {
+        "rig": {
+          "nose": 203,
+          "look": 178,
+          "restOfRig": 255
+        },
+        "gauged-housing": {
+          "nose": 203,
+          "look": 183,
+          "restOfRig": 255
+        },
+        "valved-housing": {
+          "nose": 203,
+          "look": 183,
+          "restOfRig": 255
+        },
+        "piped-housing": {
+          "nose": 203,
+          "look": 184,
+          "restOfRig": 255
+        },
+        "finned-housing": {
+          "nose": 203,
+          "look": 184,
+          "restOfRig": 255
+        },
+        "clamped-housing": {
+          "nose": 203,
+          "look": 184,
+          "restOfRig": 255
+        },
+        "flywheel-housing": {
+          "nose": 203,
+          "look": 184,
+          "restOfRig": 255
+        },
+        "bolted-housing": {
+          "nose": 203,
+          "look": 188,
+          "restOfRig": 255
+        },
+        "ribbed-housing": {
+          "nose": 203,
+          "look": 178,
+          "restOfRig": 255
+        },
+        "coiled-housing": {
+          "nose": 203,
+          "look": 178,
+          "restOfRig": 255
+        },
+        "lensed-housing": {
+          "nose": 203,
+          "look": 182,
+          "restOfRig": 255
+        },
+        "haloed-housing": {
+          "nose": 203,
+          "look": 182,
+          "restOfRig": 255
+        },
+        "aether-housing": {
+          "nose": 203,
+          "look": 182,
+          "restOfRig": 255
+        }
+      }
+    },
+    "tier-2": {
+      "phonePxPerM": 30.0,
+      "lookBoxPx": {
+        "rig -> gauged-housing": {
+          "changed": 2,
+          "of": 40
+        },
+        "gauged-housing -> valved-housing": {
+          "changed": 2,
+          "of": 40
+        },
+        "valved-housing -> piped-housing": {
+          "changed": 1,
+          "of": 40
+        },
+        "piped-housing -> finned-housing": {
+          "changed": 2,
+          "of": 40
+        },
+        "finned-housing -> clamped-housing": {
+          "changed": 1,
+          "of": 40
+        },
+        "clamped-housing -> flywheel-housing": {
+          "changed": 0,
+          "of": 40
+        },
+        "flywheel-housing -> bolted-housing": {
+          "changed": 0,
+          "of": 40
+        },
+        "bolted-housing -> ribbed-housing": {
+          "changed": 1,
+          "of": 40
+        },
+        "ribbed-housing -> coiled-housing": {
+          "changed": 0,
+          "of": 40
+        },
+        "coiled-housing -> lensed-housing": {
+          "changed": 0,
+          "of": 40
+        },
+        "lensed-housing -> haloed-housing": {
+          "changed": 1,
+          "of": 40
+        },
+        "haloed-housing -> aether-housing": {
+          "changed": 1,
+          "of": 40
+        }
+      },
+      "closestZoomPxPerM": 45.0,
+      "closestZoomLookBoxPx": {
+        "rig -> gauged-housing": {
+          "changed": 6,
+          "of": 72
+        },
+        "gauged-housing -> valved-housing": {
+          "changed": 5,
+          "of": 72
+        },
+        "valved-housing -> piped-housing": {
+          "changed": 5,
+          "of": 72
+        },
+        "piped-housing -> finned-housing": {
+          "changed": 4,
+          "of": 72
+        },
+        "finned-housing -> clamped-housing": {
+          "changed": 4,
+          "of": 72
+        },
+        "clamped-housing -> flywheel-housing": {
+          "changed": 3,
+          "of": 72
+        },
+        "flywheel-housing -> bolted-housing": {
+          "changed": 0,
+          "of": 72
+        },
+        "bolted-housing -> ribbed-housing": {
+          "changed": 4,
+          "of": 72
+        },
+        "ribbed-housing -> coiled-housing": {
+          "changed": 0,
+          "of": 72
+        },
+        "coiled-housing -> lensed-housing": {
+          "changed": 1,
+          "of": 72
+        },
+        "lensed-housing -> haloed-housing": {
+          "changed": 2,
+          "of": 72
+        },
+        "haloed-housing -> aether-housing": {
+          "changed": 3,
+          "of": 72
+        }
+      },
+      "brightest": {
+        "rig": {
+          "nose": 252,
+          "look": 190,
+          "restOfRig": 255
+        },
+        "gauged-housing": {
+          "nose": 252,
+          "look": 190,
+          "restOfRig": 255
+        },
+        "valved-housing": {
+          "nose": 252,
+          "look": 190,
+          "restOfRig": 255
+        },
+        "piped-housing": {
+          "nose": 252,
+          "look": 190,
+          "restOfRig": 255
+        },
+        "finned-housing": {
+          "nose": 252,
+          "look": 190,
+          "restOfRig": 255
+        },
+        "clamped-housing": {
+          "nose": 252,
+          "look": 190,
+          "restOfRig": 255
+        },
+        "flywheel-housing": {
+          "nose": 252,
+          "look": 190,
+          "restOfRig": 255
+        },
+        "bolted-housing": {
+          "nose": 252,
+          "look": 190,
+          "restOfRig": 255
+        },
+        "ribbed-housing": {
+          "nose": 252,
+          "look": 190,
+          "restOfRig": 255
+        },
+        "coiled-housing": {
+          "nose": 252,
+          "look": 190,
+          "restOfRig": 255
+        },
+        "lensed-housing": {
+          "nose": 252,
+          "look": 190,
+          "restOfRig": 255
+        },
+        "haloed-housing": {
+          "nose": 252,
+          "look": 190,
+          "restOfRig": 255
+        },
+        "aether-housing": {
+          "nose": 252,
+          "look": 190,
+          "restOfRig": 255
+        }
+      }
+    },
+    "tier-3": {
+      "phonePxPerM": 30.0,
+      "lookBoxPx": {
+        "rig -> gauged-housing": {
+          "changed": 0,
+          "of": 40
+        },
+        "gauged-housing -> valved-housing": {
+          "changed": 0,
+          "of": 40
+        },
+        "valved-housing -> piped-housing": {
+          "changed": 0,
+          "of": 40
+        },
+        "piped-housing -> finned-housing": {
+          "changed": 1,
+          "of": 40
+        },
+        "finned-housing -> clamped-housing": {
+          "changed": 2,
+          "of": 40
+        },
+        "clamped-housing -> flywheel-housing": {
+          "changed": 0,
+          "of": 40
+        },
+        "flywheel-housing -> bolted-housing": {
+          "changed": 0,
+          "of": 40
+        },
+        "bolted-housing -> ribbed-housing": {
+          "changed": 0,
+          "of": 40
+        },
+        "ribbed-housing -> coiled-housing": {
+          "changed": 0,
+          "of": 40
+        },
+        "coiled-housing -> lensed-housing": {
+          "changed": 0,
+          "of": 40
+        },
+        "lensed-housing -> haloed-housing": {
+          "changed": 0,
+          "of": 40
+        },
+        "haloed-housing -> aether-housing": {
+          "changed": 0,
+          "of": 40
+        }
+      },
+      "closestZoomPxPerM": 45.0,
+      "closestZoomLookBoxPx": {
+        "rig -> gauged-housing": {
+          "changed": 0,
+          "of": 72
+        },
+        "gauged-housing -> valved-housing": {
+          "changed": 0,
+          "of": 72
+        },
+        "valved-housing -> piped-housing": {
+          "changed": 1,
+          "of": 72
+        },
+        "piped-housing -> finned-housing": {
+          "changed": 2,
+          "of": 72
+        },
+        "finned-housing -> clamped-housing": {
+          "changed": 3,
+          "of": 72
+        },
+        "clamped-housing -> flywheel-housing": {
+          "changed": 0,
+          "of": 72
+        },
+        "flywheel-housing -> bolted-housing": {
+          "changed": 0,
+          "of": 72
+        },
+        "bolted-housing -> ribbed-housing": {
+          "changed": 0,
+          "of": 72
+        },
+        "ribbed-housing -> coiled-housing": {
+          "changed": 0,
+          "of": 72
+        },
+        "coiled-housing -> lensed-housing": {
+          "changed": 0,
+          "of": 72
+        },
+        "lensed-housing -> haloed-housing": {
+          "changed": 1,
+          "of": 72
+        },
+        "haloed-housing -> aether-housing": {
+          "changed": 1,
+          "of": 72
+        }
+      },
+      "brightest": {
+        "rig": {
+          "nose": 253,
+          "look": 197,
+          "restOfRig": 255
+        },
+        "gauged-housing": {
+          "nose": 253,
+          "look": 197,
+          "restOfRig": 255
+        },
+        "valved-housing": {
+          "nose": 253,
+          "look": 197,
+          "restOfRig": 255
+        },
+        "piped-housing": {
+          "nose": 253,
+          "look": 197,
+          "restOfRig": 255
+        },
+        "finned-housing": {
+          "nose": 253,
+          "look": 197,
+          "restOfRig": 255
+        },
+        "clamped-housing": {
+          "nose": 253,
+          "look": 197,
+          "restOfRig": 255
+        },
+        "flywheel-housing": {
+          "nose": 253,
+          "look": 197,
+          "restOfRig": 255
+        },
+        "bolted-housing": {
+          "nose": 253,
+          "look": 198,
+          "restOfRig": 255
+        },
+        "ribbed-housing": {
+          "nose": 253,
+          "look": 197,
+          "restOfRig": 255
+        },
+        "coiled-housing": {
+          "nose": 253,
+          "look": 197,
+          "restOfRig": 255
+        },
+        "lensed-housing": {
+          "nose": 253,
+          "look": 197,
+          "restOfRig": 255
+        },
+        "haloed-housing": {
+          "nose": 253,
+          "look": 197,
+          "restOfRig": 255
+        },
+        "aether-housing": {
+          "nose": 253,
+          "look": 197,
+          "restOfRig": 255
+        }
+      }
+    }
+  },
+  "glow": {
+    "rig": {
+      "nose": 247,
+      "look": 44,
+      "restOfRig": 253
+    },
+    "gauged-housing": {
+      "nose": 247,
+      "look": 48,
+      "restOfRig": 253
+    },
+    "valved-housing": {
+      "nose": 247,
+      "look": 49,
+      "restOfRig": 253
+    },
+    "piped-housing": {
+      "nose": 247,
+      "look": 50,
+      "restOfRig": 253
+    },
+    "finned-housing": {
+      "nose": 247,
+      "look": 50,
+      "restOfRig": 253
+    },
+    "clamped-housing": {
+      "nose": 247,
+      "look": 49,
+      "restOfRig": 253
+    },
+    "flywheel-housing": {
+      "nose": 247,
+      "look": 51,
+      "restOfRig": 253
+    },
+    "bolted-housing": {
+      "nose": 247,
+      "look": 52,
+      "restOfRig": 253
+    },
+    "ribbed-housing": {
+      "nose": 247,
+      "look": 34,
+      "restOfRig": 253
+    },
+    "coiled-housing": {
+      "nose": 247,
+      "look": 34,
+      "restOfRig": 253
+    },
+    "lensed-housing": {
+      "nose": 247,
+      "look": 139,
+      "restOfRig": 253
+    },
+    "haloed-housing": {
+      "nose": 247,
+      "look": 138,
+      "restOfRig": 253
+    },
+    "aether-housing": {
+      "nose": 247,
+      "look": 139,
+      "restOfRig": 253
+    }
+  }
+}

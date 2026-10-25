@@ -793,6 +793,35 @@ source. The part table, the outline check at tiers 1 to 3 and the review renders
 at a 360 px phone's size, are in
 [docs/art/rig-look-drill-tip/](art/rig-look-drill-tip/README.md).
 
+## Rig-look parts: the drill power
+
+The art half of the drill_power line of the rig look ladder
+([#576](https://github.com/bjor2/steampunk-miner/issues/576), authored to about P40 by
+[#875](https://github.com/bjor2/steampunk-miner/issues/875), LK12): a Blender source for the
+twelve look steps on the band edges LK1 ([#809](https://github.com/bjor2/steampunk-miner/issues/809))
+froze for the line past #554's nine glow rows, 60, 66, ..., 126 purchases,
+`art/blender/vehicle-look-drill-power/`. Each part is authored with the track's attach slot,
+`drill.housing`, at the origin (the Game Director's drill_power showcase point on #180, on the pod's
+bow at the gimbal drive's drum) and lies body-fixed over the rig (`replaces` is null, draw order 4:
+over the housing drum and the chassis, under the armour and the drill head), so the drill head, its
+tip and the drill_tip crowns on it are untouched and no second head sprite is drawn. Each step is
+the housing with one more part fitted in a socket on the drum's face the tier-2 and tier-3 bow
+armour and the headlamp leave open, a panel 5.5 cm wide and 20 cm tall read top down as a power
+train: the steam fittings first (a pressure gauge, a relief valve, the steam feed pipes, cooling
+fins, a clamp band, a power flywheel), then heavier hardware (hex bolts, iron ribs, copper coils),
+then the aether glows (sight lenses, a flywheel halo, the aether housing). Every look keeps inside
+the rig's own silhouette at tiers 1, 2 and 3, so the rig outline, the drawn drill tip and the
+collider never move; the glows sit at 0.3, under a fifth of the nose seams', so the nose stays the
+brightest part. The rig-look seam ([#640](https://github.com/bjor2/steampunk-miner/issues/640))
+registers the asset through `r.artAssets` from `rigLook.json`'s `lookAssets` and exports it to
+`public/assets/vehicle/`; each step row names its part with `asset: "vehicle-look-drill-power"`,
+and the parts form the track's third glow slot group, under the `rigBody` cap, so the finish tail
+above the top step paints them while #554's bit and head glows keep their own two groups.
+`docs/art/rig-look-drill-power/author_drill_power_looks.py` wrote the first version of the `.blend`;
+from then on the file is the source. The part table, the sockets, the outline check at tiers 1 to 3
+and the review renders, at desktop and at a 360 px phone's size, are in
+[docs/art/rig-look-drill-power/](art/rig-look-drill-power/README.md).
+
 ## Rig-look parts: the engine
 
 Retired by [#726](https://github.com/bjor2/steampunk-miner/issues/726): the drive's tracks and wheels
