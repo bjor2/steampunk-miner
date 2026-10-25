@@ -41,11 +41,6 @@ export function portablePremiumLedgerProblems(
   return [...orderProblemsOf(ledger, path), ...premiumOverHoldProblems(ledger, hold, path)]
 }
 
-/** Whether `count` is one well-formed ledger count. */
-export function isPremiumCount(count: unknown): count is PremiumCount {
-  return countProblemsOf(count, 'count').length === 0
-}
-
 function countProblemsOf(count: unknown, path: string): string[] {
   if (!isJsonObject(count)) return [`${path} must be an object`]
   const isValid =

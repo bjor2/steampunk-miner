@@ -7,6 +7,7 @@
  *   out of play, an empty hold, or a drop past the kind's cap per player per planet.
  * - `planet-kit.pickup_container {containerId}`: the container's cargo moves back into the hold,
  *   up to its free room, highest first; what does not fit stays and an emptied container goes.
+ *   The hold's premium ledger counts move with the cargo both ways (ticket 844), never debited.
  *   Refused for a container not on this planet, one the player may not open (only its owner while
  *   access is `owner`), one out of the drill's reach of the vehicle, or a full hold.
  * - `debug.planet-kit.placeContainer`: a scenario's container with given cargo, refused (never
@@ -29,6 +30,15 @@ import {
 import type { RejectionReason } from '../../../systems/authority/domainEvent'
 import type { CommandPayloads } from '../../../systems/authority/authorityCommand'
 import type { SliceCommandRules } from '../../../systems/registries/commandRules'
+import {
+  EMPTY_PREMIUM_LEDGER,
+  withPremiumCounts,
+} from '../../../systems/authority/premium/premiumLedger'
+import {
+  premiumLedgerEventsOf,
+  premiumLedgerOf,
+  withPremiumLedger,
+} from '../../../systems/authority/premium/premiumLedgerState'
 import {
   isWithinDrillReach,
   tileOfPose,
@@ -135,9 +145,13 @@ function placeContainer(state: AuthorityState, playerId: string, drop: Container
   const outcome = dropContainer(placedContainersIn(state), drop)
   if (!outcome.isDropped) return { state, events: [] }
   const placed = withPlacedContainers(state, outcome.placed)
+  const emptied = withHold(placed, playerId, outcome.hold)
   return {
-    state: withHold(placed, playerId, outcome.hold),
-    events: [containerDroppedOf(playerId, drop.planetKey, outcome.container)],
+    state: withPremiumLedger(emptied, playerId, EMPTY_PREMIUM_LEDGER),
+    events: [
+      containerDroppedOf(playerId, drop.planetKey, outcome.container),
+      ...premiumLedgerEventsOf(drop.premium, 'move', 'container_drop'),
+    ],
   }
 }
 
@@ -155,9 +169,14 @@ function takeFromContainer(
   const outcome = pickupContainer(placedContainersIn(state), pickup)
   if (!outcome.isPickedUp) return { state, events: [] }
   const placed = withPlacedContainers(state, outcome.placed)
+  const filled = withHold(placed, playerId, outcome.hold)
+  const ledger = withPremiumCounts(premiumLedgerOf(filled, playerId), outcome.movedPremium)
   return {
-    state: withHold(placed, playerId, outcome.hold),
-    events: [containerPickedUpOf(playerId, pickup.planetKey, container, outcome.moved)],
+    state: withPremiumLedger(filled, playerId, ledger),
+    events: [
+      containerPickedUpOf(playerId, pickup.planetKey, container, outcome.moved),
+      ...premiumLedgerEventsOf(outcome.movedPremium, 'move', 'container_pickup'),
+    ],
   }
 }
 
@@ -168,6 +187,7 @@ function holdDropOf(state: AuthorityState, playerId: string, kind: string): Cont
     // Read only once `outOfPlayRejection` passed, so the vehicle has a pose.
     cell: tileOfPose(vehicle.pose as VehiclePose),
     hold: vehicle.cargo,
+    premium: premiumLedgerOf(state, playerId),
   }
 }
 
@@ -176,6 +196,7 @@ function scenarioDropOf(state: AuthorityState, payload: ScenarioContainer): Cont
     ...dropBaseOf(state, payload.kind, payload.ownerId),
     cell: { tx: payload.tx, ty: payload.ty },
     hold: scenarioCargoOf(payload.ore, payload.coreFragments),
+    premium: EMPTY_PREMIUM_LEDGER,
   }
 }
 

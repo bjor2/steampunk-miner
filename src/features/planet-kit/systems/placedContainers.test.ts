@@ -36,6 +36,7 @@ function crateDrop(planetKey: string, hold: Cargo, ownerId = OWNER): ContainerDr
     access: ECONOMY.containerDefaultAccess,
     cell: { tx: 3, ty: -7 },
     hold,
+    premium: [],
     cap: CRATE_CAP,
   }
 }

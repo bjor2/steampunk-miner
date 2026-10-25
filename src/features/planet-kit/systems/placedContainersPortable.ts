@@ -2,8 +2,10 @@
  * The placed containers as a save holds them (ticket 823, the TD's final ruling on #823, point 4):
  * saved with the world, keyed on the stable planet id `s:p`, so they survive a save and load and a
  * jump away and back; an old save has none. The portable form is the state's own shape (integers
- * and strings only), so reading it back is the identity a section's `ofPortable` must be.
+ * and strings only), so reading it back is the identity a section's `ofPortable` must be. A
+ * container's premium ledger counts (ticket 844) are read against its own cargo.
  */
+import { portablePremiumLedgerProblems } from '../../../systems/authority/premium/premiumLedgerPortable'
 import { cargoUnitsOf, type Cargo } from '../../../systems/vehicle/vehicleState'
 import {
   CONTAINER_ACCESS,
@@ -76,6 +78,7 @@ function containerProblems(container: unknown, where: string): string[] {
       : [`${where}.access must be one of ${CONTAINER_ACCESS.join(', ')}`]),
     ...cellProblems(container.cell, `${where}.cell`),
     ...cargoProblems(container.cargo, `${where}.cargo`),
+    ...premiumProblems(container, `${where}.premium`),
     ...unknownFields(container, where, CONTAINER_FIELDS),
   ]
 }
@@ -87,7 +90,18 @@ const CONTAINER_FIELDS: readonly (keyof PlacedContainer)[] = [
   'access',
   'cell',
   'cargo',
+  'premium',
 ]
+
+/** The premium counts (ticket 844) read against the container's cargo once that cargo reads. */
+function premiumProblems(container: Raw, where: string): string[] {
+  if (cargoProblems(container.cargo, where).length > 0) return []
+  return portablePremiumLedgerProblems(
+    container.premium,
+    container.cargo as unknown as Cargo,
+    where,
+  )
+}
 
 function cellProblems(cell: unknown, where: string): string[] {
   const isCell = isPlainMap(cell) && Number.isSafeInteger(cell.tx) && Number.isSafeInteger(cell.ty)

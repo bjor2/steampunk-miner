@@ -13,11 +13,17 @@
  *   ore tiers from the top. What does not fit stays; an emptied container is removed. Only the
  *   owner may pick up while `access` is `owner`; `crew` opens it to every player, a data flip.
  * - **Conservation.** Cargo is moved, never copied: hold plus containers keep their unit total.
+ *   The hold's premium ledger counts move with it and back (ticket 844, `containerPremium.ts`).
  *
  * Pure: the planet key, the cap and the hold's capacity come in as arguments.
  */
 import { cargoUnitsOf, EMPTY_CARGO, type Cargo } from '../../../systems/vehicle/vehicleState'
 import type { TilePoint } from '../../../systems/world/tileGrid'
+import {
+  EMPTY_PREMIUM_LEDGER,
+  type PremiumLedger,
+} from '../../../systems/authority/premium/premiumLedger'
+import { premiumFieldOf, premiumMovedWith } from './containerPremium'
 
 export const CONTAINER_ACCESS = ['owner', 'crew'] as const
 export type ContainerAccess = (typeof CONTAINER_ACCESS)[number]
@@ -30,6 +36,11 @@ export interface PlacedContainer {
   /** The cell it is anchored to; it never collides and nothing in the ground destroys it. */
   cell: TilePoint
   cargo: Cargo
+  /**
+   * The premium ledger's counts of `cargo`'s units (ticket 844), moved in with the hold and out
+   * with a pickup; absent while there are none.
+   */
+  premium?: PremiumLedger
 }
 
 /** One planet's containers by `containerId` as decimal text, and the id the next drop takes. */
@@ -51,6 +62,8 @@ export interface ContainerDrop {
   access: ContainerAccess
   cell: TilePoint
   hold: Cargo
+  /** The hold's premium ledger counts, moved in with it (empty for a scenario's container). */
+  premium: PremiumLedger
   /** The kind's cap per player per planet. */
   cap: number
 }
@@ -78,6 +91,8 @@ export type PickupOutcome =
       placed: PlacedContainers
       /** What moved into the hold. */
       moved: Cargo
+      /** The premium ledger counts that moved with it, into the picker's ledger. */
+      movedPremium: PremiumLedger
       hold: Cargo
       /** The container as it is left, or null when the pickup emptied and removed it. */
       left: PlacedContainer | null
@@ -127,11 +142,13 @@ export function pickupContainer(placed: PlacedContainers, pickup: ContainerPicku
     container.cargo,
     freeRoomOf(pickup.hold, pickup.capacity),
   )
-  const left = cargoUnitsOf(rest) === 0 ? null : { ...container, cargo: rest }
+  const premium = premiumMovedWith(container.premium ?? EMPTY_PREMIUM_LEDGER, taken)
+  const left = cargoUnitsOf(rest) === 0 ? null : containerLeftWith(container, rest, premium.left)
   return {
     isPickedUp: true,
     placed: withContainerLeft(placed, pickup.planetKey, container.containerId, left),
     moved: taken,
+    movedPremium: premium.taken,
     hold: addedCargo(pickup.hold, taken),
     left,
   }
@@ -199,7 +216,18 @@ function containerOfDrop(planet: PlanetContainers, drop: ContainerDrop): PlacedC
     access: drop.access,
     cell: { tx: drop.cell.tx, ty: drop.cell.ty },
     cargo: drop.hold,
+    ...premiumFieldOf(drop.premium),
   }
+}
+
+/** The container with what a pickup left of its cargo and its premium counts. */
+function containerLeftWith(
+  container: PlacedContainer,
+  cargo: Cargo,
+  premium: PremiumLedger,
+): PlacedContainer {
+  const { premium: _moved, ...rest } = container
+  return { ...rest, cargo, ...premiumFieldOf(premium) }
 }
 
 function withContainer(
