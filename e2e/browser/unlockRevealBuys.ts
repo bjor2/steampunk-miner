@@ -6,7 +6,7 @@
  */
 import { expect, type Page } from '@playwright/test'
 import type { DebugApi } from '../../src/debug/debugApi'
-import { REVEAL_TEST_IDS } from '../../src/features/unlock-reveal/ui/UnlockRevealPlate'
+import { REVEAL_TEST_IDS } from '../../src/features/unlock-reveal/ui/revealTestIds'
 import { UI_IDS } from '../../src/ui/ids'
 import { SHEET_UI_IDS } from '../../src/ui/sheet/sheetIds'
 import { dockAt } from './screens/screenHelpers'

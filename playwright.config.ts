@@ -13,6 +13,7 @@
  * Emulation only, never "verified on device" (#482). Without WebKit installed the iPhone project's
  * tests skip with the install hint.
  */
+import { register } from 'node:module'
 import { defineConfig, devices } from '@playwright/test'
 import {
   cellOfDevice,
@@ -38,6 +39,9 @@ const SCREENS_GLOB = '**/browser/screens/**'
 
 // Said once per run as well as on each skipped test, so a run without WebKit reads why at the top.
 if (!isEngineInstalled('webkit')) console.warn(`mobile-webkit-iphone13: ${ENGINE_MISSING_MESSAGE}`)
+
+// The game's bare JSON imports load under Node's ESM loader in every spec (ticket 903).
+register('./e2e/jsonImportHook.mjs', import.meta.url)
 
 export default defineConfig({
   testDir: 'e2e/browser',

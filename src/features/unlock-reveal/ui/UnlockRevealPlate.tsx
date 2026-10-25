@@ -13,12 +13,8 @@ import { VectorIcon } from '../../../ui/VectorIcon'
 import { useRevealStore } from '../store/revealStore'
 import { revealPlateOf, type RevealPlate } from '../systems/revealPlate'
 import type { UnlockReveal } from '../systems/unlockReveal'
+import { REVEAL_TEST_IDS } from './revealTestIds'
 import styles from './UnlockRevealPlate.module.css'
-
-export const REVEAL_TEST_IDS = {
-  plate: 'unlock-reveal-plate',
-  name: 'unlock-reveal-name',
-} as const
 
 export function UnlockRevealPlate() {
   useEffect(() => listenForDomainEvents(useRevealStore.getState().hearRevealBatch), [])

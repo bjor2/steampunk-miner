@@ -15,6 +15,7 @@
     "index.html",
     "tsconfig*.json",
     "e2e/affected.json",
+    "e2e/jsonImportHook.mjs",
     "e2e/browser/**",
     "scripts/e2e/**"
   ],
