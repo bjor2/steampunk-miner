@@ -36,11 +36,12 @@ let sink: MemorySink
 
 /**
  * The ticket-339 dig's end at every-tick reports, with the render origin still and moved each tick,
- * as the report capsule cuts it (ticket 537, protocol 87; the bare disc read 19 and 20 tiles).
+ * as the report capsule cuts it (ticket 537, protocol 87; the bare disc read 19 and 20 tiles), on
+ * ticket 662's 1.2 m bore (protocol 103; #36's 1.9 m bore read 16 tiles each).
  */
-const STEADY_ORIGIN_RUN = { tiles: 16, xMm: -19860, yMm: 290841 }
-const MOVING_ORIGIN_RUN = { tiles: 16, xMm: -19838, yMm: 290834 }
-/** The known f32 noise between the two (TD v2 Q4 on #514): documentation, not the assertion. */
+const STEADY_ORIGIN_RUN = { tiles: 15, xMm: -19951, yMm: 289793 }
+const MOVING_ORIGIN_RUN = { tiles: 15, xMm: -19832, yMm: 289807 }
+/** The known f32 noise between the two (TD v2 Q4 on #514), and since ticket 662 the 12-tick bar. */
 const ORIGIN_NOISE = { mm: 500, tiles: 1 }
 
 beforeAll(async () => {
@@ -234,15 +235,28 @@ describe('vehicle loop', () => {
     expect(spent).toBeLessThanOrEqual(SWIVEL_TICKS * ENERGY_QUANTA_PER_TICK.thrust)
   })
 
-  it('drills on through a moved render origin as if it had never moved (ticket 339)', () => {
+  // As shipped, at 12-tick reports. Until ticket 662 the two runs ended within a millimetre: the
+  // drill's soft rim weighed a sample in 64 steps of its radius, so the f32 contact noise between
+  // the origins (TD v2 Q4 on #514, below) rarely moved a report's stamp across one. The bore-wall
+  // edge (GD lock on #662, Q1 b) weighs it to the millimetre, so that noise reaches the cut at
+  // 12-tick reports too, and the runs part as the every-tick ones do: within the known noise, each
+  // replayed byte for byte.
+  it('drills on through a moved render origin within the known f32 noise of a still one, each run replayed byte for byte (ticket 339)', () => {
     const steady = digAndTunnel({}, AS_SHIPPED)
     const moving = digAndTunnel({ originReachMm: 0 }, AS_SHIPPED)
     expect(steady.origins).toBe(1)
     expect(moving.origins).toBeGreaterThan(1)
     expect(steady.tiles.length).toBeGreaterThan(10)
-    expect(moving.tiles).toEqual(steady.tiles)
-    expect(Math.abs(moving.at.x - steady.at.x)).toBeLessThanOrEqual(0.001)
-    expect(Math.abs(moving.at.y - steady.at.y)).toBeLessThanOrEqual(0.001)
+    const apartMm = Math.hypot(
+      moving.reading.xMm - steady.reading.xMm,
+      moving.reading.yMm - steady.reading.yMm,
+    )
+    expect(apartMm).toBeLessThanOrEqual(ORIGIN_NOISE.mm)
+    expect(Math.abs(moving.reading.tiles - steady.reading.tiles)).toBeLessThanOrEqual(
+      ORIGIN_NOISE.tiles,
+    )
+    expect(replayedDigestOf(steady)).toBe(steady.end.digest)
+    expect(replayedDigestOf(moving)).toBe(moving.end.digest)
   })
 
   // At a report every tick while the drill bites (#514), which takes with the exact carry on (TD
