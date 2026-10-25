@@ -3,13 +3,16 @@
  * (on a core trip, taking the core tiles just above and below on the way), and turn home while
  * the tank still holds the climb back plus a margin (`botEnergy.ts`), or the heat gauge is near its
  * max (#113, `botHeat.ts`). A trip ends docked at the Sell bay, or towed after a strand or a death,
- * which the bot never causes on purpose but combat can.
+ * which the bot never causes on purpose but combat can. Under a crate policy (ticket 850,
+ * `botCrates.ts`) it first collects its crates, going home with them if they fill the hold, and
+ * drops a full hold as a crate on an ore trip rather than turn back.
  */
 import { coreNeededOf } from '../authority/coreBay'
 import { dockCommand, undockCommand } from '../platform/platformCommands'
 import { cargoUnitsOf, isVehicleActive, statsOfVehicle } from '../vehicle/vehicleState'
 import type { BayId } from '../world/dockBays'
 import type { TilePoint } from '../world/tileGrid'
+import { collectCrates, dropFullHold } from './botCrates'
 import { boreInPlace, openTile } from './botDig'
 import { assertReturnReserve, canAffordMoveTo } from './botEnergy'
 import { coolAtDock, isTooHotToDig } from './botHeat'
@@ -42,7 +45,7 @@ export function runTrip(session: BotSession, planet: BotPlanet, goal: TripGoal):
   coolAtDock(session)
   leavePad(session)
   openPathTo(session, planet, shaftTileAt(planet.layout, planet.layout.travelRow))
-  mineUntilTurnBack(session, planet, goal)
+  if (!collectCrates(session, planet)) mineUntilTurnBack(session, planet, goal)
   if (isVehicleActive(session.vehicle())) returnAndDock(session, planet)
   else waitForTow(session, planet)
 }
@@ -110,6 +113,7 @@ function mineGallerySide(
   if (!canAffordMoveTo(session, planet, end)) return 'stop'
   moveStraight(session, planet, end)
   for (;;) {
+    dropFullHold(session, planet, goal)
     if (!harvestBesides(session, planet, goal)) return 'stop'
     const face = galleryFaceOf(planet.layout, row, side)
     if (isGalleryEnd(session, planet.layout, face, side, goal)) {

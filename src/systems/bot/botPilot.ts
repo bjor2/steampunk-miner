@@ -25,6 +25,7 @@ import {
   type TileBore,
 } from './boreClock'
 import { faceThreats } from './botCombat'
+import type { KitPolicy } from './botCrates'
 import type { ChargePolicy } from './botCharges'
 import type { RouteDeaths } from './botDeathReplay'
 import { setGunsForEnergy } from './botGuns'
@@ -45,6 +46,8 @@ export interface BotPilot {
   facing: Facing
   /** Whether it fires the bore gun while it bores or stands by (ticket 347); absent is `never`. */
   borePolicy?: BorePolicy
+  /** What it does with the planet kits (ticket 850, `botCrates.ts`); absent is every field off. */
+  kitPolicy?: KitPolicy
   /** The ticks each enemy has held it facing (`faceThreats`, ticket 418); absent is none yet. */
   heldTicksByEnemy?: Map<string, number>
   /** What its last bore left of the tick it ended on (ticket 559); absent is none. */

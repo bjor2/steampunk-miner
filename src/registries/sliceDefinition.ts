@@ -12,6 +12,7 @@ import type { ArtefactOptionEntry } from '../systems/registries/artefactOptions'
 import type { AuthorityReaction } from '../systems/registries/authorityReactions'
 import type { BlastEffect } from '../systems/registries/blastEffects'
 import type { BuildingAttachUse } from '../systems/registries/buildingAttach'
+import type { BotCrateProvider } from '../systems/registries/botCrates'
 import type { BotPurchase } from '../systems/registries/botPurchases'
 import type { AutoGunsProvider } from '../systems/registries/autoGuns'
 import type { BoreGunProvider } from '../systems/registries/boreGun'
@@ -266,6 +267,11 @@ export interface SliceRegistrar {
   artAssets(assets: readonly ArtAsset[]): void
   /** A slice command the pacing bot may buy after the kernel's own purchases. */
   botPurchase(purchase: BotPurchase): void
+  /**
+   * One provider across all slices: the crate the pacing bot buys, drops its full hold in and
+   * picks up under `kitPolicy.crates: 'drop_on_full'` (ticket 850).
+   */
+  botCrates(provider: BotCrateProvider): void
   /**
    * A family of bot spend the #212 guard reports as one row, counted only while its anchor
    * `stats.json` row is owned or unlocked (ticket 370).

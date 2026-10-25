@@ -12,6 +12,7 @@ import { buyFuelCommand, jumpToPlanetCommand } from '../platform/platformCommand
 import { placeOfCampaign } from '../starMap/campaignIndex'
 import { bayRestTileOf } from '../world/dockBays'
 import { DEFAULT_BORE_POLICY, type BorePolicy } from './botBore'
+import { DEFAULT_KIT_POLICY, type KitPolicy } from './botCrates'
 import type { ChargePolicy } from './botCharges'
 import { noRouteDeaths } from './botDeathReplay'
 import type { BotPlanet } from './botPilot'
@@ -25,7 +26,8 @@ import { driveToSellBay } from './botTrip'
 
 /**
  * The bot on the planet its session is on, at the Sell bay with a mine not yet dug; the run's
- * gate route blocks (ticket 237) and its bore policy (ticket 347) go on from the planet before.
+ * gate route blocks (ticket 237), its bore policy (ticket 347) and its kit policy (ticket 850) go
+ * on from the planet before.
  */
 export function botPlanetOf(
   session: BotSession,
@@ -34,12 +36,13 @@ export function botPlanetOf(
   borePolicy: BorePolicy = DEFAULT_BORE_POLICY,
   sidewaysBores: SidewaysBoreTally = newSidewaysBoreTally(),
   downBores: DownBoreTally = newDownBoreTally(),
+  kitPolicy: KitPolicy = DEFAULT_KIT_POLICY,
 ): BotPlanet {
   const site = dockSiteOfPlanet(session.state().planet)
   if (site === null) throw new Error('the bot plays only on a generated planet')
   return {
     layout: newMineLayout(paramsOfSession(session.state()), site),
-    pilot: { position: bayRestTileOf(site, 'sell'), facing: 1, borePolicy },
+    pilot: { position: bayRestTileOf(site, 'sell'), facing: 1, borePolicy, kitPolicy },
     chargePolicy,
     hasMetBlastTile: false,
     shellChargeSize: 0,
@@ -69,6 +72,7 @@ export function travelWhenReady(session: BotSession, planet: BotPlanet): BotPlan
     planet.pilot.borePolicy,
     planet.sidewaysBores,
     planet.downBores,
+    planet.pilot.kitPolicy,
   )
 }
 

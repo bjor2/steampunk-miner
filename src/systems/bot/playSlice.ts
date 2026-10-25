@@ -5,9 +5,10 @@
  * same digests (`replayRun`), and its log is what the pacing report is derived from.
  *
  * Each dock cycle: travel when the core is done and the fee is paid, choose a trip (the core while
- * it is the goal, the drill digs it fast enough and the casing holds it, else the best ore band
- * the casing grade holds), run it, refine the best of the haul when the platform has the Refinery
- * bay and the bot will dive again (#105), then service and shop. Charges are bought only on a
+ * it is the goal, the drill digs it fast enough and the casing holds it, else the best ore band the
+ * casing grade holds), run it, refine the best of the haul when the platform has the Refinery bay
+ * and the bot will dive again (#105), then service and shop; a crate policy restocks Cache Crates
+ * at the Sell bay right after the trip (ticket 850, `botCrates.ts`). Charges are bought only on a
  * planet where the bot met a tile it would blast with none in stock (#129); travel starts afresh.
  * When no band the casing holds pays a trip, as after a rescue that took the last of the wallet
  * with those bands bored out and the next grade unaffordable (#216), the bot retreats to the
@@ -29,6 +30,7 @@ import { coreHardness } from '../economy/oreEconomy'
 import { deepestHeldBand, holdsCore } from './botCasing'
 import { DEFAULT_BORE_POLICY, mountBoreGunWhenForced, type BorePolicy } from './botBore'
 import { restockSizeOf, type ChargePolicy } from './botCharges'
+import { restockCrates, type KitPolicy } from './botCrates'
 import { DEFAULT_CHAIN_POLICY, type ChainPolicy } from './botChains'
 import type { GunPolicy } from './botGuns'
 import { collectWhenReady, refineWhenWorthIt, type RefineryUse } from './botRefining'
@@ -94,6 +96,8 @@ export interface SliceRunOptions {
    * `nextShotTick` (ticket 347, `balance:bore`).
    */
   borePolicy?: BorePolicy
+  /** Never carry crates (the default), or drop the hold in one whenever it fills (ticket 850). */
+  kitPolicy?: KitPolicy
   listener?: BotListener
   /** `used` (the default) from the Refinery bay's planet; `ignored` plays as if it had none. */
   refinery?: RefineryUse
@@ -121,12 +125,12 @@ interface BotRun {
 const CORE_TRIP_MAX_TICKS_PER_TILE = 20 * TICKS_PER_SECOND
 
 /**
- * What playing on from a session under way needs: the run's options past its start. The bore
- * policy rides on the planet's pilot (`botPlanetOf`), so it is not among them.
+ * What playing on from a session under way needs: the run's options past its start. The bore and
+ * kit policies ride on the planet's pilot (`botPlanetOf`), so they are not among them.
  */
 export type PlayOnOptions = Omit<
   SliceRunOptions,
-  'playerId' | 'startCommands' | 'listener' | 'borePolicy'
+  'playerId' | 'startCommands' | 'listener' | 'borePolicy' | 'kitPolicy'
 >
 
 export function playSlice(start: AuthorityState, options: SliceRunOptions): SliceRun {
@@ -137,7 +141,15 @@ export function playSlice(start: AuthorityState, options: SliceRunOptions): Slic
 }
 
 function firstBotPlanetOf(session: BotSession, options: SliceRunOptions): BotPlanet {
-  return botPlanetOf(session, chargePolicyOf(options), [], borePolicyOf(options))
+  return botPlanetOf(
+    session,
+    chargePolicyOf(options),
+    [],
+    borePolicyOf(options),
+    newSidewaysBoreTally(),
+    newDownBoreTally(),
+    options.kitPolicy,
+  )
 }
 
 /** Plays on from a session under way, the bot on `planet` (a spec's fixture, or `playSlice`). */
@@ -208,6 +220,7 @@ function playDockCycle(session: BotSession, planet: BotPlanet, run: BotRun): boo
   const goal = chooseGoal(session, planet)
   if (goal === null) return towWhenItRefills(session, planet)
   playTrip(session, planet, goal)
+  restockCrates(session, planet)
   collectWhenReady(session)
   if (isRefining(session, run)) refineWhenWorthIt(session, planet)
   serviceAtDock(session)

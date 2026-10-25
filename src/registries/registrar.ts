@@ -20,6 +20,7 @@ import { BLAST_EFFECT_REGISTRY } from '../systems/registries/blastEffects'
 import { BUILDING_ATTACH_USE_REGISTRY } from '../systems/registries/buildingAttach'
 import { CELL_GATE_LOOK_REGISTRY } from '../systems/registries/cellGateLook'
 import { KIND_LOOK_REGISTRY } from '../systems/registries/kindLook'
+import { BOT_CRATES_REGISTRY } from '../systems/registries/botCrates'
 import { BOT_PURCHASE_REGISTRY } from '../systems/registries/botPurchases'
 import { AUTO_GUNS_REGISTRY } from '../systems/registries/autoGuns'
 import { BORE_GUN_REGISTRY } from '../systems/registries/boreGun'
@@ -206,6 +207,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     vehicleLook: (source) => add(VEHICLE_LOOK_REGISTRY, source),
     artAssets: (assets) => assets.forEach((asset) => addArtAsset(sliceId, asset)),
     botPurchase: (purchase) => add(BOT_PURCHASE_REGISTRY, purchase),
+    botCrates: (provider) => add(BOT_CRATES_REGISTRY, provider),
     spendFamily: (family) => addSpendFamily(sliceId, family),
     incomeRate: (rate) => addIncomeRate(sliceId, rate),
     tripCapSource: (source) => add(TRIP_CAP_SOURCE_REGISTRY, source),

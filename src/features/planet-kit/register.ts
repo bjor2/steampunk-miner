@@ -9,14 +9,15 @@
  * draws the planet's merchant on the Sell bay. Ticket 825 brought the Blender art: the sockets'
  * parts, the merchant frontage on the Assay & Exchange and the Cache Crate prop. Ticket 850 sells
  * the kit items: the buy command and the player's holdings section, a content entry per item
- * claiming its schedule row, the Buy on each merchant line, and the carried crates' count with
- * the drop beside the gauges.
+ * claiming its schedule row, the Buy on each merchant line, the carried crates' count with the
+ * drop beside the gauges, and the crate the pacing bot carries under its kit policy.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { planetKitDebugActions } from './debug'
 import { PLANET_KIT_PROJECTIONS, PLANET_KIT_RUN_EVENTS } from './logging'
 import { KIT_SOCKET_PIECE_ID, KitSocketParts } from './scene/KitSocketParts'
 import { MERCHANT_FRONTAGE_PIECE_ID, MerchantFrontage } from './scene/MerchantFrontage'
+import { PLANET_KIT_BOT_CRATES } from './systems/botCrates'
 import { CONTAINER_RULES } from './systems/containerRules'
 import { CONTAINERS_SECTION } from './systems/containerSection'
 import { KIT_BUY_RULES } from './systems/kitBuyRules'
@@ -42,6 +43,8 @@ export const slice: SliceDefinition = {
     r.saveSection(KIT_HOLDINGS_SECTION)
     r.commandRules(CONTAINER_RULES)
     r.commandRules(KIT_BUY_RULES)
+    // The crate the pacing bot carries under `kitPolicy.crates: 'drop_on_full'` (ticket 850).
+    r.botCrates(PLANET_KIT_BOT_CRATES)
     r.eventProjections(PLANET_KIT_PROJECTIONS)
     r.runEvents(PLANET_KIT_RUN_EVENTS)
     r.hudPanel({

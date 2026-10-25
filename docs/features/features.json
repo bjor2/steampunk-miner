@@ -951,7 +951,7 @@
               "children": [
                 {
                   "title": "Cache Crate containers",
-                  "description": "Drop your whole hold as a crate at your cell and pick it up later, only you; at most 3 per planet. Crates stay through saves and jumps, show as markers on the map and in the Cache Crates list on the base sheet. A crate is bought at the Hearthmoor merchant and carried, up to 3, counted on the HUD; the list's first card drops your hold as one, spending it. The pacing bot never uses crates yet.",
+                  "description": "Drop your whole hold as a crate at your cell and pick it up later, only you; at most 3 per planet. Crates stay through saves and jumps, show as markers on the map and in the Cache Crates list on the base sheet. A crate is bought at the Hearthmoor merchant and carried, up to 3, counted on the HUD; the list's first card drops your hold as one, spending it. The pacing bot carries crates only under its crate policy, in the paired crates on/off replay.",
                   "status": "partial",
                   "issues": [823, 850],
                   "planet": 1
