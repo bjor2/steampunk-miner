@@ -1,9 +1,9 @@
 """
-The review sheets cut from render_fuel_tender.py's renders (tickets 758 and 813): the seven wagons
-alone, the rig at tiers 1 and 3 bare and with each wagon at the hitch, each row resampled to a 1080p screen's
-90 px/m at the default 12 m zoom (#39) and to a 360 px wide phone's 30 px/m over the same zoom (the
-width the #576 ladder is judged at), the phone copy enlarged 8x with no smoothing so each phone
-pixel shows. It also measures what the eye is asked to judge and writes readability.json: how many
+The review sheets cut from render_fuel_tender.py's renders (tickets 758, 813 and 874): every wagon
+of the ladder alone, the rig at tiers 1 and 3 bare and with each wagon at the hitch, six tiles a
+row, each sheet resampled to a 1080p screen's 90 px/m at the default 12 m zoom (#39) and to a 360
+px wide phone's 30 px/m over the same zoom (the width the #576 ladder is judged at), the phone copy
+enlarged 8x with no smoothing so each phone pixel shows. It also measures what the eye is asked to judge and writes readability.json: how many
 phone pixels of the wagon's footprint change between each step and the one before it, at the
 default zoom and at the closest, where the rig-look sweep spec judges a step (ticket 813), and the
 brightest pixel of the drill nose against the brightest of the wagon for each step (the wagon has
@@ -45,6 +45,8 @@ RIG_FRAME = ((-0.25, 0.05), 2.7, 1.75)
 RIG_TIERS = (1, 3)
 BARE = 'rig'
 CHANGED_THRESHOLD = 24
+# Tiles a row on every sheet: seventeen wagons in one row would be 24,000 px wide (ticket 874).
+TILES_A_ROW = 6
 
 
 def main():
@@ -91,9 +93,12 @@ def labelled(tile, label):
 
 def laid_out(tiles):
     width, height = max(tile.width for tile in tiles), max(tile.height for tile in tiles)
-    sheet = Image.new('RGB', (len(tiles) * width, height), BACKGROUND)
+    columns = min(len(tiles), TILES_A_ROW)
+    rows = -(-len(tiles) // columns)
+    sheet = Image.new('RGB', (columns * width, rows * height), BACKGROUND)
     for index, tile in enumerate(tiles):
-        sheet.paste(tile, (index * width + (width - tile.width) // 2, (height - tile.height) // 2))
+        column, row = index % columns, index // columns
+        sheet.paste(tile, (column * width + (width - tile.width) // 2, row * height + (height - tile.height) // 2))
     return sheet
 
 

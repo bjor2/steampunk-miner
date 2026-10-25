@@ -890,15 +890,14 @@ on the #576 ladder"). The tank track ([#756](https://github.com/bjor2/steampunk-
 is its own track outside `UPGRADE_IDS`, so its ladder is the kernel's
 (`src/data/vehicle/fuelTender.json`, read by `systems/render/fuelTenderLook.ts`: a pure function of
 the tank level, the starting tank's coal cart, then a wagon swap at levels 2, 3 and 5, the LK5
-parts fitted on the guild tender at 6, 7 and 8 (ticket 813) and a finish per purchase above the top
-step) and the wagon is a kernel vehicle piece, `scene/FuelTenderPiece.tsx`,
+parts fitted on the guild tender at 6, 7 and 8 (ticket 813), the LK11 fittings at 9 to 18 (ticket 874) and a finish per purchase above the top step) and the wagon is a kernel vehicle piece, `scene/FuelTenderPiece.tsx`,
 hung at the wagon hitch `hull.hitch`, the point a rig-look part never takes (HS on #577). The tail's
 tint is a glow on the wagon's slot through the vehicle look fold (`fuelTenderLookSource.ts`, the
 kernel's own source before the slices'), under the rig body's cap.
 
-| Id                  | Source         | What the build draws                                                                                                                                             |
-| ------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `vehicle-fuel-tank` | Blender, parts | the level's wagon at `hull.hitch`: `coal-cart`, `bunker-tender`, `riveted-tender`, `guild-tender`, then `twin-tank-tender`, `hopper-tender`, `glass-tank-tender` |
+| Id                  | Source         | What the build draws                                                                                                                                                                                                                 |
+| ------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `vehicle-fuel-tank` | Blender, parts | the level's wagon at `hull.hitch`: `coal-cart`, `bunker-tender`, `riveted-tender`, `guild-tender`, then `twin-tank-tender`, `hopper-tender`, `glass-tank-tender`, then the ten LK11 fittings `tooled-tender` to `aether-coil-tender` |
 
 - The id is the #52 kebab form of the kernel item `service:fuel_tank` (`systems/art/fuelTenderArt.ts`).
   Each wagon is one part with the hitch ring at the origin, drawn at `z` 0 behind every rig part, its
@@ -907,7 +906,11 @@ kernel's own source before the slices'), under the rig body's cap.
   is the source. `author_fuel_tender_steps.py` fitted the three LK5 parts into it (ticket 813: the
   guild tender with a second copper tank, then a riveted coal hopper, then a steel belly tank with a
   sight glass, each inside the wagons' footprint and clear of the rig; `check_outline.py` proves it).
-  The part table, the review renders at desktop and phone size and the readability numbers are in
+  `author_fuel_tender_p40_steps.py` fitted the ten LK11 parts after them (ticket 874: a stoker's
+  tool rack, a works plate, a head lamp, feed pipes, a water gauge, leaf springs, wheel guards, a
+  coal screen, an aether tank and aether coils, each on a face of the sight-glass tender and clear
+  of the rig's casing arms; the same check proves it). The part table, the review renders at
+  desktop and phone size and the readability numbers are in
   [docs/art/fuel-tender/](art/fuel-tender/README.md).
 
 ## Planet kit: socket parts, merchant frontages and the crate

@@ -1,5 +1,10 @@
 {
-  "footprintM": [-1.0917, -0.4787, -0.49129999999999985, 0.010000000000000009],
+  "footprintM": [
+    -1.0918,
+    -0.4788,
+    -0.4912000000000001,
+    0.010000000000000009
+  ],
   "phonePxPerM": 30.0,
   "closestZoomPxPerM": 45.0,
   "changedThreshold": 24,
@@ -13,7 +18,17 @@
         "guild-tender": 102,
         "twin-tank-tender": 14,
         "hopper-tender": 12,
-        "glass-tank-tender": 10
+        "glass-tank-tender": 10,
+        "tooled-tender": 15,
+        "plated-tender": 4,
+        "lamped-tender": 9,
+        "piped-tender": 13,
+        "gauged-tender": 8,
+        "sprung-tender": 15,
+        "guarded-tender": 9,
+        "screened-tender": 11,
+        "aether-tank-tender": 16,
+        "aether-coil-tender": 8
       },
       "footprintClosestZoomPx": 644,
       "changedClosestZoomPx": {
@@ -23,7 +38,17 @@
         "guild-tender": 229,
         "twin-tank-tender": 33,
         "hopper-tender": 20,
-        "glass-tank-tender": 32
+        "glass-tank-tender": 32,
+        "tooled-tender": 47,
+        "plated-tender": 21,
+        "lamped-tender": 24,
+        "piped-tender": 21,
+        "gauged-tender": 20,
+        "sprung-tender": 28,
+        "guarded-tender": 18,
+        "screened-tender": 25,
+        "aether-tank-tender": 29,
+        "aether-coil-tender": 19
       },
       "brightest": {
         "coal-cart": {
@@ -51,6 +76,46 @@
           "wagon": 255
         },
         "glass-tank-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "tooled-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "plated-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "lamped-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "piped-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "gauged-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "sprung-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "guarded-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "screened-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "aether-tank-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "aether-coil-tender": {
           "nose": 255,
           "wagon": 255
         }
@@ -65,7 +130,17 @@
         "guild-tender": 102,
         "twin-tank-tender": 14,
         "hopper-tender": 12,
-        "glass-tank-tender": 10
+        "glass-tank-tender": 10,
+        "tooled-tender": 15,
+        "plated-tender": 4,
+        "lamped-tender": 10,
+        "piped-tender": 13,
+        "gauged-tender": 8,
+        "sprung-tender": 15,
+        "guarded-tender": 9,
+        "screened-tender": 11,
+        "aether-tank-tender": 16,
+        "aether-coil-tender": 8
       },
       "footprintClosestZoomPx": 644,
       "changedClosestZoomPx": {
@@ -75,7 +150,17 @@
         "guild-tender": 229,
         "twin-tank-tender": 33,
         "hopper-tender": 20,
-        "glass-tank-tender": 32
+        "glass-tank-tender": 32,
+        "tooled-tender": 47,
+        "plated-tender": 21,
+        "lamped-tender": 24,
+        "piped-tender": 21,
+        "gauged-tender": 20,
+        "sprung-tender": 28,
+        "guarded-tender": 18,
+        "screened-tender": 25,
+        "aether-tank-tender": 29,
+        "aether-coil-tender": 19
       },
       "brightest": {
         "coal-cart": {
@@ -103,6 +188,46 @@
           "wagon": 255
         },
         "glass-tank-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "tooled-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "plated-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "lamped-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "piped-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "gauged-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "sprung-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "guarded-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "screened-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "aether-tank-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "aether-coil-tender": {
           "nose": 255,
           "wagon": 255
         }

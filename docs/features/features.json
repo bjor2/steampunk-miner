@@ -138,9 +138,9 @@
             },
             {
               "title": "Coal tender wagon",
-              "description": "The fuel tank trails the rig as a coal tender at the hitch: a timber coal cart to start, then a riveted bunker, a steel tender with a copper water tank and a guild tender as the tank's level rises; the next three purchases fit the guild tender with a second copper tank, a riveted coal hopper and a belly tank with a sight glass, and every purchase past them wears the next finish with pips.",
+              "description": "The fuel tank trails the rig as a coal tender at the hitch: a timber coal cart to start, then a riveted bunker, a steel tender with a copper water tank and a guild tender as the tank's level rises; the next three purchases fit the guild tender with a second copper tank, a riveted coal hopper and a belly tank with a sight glass; ten more fit a stoker's tools, a works plate, a head lamp, feed pipes, a water gauge, leaf springs, wheel guards, a coal screen, an aether tank and aether coils, one a purchase to level 18, and every purchase past them wears the next finish with pips.",
               "status": "built",
-              "issues": [650, 756, 758, 813]
+              "issues": [650, 756, 758, 813, 874]
             },
             {
               "title": "Jump drive",

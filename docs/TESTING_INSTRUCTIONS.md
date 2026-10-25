@@ -2003,7 +2003,11 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   tank levels 6, 7 and 8 to the same specs: at least five authored steps, each one purchase after
   the one before (the tender is exempt from the decade rule), each named in 3 words or fewer, the
   seven parts in the asset with no emissive map, and the tank's golden lines in
-  `rigLookLines.golden.txt` at every step and one past it. The browser spec
+  `rigLookLines.golden.txt` at every step and one past it. LK11 (ticket 874, spec #647) adds the
+  ten steps at levels 9 to 18 to the same specs: at least the 13 steps of Systems' sizing row,
+  authored through two decades of tank capacity so the tail's pips start at 2, every added step
+  still one purchase after the one before, the seventeen parts in the asset, still no emissive map
+  (the aether glass is a bright material), and the golden re-pinned. The browser spec
   `e2e/browser/fuelTenderLook.spec.ts` buys the tank level by level at the Sell bay and asserts the
   mounted wagon part through `steampunkDebug.vehicleParts()`, with a shot per level at desktop and
   360 px (Box Tester only). The star map's planet colour and tank fill are on the
