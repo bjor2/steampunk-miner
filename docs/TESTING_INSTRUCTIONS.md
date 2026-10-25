@@ -1711,6 +1711,13 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   (`npm run electron:build`, then `npm run test:packaged`, under `xvfb-run -a` on Linux); each
   launch gets a fresh user-data folder.
 - Not covered, by design: vehicle feel, camera, art and audio. Those stay hand checks.
+- **Load check** (ticket 903): `npm run test:e2e:collect` loads every spec of both configs with
+  `--list`, no browser, in seconds, and CI's `verify` job runs it, so a spec that fails at load
+  fails there rather than zeroing a Tester run (Playwright lists 0 tests when any file fails to
+  load). Specs import `src/` modules, so they reach the game's bare JSON imports: both configs
+  register `e2e/jsonImportHook.mjs`, which adds Node's `type: 'json'` import attribute. Node can't
+  load a CSS module or anything that imports one, so read `data-testid`s from a leaf ids module
+  (`starMapIds.ts`, `revealTestIds.ts`), never from a component.
 - **Affected specs** (#190): `npm run test:e2e:affected` runs only the browser specs a change can
   affect (against `origin/main`, `-- --base <ref>`, or the listing in `CHANGED_FILES`; `-- --dry-run`
   prints the choice). The map is `e2e/affected.json`: a changed spec runs itself, config, package,

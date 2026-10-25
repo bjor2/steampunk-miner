@@ -27,6 +27,9 @@ jobs:
       - run: npm run lint
       - run: npm run format:check
       - run: npm run typecheck
+      # Loads every Playwright spec without a browser: a spec that fails at load (an import Node
+      # cannot read) fails here instead of zeroing the Tester's run (ticket 903).
+      - run: npm run test:e2e:collect
       - run: npm run build
 
   # Every pull request: the same golden digests on Windows as on Linux (#3, #5 and #11 acceptance),

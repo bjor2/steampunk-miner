@@ -14,6 +14,7 @@
     "test": "vitest run",
     "test:push": "cross-env SKIP_NIGHTLY_ONLY_TESTS=1 vitest run",
     "test:e2e": "playwright test",
+    "test:e2e:collect": "playwright test --list && playwright test -c playwright.electron.config.ts --list",
     "test:e2e:affected": "node scripts/e2e/runAffectedSpecs.mjs",
     "test:e2e:timings": "node scripts/e2e/summarizeE2eTimings.mjs",
     "test:packaged": "playwright test -c playwright.electron.config.ts",
