@@ -122,7 +122,9 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   `gnawCasing(x, y)` (that ring breached, as a tunnel wrecker's gnaw leaves it, #111); for the guns (#107),
   `setGunLevel(level)` (a step: 0, or the mount 10 to the cap 160, no unlock or price; `vehicleParts()` then lists the
   turret's parts); for blasting charges (#109), `setCharges(carried, slotLevel)` (a bolted-on rack, no
-  unlock or price; `vehicleParts()` then reports `rackCharges` and the rack's parts); for the heat planets
+  unlock or price; `vehicleParts()` then reports `rackCharges` and the rack's parts) and
+  `setBlastRadiusLevel(level)` (D9 #869: the rig's Blast Radius level, no top and no price, which every
+  blast it sets off reads; the danger zone keeps the rung's radius); for the heat planets
   (#113), `setLiningType(type)` (`standard` or `refractory`, owned and laid from then on, no unlock or
   price; `lineCasing` lays the active type) and `setHeat(points)` (the heat gauge, 0 to its max, only 0
   off planets 8 to 16); for the loadout (#162, K4), `setVehicleLoadout(slots, owned?)` (replaces the

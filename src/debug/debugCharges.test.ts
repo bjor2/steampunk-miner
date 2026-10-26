@@ -9,7 +9,7 @@ import { createDebugApi } from './debugApi'
 
 // The dynamite scenario API (ticket 860): a scenario mounts a rack, places a charge through the
 // scripted fast-forward as play would, and the fuse blows it, logging the place, the detonation
-// and the blast's disc record.
+// and the blast's disc record; D9 (#869) sets the rig's Blast Radius level the blast reads.
 
 const FUSE_TICKS = 120
 
@@ -56,5 +56,21 @@ describe('debug api: place and detonate a charge (ticket 860)', () => {
       casingLaid: false,
     })
     expect(readAuthorityState().blastSeq).toBe(1)
+  })
+
+  it('blows the charge at the Blast Radius level a scenario sets: the ground widens, the danger zone stays (D9 #869)', () => {
+    const debug = createDebugApi()
+    expect(debug.setCharges(2, 0, 1)).toEqual({ ok: true })
+    expect(debug.setBlastRadiusLevel(10)).toEqual({ ok: true })
+    expect(debug.teleportToDepthTiles(30)).toEqual({ ok: true })
+    const at = readAuthorityState().tick + 1
+    const plant = { tick: at, type: 'plantCharge', payload: { size: 1 } } as const
+    expect(debug.fastForward(FUSE_TICKS + 5, [facingThePocketFloor(at), plant]).ok).toBe(true)
+    const blast = sink.events.find((event) => event.event === 'blast')
+    expect(blast?.data).toMatchObject({ radiusLevel: 10, baseR2: '400', groundR2: '650' })
+    const applied = sink.events.filter((event) => event.event === 'debug_command_applied')
+    expect(applied.map(({ data }) => (data as { command: string }).command)).toContain(
+      'debug.setBlastRadiusLevel',
+    )
   })
 })

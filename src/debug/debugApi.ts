@@ -24,6 +24,7 @@ import type { UpgradeLevels } from '../systems/economy/vehicleStats'
 import {
   setEnergyCommand,
   setChargesCommand,
+  setBlastRadiusLevelCommand,
   setGunLevelCommand,
   setHeatCommand,
   setLiningTypeCommand,
@@ -247,6 +248,8 @@ export interface DebugApi {
    * `size` (1, the shipped charge, unless named; K8 #218).
    */
   setCharges(carried: number, slotLevel: number, size?: number): DebugResult
+  /** The rig's Blast Radius level (D9 #869), 0 up with no top, no price: every blast reads it. */
+  setBlastRadiusLevel(level: number): DebugResult
   // heat planets (#113): `debug.*` commands
   /** The lining type the vehicle owns and lays from now on (`standard`, `refractory`), no price. */
   setLiningType(liningType: string): DebugResult
@@ -485,6 +488,10 @@ export function createDebugApi(): DebugApi {
     setCharges: (carried, slotLevel, size = 1) =>
       runUnlessRefused(vehicleDebugProblems(setChargesCommand(carried, slotLevel, size)), () =>
         game().setCharges(carried, slotLevel, size),
+      ),
+    setBlastRadiusLevel: (level) =>
+      runUnlessRefused(vehicleDebugProblems(setBlastRadiusLevelCommand(level)), () =>
+        game().setBlastRadiusLevel(level),
       ),
     setLiningType: (liningType) =>
       runUnlessRefused(vehicleDebugProblems(setLiningTypeCommand(liningType)), () =>

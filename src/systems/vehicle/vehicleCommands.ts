@@ -46,6 +46,13 @@ export function setChargesCommand(
   return { type: 'debug.setCharges', payload: { size, carried, slotLevel } }
 }
 
+/** A scenario's Blast Radius level (D9 #869), no price. */
+export function setBlastRadiusLevelCommand(
+  level: number,
+): CommandIntent<'debug.setBlastRadiusLevel'> {
+  return { type: 'debug.setBlastRadiusLevel', payload: { level } }
+}
+
 export function setGunLevelCommand(level: number): CommandIntent<'debug.setGunLevel'> {
   return { type: 'debug.setGunLevel', payload: { level } }
 }
