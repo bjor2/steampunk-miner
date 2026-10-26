@@ -5,13 +5,15 @@ import { actOf } from '../../planet-mix'
 import economyFile from '../solar-systems.economy.json'
 import paletteFile from '../palette.json'
 import { paletteProblems } from './paletteGuards'
-import { ARCHETYPE_PALETTE, mixedActIds } from './paletteRows'
+import { ARCHETYPE_PALETTE, kindLookPatternIds, mixedActIds } from './paletteRows'
+import { epithetWordOf } from './rosterNames'
 
 // The archetype palette (ticket 775, P&N lock of 23 Oct): written once, read whole, refused whole.
 
 type Raw = Record<string, unknown>
 
 const ACTS = mixedActIds()
+const PATTERNS = kindLookPatternIds()
 /** A conservative average advance of the body serif (Georgia), in em (planetNames.test.ts). */
 const SERIF_ADVANCE_EM = 0.6
 const SCREENS: readonly (readonly [number, number])[] = [
@@ -20,7 +22,7 @@ const SCREENS: readonly (readonly [number, number])[] = [
 ]
 
 function problemsWith(palette: Raw, economy: Raw = economyFile): string[] {
-  return paletteProblems({ ...paletteFile, ...palette }, economy, ACTS)
+  return paletteProblems({ ...paletteFile, ...palette }, economy, ACTS, PATTERNS)
 }
 
 function namesWith(change: Raw): Raw {
@@ -35,7 +37,32 @@ function displayFitOf(name: string, [width, height]: readonly [number, number]) 
 
 describe('archetype palette', () => {
   it('ships with no problem', () => {
-    expect(paletteProblems(paletteFile, economyFile, ACTS)).toEqual([])
+    expect(paletteProblems(paletteFile, economyFile, ACTS, PATTERNS)).toEqual([])
+  })
+
+  it('gives every pattern an epithet word of its own #699 stem, so no planet draws two species of one stem (ticket 890)', () => {
+    const stems = PATTERNS.map(
+      (pattern) =>
+        epithetWordOf(ARCHETYPE_PALETTE.names.epithetWords, pattern).toLowerCase().split('-')[0],
+    )
+    expect(stems.filter((stem, at) => stems.indexOf(stem) !== at)).toEqual([])
+    expect(epithetWordOf(ARCHETYPE_PALETTE.names.epithetWords, 'two-metal')).toBe('Bimetal')
+    expect(epithetWordOf(ARCHETYPE_PALETTE.names.epithetWords, 'two-tone')).toBe('Two-tone')
+  })
+
+  it('refuses epithet words that share a stem, name no pattern or are not capitalised words', () => {
+    expect(problemsWith(namesWith({ epithetWords: {} }))).toEqual([
+      'names.epithetWords: the patterns two-tone, two-metal share the stem "two"',
+    ])
+    expect(problemsWith(namesWith({ epithetWords: { 'two-metal': 'Translucent' } }))).toEqual([
+      'names.epithetWords: the patterns translucent, two-metal share the stem "translucent"',
+    ])
+    expect(
+      problemsWith(namesWith({ epithetWords: { lumpy: 'Lumpy', 'two-metal': 'bimetal' } })),
+    ).toEqual([
+      'names.epithetWords names "lumpy", no pattern',
+      'names.epithetWords.two-metal must be a capitalised word',
+    ])
   })
 
   it('names prefixes and a look for every act a planet from campaign index 2 can hold', () => {

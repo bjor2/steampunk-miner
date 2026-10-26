@@ -8,10 +8,12 @@
  * draw. The hard start's step and its ceiling are the economy rows' (`economyRules.ts`, ticket 776).
  */
 import { familyRowProblems, type CopyFillBudget } from './familyGuards'
+import { epithetWordOf } from './rosterNames'
 
 type Raw = Record<string, unknown>
 
 const CAPITALISED_WORD = /^[A-Z][a-z]+$/
+const EPITHET_WORD = /^[A-Z][a-z]+(-[a-z]+)*$/
 const KEBAB_ID = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/
 const HOOK_FIELDS = {
   mindful: ['{g}', '{ground}', '{pays}', '{mind}'],
@@ -19,11 +21,18 @@ const HOOK_FIELDS = {
 }
 const WHOLE_RADIUS_BP = 10000
 
-export function paletteProblems(palette: unknown, economy: unknown, actIds: readonly string[]) {
+/** `patternIds`: the kind look patterns a generated kind may wear, whose epithet words it checks. */
+export function paletteProblems(
+  palette: unknown,
+  economy: unknown,
+  actIds: readonly string[],
+  patternIds: readonly string[],
+) {
   const raw = asMap(palette)
   const names = asMap(raw.names)
   return [
     ...namePartProblems(names, actIds),
+    ...epithetWordProblems(names.epithetWords, patternIds),
     ...hookTemplateProblems(asMap(names.hookTemplates)),
     ...lookProblems(raw.looks, actIds),
     ...newContentProblems(asMap(raw.newContentSlots), copyFillBudgetOf(names)),
@@ -54,6 +63,44 @@ function nameBudgetProblems(names: Raw, prefixes: readonly unknown[]): string[] 
   return [
     `names: the longest name with ${names.numberDigitsReserved} digits takes ${longest} characters, over ${names.charactersMax}`,
   ]
+}
+
+/**
+ * The palette's own epithet words name known patterns as capitalised words, and no two patterns'
+ * words share a #699 stem (the first word, split at hyphens), so one planet can never draw two
+ * species of one stem (P&N's guard on ticket 890).
+ */
+function epithetWordProblems(epithetWords: unknown, patternIds: readonly string[]): string[] {
+  if (!isJsonMap(epithetWords)) return ['names.epithetWords must map pattern ids to words']
+  const rowProblems = Object.entries(epithetWords).flatMap(([pattern, word]) => [
+    ...(patternIds.includes(pattern) ? [] : [`names.epithetWords names "${pattern}", no pattern`]),
+    ...(typeof word === 'string' && EPITHET_WORD.test(word)
+      ? []
+      : [`names.epithetWords.${pattern} must be a capitalised word`]),
+  ])
+  if (rowProblems.length > 0) return rowProblems
+  return stemClashProblems(patternIds, epithetWords as Record<string, string>)
+}
+
+function stemClashProblems(
+  patternIds: readonly string[],
+  epithetWords: Record<string, string>,
+): string[] {
+  const patternsByStem = new Map<string, string[]>()
+  for (const pattern of patternIds) {
+    const stem = stemOfWord(epithetWordOf(epithetWords, pattern))
+    patternsByStem.set(stem, [...(patternsByStem.get(stem) ?? []), pattern])
+  }
+  return [...patternsByStem]
+    .filter(([, patterns]) => patterns.length > 1)
+    .map(
+      ([stem, patterns]) =>
+        `names.epithetWords: the patterns ${patterns.join(', ')} share the stem "${stem}"`,
+    )
+}
+
+function stemOfWord(word: string): string {
+  return word.toLowerCase().split('-')[0]
 }
 
 function hookTemplateProblems(templates: Raw): string[] {
@@ -212,6 +259,10 @@ function isWhole(value: unknown): value is number {
 
 function isText(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0 && value.trim() === value
+}
+
+function isJsonMap(value: unknown): value is Raw {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
 function asMap(value: unknown): Raw {

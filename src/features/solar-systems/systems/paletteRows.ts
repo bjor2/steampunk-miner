@@ -19,6 +19,7 @@
  *   (`newContentSlots.ts`).
  * - Size classes: S/M/L/XL as basis points of an SS1 planet's radius; XL only on a standard start.
  */
+import { KIND_LOOKS } from '../../../systems/render/kindLooks'
 import { familyRows } from '../../planet-mix'
 import economyFile from '../solar-systems.economy.json'
 import paletteFile from '../palette.json'
@@ -29,6 +30,12 @@ export interface NameParts {
   prefixesByAct: Readonly<Record<string, readonly string[]>>
   /** Capitalised nouns, as "Reach"; any act draws any noun. */
   nouns: readonly string[]
+  /**
+   * The epithet word a generated kind's name opens with, by kind look pattern id, where it is not
+   * the capitalised id: `two-metal` reads "Bimetal" so it never shares the #699 stem "two" with
+   * `two-tone` (P&N on ticket 890). Display copy only; the pattern id is untouched.
+   */
+  epithetWords: Readonly<Record<string, string>>
   /** The longest full name, digits reserved, fits the display role inside 360 px. */
   charactersMax: number
   /** Digits of `g` the budget keeps room for. */
@@ -131,13 +138,18 @@ export interface ArchetypePalette {
 
 export const ARCHETYPE_PALETTE: ArchetypePalette = loadPalette(paletteFile, economyFile)
 
+/** The patterns a generated kind may wear: every pattern of the kernel's kind look catalogue. */
+export function kindLookPatternIds(): string[] {
+  return KIND_LOOKS.patterns.map((pattern) => pattern.id)
+}
+
 /** The acts a system past the first can hold: every #141 act that names families. */
 export function mixedActIds(): string[] {
   return [...new Set(familyRows().flatMap((row) => row.homeActs))].sort()
 }
 
 function loadPalette(palette: typeof paletteFile, economy: typeof economyFile): ArchetypePalette {
-  const problems = paletteProblems(palette, economy, mixedActIds())
+  const problems = paletteProblems(palette, economy, mixedActIds(), kindLookPatternIds())
   if (problems.length > 0)
     throw new Error(`The solar-systems palette is refused:\n${problems.join('\n')}`)
   return {

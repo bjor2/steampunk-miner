@@ -7,13 +7,14 @@ import { systemMaterialPoolsOf } from './materialPool'
 // and every planet of it by its shape, so a change to a draw reads as a change of ore; the rest are
 // digests. A new stream, a roster or palette row, a moved mix or a new look row re-pins them with its
 // ticket; the seed is the lock's date. Ticket 888 re-pinned them for each run's least kinds under
-// the VS's band-trip bounds: a swapped band 3's fossil common splits in two (c5, c6).
+// the VS's band-trip bounds: a swapped band 3's fossil common splits in two (c5, c6). Ticket 890
+// re-pinned systems 2 and 10 for the epithet word "Bimetal" (was "Two-metal"), names only.
 
 const SEED = 20261024
 
 const GOLDEN = {
-  system2: 'a7efbdc1953b2f2c',
-  system10: 'c2fead4c4648da0e',
+  system2: 'a26201078f57ff5c',
+  system10: '8b5b925273d1e0b6',
   system1e6: '06f390e848eb3691',
 }
 

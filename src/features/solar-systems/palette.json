@@ -22,6 +22,7 @@
       "Ledger",
       "Warrant"
     ],
+    "epithetWords": { "two-metal": "Bimetal" },
     "charactersMax": 22,
     "numberDigitsReserved": 3,
     "hookTemplates": {

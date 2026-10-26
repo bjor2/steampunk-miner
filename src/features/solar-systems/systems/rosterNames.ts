@@ -56,6 +56,14 @@ export function ledgerHookOf(
     .replace('{mind}', isMindful ? slot.name.toLowerCase() : '')
 }
 
+/**
+ * The word a generated kind's epithet opens with (ticket 777's "the look's own words"): the
+ * palette's own word for its pattern where it names one (ticket 890), else the capitalised id.
+ */
+export function epithetWordOf(epithetWords: NameParts['epithetWords'], pattern: string): string {
+  return epithetWords[pattern] ?? `${pattern.charAt(0).toUpperCase()}${pattern.slice(1)}`
+}
+
 /** A new ore family pays; otherwise the act's signature family, or its first common. */
 function paysInOf(act: OreAct, slot: NewContentFamily | null): string {
   if (slot !== null && slot.kind === 'ore_family') return slot.name.toLowerCase()

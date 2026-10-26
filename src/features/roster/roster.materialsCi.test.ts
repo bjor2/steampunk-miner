@@ -171,6 +171,13 @@ describe('materials CI of every generated planet (ticket 890)', () => {
       expect(repeatsOf(names)).toEqual([])
     })
 
+    it.each(CASES)('gives every species of %s its own #699 stem', (_, planet) => {
+      const stems = speciesOfPlanet(planet).map(
+        (species) => speciesNameOf(species.epithet).toLowerCase().split(/[\s-]/)[0],
+      )
+      expect(repeatsOf(stems)).toEqual([])
+    })
+
     it.each(CASES)('gives every species of %s its own sprite', (_, planet) => {
       const sprites = speciesOfPlanet(planet).map(
         (species) => `${species.silhouette}|${species.pattern}`,

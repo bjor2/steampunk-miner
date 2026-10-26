@@ -43,10 +43,11 @@ import { materialNameOf } from '../../materials'
 import { oreFamilies, rarityTierOf } from '../../ores'
 import { oreMixOf, type OreMix } from '../../planet-mix'
 import { MATERIAL_POOL_RULES, type MaterialPoolRules } from './materialPoolRules'
-import type { NewContentFamily } from './paletteRows'
+import { ARCHETYPE_PALETTE, type NewContentFamily } from './paletteRows'
 import { gemValueShareBpOf, type RunSale } from './poolGemShare'
 import { systemKindLooksOf, type KindLook } from './poolKindLooks'
 import { paintedRunsOf, splitRunsOf, type SplitRun } from './poolRuns'
+import { epithetWordOf } from './rosterNames'
 import { systemRosterOf, type PlanetId, type RosterPlanet } from './systemRoster'
 
 export interface PoolKind extends KindLook {
@@ -251,7 +252,7 @@ function namedKindOf(kind: PoolDraft['kinds'][number], look: KindLook): PoolKind
 
 /** The look's own words: "Glinting grits" for the pattern `glinting` over the silhouette `grits`. */
 function epithetOf(look: KindLook): string {
-  return `${look.pattern.charAt(0).toUpperCase()}${look.pattern.slice(1)} ${look.silhouette}`
+  return `${epithetWordOf(ARCHETYPE_PALETTE.names.epithetWords, look.pattern)} ${look.silhouette}`
 }
 
 function familyNameOf(familyId: string): string {
