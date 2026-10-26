@@ -137,7 +137,7 @@ function gunCardOf(row: GunRow): OutfitterCard {
 }
 
 function chargeCardsOf(rows: ChargeRows): OutfitterCard[] {
-  return [...rows.restock, rows.rack].map(chargeCardOf)
+  return [...rows.restock, rows.rack, rows.radius].map(chargeCardOf)
 }
 
 function chargeCardOf(row: ChargeRow): OutfitterCard {

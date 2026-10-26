@@ -71,6 +71,7 @@ export const UI_IDS = {
   upgradebayGunsBuy: 'upgradebay-guns-buy',
   upgradebayChargesRestock: 'upgradebay-charges-restock',
   upgradebayRackBuy: 'upgradebay-rack-buy',
+  upgradebayBlastRadiusBuy: 'upgradebay-blast-radius-buy',
   upgradebayLiningButton: 'upgradebay-lining-button',
   refinerybayScreen: 'refinerybay-screen',
   refinerybayBatchCap: 'refinerybay-batch-cap',

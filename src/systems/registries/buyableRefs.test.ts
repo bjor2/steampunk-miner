@@ -44,6 +44,7 @@ describe('buyable refs', () => {
       'bay:refinery',
       'bay:sell',
       'bay:upgrade',
+      'module:blast_radius',
       'module:casing',
       'module:charge_rack',
       'module:charges',

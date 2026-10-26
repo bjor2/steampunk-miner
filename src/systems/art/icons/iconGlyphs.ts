@@ -91,6 +91,14 @@ const GLYPHS: Readonly<Record<string, IconGlyph>> = {
   gun: { body: GUN, lines: 'M14 7l2-3M6 14h8' },
   charge: { body: CHARGE, lines: 'M12 9V5c0-2 3-2 3-4M8 13h8', dots: [[15.5, 1.5, 1.2]] },
   'charge-rack': { body: 'M3 10h18v11H3z', lines: 'M9 10v11M15 10v11M3 15h18' },
+  // The danger zone's ring inside the ground the blast clears, round the charge: nested circles,
+  // filled even-odd.
+  'blast-radius': {
+    body:
+      'M12 2a10 10 0 1 1 0 20a10 10 0 1 1 0-20zM12 4a8 8 0 1 1 0 16a8 8 0 1 1 0-16z' +
+      'M12 6.5a5.5 5.5 0 1 1 0 11a5.5 5.5 0 1 1 0-11zM12 8.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 1 1 0-7z' +
+      'M12 10a2 2 0 1 1 0 4a2 2 0 1 1 0-4z',
+  },
   furnace: { body: FURNACE, lines: 'M9 21v-6h6v6M12 10c-2 2 1 3 0 5' },
   // The artefacts (#46), horizontal power-ups.
   'ore-whisper': {

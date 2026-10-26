@@ -83,6 +83,15 @@ export function blastRadiusLevelPrice(level: number, planetIndex: number): Money
   return mul(row, paceScale(planetIndex))
 }
 
+/**
+ * How many times its rung's radius a blast clears at Blast Radius `level`: m(L) = sqrt(1 + L/d),
+ * d the track's divisor (16), for the shop's words only; the blast itself stamps the integer r² of
+ * `charges/blastDisc.ts`, and the reader holds the exponent at 1/2.
+ */
+export function blastRadiusMultipleAt(level: number): number {
+  return Math.sqrt(1 + level / charges.radiusTrack.levelDivisor)
+}
+
 /** The planet the Blast Casing node (D3 #862) is priced on, as the tree's `unlockTier`. */
 export function blastCasingPriceAnchor(): number {
   return charges.nodePriceAnchors.blastCasing

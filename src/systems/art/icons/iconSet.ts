@@ -129,6 +129,9 @@ export const BLASTING_CHARGES_ICON_ID = `icon-${kebabOf(BLASTING_CHARGES_ROW_ID)
 /** The Rack row's own icon: the rack the charges sit in, not a charge. */
 export const CHARGE_RACK_ICON_ID = 'icon-charge-rack'
 
+/** The Blast Radius row's own icon (D9 #869): a charge's blast rings, not a charge. */
+export const BLAST_RADIUS_ICON_ID = 'icon-blast-radius'
+
 /** The HUD heat gauge's icon. */
 export const HEAT_GAUGE_ICON_ID = `icon-${kebabOf(HEAT_LAVA_ROW_ID)}`
 
@@ -355,6 +358,13 @@ function buyableEntries(): IconEntry[] {
       axis: 'verdigris',
       title: 'Rack',
       glyph: 'charge-rack',
+    },
+    {
+      id: BLAST_RADIUS_ICON_ID,
+      frame: 'plate',
+      axis: 'verdigris',
+      title: 'Blast Radius',
+      glyph: 'blast-radius',
     },
     {
       id: REFINERY_SLOT_ICON_ID,

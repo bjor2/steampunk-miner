@@ -269,6 +269,7 @@ function upgradeBayTexts(model: UpgradeBayModel): Partial<Record<UiId, string | 
     ...(model.guns === null ? {} : { [UI_IDS.upgradebayGunsBuy]: null }),
     [UI_IDS.upgradebayChargesRestock]: null,
     [UI_IDS.upgradebayRackBuy]: null,
+    [UI_IDS.upgradebayBlastRadiusBuy]: null,
   }
 }
 

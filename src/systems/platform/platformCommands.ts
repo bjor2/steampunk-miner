@@ -63,6 +63,11 @@ export function buyChargeRackSlotCommand(chain: number): CommandIntent<'buyCharg
   return { type: 'buyChargeRackSlot', payload: { chain } }
 }
 
+/** One more Blast Radius level at the Upgrade bay (D9 #869). */
+export function buyBlastRadiusLevelCommand(chain: number): CommandIntent<'buyBlastRadiusLevel'> {
+  return { type: 'buyBlastRadiusLevel', payload: { chain } }
+}
+
 export function buyLiningTypeCommand(liningType: string): CommandIntent<'buyLiningType'> {
   return { type: 'buyLiningType', payload: { liningType } }
 }

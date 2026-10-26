@@ -8,11 +8,15 @@ import {
   WALL_TILE,
 } from '../authority/charges/chargeFixtures'
 import { createScriptedSession } from '../authority/scriptedSession'
-import { rackSlotPrice } from '../economy/blastingCharges'
+import { blastRadiusLevelPrice, rackSlotPrice } from '../economy/blastingCharges'
 import { chargePrice } from '../economy/chargeSizes'
 import { KEYBOARD_PROMPTS } from '../input/promptFixtures'
 import { toCanonical } from '../money'
-import { buyChargeRackSlotCommand, restockChargesCommand } from '../platform/platformCommands'
+import {
+  buyBlastRadiusLevelCommand,
+  buyChargeRackSlotCommand,
+  restockChargesCommand,
+} from '../platform/platformCommands'
 import { CLICK_CHAIN } from '../authority/purchaseChain'
 import { grantMoneyCommand } from '../startScenarioCommands'
 import { teleportToDockCommand } from '../vehicle/vehicleCommands'
@@ -177,5 +181,42 @@ describe('upgrade bay model: the charge rows (#109)', () => {
     expect(ids.indexOf(UI_IDS.upgradebayGunsBuy)).toBeLessThan(restockAt)
     expect(ids[restockAt + 1]).toBe(UI_ID_TEMPLATES.upgradebayChargeSizeRestock(2))
     expect(ids[restockAt + 12]).toBe(UI_IDS.upgradebayRackBuy)
+    expect(ids[restockAt + 13]).toBe(UI_IDS.upgradebayBlastRadiusBuy)
+  })
+})
+
+describe('upgrade bay model: the Blast Radius row (D9 #869)', () => {
+  it('offers level 0 → 1 on planet 1 at the track price, with no rack bolted on', () => {
+    expect(upgradeBayOf(atUpgradeBayOn(1)).charges.radius).toMatchObject({
+      key: 'blast-radius',
+      iconId: 'icon-blast-radius',
+      label: 'Blast Radius',
+      levelText: '0 → 1',
+      effectText: '×1.03 blast radius',
+      cost: { exact: toCanonical(blastRadiusLevelPrice(0, 1)) },
+      badge: null,
+      buy: { id: UI_IDS.upgradebayBlastRadiusBuy, label: 'Buy', reason: null },
+    })
+  })
+
+  it('climbs a level a buy and never tops out, its Buy closed only by the wallet', () => {
+    const session = atUpgradeBayOn(1)
+    session.submit(2, buyBlastRadiusLevelCommand(CLICK_CHAIN))
+    expect(upgradeBayOf(session).charges.radius).toMatchObject({
+      levelText: '1 → 2',
+      effectText: '×1.06 blast radius',
+      cost: { exact: toCanonical(blastRadiusLevelPrice(1, 1)) },
+    })
+    const broke = atUpgradeBayOn(1, '0')
+    expect(upgradeBayOf(broke).charges.radius.buy.reason).toBe('money_short')
+  })
+
+  it('reads ×250 at level 1e6: every blast clears 250 times its rung, its danger zone kept', () => {
+    const session = atUpgradeBayOn(1)
+    session.submit(2, { type: 'debug.setBlastRadiusLevel', payload: { level: 999_999 } })
+    expect(upgradeBayOf(session).charges.radius).toMatchObject({
+      levelText: '999999 → 1000000',
+      effectText: '×250.00 blast radius',
+    })
   })
 })
