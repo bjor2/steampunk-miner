@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { fromCanonical, toFixedText, ZERO_MONEY } from '../systems/money'
 import { emptyEconomyTrace, type PlanetEconomy, type TripSale } from './economyTrace'
+import { emptyTripFold } from './tripFold'
 import { economyTraceMarkdownOf, economyTraceMediansOf } from './economyTraceReport'
 import {
   economyTraceRowsOf,
@@ -79,7 +80,7 @@ describe('economy trace report (ticket 907)', () => {
 function runOf(worldSeed: number, hand: KitHand, planets: PlanetEconomy[]): EconomyTraceRun {
   const trace = emptyEconomyTrace()
   planets.forEach((planet) => trace.planets.set(planet.planet, planet))
-  return { worldSeed, hand, trace, endTick: 0 }
+  return { worldSeed, hand, trace, trips: emptyTripFold(), endTick: 0 }
 }
 
 /** Two minutes on `planet`: three buys, two deaths, two asks (one covered), five trips. */

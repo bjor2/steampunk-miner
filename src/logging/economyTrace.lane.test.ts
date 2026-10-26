@@ -6,13 +6,17 @@ import { formatNdjsonLine } from './ndjson'
 import { economyTraceLinesOf, economyTraceMarkdownOf, KIT_HANDS } from './economyTraceReport'
 import { economyTraceRowsOf, type EconomyTraceRun } from './economyTraceRows'
 import { economyTraceRunOf } from './economyTraceRuns'
+import { tripMarkdownOf, tripRowsOf } from './tripRows'
 
 // The P3-P5 pacing diagnosis, part 1 (ticket 907; the GD lock of 25 Oct, Campaign Scaling room):
 // each pacing seed (83921, 31415, 27182) plays the bot scenario to planet 5's core with kitPolicy
 // off and on, and every step folds into the per-planet economy trace (`economyTrace.ts`). Nothing
 // is gated: the trace rows go to balance-report/economy-trace.ndjson and the run-comparison log to
 // balance-report/economy-trace.md, which replaces docs/economy/economy-trace-p1-p5.md as the
-// baseline #908 re-measures against. Six runs of up to an hour each, so this is a lane:
+// baseline #908 re-measures against. Each trip's row (ticket 918: start and end tick, endCause,
+// deepest band, cells cut, sell value, fuel used) goes to balance-report/economy-trace-trips.ndjson
+// and its per-planet summary for #908's trip gate to balance-report/economy-trace-trips.md. Six
+// runs of up to an hour each, so this is a lane:
 //   npx vitest run src/logging/economyTrace.lane.test.ts
 const RUN_TIMEOUT_MS = 8 * 60 * 60 * 1000
 const SCENARIO_FILE = new URL('../../scenarios/bot-slice.scenario.json', import.meta.url)
@@ -37,7 +41,7 @@ describe('economy trace: P1-P5 on three seeds, kitPolicy off and on (ticket 907)
   })
 })
 
-/** The trace rows as NDJSON and the run-comparison log as the doc it replaces. */
+/** The trace rows as NDJSON, the run-comparison log as the doc it replaces, then the trips. */
 function writeReports(runs: readonly EconomyTraceRun[]): void {
   const measuredOn = new Date().toISOString().slice(0, 10)
   mkdirSync(REPORT_FOLDER, { recursive: true })
@@ -50,5 +54,18 @@ function writeReports(runs: readonly EconomyTraceRun[]): void {
   writeFileSync(
     new URL('economy-trace.md', REPORT_FOLDER),
     `${economyTraceMarkdownOf(runs, measuredOn)}\n`,
+  )
+  writeTripReports(runs, measuredOn)
+}
+
+function writeTripReports(runs: readonly EconomyTraceRun[], measuredOn: string): void {
+  const rows = tripRowsOf(runs)
+  writeFileSync(
+    new URL('economy-trace-trips.ndjson', REPORT_FOLDER),
+    rows.map((row) => formatNdjsonLine({ measuredOn, ...row })).join(''),
+  )
+  writeFileSync(
+    new URL('economy-trace-trips.md', REPORT_FOLDER),
+    `${tripMarkdownOf(rows, measuredOn)}\n`,
   )
 }

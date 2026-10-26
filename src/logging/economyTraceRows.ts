@@ -7,15 +7,17 @@ import { TICKS_PER_SECOND } from '../constants/physics'
 import { cmp, div, floor, fromSafeInteger, mul, toCanonical, type Money } from '../systems/money'
 import type { EconomyTrace, PlanetEconomy, TripSale } from './economyTrace'
 import { askWaitTicks, type UpgradeAsk } from './economyTraceAsks'
+import type { TripFold } from './tripFold'
 
 /** The bare bot, or the bot buying and using each planet's kit (#823, #826). */
 export type KitHand = 'off' | 'on'
 
-/** One seed's run under one hand: its trace and the tick it ended at. */
+/** One seed's run under one hand: its trace, its trips (ticket 918) and the tick it ended at. */
 export interface EconomyTraceRun {
   worldSeed: number
   hand: KitHand
   trace: EconomyTrace
+  trips: TripFold
   endTick: number
 }
 

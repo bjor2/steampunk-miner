@@ -838,7 +838,11 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   minute, the next useful upgrade and its wait, upgrades bought, deaths by cause, each trip's sale
   by its deepest band). It gates nothing and writes `balance-report/economy-trace.ndjson` and
   `economy-trace.md`, which replaces the baseline `docs/economy/economy-trace-p1-p5.md`; the fold
-  is unit-specced in `economyTrace.test.ts` and the rows in `economyTraceReport.test.ts`.
+  is unit-specced in `economyTrace.test.ts` and the rows in `economyTraceReport.test.ts`. The same
+  lane folds every trip for #908's trip gate (ticket 918: start and end tick, endCause, deepest
+  band, cells cut, sell value, fuel used) into `balance-report/economy-trace-trips.ndjson` and
+  `economy-trace-trips.md`; the fold is unit-specced in `tripFold.test.ts` (a scripted run ending
+  in all six causes) and the rows in `tripRows.test.ts`.
   D6's soft opening target for the dynamite rows (ticket 865: a
   size-1 charge costs at most 5% of the money the bot holds within its first 5 minutes on P1) is
   the lane `src/logging/chargeOpening.lane.test.ts`, which prints each seed's peak wallet and

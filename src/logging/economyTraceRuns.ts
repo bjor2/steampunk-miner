@@ -4,11 +4,12 @@
  * passable without its tool, so the bare bot must clear it too). Off is the bare bot that skips
  * every crate, flask and merchant; on is PK7's merchants-on hand (#826): the Cache Crate under
  * `drop_on_full`, the flask uncorked on firedamp, each planet's own kit bought at its merchant.
- * Every step folds into the economy trace. Only specs use it.
+ * Every step folds into the economy trace and the per-trip fold (ticket 918). Only specs use it.
  */
 import { TICKS_PER_SECOND } from '../constants/physics'
 import type { CommandIntent } from '../systems/authority/authorityCommand'
-import { createAuthorityState } from '../systems/authority/authorityState'
+import { createAuthorityState, type AuthorityState } from '../systems/authority/authorityState'
+import type { DomainEvent } from '../systems/authority/domainEvent'
 import { DEFAULT_KIT_POLICY, type KitPolicy } from '../systems/bot/botCrates'
 import { createBotSession } from '../systems/bot/botSession'
 import { botPlanetOf } from '../systems/bot/botTravel'
@@ -19,6 +20,7 @@ import { startOfScenario, validateScenario, type Scenario } from '../systems/sce
 import { startScenarioCommands } from '../systems/startScenarioCommands'
 import { emptyEconomyTrace, traceEconomyStep } from './economyTrace'
 import type { EconomyTraceRun, KitHand } from './economyTraceRows'
+import { emptyTripFold, foldTripStep } from './tripFold'
 
 export const ECONOMY_TRACE_LAST_PLANET = 5
 
@@ -36,7 +38,13 @@ export function economyTraceRunOf(
   worldSeed: number,
   hand: KitHand,
 ): EconomyTraceRun {
-  const run: EconomyTraceRun = { worldSeed, hand, trace: emptyEconomyTrace(), endTick: 0 }
+  const run: EconomyTraceRun = {
+    worldSeed,
+    hand,
+    trace: emptyEconomyTrace(),
+    trips: emptyTripFold(),
+    endTick: 0,
+  }
   const start = createAuthorityState({
     planetIndex: 1,
     planetSeed: worldSeed,
@@ -44,7 +52,7 @@ export function economyTraceRunOf(
   })
   const session = createBotSession(start, PLAYER_ID, {
     onCommand: () => undefined,
-    onEvents: (state, events) => traceEconomyStep(run.trace, state, PLAYER_ID, events),
+    onEvents: (state, events) => traceRunStep(run, state, events),
   })
   scenarioStartOf(scenario).forEach((intent) => session.submit(intent))
   const planet = botPlanetOf(
@@ -59,6 +67,15 @@ export function economyTraceRunOf(
   playSliceFrom(session, planet, { lastPlanet: ECONOMY_TRACE_LAST_PLANET, maxTicks: BUDGET_TICKS })
   run.endTick = session.tick()
   return run
+}
+
+function traceRunStep(
+  run: EconomyTraceRun,
+  state: AuthorityState,
+  events: readonly DomainEvent[],
+): void {
+  traceEconomyStep(run.trace, state, PLAYER_ID, events)
+  foldTripStep(run.trips, state, PLAYER_ID, events)
 }
 
 /** Refused, never trimmed: a broken scenario file. */
