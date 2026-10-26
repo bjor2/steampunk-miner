@@ -2057,7 +2057,7 @@ Spec #878, MF of the GD's Materials Expansion lock; the GD lock of 26 Oct on #89
 
 ### 3.106 Casing grades by depth (ticket 829)
 
-Spec #647, CG1 of the GD lock on casing grades by depth (24 Oct) and its re-lock (25 Oct: "the biome decides the casing grade"). A kernel ticket: the ladder, the burst and their seams; no slice registers anything new. Protocol 126, economy rules 7.
+Spec #647, CG1 of the GD lock on casing grades by depth (24 Oct) and its re-lock (25 Oct: "the biome decides the casing grade"). A kernel ticket: the ladder, the burst and their seams; no slice registers anything new. Protocol 127, economy rules 7.
 
 - **The ladder** (`economy/casingGrades.ts`): `requiredCasingGrade({ planetIndex, band })` = `q_surface(g) + b + biomeDelta`, `b` the band from 0, the core clamped to the last ore band. `q_surface` is the planet row's `casingSurfaceGrade` (`registries/planetRow.ts`), `casingGradeStart + gradesPerPlanet * (g - 1)` generated; a provider may lift it (an offset start), refused by `casingSurfaceOffsets.ts` past +1, on a system's first planet, twice in a system, or with a catch-up over 8% of a measured median money held (`casing.surfaceOffset.moneyHeldAfterFuel`, empty: no offset ships). `biomeDelta` (0 or 1) is the hazard act's `casingBiomeDelta` (`economy.json` `archetypes`), never added on band 0; all ship 0. `vehicle.casingGrade` is a bigint (a JSON count in the snapshot).
 - **Prices** (`economy/casingPrices.ts`): up to grade 5 main's rows; past it `price(5) * r^(q-5)` for a grade and planet 1 band 5's metre `* r^(q-5)` for lining, `r = planetPriceRatio^(1/gradesPerPlanet)`, whole planets exactly `planetPriceRatio`.
