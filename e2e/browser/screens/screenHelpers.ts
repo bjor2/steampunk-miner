@@ -88,22 +88,65 @@ export async function settledStats(page: Page) {
   return renderStats(page)
 }
 
-/** Docked at a bay with its screen open behind the shutter. */
-export async function dockAt(page: Page, bay: 'sell' | 'upgrade'): Promise<void> {
-  await page.evaluate((name) => {
-    const result = window.steampunkDebug!.teleportToDock(name)
+/** What `teleportToDock` refuses with when the rig already sits in a bay (`setPlanet` docks it). */
+const ALREADY_DOCKED = 'the vehicle is already docked'
+
+type BayName = 'sell' | 'upgrade'
+
+/**
+ * Docked at a bay with its screen open behind the shutter. A rig already docked there is only
+ * waited on (ticket 904); one docked at the other bay leaves it first, as a player would.
+ */
+export async function dockAt(page: Page, bay: BayName): Promise<void> {
+  if (await isDockRefusedAsDocked(page, bay)) await leaveOtherBayFor(page, bay)
+  await waitForOpenBay(page, bay)
+}
+
+/** Teleports into `bay`; true when refused only because the rig is already docked somewhere. */
+function isDockRefusedAsDocked(page: Page, bay: BayName): Promise<boolean> {
+  return page.evaluate(
+    ({ name, alreadyDocked }) => {
+      const result = window.steampunkDebug!.teleportToDock(name)
+      if (result.ok) return false
+      if (result.problems.length === 1 && result.problems[0] === alreadyDocked) return true
+      throw new Error(result.problems.join('; '))
+    },
+    { name: bay, alreadyDocked: ALREADY_DOCKED },
+  )
+}
+
+/** Docked elsewhere: undock once the shutter shows where, then teleport as soon as it lands. */
+async function leaveOtherBayFor(page: Page, bay: BayName): Promise<void> {
+  const docked = await openShutterBay(page)
+  if (docked === bay) return
+  await page.evaluate(() => {
+    const result = window.steampunkDebug!.input.tap('undock')
     if (!result.ok) throw new Error(result.problems.join('; '))
-  }, bay)
+  })
   await expect
-    .poll(
-      () =>
-        page.evaluate(() => {
-          const result = window.steampunkDebug!.ui.getBayPresentation()
-          return result.ok ? result.presentation.shutter.phase : 'closed'
-        }),
-      { timeout: 30_000 },
-    )
+    .poll(async () => !(await isDockRefusedAsDocked(page, bay)), { timeout: 30_000 })
+    .toBe(true)
+}
+
+/** The bay the shutter stands open over, once it has opened. */
+async function openShutterBay(page: Page): Promise<string | null> {
+  await expect
+    .poll(() => shutterOf(page).then(({ phase }) => phase), { timeout: 30_000 })
     .toBe('open')
+  return (await shutterOf(page)).bay
+}
+
+async function waitForOpenBay(page: Page, bay: BayName): Promise<void> {
+  await expect.poll(() => shutterOf(page), { timeout: 30_000 }).toEqual({ bay, phase: 'open' })
+}
+
+function shutterOf(page: Page): Promise<{ bay: string | null; phase: string }> {
+  return page.evaluate(() => {
+    const result = window.steampunkDebug!.ui.getBayPresentation()
+    if (!result.ok) return { bay: null, phase: 'closed' }
+    const { bay, phase } = result.presentation.shutter
+    return { bay, phase }
+  })
 }
 
 export function boxOf(page: Page, testId: string): Promise<Box> {
