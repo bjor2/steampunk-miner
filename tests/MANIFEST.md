@@ -1473,6 +1473,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/render/artefactLook.test.ts` | 2 | 2 |
 | `src/systems/render/bandPalette.test.ts` | 6 | 6 |
+| `src/systems/render/bodyWidthLook.test.ts` | 15 | 15 |
+| `src/systems/render/bodyWidthLookImports.test.ts` | 2 | 2 |
 | `src/systems/render/cameraFollow.test.ts` | 9 | 9 |
 | `src/systems/render/cameraTurn.test.ts` | 7 | 7 |
 | `src/systems/render/casingBlink.test.ts` | 6 | 6 |
@@ -1523,7 +1525,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/kindLookTable.test.ts` | 21 | 21 |
 | `src/systems/render/kindLooks.test.ts` | 6 | 6 |
 | `src/systems/render/lookPartQuads.test.ts` | 6 | 6 |
-| `src/systems/render/mountedPartLook.test.ts` | 8 | 4 |
+| `src/systems/render/mountedPartLook.test.ts` | 9 | 5 |
 | `src/systems/render/oreGrade.test.ts` | 2 | 2 |
 | `src/systems/render/oreLook.test.ts` | 11 | 9 |
 | `src/systems/render/partMotion.test.ts` | 16 | 13 |

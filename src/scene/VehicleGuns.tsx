@@ -2,7 +2,8 @@
  * The `auto_guns` turret on the run vehicle (#107, #81 acceptance 3): drawn in the vehicle's body
  * frame while the guns are mounted, its barrel look following the gun level (#108). The barrel
  * swings each frame towards the enemy the guns would shoot while they are on Auto, and back to
- * rest otherwise; its turn lives on a ref and never goes through React or the store.
+ * rest otherwise; its turn lives on a ref and never goes through React or the store. It keeps its
+ * size on a wider rig and rides the body from its trunnion (ticket 913).
  */
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
@@ -19,7 +20,9 @@ import {
   stepGunTurn,
   type AimFrame,
 } from '../systems/render/gunLook'
+import type { RigWidth } from '../systems/render/bodyWidthLook'
 import { isGunOnAuto } from '../systems/vehicle/vehicleGun'
+import { HeldSizeMount } from './HeldSizeMount'
 import { PartQuadMesh } from './PartQuadMesh'
 import { SHIPPED_ART } from './shippedArt'
 import { vehiclePresence } from './vehiclePresence'
@@ -29,7 +32,7 @@ const TURRET_Z = 0.1
 const REST_TURN = 0
 const maps = atlasMapsOf(SHIPPED_ART, GUN_ASSET_ID)
 
-export function VehicleGuns() {
+export function VehicleGuns({ rig }: { rig: RigWidth }) {
   const gunLevel = useGameStore((state) => state.vehicle.gunLevel)
   const fixed = useMemo(() => gunFixedQuadsOf(SHIPPED_ART, gunLevel), [gunLevel])
   const barrels = useMemo(() => gunBarrelQuadsOf(SHIPPED_ART, gunLevel), [gunLevel])
@@ -42,7 +45,7 @@ export function VehicleGuns() {
     barrel.current?.rotation.set(0, 0, turn.current)
   })
   return (
-    <>
+    <HeldSizeMount rig={rig} mountX={trunnion[0]}>
       {fixed.map((quad) => (
         <PartQuadMesh key={quad.partId} quad={quad} maps={maps} baseZ={TURRET_Z} />
       ))}
@@ -51,7 +54,7 @@ export function VehicleGuns() {
           <PartQuadMesh key={quad.partId} quad={quad} maps={maps} baseZ={TURRET_Z} />
         ))}
       </group>
-    </>
+    </HeldSizeMount>
   )
 }
 

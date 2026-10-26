@@ -3,7 +3,8 @@
  * the guns' turret once mounted (#107), the fuel tank's coal tender at the hitch (ticket 758), the
  * slices' pieces at their attach points (#235; the dynamite rack among them since #215), and the
  * heat shimmer above the throttle line (#113), all painted with the looks the slices ask of the
- * vehicle (ticket 389).
+ * vehicle (ticket 389). The rig is drawn at its own collider width (ticket 913): its presence is
+ * its width record, handed to the body and to every part that keeps its size.
  */
 import { useMemo } from 'react'
 import { VehicleBody } from '../physics/VehicleBody'
@@ -36,14 +37,15 @@ export function Vehicle() {
       presence={vehiclePresence}
       origin={renderOriginPresence}
       stage={vehicleStagePresence}
+      width={vehiclePresence}
     >
       {(controller) => (
         <VehicleLook>
           <VehiclePlaceholder />
-          <DrillHeadView controller={controller} />
-          <VehicleGuns />
-          <FuelTenderPiece />
-          <JumpDrivePiece />
+          <DrillHeadView controller={controller} rig={vehiclePresence} />
+          <VehicleGuns rig={vehiclePresence} />
+          <FuelTenderPiece rig={vehiclePresence} />
+          <JumpDrivePiece rig={vehiclePresence} />
           <VehiclePieces />
           <HeatShimmer />
         </VehicleLook>

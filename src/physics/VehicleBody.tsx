@@ -5,7 +5,9 @@
  * the last step by the step blend, so it glides on every frame instead of jumping on the frames
  * that complete a step (presentation only; nothing per-frame reaches React state). The drawn car
  * is shifted by the dock building's staging (#170 auto-roll) and turned about its own up axis on a
- * turntable (#180), which never moves or turns the body. The body is measured from the render origin
+ * turntable (#180), which never moves or turns the body; the hull root is drawn across its width at
+ * the rig's own collider width on top of the turntable's share (ticket 913), read from the rig's
+ * width record, never from the controller. The body is measured from the render origin
  * (ticket 339); the car is drawn in planet metres under the scene's world root, and the origin it was
  * drawn from is published with it, so the root, the camera and the particles move the same frame.
  */
@@ -15,7 +17,7 @@ import { useRapier } from '@react-three/rapier'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Quaternion, Vector3, type Group } from 'three'
 import { BODY_DRAW_FRAME_PRIORITY, MM_PER_METRE } from '../constants/physics'
-import { turnedWidthShareOf } from '../systems/render/stagedTurn'
+import { hullRootWidthShareOf, type RigWidth } from '../systems/render/bodyWidthLook'
 import type { VehiclePose } from '../systems/vehicle/vehiclePose'
 import { mountFixedTick } from './liveFixedStep'
 import { stepBlend } from './stepBlend'
@@ -35,6 +37,8 @@ interface VehicleBodyProps {
   origin: { x: number; y: number }
   /** Where the car is drawn from the body, and its turn; none unless a dock building stages it. */
   stage: DrawStaging
+  /** This rig's own collider width, written as it grows; the hull root is drawn at it. */
+  width: RigWidth
   children: (controller: VehicleController) => ReactNode
 }
 
@@ -67,13 +71,17 @@ export function VehicleBody({
   presence,
   origin,
   stage,
+  width,
   children,
 }: VehicleBodyProps) {
   const { world, rapier } = useRapier()
   const group = useRef<Group>(null)
   const [mounted, setMounted] = useState<MountedVehicle | null>(null)
   const poses = useMemo(createStepPoses, [])
-  const drawn = useMemo<DrawnPresence>(() => ({ presence, origin }), [presence, origin])
+  const drawn = useMemo<DrawnPresence>(
+    () => ({ presence, origin, width }),
+    [presence, origin, width],
+  )
 
   useEffect(() => {
     const placed = createVehicleBody(rapier, world, startPose)
@@ -132,10 +140,14 @@ function readBodyPose(body: RAPIER.RigidBody, into: DrawnPose): void {
   into.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w)
 }
 
-/** Where the drawn car and the origin it was measured from are published each frame. */
+/**
+ * Where the drawn car and the origin it was measured from are published each frame, and the rig's
+ * own collider width it is drawn at.
+ */
 interface DrawnPresence {
   presence: { x: number; y: number }
   origin: { x: number; y: number }
+  width: RigWidth
 }
 
 function drawBetweenSteps(
@@ -148,7 +160,7 @@ function drawBetweenSteps(
   readBodyPose(mounted.body, poses.latest)
   blendStepPoses(poses.stepStart, poses.latest, group)
   measureFromPlanetCentre(group, mounted.controller, drawn.origin)
-  stageDrawnCar(group, stage)
+  stageDrawnCar(group, stage, drawn.width)
   drawn.presence.x = group.position.x
   drawn.presence.y = group.position.y
 }
@@ -172,8 +184,8 @@ function blendStepPoses(stepStart: DrawnPose, latest: DrawnPose, group: Group): 
   group.quaternion.slerpQuaternions(stepStart.quaternion, latest.quaternion, stepBlend.share)
 }
 
-function stageDrawnCar(group: Group, stage: DrawStaging): void {
+function stageDrawnCar(group: Group, stage: DrawStaging, width: RigWidth): void {
   group.position.x += stage.drawOffsetX
   group.position.y += stage.drawOffsetY
-  group.scale.x = turnedWidthShareOf(stage.rotation)
+  group.scale.x = hullRootWidthShareOf(stage.rotation, width)
 }

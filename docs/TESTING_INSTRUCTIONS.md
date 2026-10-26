@@ -1069,6 +1069,18 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   owned body; the bare level unchanged), `render/widthZoom.test.ts` (the rig's size on screen and
   the 1 s ahead from level 1 to 1e6, phone and desktop) and `vehicle/wagonFit.test.ts` (the
   shipped `hull.hitch` and a wagon of the rig's width in its bore along every aim).
+- **The rig drawn at its collider width** (ticket 913, the GD and TD locks on #666):
+  `src/systems/render/bodyWidthLook.test.ts` checks on the CPU in float64 that the drawn body's side
+  and edges match the settled collider within 0.05 m at Marks 1, 5, 20, 101 and 1e6, for two rigs at
+  different Marks each from its own width record; that the width share stacks on the turntable's;
+  that the turret and the coal tender keep their size, an on-body mount moving out in proportion and
+  the hitch keeping its overhang past the scaled stern; that the drill head rides the grown face as
+  the cut's body reach does along every aim; that the code-side `body` anchor stands on the shipped
+  chassis centre; and the HS's data curve (`bodyWidthMmAt / 2` against the settled collider at Marks
+  0, 1, 2, 3, 10, 101 and 1e6). `bodyWidthLookImports.test.ts` is the render-only guard: no
+  authority, economy, vehicle, store or log module imports the drawn width, so the committed goldens
+  replay byte for byte whatever width a rig is drawn at, and no reader of it imports the local
+  `vehiclePresence`.
 - **Riding the cut face** (ticket 570): `src/physics/cutFaceRide.test.ts` plays down legs at drill
   purchases 1, 10 and 20 (1.5, 10.7 and 94 m/s on planet 1) on a column and a tilted column at 30
   and 144 frames/s, and a level leg turned out of a down bore, in the live loop with
