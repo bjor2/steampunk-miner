@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { bottomCasingGrade } from '../../../systems/economy/casingGrades'
 import type { CommandIntent } from '../../../systems/authority/authorityCommand'
 import { createAuthorityState } from '../../../systems/authority/authorityState'
 import { buyVehicleItemCommand } from '../../../systems/authority/loadoutCommands'
@@ -21,7 +22,8 @@ import { availableFromPlanet, ownsRig } from './rigs'
 
 // #142 acceptance 7 (ticket 296): on its own planet the bot researches the extractor's node and
 // buys the extractor ahead of its track levels, saving for them while the wallet is short. The bot
-// arrives on curve with an empty wallet, so every coin comes from that planet's trips; whether a
+// arrives on curve with an empty wallet and the casing its planet's core needs (ticket 829's
+// ladder), so every coin comes from that planet's trips; whether a
 // pacing run buys within its first 4 trips is `balance:charges`' table over the three seeds.
 
 /** Long enough for the planet's core: the run stops there or here. */
@@ -35,7 +37,7 @@ function arrivedBroke(planetIndex: number): CommandIntent[] {
     setPlanetSeedCommand(FIXTURE_SEED),
     { type: 'debug.setMoney', payload: { amount: '0' } },
     ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, onCurveStep(id, planetIndex))),
-    { type: 'debug.setCasingGrade', payload: { grade: 5 } },
+    { type: 'debug.setCasingGrade', payload: { grade: Number(bottomCasingGrade(planetIndex)) } },
     { type: 'debug.setLiningType', payload: { liningType: 'refractory' } },
     { type: 'debug.freezeEnemies', payload: { frozen: true } },
   ]
