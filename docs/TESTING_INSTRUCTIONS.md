@@ -1029,8 +1029,12 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   facings' rings to the byte; `src/systems/authority/casingAlongAim.test.ts` digs 10 m swept legs
   straight down, at 45 degrees and 5/64 turn off down (both walls lined, run ≤ 1 sample, the 45
   degree wall past 0.85 m lined), bills a 45 degree leg 10 m ± one ring swept and reported every
-  0.5 m or 1 m, and keeps the aims across a save. The lane `src/physics/casingAlongAim.lane.test.ts`
-  (Tester) digs the same three aims off planet 1's pad at purchases 1, 10 and 20 in the live loop:
+  0.5 m or 1 m, and keeps the aims across a save (its legs are `casingAimFixtures.ts`'s).
+  `src/logging/diagonalCasingBill.test.ts` is the unit-level billing check that replaced the
+  diagonal-heavy bot run (moved to #899): every ring of a 45 degree leg is priced as the straight
+  leg's ring of its band and length, the trail pays about 1.41 m a metre of depth, and the bot
+  baseline's lining with its trail all at 45 degrees stays at or under 6% of its spend. The lane
+  `src/physics/casingAlongAim.lane.test.ts` (Tester) digs the same three aims off planet 1's pad at purchases 1, 10 and 20 in the live loop:
   no unlined run past one cell along either wall, and no aimed leg meets more of its lining than
   the straight-down leg at its purchase (the dig-pace bar). The straight legs stay
   `casingPerMetre.lane.test.ts`'s.
