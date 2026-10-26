@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-26T06:42:45+01:00",
+  "updated_at": "2026-10-26T06:43:01+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -354,11 +354,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-26 06:24 CET",
+    "at": "2026-10-26 06:43 CET",
     "mode": "refill-dev",
-    "triggers": "#864",
+    "triggers": "#869",
     "started": "",
-    "note": "no pickable build ticket"
+    "note": "load guard (MemAvailable 3060 MB < 3072 MB)"
   },
   "totals": {
     "grok": {
