@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-26T01:49:10+01:00",
+  "updated_at": "2026-10-26T01:49:39+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -358,11 +358,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-26 01:26 CET",
+    "at": "2026-10-26 01:49 CET",
     "mode": "refill-dev",
-    "triggers": "#863",
-    "started": "#863->C4/A1 #865->C5/A1",
-    "note": "spawned 2 worker(s)"
+    "triggers": "#904 #907",
+    "started": "",
+    "note": "load guard (MemAvailable 2852 MB < 3072 MB)"
   },
   "totals": {
     "grok": {
@@ -394,19 +394,6 @@
         "state": "blocked",
         "tickets": [
           908
-        ],
-        "done": [],
-        "live": 0
-      },
-      {
-        "number": 909,
-        "key": "878-1H",
-        "map": 878,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          907
         ],
         "done": [],
         "live": 0
