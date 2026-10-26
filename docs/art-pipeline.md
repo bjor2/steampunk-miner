@@ -915,9 +915,14 @@ HS rule on #576) and never takes a module point. Unlike the drill_tip looks thes
 silhouette on purpose: the cutters stick out to the sides (0.34 m at Mark 1, 0.5 m at Mark 2), the
 reamers are a 0.6 m ring round the bit, the crown is a 0.5 m spike ahead, which is what makes the
 type read at a 360 px phone's width. A look is one or more parts; the cutter arms and the boom's
-ram have their origin at their hinge or slide and carry a folded pose in the table, so a
-toggled-off cutter can fold in. Nothing registers, exports or draws it yet: the wiring (#623) names
-the looks from owned state through the rig-look registry (#577).
+ram have their origin at their hinge or slide and carry a folded pose in the table; folding was
+dropped (GD lock of 25 Oct on #623), so the game draws the deployed pose. Wired by
+[#623](https://github.com/bjor2/steampunk-miner/issues/623): the rig-look slice registers the asset
+from `rigLook.json`'s `lookAssets` and draws each look through its `itemTracks`, one track per
+drill type keyed by its item id; it was exported unchanged with `npm run art:export`, its
+placeholder sidecar laid out from the export. The equipped type takes `drill.head` by row order
+(twin bit, the fork branch, the side cutters, the boom), ahead of the drill_tip step, whose level
+look stays on as the tint on its parts.
 `docs/art/rig-look-drill-type/author_drill_type_looks.py` wrote the first version of the `.blend`;
 from then on it is the source. The look table, the reach check and the review renders, at desktop
 and at a 360 px phone's size, are in [docs/art/rig-look-drill-type/](art/rig-look-drill-type/README.md).

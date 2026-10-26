@@ -10,9 +10,11 @@ GD lock (6301848748) put the parts in their own ticket on #578's slot and render
 #577 registry, and the Horizontal Scaler (6301809360) ruled that drill-head parts belong to the
 drill-head slot and never to a module point.
 
-**Not wired.** Nothing registers, exports or draws the asset: the wiring (#623) names the looks
-from owned state through the rig-look registry (#577), swaps the parts on the slot, folds a
-toggled-off cutter in and gives the #590 sweep its rows. `drillTypeLooks.json` here is the one
+**Wired by #623.** The rig-look slice registers and draws the asset: `rigLook.json`'s
+`itemTracks` key each look by its drill type's item id, `n` the owned Mark while the type is
+equipped (slotted, or its fork branch active), and the first equipped type in row order swaps its
+parts onto `drill.head` in place of the bit. Folding was dropped (GD lock of 25 Oct on #623): the
+deployed pose is drawn. The browser rows are `e2e/browser/rigLookDrillTypes.spec.ts`. `drillTypeLooks.json` here is the one
 table this folder's scripts share; the wiring keeps its own rows. The asset id follows the #52
 kebab form under the vehicle category, `vehicle-look-drill-type`, beside #578's
 `vehicle-look-drill-tip`; the part ids are the looks' names. #578 does not grow: this is a second
