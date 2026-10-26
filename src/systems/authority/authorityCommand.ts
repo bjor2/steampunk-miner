@@ -595,8 +595,16 @@ import type { JsonCount } from '../wholeCount'
  *    `r(aim)` the stamp's own radius along that aim round the rig's bore at its width level now
  *    (0.787 m at 45 degrees on the bare rig). A point with no aim, every one before, is laid along
  *    its facing as it was, so a straight dig moves no digest.
+ * 124: the Blast Radius track (ticket 869, D9 of #647): `buyBlastRadiusLevel {chain}` raises the
+ *    rig's level at the Upgrade bay for `ceil(50 * 1.6^L) * paceScale(p)`, uncapped and refused
+ *    only `wrong_bay`, `money_short` or a held step's `service_reserve`, answered
+ *    `BlastRadiusUpgraded {from, to, price}` with its chain; `debug.setBlastRadiusLevel {level}`
+ *    sets it. The level rides on the vehicle's charges as `radiusLevel` (absent at 0, snapshot
+ *    31), and every blast reads the planter's owned level when it blows, so its `BlastStarted`
+ *    carries it and its ground r² widens while the base r² stays. A rig that never buys a level
+ *    moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 123
+export const AUTHORITY_PROTOCOL_VERSION = 124
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

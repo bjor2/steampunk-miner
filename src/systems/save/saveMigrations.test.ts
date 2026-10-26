@@ -75,6 +75,8 @@ const BIGNUM_HOLD_STEP = { version: 'snapshotVersion', from: 27, to: 28 }
 const BLAST_RECORD_STEP = { version: 'snapshotVersion', from: 28, to: 29 }
 /** Ticket 888: every fixture was written before the planets' ore rules stamps were kept. */
 const STAMPS_STEP = { version: 'snapshotVersion', from: 29, to: 30 }
+/** Ticket 869: every fixture was written before the Blast Radius track. */
+const RADIUS_LEVEL_STEP = { version: 'snapshotVersion', from: 30, to: 31 }
 /** #401: every fixture was written in the one-slot layout, format 1. */
 const SLOT_FORMAT_STEP = { version: 'formatVersion', from: 1, to: 2 }
 const PACKED_CHUNKS_STEP = { version: 'formatVersion', from: 2, to: 3 }
@@ -135,6 +137,7 @@ describe('save migration chain', () => {
       BIGNUM_HOLD_STEP,
       BLAST_RECORD_STEP,
       STAMPS_STEP,
+      RADIUS_LEVEL_STEP,
       GENERATOR_STEP,
       ORE_LEAD_STEP,
       ORE_MIX_STEP,
@@ -172,6 +175,7 @@ describe('save migration chain', () => {
       BIGNUM_HOLD_STEP,
       BLAST_RECORD_STEP,
       STAMPS_STEP,
+      RADIUS_LEVEL_STEP,
       GENERATOR_STEP,
       ORE_LEAD_STEP,
       ORE_MIX_STEP,
@@ -415,6 +419,7 @@ describe('save migration chain: levels to steps (#181)', () => {
       BIGNUM_HOLD_STEP,
       BLAST_RECORD_STEP,
       STAMPS_STEP,
+      RADIUS_LEVEL_STEP,
       ORE_LEAD_STEP,
       ORE_MIX_STEP,
       ORE_RULES_STEP,

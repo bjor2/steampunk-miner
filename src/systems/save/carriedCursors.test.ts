@@ -76,6 +76,7 @@ describe('save migration chain: snapshot 20 -> 21 (ticket 399)', () => {
       { version: 'snapshotVersion', from: 27, to: 28 },
       { version: 'snapshotVersion', from: 28, to: 29 },
       { version: 'snapshotVersion', from: 29, to: 30 },
+      { version: 'snapshotVersion', from: 30, to: 31 },
     ])
     expect(vehicleOf(reading.state, 'p1').sweptCut).toEqual({
       ...vehicleOf(old, 'p1').sweptCut,

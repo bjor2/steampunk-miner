@@ -90,6 +90,8 @@ import {
 } from './vehicleSnapshot'
 
 /**
+ * 31: the Blast Radius track (ticket 869, D9 of #647): each vehicle's charges hold the level bought
+ * as `radiusLevel` from 1 (older saves own none, the absent key, `saveMigrations.ts`);
  * 30: the ore rules stamp of each planet (ticket 888): the stamps of the planets the session has
  * left, by `s:p`, under `awayOreRules` (older saves keep no left planet's stamp, the absent key: a
  * left planet with a saved core bay lands as the build before the generated pools made it,
@@ -131,7 +133,7 @@ import {
  * vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
  * progress (#24); 3 the platform (#23).
  */
-export const SNAPSHOT_VERSION = 30
+export const SNAPSHOT_VERSION = 31
 
 export interface SessionSnapshot {
   snapshotVersion: number

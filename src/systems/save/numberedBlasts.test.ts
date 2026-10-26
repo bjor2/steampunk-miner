@@ -24,6 +24,7 @@ function migratedState(state: AuthorityState): AuthorityState {
   expect(reading.migrations).toEqual([
     { version: 'snapshotVersion', from: 28, to: 29 },
     { version: 'snapshotVersion', from: 29, to: 30 },
+    { version: 'snapshotVersion', from: 30, to: 31 },
   ])
   return reading.state
 }

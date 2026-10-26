@@ -60,6 +60,10 @@
  * pools made it, and the planet the save is on keeps its own stamp; a build from before the stamps
  * refuses a save that holds one it would drop.
  *
+ * Snapshot 30 -> 31 (ticket 869, the Blast Radius track): a save from before it owns no level, the
+ * absent key of this build, so the old digest is checked and the state is kept as saved; a build
+ * from before the track refuses a save that holds a level it would drop.
+ *
  * Generator 5 -> 6 (#175): the pad grew to -8..+12 under the two shop buildings, so the chunk edits
  * of every chunk the old or new pad and its cleared air touch are dropped and regenerate under the
  * new stamp, every vehicle is put on the Sell bay's rest pose, and the params are recomputed from
@@ -230,6 +234,7 @@ const SAVE_MIGRATION_STEPS: readonly SaveMigrationStep[] = [
   { version: 'snapshotVersion', from: 27, to: 28, migrate: keepSafeHoldCounts },
   { version: 'snapshotVersion', from: 28, to: 29, migrate: numberLiveBlasts },
   { version: 'snapshotVersion', from: 29, to: 30, migrate: keepPlanetsWithoutStamps },
+  { version: 'snapshotVersion', from: 30, to: 31, migrate: keepRigsWithoutRadiusLevel },
   { version: 'generatorVersion', from: 5, to: 6, migrate: regeneratePadArea },
   { version: 'generatorVersion', from: 6, to: 7, migrate: keepEditsUnderOreLeads },
   { version: 'generatorVersion', from: 7, to: 8, migrate: keepEditsUnderOreMix },
@@ -386,6 +391,11 @@ function numberLiveBlasts(file: MigratingFile): MigratingFile | null {
 /** Snapshot 29 -> 30: no left planet's stamp is the absent key, so the state is kept. */
 function keepPlanetsWithoutStamps(file: MigratingFile): MigratingFile | null {
   return reshapedFile(file, 30, (state) => state)
+}
+
+/** Snapshot 30 -> 31: no Blast Radius level owned is the absent key, so the state is kept. */
+function keepRigsWithoutRadiusLevel(file: MigratingFile): MigratingFile | null {
+  return reshapedFile(file, 31, (state) => state)
 }
 
 /** Generator 5 -> 6: the state is read as saved (the digest must hold), then moved off the pad. */

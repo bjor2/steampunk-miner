@@ -173,19 +173,19 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/drill-look/drillLook.test.ts` | 6 | 6 |
 | `src/features/drill-look/systems/render/drillLookSteps.test.ts` | 8 | 8 |
 
-### `dynamite`: 7 files, 27 tests
+### `dynamite`: 7 files, 29 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/dynamite/logging.test.ts` | 2 | 2 |
 | `src/features/dynamite/systems/blastBit.test.ts` | 3 | 3 |
-| `src/features/dynamite/systems/chargeRings.test.ts` | 2 | 2 |
+| `src/features/dynamite/systems/chargeRings.test.ts` | 3 | 3 |
 | `src/features/dynamite/systems/detonateReaction.test.ts` | 3 | 3 |
 | `src/features/dynamite/systems/dynamiteSizes.test.ts` | 4 | 4 |
 | `src/features/dynamite/systems/plunger.test.ts` | 6 | 6 |
-| `src/features/dynamite/systems/rackPanel.test.ts` | 7 | 7 |
+| `src/features/dynamite/systems/rackPanel.test.ts` | 8 | 8 |
 
-### `dynamite-visuals`: 21 files, 129 tests
+### `dynamite-visuals`: 23 files, 135 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -193,6 +193,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dynamite-visuals/scene/blastStages.test.ts` | 7 | 7 |
 | `src/features/dynamite-visuals/sceneBudget.test.ts` | 5 | 5 |
 | `src/features/dynamite-visuals/sliceRemoved.test.ts` | 7 | 7 |
+| `src/features/dynamite-visuals/store/rackSightReads.test.ts` | 2 | 2 |
 | `src/features/dynamite-visuals/systems/render/blastCollapseFall.test.ts` | 5 | 5 |
 | `src/features/dynamite-visuals/systems/render/blastCue.test.ts` | 8 | 8 |
 | `src/features/dynamite-visuals/systems/render/blastCueProvider.test.ts` | 5 | 5 |
@@ -210,6 +211,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dynamite-visuals/systems/render/fuseBuild.test.ts` | 4 | 4 |
 | `src/features/dynamite-visuals/systems/render/plantedDynamiteLook.test.ts` | 4 | 4 |
 | `src/features/dynamite-visuals/systems/render/rackLook.test.ts` | 7 | 7 |
+| `src/features/dynamite-visuals/systems/render/ringLevels.test.ts` | 4 | 4 |
 
 ### `example`: 4 files, 10 tests
 
@@ -925,6 +927,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/charges/blastDisc.test.ts` | 8 | 8 |
 | `src/systems/authority/charges/blastFront.test.ts` | 10 | 10 |
 | `src/systems/authority/charges/blastPrefetch.test.ts` | 2 | 2 |
+| `src/systems/authority/charges/blastRadiusTrack.test.ts` | 9 | 9 |
 | `src/systems/authority/charges/chargeBackOut.test.ts` | 4 | 4 |
 | `src/systems/authority/charges/chargeBlast.test.ts` | 17 | 17 |
 | `src/systems/authority/charges/chargeBlastEffects.test.ts` | 3 | 3 |
@@ -1130,7 +1133,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/debug/debugApi.test.ts` | 52 | 51 |
 | `src/debug/debugArtefact.test.ts` | 6 | 6 |
 | `src/debug/debugBot.test.ts` | 2 | 2 |
-| `src/debug/debugCharges.test.ts` | 1 | 1 |
+| `src/debug/debugCharges.test.ts` | 2 | 2 |
 | `src/debug/debugDevFlags.test.ts` | 4 | 4 |
 | `src/debug/debugHudCoverage.test.ts` | 5 | 5 |
 | `src/debug/debugHudLayout.test.ts` | 5 | 5 |
@@ -1570,6 +1573,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/save/aimOldSaves.test.ts` | 4 | 4 |
 | `src/systems/save/bignumHoldSaves.test.ts` | 2 | 2 |
+| `src/systems/save/blastRadiusSaves.test.ts` | 6 | 4 |
 | `src/systems/save/byteCodecs.test.ts` | 20 | 12 |
 | `src/systems/save/carriedCursors.test.ts` | 3 | 3 |
 | `src/systems/save/casingPriceSaves.test.ts` | 2 | 3 |
@@ -1929,7 +1933,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/bayPresentation.test.ts` | 6 | 6 |
 | `src/systems/views/brassCrop.test.ts` | 5 | 5 |
 | `src/systems/views/cardReveal.test.ts` | 6 | 6 |
-| `src/systems/views/chargeViews.test.ts` | 14 | 14 |
+| `src/systems/views/chargeViews.test.ts` | 17 | 17 |
 | `src/systems/views/combatStatuses.test.ts` | 8 | 8 |
 | `src/systems/views/compactNumbers.test.ts` | 3 | 3 |
 | `src/systems/views/depthBandTint.test.ts` | 4 | 4 |
