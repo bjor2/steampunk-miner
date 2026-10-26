@@ -608,8 +608,13 @@ import type { JsonCount } from '../wholeCount'
  *    picks. Wire shape unchanged: the stamp rides where it did, and a client that knows no rules 15
  *    refuses a join or travel stamped 15 ("update required"), never re-picks. A run that stays on
  *    rules-14 planets moves no digest.
+ * 126: the cut past a cell a tick pays its start cell (ticket 921, red main after 119): the front's
+ *    line (`lineCutStep.ts`) prices the cell it starts in for the mm it still crosses there, where
+ *    119 left that rest free, so a rig just past a cell a tick read up to a quarter over the drill
+ *    law (P1's stored drill step 18 at 1258 mm a tick where its sub-steps allow 1008). A cleared
+ *    start cell is open ground and still free. A rig at most a cell a tick steps as before.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 125
+export const AUTHORITY_PROTOCOL_VERSION = 126
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
