@@ -532,7 +532,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/useRefusals.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/useResolution.test.ts` | 12 | 12 |
 
-### `rig-look`: 22 files, 393 tests
+### `rig-look`: 24 files, 445 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -540,6 +540,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/rig-look/systems/cargoHoldLooks.test.ts` | 33 | 11 |
 | `src/features/rig-look/systems/drillPowerLooks.test.ts` | 30 | 15 |
 | `src/features/rig-look/systems/drillTipLooks.test.ts` | 34 | 11 |
+| `src/features/rig-look/systems/drillTypeLoadout.test.ts` | 6 | 3 |
+| `src/features/rig-look/systems/drillTypeLooks.test.ts` | 46 | 22 |
 | `src/features/rig-look/systems/engineLooks.test.ts` | 57 | 16 |
 | `src/features/rig-look/systems/groundGunItemParts.test.ts` | 7 | 7 |
 | `src/features/rig-look/systems/render/rigLookBands.test.ts` | 10 | 10 |
