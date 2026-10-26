@@ -58,6 +58,8 @@ export interface TickRead {
   isOnGround: boolean
   /** Energy quanta the tick's commands took from the tank (the rig's refill before it excluded). */
   energySpent: number
+  /** The collider's half side after the tick, m: it grows with the width level (ticket 750). */
+  bodyHalfSide: number
 }
 
 /** A rig's live loop, stepped one render frame at a time. */
@@ -140,6 +142,7 @@ function stepTick(
     isInsideGround: isInsideGround(position),
     isOnGround: isInsideGround(groundProbeOf(position, upOf(stepResult.pose))),
     energySpent: energyBefore - readLocalVehicle().energy,
+    bodyHalfSide: controller.bodyHalfSide(),
   }
 }
 

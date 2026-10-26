@@ -177,6 +177,7 @@ export const BODY_GROWTH_PROBE_STEP_MM = 125
 
 /**
  * The growth's probes start this far above the wheels, mm: a resting body sinks a few mm into its
- * floor (`drillStamp.ts` allows 20 for the same), and that floor is the body's own support.
+ * floor, and a floor's blended contour lies up to 21 mm off its circle between samples, as a cut's
+ * level floor allows 35 mm for (`drillStamp.ts`); that floor is the body's own support.
  */
-export const BODY_GROWTH_FLOOR_ALLOWANCE_MM = 20
+export const BODY_GROWTH_FLOOR_ALLOWANCE_MM = 35

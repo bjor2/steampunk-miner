@@ -24,6 +24,10 @@
  * substep budget sweeps the body against the ground with no contact solve. With the swept cut the
  * loop hands it the world the tick's own `drillStep` left before the substeps (ticket 459,
  * `syncGround`), so the body never meets ground the authority opened that tick.
+ *
+ * The collider grows to the rig's width level (ticket 750, `bodyGrowthMotor.ts`): bottom-anchored
+ * by velocity, only into open ground, and the pose it reports is the owned body's centre standing
+ * on the collider's wheels, the body the host cuts round. The bare level is the 0.9 m box as ever.
  */
 import type RAPIER from '@dimforge/rapier3d-compat'
 import { PHYSICS_TIMESTEP, VEHICLE_COLLIDER_SIZE } from '../constants/physics'
@@ -48,23 +52,15 @@ import type { ActionFlags } from '../systems/vehicle/poseReport'
 import { quantisePose } from '../systems/vehicle/poseReport'
 import { downCutAccelerationAtPoint, gravityAt } from '../systems/vehicle/radialGravity'
 import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
-import {
-  isInputLocked,
-  isPlainMotion,
-  passThroughOf,
-  type VehicleMotion,
-} from '../systems/vehicle/motionEffects'
+import { isInputLocked, passThroughOf, type VehicleMotion } from '../systems/vehicle/motionEffects'
 import {
   groundProbeOf,
   offsetToTileCentre,
   stepVehicleMotion,
-  surfaceProbesOf,
-  type MotionEffectInput,
 } from '../systems/vehicle/vehicleMotion'
 import type { VehiclePose } from '../systems/vehicle/vehiclePose'
 import type { GroundReader } from '../systems/world/groundReader'
 import type { TilePoint } from '../systems/world/tileGrid'
-import { ISO_DENSITY } from '../systems/world/sampleGrid'
 import {
   createBodyFrame,
   placeBodyAt,
@@ -76,6 +72,14 @@ import {
 import { cutFollowReadFor, cutTickFor, drillContactFor, maxSpeedFor } from './drillEngagement'
 import { createGroundHalo, type GroundHalo, type HaloGround } from './groundHalo'
 import { createStrutColliders, type StrutColliders } from './strutColliders'
+import { createBodyGrowthMotor } from './bodyGrowthMotor'
+import {
+  createBlockedReader,
+  isGroundedAt,
+  isHeldByFloor,
+  motionEffectInputOf,
+} from './bodyGroundReads'
+import { BARE_WIDTH_LEVEL, bodyHalfMmAt } from '../systems/vehicle/drillBore'
 import { stepWorldThroughTick, sweepGroundOf } from './tickStepping'
 
 type Rapier = typeof RAPIER
@@ -119,6 +123,11 @@ export interface VehicleStepInput {
   stepBounds?: StepBounds
   /** The bore struts standing now (ticket 379), the rig lands on their planks; none when absent. */
   struts?: StandingStruts
+  /**
+   * The rig's width level the host derives (ticket 750, `registries/boreWidth.ts`): the body the
+   * collider grows to and the pose reports the centre of; the bare body when absent.
+   */
+  widthLevel?: number
 }
 
 export interface VehicleStepResult {
@@ -152,6 +161,8 @@ export interface VehicleController {
   /** The point the body's Rapier translation is measured from. */
   renderOrigin(): RenderOrigin
   drillHead(): DrillHead
+  /** The collider's half side now, m: the camera frames the rig by it (ticket 750). */
+  bodyHalfSide(): number
   colliderCount(): number
   dispose(): void
 }
@@ -208,6 +219,8 @@ export function createVehicleController(
   const halo = createGroundHalo(rapier, world, HALO_RADIUS_BLOCKS, frame.origin)
   const struts = createStrutColliders(rapier, world, frame.origin)
   const colliders = followersOf(halo, struts)
+  const growth = createBodyGrowthMotor(body, halo)
+  const blocked = createBlockedReader(struts)
   let head = newDrillHead(AIM.right)
   let up: Vector2 = { x: 0, y: 1 }
   let plan: TickPlan = tickPlanOf(0)
@@ -234,15 +247,17 @@ export function createVehicleController(
       const input = withInputLockedWhenGliding(stepInput)
       const position = planetPositionOf(body, frame.origin)
       recentreWhenFar(body, colliders, frame, position)
-      const velocity = vectorOf(body.linvel())
+      const velocity = growth.ownVelocityOf(body.linvel())
       up = localUpOf(position, up)
+      const ownedHalfMm = bodyHalfMmAt(input.widthLevel ?? BARE_WIDTH_LEVEL)
       holdPlanet(planet)
       passThrough = passThroughOf(input.motion)
       syncHaloAt(position)
       struts.sync(input.struts ?? NO_STRUTS)
       head = stepDrillHead(head, input.intent.aim)
       // The velocity the body actually had, after contacts, so a resting vehicle reports 0.
-      const pose = quantisePose(position, velocity, up, settledAimOf(head))
+      const centre = growth.ownedCentreOf(position, up, ownedHalfMm)
+      const pose = quantisePose(centre, velocity, up, settledAimOf(head))
       const isLifting = input.canAct && input.intent.lift
       const contact = input.canAct
         ? drillContactFor(input, head, { pose, isLifting }, planet.ground, cutMemory.followedTicks)
@@ -250,7 +265,9 @@ export function createVehicleController(
       const isDrilling = contact !== 'none'
       const isCuttingLevel = isDrilling && !isLifting && isSidewaysAim(aimOfPose(pose))
       const cutRead = cutFollowReadFor(input, { pose, isLifting }, isDrilling)
-      const isGrounded = isGroundedAt(planet.ground, struts, groundProbeOf(position, up))
+      const halfSide = growth.halfSide()
+      const wheelProbe = groundProbeOf(position, up, halfSide)
+      const isGrounded = isGroundedAt(planet.ground, struts, wheelProbe)
       const cutStart = { read: cutRead, memory: cutMemory, contact, isCuttingLevel, isGrounded }
       const cutTick = cutTickFor(input, { pose, isLifting }, cutStart, planet.ground)
       const { cut: cutFollow, isGateOpen, isWaitingForCut } = cutTick
@@ -267,7 +284,7 @@ export function createVehicleController(
         isCuttingLevel: isCuttingLevel,
         isWaitingForCut,
         dt: PHYSICS_TIMESTEP,
-        effect: motionEffectInputOf(input.motion, position, up, planet.ground),
+        effect: motionEffectInputOf(input.motion, { position, up, halfSide }, planet.ground),
         tug: input.tug,
         cutFollow,
         maxSpeed: maxSpeedFor(input, cutRead),
@@ -278,10 +295,20 @@ export function createVehicleController(
           planet.gravityMultiplier,
         ),
       })
-      const sweep = sweepGroundOf(planet.ground, position, isGateOpen ? pose : null)
+      const cuttingPose = isGateOpen ? pose : null
+      const sweep = sweepGroundOf(planet.ground, position, cuttingPose, halfSide)
       const planned = plannedTickOf(motion.velocity, PHYSICS_TIMESTEP, sweep)
       plan = planned.plan
-      driveBody(body, planned.velocity, up)
+      blocked.ground = planet.ground
+      const isBlockedAt = blocked.isBlockedAt
+      const isCuttingAlongUp = isGateOpen && isAlongUpAim(aimOfPose(pose))
+      const isOnFloor = isHeldByFloor({ isGrounded, velocity, up, isCuttingAlongUp })
+      const growthStep = {
+        ...{ ownedHalfMm, position, velocity: planned.velocity, up },
+        ...{ isBlockedAt, isOnFloor },
+      }
+      const rise = growth.planStep(growthStep)
+      driveBody(body, planned.velocity, up, rise)
       return {
         flags: { isDriving: motion.isDriving, isThrusting: motion.isThrusting, isDrilling },
         pose,
@@ -291,8 +318,12 @@ export function createVehicleController(
       }
     },
     syncGround: holdPlanet,
-    stepWorld: () => stepWorldThroughTick(tick, plan),
+    stepWorld() {
+      stepWorldThroughTick(tick, plan)
+      growth.finishStep()
+    },
     placeAt(pose) {
+      growth.restart()
       placeBodyAt(body, colliders, frame, pose)
       body.setLinvel({ x: 0, y: 0, z: 0 }, true)
       head = newDrillHead(aimOfPose(pose))
@@ -301,6 +332,7 @@ export function createVehicleController(
     planetPosition: () => planetPositionOf(body, frame.origin),
     renderOrigin: () => frame.origin,
     drillHead: () => head,
+    bodyHalfSide: () => growth.halfSide(),
     colliderCount: () => halo.colliderCount(),
     dispose() {
       halo.dispose()
@@ -325,34 +357,9 @@ function followersOf(halo: GroundHalo, struts: StrutColliders): OriginFollower {
   }
 }
 
-/** Ground under the wheels: solid ground, or a strut's plank (ticket 379). */
-function isGroundedAt(ground: GroundReader, struts: StrutColliders, probe: Vector2): boolean {
-  return isSolidAt(ground, probe) || struts.isOnPlank(probe)
-}
-
 /** What the halo reads of a planet view, built once per view. */
 function haloPlanetOf(view: PlanetView): { view: PlanetView; ground: HaloGround } {
   return { view, ground: { densityAt: view.ground.densityAt, chunkVersion: view.chunkVersion } }
-}
-
-/** The effect for the motion rule, or nothing for no effect; ground is probed only to cling. */
-function motionEffectInputOf(
-  motion: VehicleMotion | undefined,
-  position: Vector2,
-  up: Vector2,
-  ground: GroundReader,
-): MotionEffectInput | undefined {
-  if (motion === undefined || isPlainMotion(motion)) return undefined
-  const isTouchingSurface = motion.isClinging && isTouchingAnySide(ground, position, up)
-  return { motion, position, isTouchingSurface }
-}
-
-function isTouchingAnySide(ground: GroundReader, position: Vector2, up: Vector2): boolean {
-  return surfaceProbesOf(position, up).some((probe) => isSolidAt(ground, probe))
-}
-
-function isSolidAt(ground: GroundReader, point: Vector2): boolean {
-  return ground.densityAtPoint(point.x, point.y) >= ISO_DENSITY
 }
 
 /** Straight down or up: a diagonal bore has no column to centre in. */
@@ -360,10 +367,13 @@ function isAimingAlongUp(intent: VehicleIntent): boolean {
   return intent.aim !== null && isAlongUpAim(intent.aim)
 }
 
-/** Motion by velocity; the spin turns the body toward `localUp` (the righting torque of #7). */
-function driveBody(body: RAPIER.RigidBody, velocity: Vector2, up: Vector2): void {
-  scratchVelocity.x = velocity.x
-  scratchVelocity.y = velocity.y
+/**
+ * Motion by velocity, with the growth's `rise` (m/s along `up`, ticket 750); the spin turns the
+ * body toward `localUp` (the righting torque of #7).
+ */
+function driveBody(body: RAPIER.RigidBody, velocity: Vector2, up: Vector2, rise: number): void {
+  scratchVelocity.x = velocity.x + up.x * rise
+  scratchVelocity.y = velocity.y + up.y * rise
   body.setLinvel(scratchVelocity, true)
   scratchSpin.z = (tiltOf(body.rotation(), up) * RIGHTING_GAIN) / PHYSICS_TIMESTEP
   body.setAngvel(scratchSpin, true)
@@ -375,8 +385,4 @@ function tiltOf(rotation: RAPIER.Rotation, up: Vector2): number {
   const targetAngle = Math.atan2(-up.x, up.y)
   const turn = targetAngle - bodyAngle
   return Math.atan2(Math.sin(turn), Math.cos(turn))
-}
-
-function vectorOf(vector: { x: number; y: number }): Vector2 {
-  return { x: vector.x, y: vector.y }
 }

@@ -18,6 +18,7 @@ import {
   type DrillContact,
   type DrillContactRule,
 } from '../systems/vehicle/drillContact'
+import { BARE_WIDTH_LEVEL } from '../systems/vehicle/drillBore'
 import { isHeadSettled, type DrillHead } from '../systems/vehicle/drillHead'
 import { solidToeAheadOf } from '../systems/vehicle/drillToe'
 import {
@@ -48,6 +49,11 @@ export interface DrillEngagementInput {
   /** The step the swept cut's front takes at a step's pose (ticket 570, `frontStepMmAt`). */
   frontStepOf?: (step: CutFollowStep) => number
   stepBounds?: StepBounds
+  /**
+   * The rig's width level (ticket 750): the pose is the owned body's centre, its face and wheels
+   * half that body's side out; the bare body when absent.
+   */
+  widthLevel?: number
 }
 
 /** The step's pose and whether its lift is on. */
@@ -87,10 +93,12 @@ function bitingStampOf(
   isLifting: boolean,
   followedTicks: number,
 ): DiscStamp {
+  const level = widthLevelOf(input)
   if (input.stepBounds === undefined || followedTicks === 0)
-    return reportCutStampOf(pose, isLifting)
+    return reportCutStampOf(pose, isLifting, level)
   const stepMm = frontStepAt(input, input.stepBounds, { pose, isLifting })
-  return cuttingReachStampOf(pose, isLifting, sweptStampAheadMmOf(stepMm, aimOfPose(pose)))
+  const aheadMm = sweptStampAheadMmOf(stepMm, aimOfPose(pose), level)
+  return cuttingReachStampOf(pose, isLifting, aheadMm, level)
 }
 
 /** The front's step at the pose as the authority reads it; the cutting bound with no read. */
@@ -110,7 +118,7 @@ function facedContactOf(
   { pose, isLifting }: DrillPose,
   ground: GroundReader,
 ): DrillContact {
-  return contactOf(input, pose, ground, reportCutStampOf(pose, isLifting))
+  return contactOf(input, pose, ground, reportCutStampOf(pose, isLifting, widthLevelOf(input)))
 }
 
 /** What `stamp` meets along the pose's facing. */
@@ -126,7 +134,13 @@ function contactOf(
     facing: aimVectorOfPose(pose),
     stamp,
     inTheWayMm: input.stepBounds && inTheWayMmOf(input.stepBounds.cuttingMm),
+    widthLevel: widthLevelOf(input),
   })
+}
+
+/** The rig's width level the step reads, the bare body's when the input has none. */
+function widthLevelOf(input: DrillEngagementInput): number {
+  return input.widthLevel ?? BARE_WIDTH_LEVEL
 }
 
 /**
@@ -168,7 +182,8 @@ function hasToeAheadOf(
   pose: VehiclePose,
   ground: GroundReader,
 ): boolean {
-  return solidToeAheadOf(ground, pose, inTheWayMmOf(input.stepBounds?.cuttingMm ?? 0))
+  const reachMm = inTheWayMmOf(input.stepBounds?.cuttingMm ?? 0)
+  return solidToeAheadOf(ground, pose, reachMm, widthLevelOf(input))
 }
 
 /**

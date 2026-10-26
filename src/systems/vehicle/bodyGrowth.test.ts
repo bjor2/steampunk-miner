@@ -4,11 +4,13 @@ import {
   BARE_BODY_GROWTH,
   growthStepMm,
   isFullyGrown,
-  isRoomToGrow,
+  climbToGrowMm,
   isWaitingForRoom,
   nextBodyGrowth,
   ownedCentreOf,
+  riseMmOf,
   type BodyGrowth,
+  type ClimbReader,
   type IsBlockedAt,
 } from './bodyGrowth'
 import { bodyHalfMmAt } from './drillBore'
@@ -19,8 +21,8 @@ import { bodyHalfMmAt } from './drillBore'
 
 const UPRIGHT = { x: 0, y: 1 }
 const OPEN: IsBlockedAt = () => false
-const ALWAYS_ROOM = () => true
-const NEVER_ROOM = () => false
+const ALWAYS_ROOM: ClimbReader = () => 0
+const NEVER_ROOM: ClimbReader = () => null
 
 function grownFor(ticks: number, ownedHalfMm: number, hasRoom = ALWAYS_ROOM): BodyGrowth {
   let growth = BARE_BODY_GROWTH
@@ -63,7 +65,7 @@ describe('body growth', () => {
     const asked: number[][] = []
     nextBodyGrowth(BARE_BODY_GROWTH, bodyHalfMmAt(1), (fromMm, toMm) => {
       asked.push([fromMm, toMm])
-      return true
+      return 0
     })
     expect(asked).toEqual([[bodyHalfMmAt(0), bodyHalfMmAt(0) + growthStepMm()]])
   })
@@ -72,7 +74,7 @@ describe('body growth', () => {
     let probes = 0
     const counted = () => {
       probes++
-      return false
+      return null
     }
     grownFor(BODY_GROWTH_WAIT_LIMIT_TICKS * 3, bodyHalfMmAt(1), counted)
     expect(probes).toBe(BODY_GROWTH_WAIT_LIMIT_TICKS + 2)
@@ -126,9 +128,11 @@ describe('owned body centre', () => {
 
 describe('room to grow', () => {
   const footing = { bottom: { x: 0, y: 0 }, up: UPRIGHT }
+  const hasRoom = (isBlockedAt: IsBlockedAt, at = footing) =>
+    climbToGrowMm(isBlockedAt, at, 450, 467) !== null
 
-  it('finds room in open ground', () => {
-    expect(isRoomToGrow(OPEN, footing, 450, 467)).toBe(true)
+  it('finds room in open ground, with nothing to climb', () => {
+    expect(climbToGrowMm(OPEN, footing, 450, 467)).toBe(0)
   })
 
   it('finds no room under a roof the grown top would reach', () => {
@@ -136,8 +140,8 @@ describe('room to grow', () => {
       (height: number): IsBlockedAt =>
       (_x, y) =>
         y >= height
-    expect(isRoomToGrow(roofAt(0.93), footing, 450, 467)).toBe(false)
-    expect(isRoomToGrow(roofAt(0.95), footing, 450, 467)).toBe(true)
+    expect(hasRoom(roofAt(0.93))).toBe(false)
+    expect(hasRoom(roofAt(0.95))).toBe(true)
   })
 
   it('finds no room beside a wall the grown side would reach', () => {
@@ -145,29 +149,49 @@ describe('room to grow', () => {
       (across: number): IsBlockedAt =>
       (x) =>
         x >= across
-    expect(isRoomToGrow(wallAt(0.46), footing, 450, 467)).toBe(false)
-    expect(isRoomToGrow(wallAt(0.47), footing, 450, 467)).toBe(true)
+    expect(hasRoom(wallAt(0.46))).toBe(false)
+    expect(hasRoom(wallAt(0.47))).toBe(true)
   })
 
   it('never reads the floor the wheels stand on as in the way', () => {
     const floor: IsBlockedAt = (_x, y) => y <= 0.01
-    expect(isRoomToGrow(floor, footing, 450, 467)).toBe(true)
+    expect(climbToGrowMm(floor, footing, 450, 467)).toBe(0)
+  })
+
+  it('climbs a floor rising gently under its new side, by less than a step', () => {
+    const slope: IsBlockedAt = (x, y) => y <= 0.035 + 0.2 * Math.max(0, x - 0.45)
+    const climbMm = climbToGrowMm(slope, footing, 450, 467)
+    expect(climbMm).toBeGreaterThan(0)
+    expect(climbMm).toBeLessThanOrEqual(growthStepMm())
   })
 
   it('reads a lip on the floor beside the wheels as in the way', () => {
     const lip: IsBlockedAt = (x, y) => x >= 0.46 && y <= 0.1
-    expect(isRoomToGrow(lip, footing, 450, 467)).toBe(false)
+    expect(hasRoom(lip)).toBe(false)
   })
 
   it('probes nothing inside the collider it already has', () => {
     const insideOnly: IsBlockedAt = (x, y) => Math.abs(x) < 0.44 && y > 0.05 && y < 0.89
-    expect(isRoomToGrow(insideOnly, footing, 450, 467)).toBe(true)
+    expect(hasRoom(insideOnly)).toBe(true)
   })
 
   it('turns the band with the body’s up', () => {
     const sideways = { bottom: { x: 0, y: 0 }, up: { x: 1, y: 0 } }
     const roofOnTheRight: IsBlockedAt = (x) => x >= 0.93
-    expect(isRoomToGrow(roofOnTheRight, sideways, 450, 467)).toBe(false)
-    expect(isRoomToGrow(roofOnTheRight, footing, 450, 467)).toBe(true)
+    expect(hasRoom(roofOnTheRight, sideways)).toBe(false)
+    expect(hasRoom(roofOnTheRight)).toBe(true)
+  })
+})
+
+describe('body growth rise', () => {
+  it('lifts the wheels by the step’s growth and the floor it climbed', () => {
+    const next = nextBodyGrowth(BARE_BODY_GROWTH, bodyHalfMmAt(1), () => 4)
+    expect(riseMmOf(BARE_BODY_GROWTH, next)).toBe(growthStepMm() + 4)
+  })
+
+  it('lowers them by a shrink, with no climb', () => {
+    const grown = grownFor(60, bodyHalfMmAt(1))
+    const shrunk = nextBodyGrowth(grown, bodyHalfMmAt(0), NEVER_ROOM)
+    expect(riseMmOf(grown, shrunk)).toBe(-growthStepMm())
   })
 })

@@ -6,7 +6,7 @@
  * so no continuous collision detection is needed. A block is rebuilt only when a chunk under it
  * changed, or a glide's pass-through cell (ticket 390) came or went over it.
  */
-import { COLLISION_BLOCK_METRES } from '../../constants/physics'
+import { COLLISION_BLOCK_METRES, MM_PER_METRE, SUBSTEP_REACH_MM } from '../../constants/physics'
 import { contourSegmentsOf, type DensityAt } from '../world/groundContour'
 import { SAMPLES_PER_TILE, chunkOfSample } from '../world/sampleGrid'
 import type { TilePoint } from '../world/tileGrid'
@@ -27,6 +27,16 @@ export function blockOfPoint(position: Vector2): BlockPoint {
     bx: Math.floor(position.x / COLLISION_BLOCK_METRES),
     by: Math.floor(position.y / COLLISION_BLOCK_METRES),
   }
+}
+
+/**
+ * The ring of blocks a body of half side `halfSide` (m) needs round its block (ticket 750): its far
+ * side and a substep's reach must lie inside the ring wherever in its block the centre stands. One
+ * ring for the bare body and every body up to a few metres; more as the width level grows it.
+ */
+export function haloRadiusBlocksFor(halfSide: number): number {
+  const reach = halfSide + SUBSTEP_REACH_MM / MM_PER_METRE
+  return Math.max(1, Math.ceil(reach / COLLISION_BLOCK_METRES))
 }
 
 /** The square of blocks `radius` blocks round `centre`. */

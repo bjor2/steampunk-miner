@@ -7,8 +7,10 @@
  *   support it never sinks into the floor: the physics layer moves the body up by the growth as a
  *   velocity for the step, then widens the box (`physics/vehicleController.ts`), never placing it.
  * - **Cut first.** A step's growth goes ahead only where the band it would take is open ground
- *   (`isRoomToGrow`): never a cell the cut left standing, a gated one included, so the collider
- *   never carves and never wedges. Otherwise it waits, probing every step up to
+ *   (`climbToGrowMm`): never a cell the cut left standing, a gated one included, so the collider
+ *   never carves and never wedges. A floor that rises under the new sides (a slope, the blend
+ *   between samples) is climbed by up to a step's growth, as a box on that floor would stand on its
+ *   high corner; a lip or a wall is ground in the way. Otherwise it waits, probing every step up to
  *   `BODY_GROWTH_WAIT_LIMIT_TICKS` and then once a period ("applies when clear"); the rig drives
  *   on meanwhile, so the wait never holds it.
  * - **The owned body's centre** is what the pose reports (`ownedCentreOf`): the owned square
@@ -31,11 +33,21 @@ import { DRILL_BORE_ROWS } from '../../constants/balance'
 import { BARE_WIDTH_LEVEL, bodyHalfMmAt } from './drillBore'
 import type { Vector2 } from './localFrame'
 
-/** The collider's half side now, and the steps its growth has waited on ground in the way. */
+/**
+ * The collider's half side now, the steps its growth has waited on ground in the way, and how far
+ * its last step climbed a floor rising under its new sides, mm.
+ */
 export interface BodyGrowth {
   halfMm: number
   waitedTicks: number
+  climbMm: number
 }
+
+/**
+ * How far a step growing the half side from `fromMm` to `toMm` must climb its floor, mm: 0 on a
+ * level one, null where the band has no room.
+ */
+export type ClimbReader = (fromMm: number, toMm: number) => number | null
 
 /** Whether ground the collider may not enter stands at a point, in metres. */
 export type IsBlockedAt = (x: number, y: number) => boolean
@@ -50,7 +62,11 @@ export interface GrowthFooting {
 export const BARE_BODY_GROWTH: BodyGrowth = {
   halfMm: bodyHalfMmAt(BARE_WIDTH_LEVEL),
   waitedTicks: 0,
+  climbMm: 0,
 }
+
+/** The lowest band beside the wheels is probed this finely for the floor a growth climbs, mm. */
+const CLIMB_PROBE_STEP_MM = 5
 
 /** How far the half side moves in one step: a level's half metre in `BODY_GROWTH_SECONDS_PER_LEVEL`. */
 export function growthStepMm(): number {
@@ -60,18 +76,24 @@ export function growthStepMm(): number {
 
 /**
  * The growth one step on toward `ownedHalfMm`: a step's shrink at once, a step's growth where
- * `hasRoomFor(fromMm, toMm)` says the band is open, else one more step waited.
+ * `climbFor(fromMm, toMm)` finds room (with the climb it takes), else one more step waited.
  */
 export function nextBodyGrowth(
   growth: BodyGrowth,
   ownedHalfMm: number,
-  hasRoomFor: (fromMm: number, toMm: number) => boolean,
+  climbFor: ClimbReader,
 ): BodyGrowth {
   if (isAtRest(growth, ownedHalfMm)) return growth
   if (growth.halfMm >= ownedHalfMm) return shrunkToward(growth, ownedHalfMm)
   if (!isDueToProbe(growth.waitedTicks)) return waitedOneStep(growth)
   const halfMm = Math.min(ownedHalfMm, growth.halfMm + growthStepMm())
-  return hasRoomFor(growth.halfMm, halfMm) ? { halfMm, waitedTicks: 0 } : waitedOneStep(growth)
+  const climbMm = climbFor(growth.halfMm, halfMm)
+  return climbMm === null ? waitedOneStep(growth) : { halfMm, waitedTicks: 0, climbMm }
+}
+
+/** How far the collider's wheels move up this step, mm: its growth and the floor it climbed. */
+export function riseMmOf(growth: BodyGrowth, next: BodyGrowth): number {
+  return next.halfMm - growth.halfMm + next.climbMm
 }
 
 /** Whether the collider stands at the owned body's size. */
@@ -99,21 +121,34 @@ export function ownedCentreOf(
 }
 
 /**
- * Whether the band a collider standing on `footing` takes growing from `fromMm` to `toMm` of half
- * side is clear: its strip over the top and one up either side, probed on a grid
- * `BODY_GROWTH_PROBE_STEP_MM` apart with both edges included, from just over the wheels.
+ * How far a collider standing on `footing` climbs growing from `fromMm` to `toMm` of half side, mm,
+ * or null where it has no room. The floor under its new sides may rise up to a step's growth over
+ * the wheels (probed `CLIMB_PROBE_STEP_MM` apart just over them); above that floor its new sides
+ * and its strip over the top, lifted by the climb, must be clear, probed on a grid
+ * `BODY_GROWTH_PROBE_STEP_MM` apart with both edges included.
  */
-export function isRoomToGrow(
+export function climbToGrowMm(
   isBlockedAt: IsBlockedAt,
   footing: GrowthFooting,
   fromMm: number,
   toMm: number,
-): boolean {
+): number | null {
   const lowMm = BODY_GROWTH_FLOOR_ALLOWANCE_MM
-  const top = { acrossFrom: -toMm, acrossTo: toMm, upFrom: 2 * fromMm, upTo: 2 * toMm }
-  const left = { acrossFrom: -toMm, acrossTo: -fromMm, upFrom: lowMm, upTo: 2 * fromMm }
-  const right = { acrossFrom: fromMm, acrossTo: toMm, upFrom: lowMm, upTo: 2 * fromMm }
-  return [top, left, right].every((strip) => isStripClear(isBlockedAt, footing, strip))
+  const sidesFromMm = lowMm + growthStepMm()
+  const left = { acrossFrom: -toMm, acrossTo: -fromMm, upFrom: lowMm, upTo: sidesFromMm }
+  const right = { acrossFrom: fromMm, acrossTo: toMm, upFrom: lowMm, upTo: sidesFromMm }
+  const climbMm = Math.max(
+    floorClimbMm(isBlockedAt, footing, left),
+    floorClimbMm(isBlockedAt, footing, right),
+  )
+  if (climbMm > growthStepMm()) return null
+  const sides = { upFrom: sidesFromMm, upTo: 2 * fromMm + climbMm }
+  const top = { acrossFrom: -toMm, acrossTo: toMm, upFrom: 2 * fromMm, upTo: 2 * toMm + climbMm }
+  const isClear =
+    isStripClear(isBlockedAt, footing, { ...left, ...sides }) &&
+    isStripClear(isBlockedAt, footing, { ...right, ...sides }) &&
+    isStripClear(isBlockedAt, footing, top)
+  return isClear ? climbMm : null
 }
 
 /** A rectangle in the collider's frame, mm: across its up axis and up from its wheels. */
@@ -143,6 +178,22 @@ function isRowClear(
   }
 }
 
+/**
+ * How far over the strip's floor line the floor stands under it, mm: a fine probe's step past the
+ * highest blocked one, 0 with none; past the strip's top when its top probe is blocked.
+ */
+function floorClimbMm(isBlockedAt: IsBlockedAt, footing: GrowthFooting, strip: Strip): number {
+  let climbMm = 0
+  for (let acrossMm = strip.acrossFrom; ; acrossMm = nextStop(acrossMm, strip.acrossTo)) {
+    for (let upMm = strip.upFrom; upMm <= strip.upTo; upMm += CLIMB_PROBE_STEP_MM) {
+      if (isBlockedInFrame(isBlockedAt, footing, acrossMm, upMm)) {
+        climbMm = Math.max(climbMm, upMm - strip.upFrom + CLIMB_PROBE_STEP_MM)
+      }
+    }
+    if (acrossMm >= strip.acrossTo) return climbMm
+  }
+}
+
 /** The next probe along a strip's side: a step on, never past its far edge. */
 function nextStop(mm: number, endMm: number): number {
   return Math.min(endMm, mm + BODY_GROWTH_PROBE_STEP_MM)
@@ -162,11 +213,12 @@ function isBlockedInFrame(
 
 /** Grown to the owned body with nothing waited: the same growth, so a resting step allocates nothing. */
 function isAtRest(growth: BodyGrowth, ownedHalfMm: number): boolean {
-  return growth.halfMm === ownedHalfMm && growth.waitedTicks === 0
+  return growth.halfMm === ownedHalfMm && growth.waitedTicks === 0 && growth.climbMm === 0
 }
 
 function shrunkToward(growth: BodyGrowth, ownedHalfMm: number): BodyGrowth {
-  return { halfMm: Math.max(ownedHalfMm, growth.halfMm - growthStepMm()), waitedTicks: 0 }
+  const halfMm = Math.max(ownedHalfMm, growth.halfMm - growthStepMm())
+  return { halfMm, waitedTicks: 0, climbMm: 0 }
 }
 
 /** Every step up to the limit, then the first step of each period after it. */
@@ -177,5 +229,5 @@ function isDueToProbe(waitedTicks: number): boolean {
 }
 
 function waitedOneStep(growth: BodyGrowth): BodyGrowth {
-  return { halfMm: growth.halfMm, waitedTicks: growth.waitedTicks + 1 }
+  return { halfMm: growth.halfMm, waitedTicks: growth.waitedTicks + 1, climbMm: 0 }
 }

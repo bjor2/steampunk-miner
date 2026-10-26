@@ -27,6 +27,8 @@ export interface SweepGround {
   position: Vector2
   /** The drill's facing as a unit vector while the rig cuts (it follows its bore), else null. */
   boreFacing: Vector2 | null
+  /** The collider's half side, m (ticket 750); the bare body's when absent. */
+  halfSide?: number
 }
 
 const SUBSTEP_PLANS: readonly TickPlan[] = Array.from({ length: MAX_PHYSICS_SUBSTEPS }, (_, at) =>
@@ -47,7 +49,8 @@ export function tickPlanOf(stepMm: number): TickPlan {
 export function plannedTickOf(velocity: Vector2, dt: number, ground: SweepGround): PlannedTick {
   const plan = tickPlanOf(Math.sqrt(dot(velocity, velocity)) * dt * MM_PER_METRE)
   if (plan.kind === 'substeps') return { plan, velocity }
-  const swept = sweptStepOf(ground.isSolidAt, ground.position, tickStepOf(velocity, dt, ground))
+  const step = tickStepOf(velocity, dt, ground)
+  const swept = sweptStepOf(ground.isSolidAt, ground.position, step, ground.halfSide)
   return { plan, velocity: { x: swept.x / dt, y: swept.y / dt } }
 }
 

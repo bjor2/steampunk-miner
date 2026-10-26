@@ -346,15 +346,26 @@ export function withinSpeedBound(velocity: Vector2, maxSpeed = MAX_SPEED): Vecto
   return { x: (velocity.x / speed) * maxSpeed, y: (velocity.y / speed) * maxSpeed }
 }
 
-/** The point just under the wheels, half a body plus the probe depth below the centre. */
-export function groundProbeOf(position: Vector2, up: Vector2): Vector2 {
-  const reach = VEHICLE_COLLIDER_SIZE / 2 + GROUND_PROBE_DEPTH
+/**
+ * The point just under the wheels, half a body plus the probe depth below the centre; `halfSide`
+ * is the collider's, in metres, as it grows with the width level (ticket 750).
+ */
+export function groundProbeOf(
+  position: Vector2,
+  up: Vector2,
+  halfSide = VEHICLE_COLLIDER_SIZE / 2,
+): Vector2 {
+  const reach = halfSide + GROUND_PROBE_DEPTH
   return { x: position.x - up.x * reach, y: position.y - up.y * reach }
 }
 
 /** The points just outside the body on its four sides, where a clinging vehicle looks for ground. */
-export function surfaceProbesOf(position: Vector2, up: Vector2): Vector2[] {
-  const reach = VEHICLE_COLLIDER_SIZE / 2 + GROUND_PROBE_DEPTH
+export function surfaceProbesOf(
+  position: Vector2,
+  up: Vector2,
+  halfSide = VEHICLE_COLLIDER_SIZE / 2,
+): Vector2[] {
+  const reach = halfSide + GROUND_PROBE_DEPTH
   const side = tangentOf(up)
   return [up, side, { x: -up.x, y: -up.y }, { x: -side.x, y: -side.y }].map((direction) => ({
     x: position.x + direction.x * reach,

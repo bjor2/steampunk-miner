@@ -21,6 +21,7 @@
  * The client flags are read from the store at every step (ticket 548), so a debug flip takes on
  * the next one; a `drill.sweptCut` flip lands only at a step whose last step did not drill.
  */
+import { widthLevelOf } from '../systems/registries/boreWidth'
 import type { DevFlags } from '../constants/devFlags'
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../constants/physics'
 import type { PlanetView, VehicleController, VehicleStepResult } from '../physics/vehicleController'
@@ -138,6 +139,7 @@ export function createVehicleLoop(fixedFlags?: DevFlags): VehicleLoop {
           frontStepOf: frontStepRuleOf(flags),
           stepBounds: stepBoundsOfFlag(flags),
           struts: strutsOf(readAuthorityState()),
+          widthLevel: readLocalWidthLevel(),
         },
         planetViewOf(loop, params, world),
       )
@@ -159,6 +161,11 @@ export function createVehicleLoop(fixedFlags?: DevFlags): VehicleLoop {
 function readClientFlagsForStep(isDrillIdle: boolean): DevFlags {
   useGameStore.getState().settleClientDevFlags(isDrillIdle)
   return useGameStore.getState().clientDevFlags.flags
+}
+
+/** The width level the host derives for the local rig (ticket 750): the body its collider grows to. */
+function readLocalWidthLevel(): number {
+  return widthLevelOf(readAuthorityState(), useGameStore.getState().playerId)
 }
 
 /** The slices' motion effects on the local vehicle at the authority's tick (ticket 233). */

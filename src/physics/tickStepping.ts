@@ -49,11 +49,13 @@ export function sweepGroundOf(
   ground: GroundReader,
   position: Vector2,
   cuttingPose: VehiclePose | null,
+  halfSide?: number,
 ): SweepGround {
   return {
     isSolidAt: (x, y) => ground.densityAtPoint(x, y) >= ISO_DENSITY,
     position,
     boreFacing: cuttingPose === null ? null : unitFacingOf(cuttingPose),
+    halfSide,
   }
 }
 

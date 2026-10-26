@@ -38,6 +38,11 @@ export interface GroundHalo {
     ground: HaloGround,
     passThrough?: TilePoint | null,
   ): void
+  /**
+   * Reaches `radiusBlocks` blocks round the body from the next sync on: a grown body (ticket 750)
+   * needs its walls further out.
+   */
+  reachBlocks(radiusBlocks: number): void
   /** Measures every collider from another render origin: they stay where they are on the planet. */
   moveOrigin(origin: RenderOrigin): void
   /** How many ground colliders exist now (the #4 budget counts them). */
@@ -76,12 +81,13 @@ interface HaloFrame {
 export function createGroundHalo(
   rapier: Rapier,
   world: RAPIER.World,
-  radiusBlocks: number,
+  startRadiusBlocks: number,
   origin: RenderOrigin,
 ): GroundHalo {
   const blocks = new Map<string, BlockCollider>()
   const frame: HaloFrame = { origin }
   let last: HaloSync | null = null
+  let radiusBlocks = startRadiusBlocks
 
   return {
     syncAround(centre, worldVersion, ground, passThrough = null) {
@@ -91,6 +97,11 @@ export function createGroundHalo(
       const wanted = new Map(blocksAround(centre, radiusBlocks).map((b) => [keyOf(b), b]))
       removeUnwanted(world, blocks, wanted)
       refreshWanted(rapier, world, blocks, wanted, { ground, passThrough, frame })
+    },
+    reachBlocks(next) {
+      if (next === radiusBlocks) return
+      radiusBlocks = next
+      last = null
     },
     moveOrigin(next) {
       frame.origin = next
