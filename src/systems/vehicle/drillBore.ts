@@ -106,7 +106,7 @@ export function bodyReachMmAlongAt(aim: Aim, widthLevel: number): number {
 }
 
 /** How far a square of half side `halfMm` reaches from its centre along `aim`, rounded up. */
-function squareReachMmAlong(aim: Aim, halfMm: number): number {
+export function squareReachMmAlong(aim: Aim, halfMm: number): number {
   const { along, up } = aimDirectionOf(aim)
   return Math.ceil((halfMm * (Math.abs(along) + Math.abs(up))) / UP_VECTOR_SCALE)
 }
