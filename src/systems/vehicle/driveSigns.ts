@@ -9,7 +9,7 @@
  * a diagonal aim reads down while it points at least halfway down, by the same rule.
  */
 import { DRIVE_PUSH_SHARE_MIN, DRIVE_PUSH_STEPS, UP_VECTOR_SCALE } from '../../constants/physics'
-import { aimDirectionOf } from './aim'
+import { aimDirectionOf, type Aim } from './aim'
 import type { VehicleIntent } from './vehicleIntent'
 import { FACING, type Facing } from './vehiclePose'
 
@@ -36,6 +36,16 @@ const DRIVE_OF_FACING: Readonly<Record<Facing, DriveSigns>> = {
 
 export function driveOfFacing(facing: Facing): DriveSigns {
   return DRIVE_OF_FACING[facing]
+}
+
+/**
+ * The push an aim stands for at the stick's rim (ticket 899, the pacing bot's aimed bores): each
+ * part of the aim at least halfway to its side, so a cardinal aim pushes as its facing's key does
+ * and a 45° aim down and to the right pushes `{ x: 1, y: -1 }`.
+ */
+export function driveOfAim(aim: Aim): DriveSigns {
+  const { along, up } = aimDirectionOf(aim)
+  return { x: signOfPush(along / UP_VECTOR_SCALE), y: signOfPush(up / UP_VECTOR_SCALE) }
 }
 
 const DRIVE_SIGNS: readonly unknown[] = [-1, 0, 1]

@@ -12,9 +12,17 @@
  * Scripted mining lays and charges casing through the player's placement code (#115), one ring per
  * metre the bot bores, charged per metre as a player's two rings are, onto the lining bill its
  * sales settle. Positions are tile centres, upright (up = (0, 1024)), velocity 0 at each report.
+ *
+ * It aims as well as faces (ticket 899): a bore reports the head's aim in 1/64 turns as the
+ * player's analog stick sends it (ticket 791), and the tile it bores is the player's nose tile
+ * along that aim (`noseTileAlong`), so the cut, its casing ring and the ring's bill follow the aim
+ * through the player's own rules. A diagonal neighbour is bored at 45° and moved into along the
+ * diagonal, √2 m (`DIAGONAL_STEP_METRES`), climbing on thrust and drive at once as a player
+ * holding both; every move and bore along the four facings reports exactly as before.
  */
 import { POSE_REPORT_INTERVAL_TICKS } from '../../constants/balance'
 import type { UpgradeLevels } from '../economy/vehicleStats'
+import { facingOfAim, isCardinalAim, type Aim } from '../vehicle/aim'
 import { isVehicleActive } from '../vehicle/vehicleState'
 import type { Facing } from '../vehicle/vehiclePose'
 import type { TilePoint } from '../world/tileGrid'
@@ -32,12 +40,18 @@ import { uncorkOnFiredampEntry } from './botFlask'
 import type { ChargePolicy } from './botCharges'
 import type { RouteDeaths } from './botDeathReplay'
 import { setGunsForEnergy } from './botGuns'
-import { facingTowards, NO_TICKS, reportPoseIntent } from './botPose'
+import {
+  aimTowards,
+  NO_TICKS,
+  noseTileAlong,
+  reportAimedPoseIntent,
+  type ActionTicks,
+} from './botPose'
 import type { BotSession } from './botSession'
 import type { GateRouteBlock } from './gateRouteBlocks'
 import { descentLegOf, type DownBoreTally, type DownLeg } from './downBores'
 import type { SidewaysBoreTally } from './sidewaysBores'
-import { botMoveSpeedOf, moveTicks, tileKindAt } from './botWorld'
+import { botMoveSpeedOf, DIAGONAL_STEP_METRES, moveTicks, tileKindAt } from './botWorld'
 import type { MineLayout } from './mineLayout'
 
 /** A bore reports at least this often, like the client's 5 Hz pose reports. */
@@ -47,6 +61,11 @@ const BORE_REPORT_TICKS = 60
 export interface BotPilot {
   position: TilePoint
   facing: Facing
+  /**
+   * The aim the head is held at for an aimed bore (ticket 899, `openTileAlongAim`): a bore of its
+   * nose tile reports it; any other bore reports the aim toward its tile. Absent is none held.
+   */
+  aim?: Aim
   /** Whether it fires the bore gun while it bores or stands by (ticket 347); absent is `never`. */
   borePolicy?: BorePolicy
   /** What it does with the planet kits (ticket 850, `botCrates.ts`); absent is every field off. */
@@ -121,16 +140,27 @@ export function boreTile(session: BotSession, pilot: BotPilot, tile: TilePoint, 
 /** One report's stretch of a bore; false when the tile opened early or the vehicle was lost. */
 function boreChunk(session: BotSession, pilot: BotPilot, tile: TilePoint, chunk: BoreChunk) {
   if (!isBoreOn(session, tile)) return false
-  const facing = facingTowards(pilot.position, tile)
+  const aim = boreAimOf(pilot, tile)
   faceThreats(session, pilot)
   setGunsForEnergy(session)
-  session.submit(reportPoseIntent(pilot.position, facing, NO_TICKS))
+  session.submit(reportAimedPoseIntent(pilot.position, aim, NO_TICKS))
   uncorkOnFiredampEntry(session, pilot, pilot.position)
   waitFiring(session, pilot, chunk.waitTicks)
   if (!isBoreOn(session, tile)) return false
   session.submit({ type: 'drillTile', payload: { ...tile, ticks: chunk.windowTicks } })
-  pilot.facing = facing
+  pilot.facing = facingOfAim(aim)
   return true
+}
+
+/** The aim a bore of `tile` reports: the held aim where `tile` is its nose tile, else toward it. */
+export function boreAimOf(pilot: BotPilot, tile: TilePoint): Aim {
+  const held = pilot.aim
+  if (held !== undefined && isSameTile(noseTileAlong(pilot.position, held), tile)) return held
+  return aimTowards(pilot.position, tile)
+}
+
+function isSameTile(a: TilePoint, b: TilePoint): boolean {
+  return a.tx === b.tx && a.ty === b.ty
 }
 
 /**
@@ -147,11 +177,11 @@ function isBoreOn(session: BotSession, tile: TilePoint): boolean {
  * starts there (ticket 237). A refused cell takes no drill ticks, so the touch costs no energy.
  */
 export function touchTile(session: BotSession, pilot: BotPilot, tile: TilePoint): void {
-  const facing = facingTowards(pilot.position, tile)
-  session.submit(reportPoseIntent(pilot.position, facing, NO_TICKS))
+  const aim = boreAimOf(pilot, tile)
+  session.submit(reportAimedPoseIntent(pilot.position, aim, NO_TICKS))
   session.wait(1)
   session.submit({ type: 'drillTile', payload: { ...tile, ticks: 1 } })
-  pilot.facing = facing
+  pilot.facing = facingOfAim(aim)
 }
 
 /** Waits where it stands for `ticks`, meeting threats, setting its guns and firing as a bore does. */
@@ -174,30 +204,44 @@ export function enterBoredTile(pilot: BotPilot, tile: TilePoint): void {
 }
 
 /**
- * Moves in a straight line through open tiles to `to`, reporting along the way. Climbing is
- * thrust; driving and falling are drive (#6 energy rates).
+ * Moves in a straight line through open tiles to `to`, along one axis or at 45° (ticket 899),
+ * reporting along the way. Climbing is thrust; driving and falling are drive (#6 energy rates); a
+ * climb at 45° pushes to the side as it lifts, so it is both.
  */
 export function moveStraight(session: BotSession, planet: BotPlanet, to: TilePoint): void {
   const { pilot } = planet
   const from = pilot.position
   const tiles = straightPath(from, to)
   const speed = botMoveSpeedOf(session.state(), session.playerId, from, to)
-  const facing = facingTowards(from, to)
+  const aim = aimTowards(from, to)
+  const stepMetres = stepMetresAlong(aim)
   const isClimb = to.ty > from.ty
   let reportedTicks = 0
   tiles.forEach((tile, index) => {
-    const ticks = moveTicks(index + 1, speed)
+    const ticks = moveTicks((index + 1) * stepMetres, speed)
     const isLast = index === tiles.length - 1
     if (!isLast && ticks - reportedTicks < POSE_REPORT_INTERVAL_TICKS) return
-    reportMove(session, tile, facing, ticks - reportedTicks, isClimb)
+    reportMove(session, tile, aim, moveActionTicksOf(aim, ticks - reportedTicks, isClimb))
     uncorkOnFiredampEntry(session, pilot, tile)
     reportedTicks = ticks
     // #724: the move's speed carries into a bore below only if nothing holds the rig first.
     if (isLast) pilot.downLeg = descentLegOf(from, to, session.tick(), speed)
     faceThreatsOnTheMove(session, planet, tile)
   })
-  if (tiles.length > 0) pilot.facing = facing
+  if (tiles.length > 0) pilot.facing = facingOfAim(aim)
   pilot.position = to
+}
+
+/** A step's length along `aim`: a tile, or a tile's diagonal at 45°. */
+function stepMetresAlong(aim: Aim): number {
+  return isCardinalAim(aim) ? 1 : DIAGONAL_STEP_METRES
+}
+
+/** A move's action ticks: a climb's thrust, a move's drive, and both on a climb at 45°. */
+function moveActionTicksOf(aim: Aim, ticks: number, isClimb: boolean): ActionTicks {
+  if (!isClimb) return { ...NO_TICKS, driveTicks: ticks }
+  const climb = { ...NO_TICKS, thrustTicks: ticks }
+  return isCardinalAim(aim) ? climb : { ...climb, driveTicks: ticks }
 }
 
 /** After a death on this planet, each report on the move also meets a closing enemy (#130). */
@@ -207,27 +251,28 @@ function faceThreatsOnTheMove(session: BotSession, planet: BotPlanet, tile: Tile
   faceThreats(session, planet.pilot)
 }
 
-function reportMove(
-  session: BotSession,
-  tile: TilePoint,
-  facing: Facing,
-  ticks: number,
-  isClimb: boolean,
-): void {
-  session.wait(ticks)
+function reportMove(session: BotSession, tile: TilePoint, aim: Aim, counts: ActionTicks): void {
+  session.wait(Math.max(counts.thrustTicks, counts.driveTicks))
   setGunsForEnergy(session)
-  const counts = isClimb ? { ...NO_TICKS, thrustTicks: ticks } : { ...NO_TICKS, driveTicks: ticks }
-  session.submit(reportPoseIntent(tile, facing, counts))
+  session.submit(reportAimedPoseIntent(tile, aim, counts))
 }
 
-/** The tiles after `from` up to and including `to`, along one axis. */
+/** The tiles after `from` up to and including `to`, along one axis or at 45°. */
 function straightPath(from: TilePoint, to: TilePoint): TilePoint[] {
   const dx = Math.sign(to.tx - from.tx)
   const dy = Math.sign(to.ty - from.ty)
-  const length = Math.abs(to.tx - from.tx) + Math.abs(to.ty - from.ty)
-  if (dx !== 0 && dy !== 0) throw new RangeError('the bot moves along one axis at a time')
+  const length = Math.max(Math.abs(to.tx - from.tx), Math.abs(to.ty - from.ty))
+  if (!isStraightOrDiagonal(from, to)) {
+    throw new RangeError('the bot moves along one axis or at 45° at a time')
+  }
   return Array.from({ length }, (_, step) => ({
     tx: from.tx + dx * (step + 1),
     ty: from.ty + dy * (step + 1),
   }))
+}
+
+function isStraightOrDiagonal(from: TilePoint, to: TilePoint): boolean {
+  const across = Math.abs(to.tx - from.tx)
+  const down = Math.abs(to.ty - from.ty)
+  return across === 0 || down === 0 || across === down
 }

@@ -3,9 +3,11 @@
  * so a gallery tile the drill would cut faster than the drive drives takes the drive's time over
  * it on the scripted clock. Each planet keeps its level-leg bore ticks and the share of them the
  * drive held, which `balance:report` prints per planet (`logging/driveBoundReport.ts`): over half
- * from planet 3 on fails the ticket's bar.
+ * from planet 3 on fails the ticket's bar. A 45° bore (ticket 899) has a sideways part a metre
+ * across, which the drive holds the same way, and counts among them.
  */
-import { isDriveCappedFacing } from '../vehicle/cutAxisCaps'
+import { aimOfFacing, type Aim } from '../vehicle/aim'
+import { isDriveCappedAim } from '../vehicle/cutAxisCaps'
 import { sidewaysSubStepsOf } from '../vehicle/cutCapSpeed'
 import type { Facing } from '../vehicle/vehiclePose'
 import type { TileBore } from './boreClock'
@@ -27,7 +29,15 @@ export function newSidewaysBoreTally(): SidewaysBoreTally {
 
 /** A bore along `facing`: sideways, at least the drive's time over the tile; else the drill's. */
 export function drivenBoreOf(bore: TileBore, facing: Facing, speedMax: number): TileBore {
-  if (!isDriveCappedFacing(facing)) return bore
+  return drivenBoreAlongOf(bore, aimOfFacing(facing), speedMax)
+}
+
+/**
+ * A bore along `aim`: one with a sideways part, at least the drive's time over the metre across;
+ * one straight up or down, the drill's.
+ */
+export function drivenBoreAlongOf(bore: TileBore, aim: Aim, speedMax: number): TileBore {
+  if (!isDriveCappedAim(aim)) return bore
   return { ...bore, subSteps: sidewaysSubStepsOf(bore.subSteps, speedMax, bore.quantum) }
 }
 

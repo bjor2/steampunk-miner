@@ -2,8 +2,9 @@
  * What the bot reads of the world and how long things take it (#29 Systems & Economy note 3, the
  * movement-time model of the #6 simulation, not physics): driving and falling along a bored tunnel
  * at the travel speed for `drive` energy, climbing at the same speed for `thrust` energy, and
- * boring a tile in exactly the ticks the #7 drill rule gives. Tiles are 1 m. The travel speed is
- * the drive's, the engine's top speed alone (ticket 723 retired travel parity).
+ * boring a tile in exactly the ticks the #7 drill rule gives. Tiles are 1 m, and a step to a
+ * diagonal neighbour is their diagonal, √2 m (ticket 899). The travel speed is the drive's, the
+ * engine's top speed alone (ticket 723 retired travel parity).
  */
 import { BASIS_POINTS } from '../../constants/balance'
 import { TICKS_PER_SECOND } from '../../constants/physics'
@@ -24,9 +25,12 @@ import type { PlanetParams } from '../world/planetParams'
 import type { TilePoint } from '../world/tileGrid'
 import { CELL_KIND, GROUND_CELL, isAirCell, isRemovableCell, kindOfCell } from '../world/worldCell'
 import { cellAt, isTileYielded, materialCellAt } from '../world/worldState'
-import { botPoseAt, facingTowards } from './botPose'
+import { aimTowards, botAimedPoseAt } from './botPose'
 
 export type BotTileKind = 'open' | 'ground' | 'ore' | 'core' | 'pad' | 'lava'
+
+/** Metres from a tile's centre to a diagonal neighbour's: the #6 model's 45° step (ticket 899). */
+export const DIAGONAL_STEP_METRES = Math.SQRT2
 
 const LAVA_NEIGHBOURS: readonly (readonly [number, number])[] = [
   [0, 0],
@@ -77,14 +81,14 @@ export function isBoreLavaRisk(
   return cut.some((cell) => isLavaRisk(state, cell))
 }
 
-/** The gear's cells of a bore of `tile` from `from`, as the authority will cut them. */
+/** The gear's cells of a bore of `tile` from `from`, aimed at it, as the authority will cut them. */
 function gearCellsOfBore(
   state: AuthorityState,
   playerId: string,
   from: TilePoint,
   tile: TilePoint,
 ): TilePoint[] {
-  const pose = botPoseAt(from, facingTowards(from, tile))
+  const pose = botAimedPoseAt(from, aimTowards(from, tile))
   return scriptedGearCellsOf(state, playerId, { tile, pose })
 }
 

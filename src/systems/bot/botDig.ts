@@ -15,20 +15,25 @@
  * `sidewaysBores.ts`), and a bore down at least the time local gravity lets the body gain the
  * drill's speed across it (Bjor's ruling on #724, `downBores.ts`); what it can afford and whether
  * a charge pays still read the drill's time.
+ * A bore at an aim off the four facings (ticket 899) keeps each part's rule, as the player's
+ * diagonal cut does (`vehicle/cutAxisCaps.ts`): its sideways part at least the drive's time over
+ * the metre across, then a downward part's ramp along the aim across the √2 m to a diagonal tile.
+ * `openTileAlongAim` holds the head at any 1/64-turn aim and opens the player's nose tile there.
  */
 import { heatThrottledDrill } from '../authority/heatRules'
 import { gatedDrillTimeOf, type GateVerdict } from '../registries/gateChecks'
 import { drillQuantumAt } from '../authority/stepBoundRead'
-import { isGravityRampedFacing } from '../vehicle/cutAxisCaps'
+import { isCardinalAim, type Aim } from '../vehicle/aim'
+import { isGravityRampedAim } from '../vehicle/cutAxisCaps'
 import { driveSpeedOf } from '../vehicle/cutCapSpeed'
 import { downCutAccelerationAt } from '../vehicle/radialGravity'
-import type { Facing } from '../vehicle/vehiclePose'
 import { isVehicleActive } from '../vehicle/vehicleState'
 import type { TilePoint } from '../world/tileGrid'
 import { blastOpen, blastShellOpen, isBlastWorthIt, noteTileWorthACharge } from './botCharges'
 import { drillGateAt, extractorWaitOf, isShellGate, isWallGate } from './botGates'
 import { canAffordBore } from './botEnergy'
 import {
+  boreAimOf,
   boreTile,
   enterBoredTile,
   moveStraight,
@@ -36,17 +41,25 @@ import {
   touchTile,
   type BotPlanet,
 } from './botPilot'
-import { facingTowards } from './botPose'
+import { noseTileAlong } from './botPose'
 import type { BotSession } from './botSession'
 import {
   entrySpeedOf,
+  legAimFieldOf,
   rampedDownBoreOf,
   rampRestTicksOf,
   tallyDownBore,
   type RampedBore,
 } from './downBores'
-import { drivenBoreOf, tallySidewaysBore } from './sidewaysBores'
-import { boreSubSteps, cellOfTile, isBoreLavaRisk, isLavaRisk, tileKindAt } from './botWorld'
+import { drivenBoreAlongOf, tallySidewaysBore } from './sidewaysBores'
+import {
+  boreSubSteps,
+  cellOfTile,
+  DIAGONAL_STEP_METRES,
+  isBoreLavaRisk,
+  isLavaRisk,
+  tileKindAt,
+} from './botWorld'
 import type { TileBore } from './boreClock'
 
 /** Opening a tile: done, impossible for this tip or for the lava, or too dear for the tank. */
@@ -57,6 +70,15 @@ const MAX_REBORES = 8
 
 /** Past an extractor's own ticks: the clock acting on them, and a pulled cell's edit landing. */
 const EXTRACTOR_SETTLE_TICKS = 2
+
+/**
+ * Opens the tile at the drill's nose with the head held at `aim`, any 1/64 turn, and moves into it
+ * (ticket 899): the player's nose tile one metre along the aim, bored and reported at that aim.
+ */
+export function openTileAlongAim(session: BotSession, planet: BotPlanet, aim: Aim): OpenOutcome {
+  planet.pilot.aim = aim
+  return openTile(session, planet, noseTileAlong(planet.pilot.position, aim))
+}
 
 /** Opens a neighbouring tile and moves into it: bores it, or drives in when it is open. */
 export function openTile(session: BotSession, planet: BotPlanet, tile: TilePoint): OpenOutcome {
@@ -129,73 +151,85 @@ function boreUngated(
   if (isBlastWorthIt(session, planet, tile, ticks) && blastOpen(session, planet, tile)) {
     return isVehicleActive(session.vehicle()) ? 'opened' : 'short'
   }
-  boreAlongFacing(session, planet, tile, bore)
+  boreAlongAim(session, planet, tile, bore)
   return isVehicleActive(session.vehicle()) ? 'opened' : 'short'
 }
 
 /**
- * Bores the tile as the rig cuts it from where it stands: a cut down at the drill's work, then
- * standing by for the rest of the time gravity takes to bring the body across it (#724); sideways
- * held to the drive (#723); up at the drill's time.
+ * Bores the tile as the rig cuts it from where it stands, along the bore's aim: a cut down at the
+ * drill's work, then standing by for the rest of the time gravity takes to bring the body across
+ * it (#724); sideways held to the drive (#723); up at the drill's time; at 45° the sideways part
+ * held to the drive, then a downward part's ramp (ticket 899).
  */
-function boreAlongFacing(
-  session: BotSession,
-  planet: BotPlanet,
-  tile: TilePoint,
-  bore: TileBore,
-): void {
-  const facing = facingTowards(planet.pilot.position, tile)
-  if (isGravityRampedFacing(facing)) return boreDownUnderRamp(session, planet, tile, bore)
-  boreTile(session, planet.pilot, tile, sidewaysBoreAt(session, planet, facing, bore))
+function boreAlongAim(session: BotSession, planet: BotPlanet, tile: TilePoint, bore: TileBore) {
+  const aim = boreAimOf(planet.pilot, tile)
+  const driven = sidewaysBoreAt(session, planet, aim, bore)
+  if (isGravityRampedAim(aim)) return boreDownUnderRamp(session, planet, { tile, aim }, driven)
+  boreTile(session, planet.pilot, tile, driven)
+}
+
+/** A bore's tile and the aim it is bored along. */
+interface AimedTile {
+  tile: TilePoint
+  aim: Aim
 }
 
 /**
- * A bore down: the drill's own sub-steps on the clock, so the drill heats and draws for its work
- * alone, as a player's does; then the ramp's remaining ticks stood by; the speed it leaves carried
- * for the tile below.
+ * A bore down: the drill's own sub-steps on the clock (a 45° bore's held to the drive), so the
+ * drill heats and draws for its work alone, as a player's does; then the ramp's remaining ticks
+ * stood by; the speed it leaves carried for the tile beyond it along the aim.
  */
 function boreDownUnderRamp(
   session: BotSession,
   planet: BotPlanet,
-  tile: TilePoint,
+  { tile, aim }: AimedTile,
   bore: TileBore,
 ): void {
   const startTick = session.tick()
-  const ramped = rampedDownBoreAt(session, planet, tile, bore)
+  const ramped = rampedDownBoreAt(session, planet, { tile, aim }, bore)
   boreTile(session, planet.pilot, tile, bore)
   standBy(session, planet.pilot, rampRestTicksOf(ramped.bore, bore, session.tick() - startTick))
-  planet.pilot.downLeg = { tick: session.tick(), tile, speed: ramped.exitSpeed }
+  const leg = { tick: session.tick(), tile, speed: ramped.exitSpeed }
+  planet.pilot.downLeg = { ...leg, ...legAimFieldOf(aim) }
 }
 
-/** A bore down from the leg's speed, under local gravity at the tile's centre (#724), tallied. */
+/**
+ * A bore down from the leg's speed along its aim, under local gravity at the tile's centre (#724),
+ * across the metres the body travels, tallied.
+ */
 function rampedDownBoreAt(
   session: BotSession,
   planet: BotPlanet,
-  tile: TilePoint,
+  { tile, aim }: AimedTile,
   bore: TileBore,
 ): RampedBore {
   const { pilot, layout } = planet
-  const entrySpeed = entrySpeedOf(pilot.downLeg, pilot.position, session.tick())
+  const entrySpeed = entrySpeedOf(pilot.downLeg, pilot.position, session.tick(), aim)
   const acceleration = downCutAccelerationAt(
     Math.hypot(tile.tx + 0.5, tile.ty + 0.5),
     layout.params.radiusTiles,
     layout.params.gravityMultiplier,
   )
-  const ramped = rampedDownBoreOf(bore, entrySpeed, acceleration)
+  const ramped = rampedDownBoreOf(bore, entrySpeed, acceleration, metresAlong(aim))
   if (planet.downBores !== undefined) {
     tallyDownBore(planet.downBores, session.state().planet.index, bore, ramped.bore)
   }
   return ramped
 }
 
-/** A sideways bore held to the drive, and tallied; the drill's bore up. */
+/** The metres a bore along `aim` takes the body: one straight down, √2 at 45°. */
+function metresAlong(aim: Aim): number {
+  return isCardinalAim(aim) ? 1 : DIAGONAL_STEP_METRES
+}
+
+/** A bore with a sideways part held to the drive, and tallied; the drill's bore up or down. */
 function sidewaysBoreAt(
   session: BotSession,
   planet: BotPlanet,
-  facing: Facing,
+  aim: Aim,
   bore: TileBore,
 ): TileBore {
-  const driven = drivenBoreOf(bore, facing, driveSpeedOf(session.vehicle()))
+  const driven = drivenBoreAlongOf(bore, aim, driveSpeedOf(session.vehicle()))
   if (driven === bore || planet.sidewaysBores === undefined) return driven
   tallySidewaysBore(planet.sidewaysBores, session.state().planet.index, bore, driven)
   return driven

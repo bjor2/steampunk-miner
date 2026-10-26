@@ -12,16 +12,25 @@
  * Each planet keeps its down-bore metres, ticks and the ticks the ramp added, so `balance:report`
  * prints the effective down speed (leg distance over leg time) per planet
  * (`logging/downSpeedReport.ts`).
+ *
+ * A 45° bore down (ticket 899) ramps the same way along its aim, as the player's diagonal cut does
+ * (`vehicle/downCutRamp.ts`): across the √2 m its body travels to the diagonal tile, at the same
+ * acceleration. A leg keeps the aim it ran along, and carries its speed only into a bore along
+ * that aim; its down metre is still one metre of depth.
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
+import { AIM, type Aim } from '../vehicle/aim'
 import type { TilePoint } from '../world/tileGrid'
 import type { TileBore } from './boreClock'
+import { aimTowards } from './botPose'
 
 /** The speed a bore down left the body at, in m/s, on the tick it ended, in the tile it opened. */
 export interface DownLeg {
   tick: number
   tile: TilePoint
   speed: number
+  /** The aim it ran along where that is not straight down (ticket 899). */
+  aim?: Aim
 }
 
 /** A down bore on the scripted clock, and the speed it leaves the body at. */
@@ -48,33 +57,52 @@ export function newDownBoreTally(): DownBoreTally {
   return new Map()
 }
 
-/** The speed a bore of `tile` starting at `tick` enters with: the leg's, or 0 on a new leg. */
-export function entrySpeedOf(leg: DownLeg | undefined, from: TilePoint, tick: number): number {
-  if (leg === undefined || leg.tick !== tick) return 0
+/**
+ * The speed a bore along `aim` from `from` starting at `tick` enters with: the leg's, or 0 on a
+ * new leg or one that ran along another aim.
+ */
+export function entrySpeedOf(
+  leg: DownLeg | undefined,
+  from: TilePoint,
+  tick: number,
+  aim: Aim = AIM.down,
+): number {
+  if (leg === undefined || leg.tick !== tick || (leg.aim ?? AIM.down) !== aim) return 0
   return leg.tile.tx === from.tx && leg.tile.ty === from.ty ? leg.speed : 0
 }
 
-/** The leg a move from `from` to `to` ends on at `tick`: one down, at `speed` m/s; else none. */
+/**
+ * The leg a move from `from` to `to` ends on at `tick`: one down, straight or at 45°, at `speed`
+ * m/s along it; else none.
+ */
 export function descentLegOf(
   from: TilePoint,
   to: TilePoint,
   tick: number,
   speed: number,
 ): DownLeg | undefined {
-  return to.ty < from.ty ? { tick, tile: to, speed } : undefined
+  if (to.ty >= from.ty) return undefined
+  return { tick, tile: to, speed, ...legAimFieldOf(aimTowards(from, to)) }
+}
+
+/** A leg's aim field: none straight down, so a straight leg keeps the shape it had. */
+export function legAimFieldOf(aim: Aim): { aim?: Aim } {
+  return aim === AIM.down ? {} : { aim }
 }
 
 /**
  * The bore down of one tile entered at `entrySpeed` m/s under `acceleration` m/s²: at least the
- * drill's sub-steps, and as many as the ramp needs across the metre where that is longer.
+ * drill's sub-steps, and as many as the ramp needs across the `metres` the body travels where that
+ * is longer (a metre straight down, √2 m at 45°).
  */
 export function rampedDownBoreOf(
   bore: TileBore,
   entrySpeed: number,
   acceleration: number,
+  metres: number = CELL_METRES,
 ): RampedBore {
-  const topSpeed = topSpeedOf(bore)
-  const cell = rampedCellOf(entrySpeed, topSpeed, acceleration)
+  const topSpeed = topSpeedOf(bore, metres)
+  const cell = rampedCellOf(entrySpeed, topSpeed, acceleration, metres)
   const rampSubSteps = Math.ceil(cell.seconds * TICKS_PER_SECOND * bore.quantum)
   return {
     bore: { ...bore, subSteps: Math.max(bore.subSteps, rampSubSteps) },
@@ -125,9 +153,9 @@ function wholeTicksOf(bore: TileBore): number {
   return Math.ceil(bore.subSteps / bore.quantum)
 }
 
-/** m/s the drill alone cuts the tile's metre at. */
-function topSpeedOf(bore: TileBore): number {
-  return (CELL_METRES * TICKS_PER_SECOND * bore.quantum) / bore.subSteps
+/** m/s the drill alone takes the body across the tile's `metres` at. */
+function topSpeedOf(bore: TileBore, metres: number): number {
+  return (metres * TICKS_PER_SECOND * bore.quantum) / bore.subSteps
 }
 
 interface RampedCell {
@@ -135,21 +163,26 @@ interface RampedCell {
   exitSpeed: number
 }
 
-/** One metre from `entrySpeed` toward `topSpeed` at `acceleration`, slowing to it at once. */
-function rampedCellOf(entrySpeed: number, topSpeed: number, acceleration: number): RampedCell {
-  if (entrySpeed >= topSpeed) return { seconds: CELL_METRES / topSpeed, exitSpeed: topSpeed }
+/** `metres` from `entrySpeed` toward `topSpeed` at `acceleration`, slowing to it at once. */
+function rampedCellOf(
+  entrySpeed: number,
+  topSpeed: number,
+  acceleration: number,
+  metres: number,
+): RampedCell {
+  if (entrySpeed >= topSpeed) return { seconds: metres / topSpeed, exitSpeed: topSpeed }
   const rampSeconds = (topSpeed - entrySpeed) / acceleration
   const rampMetres = ((entrySpeed + topSpeed) / 2) * rampSeconds
-  if (rampMetres >= CELL_METRES) return cellWithinRampOf(entrySpeed, acceleration)
+  if (rampMetres >= metres) return cellWithinRampOf(entrySpeed, acceleration, metres)
   return {
-    seconds: rampSeconds + (CELL_METRES - rampMetres) / topSpeed,
+    seconds: rampSeconds + (metres - rampMetres) / topSpeed,
     exitSpeed: topSpeed,
   }
 }
 
-/** The metre still ramping at its end: `d = v0 t + a t² / 2` solved for `t`. */
-function cellWithinRampOf(entrySpeed: number, acceleration: number): RampedCell {
-  const exitSpeed = Math.sqrt(entrySpeed * entrySpeed + 2 * acceleration * CELL_METRES)
+/** The `metres` still ramping at their end: `d = v0 t + a t² / 2` solved for `t`. */
+function cellWithinRampOf(entrySpeed: number, acceleration: number, metres: number): RampedCell {
+  const exitSpeed = Math.sqrt(entrySpeed * entrySpeed + 2 * acceleration * metres)
   return { seconds: (exitSpeed - entrySpeed) / acceleration, exitSpeed }
 }
 
