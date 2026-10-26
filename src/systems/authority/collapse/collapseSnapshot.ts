@@ -3,7 +3,8 @@
  * `{block, startTick}` is plain JSON already, so it travels as it is and a load mid-warning fires
  * the collapse on the same tick. A braced entry carries `isBraced: true` (ticket 331), so a join or
  * a replay mid-brace keeps the brace; an older save has none and loads unbraced. A block a bare
- * blast rolled carries `isBlast: true` (D2 #861), so a load mid-warning refills it as a blast's. Reading checks
+ * blast rolled carries `isBlast: true` (D2 #861), so a load mid-warning refills it as a blast's. A
+ * burst carries its `holdTicks` (ticket 829), so its timer survives a save and a load. Reading checks
  * the shape; the digest check in `sessionSnapshot.ts` catches wrong values.
  */
 import { blockOfId } from '../../world/collapseBlock'
@@ -32,7 +33,8 @@ function isCollapsingBlock(entry: unknown): entry is CollapsingBlock {
     isWholeNumber(entry.startTick) &&
     typeof entry.isForced === 'boolean' &&
     isTrueBit(entry.isBraced) &&
-    isTrueBit(entry.isBlast)
+    isTrueBit(entry.isBlast) &&
+    (entry.holdTicks === undefined || isWholeNumber(entry.holdTicks))
   )
 }
 

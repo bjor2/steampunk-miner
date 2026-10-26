@@ -18,7 +18,7 @@ import {
 } from '../commandRule'
 import { noPlanetRejection, planetParamsOf } from '../planetOfState'
 import { entryOfBlock, withCollapsingBlock } from './collapseState'
-import { forcedWeaknessOf, startWarning } from './collapseWatch'
+import { forcedWeaknessOf, startForcedWarning } from './collapseWatch'
 
 export const COLLAPSE_DEBUG_RULES: {
   readonly 'debug.forceCollapse': CommandRule<'debug.forceCollapse'>
@@ -51,5 +51,5 @@ function forceCollapse(state: AuthorityState, id: string): RuleEffect {
   }
   const weakness = forcedWeaknessOf(state, params, block)
   if (weakness === null) return unchanged(state)
-  return startWarning(state, { block, weakness }, true)
+  return startForcedWarning(state, { block, weakness })
 }

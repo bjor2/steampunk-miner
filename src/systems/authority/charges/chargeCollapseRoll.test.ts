@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { toCanonicalJson } from '../canonicalJson'
 import { COLLAPSE_FILL_TICKS, COLLAPSE_WARN_TICKS } from '../../../constants/balance'
 import { projectDomainEvent } from '../../../logging/domainEventProjection'
 import { chargeRadiusMm } from '../../economy/chargeSizes'
@@ -249,7 +250,7 @@ describe('bare blast collapse roll (ticket 861)', () => {
     const reloaded = continueScriptedSession(snapshot.state)
     reloaded.advanceTo(SETTLED_TICK)
     const afterCut = whole.events().filter(({ tick }) => tick > firstWarning.tick + 10)
-    expect(JSON.stringify(reloaded.events())).toBe(JSON.stringify(afterCut))
+    expect(toCanonicalJson(reloaded.events())).toBe(toCanonicalJson(afterCut))
     expect(stateDigest(reloaded.state())).toBe(stateDigest(whole.state()))
   })
 
@@ -271,7 +272,7 @@ describe('bare blast collapse roll (ticket 861)', () => {
       const first = replayedCollapse(planetIndex, SETTLED_TICK)
       const second = replayedCollapse(planetIndex, SETTLED_TICK)
       expect(collapsedBlocksOf(first.events).length).toBeGreaterThan(0)
-      expect(JSON.stringify(second.events)).toBe(JSON.stringify(first.events))
+      expect(toCanonicalJson(second.events)).toBe(toCanonicalJson(first.events))
       expect(second.digest).toBe(first.digest)
     }
   })

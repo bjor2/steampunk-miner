@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { COLLAPSE_FILL_TICKS, COLLAPSE_WARN_TICKS } from '../../../constants/balance'
+import { COLLAPSE_FILL_TICKS } from '../../../constants/balance'
 import { withRegistrations } from '../../../registries/registrar'
 import { blockContaining, blockIdOf, blockOfId, samplesOfBlock } from '../../world/collapseBlock'
 import { SAMPLES_PER_TILE } from '../../world/sampleGrid'
@@ -11,14 +11,23 @@ import { ofType } from '../charges/chargeFixtures'
 import { createScriptedSession, PARAMS, type ScriptedSession } from '../scriptedSession'
 import { braceCommand, braceProbeSlice } from './braceFixtures'
 import { forceCollapseCommand } from './collapseCommands'
-import { buildWeakTunnel } from './collapseFixtures'
+import {
+  BAND_2_Y,
+  buildWeakTunnel,
+  poseAt,
+  TUNNEL_FROM_X,
+  TUNNEL_TO_X,
+  tunnelIntents,
+  WEAK_TUNNEL_HOLD_TICKS,
+} from './collapseFixtures'
 import { reinforcementProbeSlice } from './reinforcementFixtures'
 import { weakBlocksNearVehicles } from './collapseWatch'
 
-// The weak band-2 tunnel warns its blocks at tick 10, so each would refill at 70.
+// The weak band-2 tunnel warns its blocks at tick 10, so each would burst its 20 s hold later.
 const WARN_TICK = 10
-const REFILL_TICK = WARN_TICK + COLLAPSE_WARN_TICKS
+const REFILL_TICK = WARN_TICK + WEAK_TUNNEL_HOLD_TICKS
 const DONE_TICK = REFILL_TICK + COLLAPSE_FILL_TICKS + 5
+const TUNNEL_MIDDLE_X = (TUNNEL_FROM_X + TUNNEL_TO_X) / 2
 
 function weakTunnelSession(): ScriptedSession {
   const session = createScriptedSession()
@@ -83,7 +92,12 @@ describe('collapse reinforcement: weakness and warnings (ticket 365)', () => {
       const before = carvedAirOfTile(session.state().world, block, tile)
       session.advanceTo(DONE_TICK)
       const types = eventsOfBlock(session, block).map(({ type }) => type)
-      expect(types).toEqual(['CollapseWarned', 'CollapseStarted'])
+      expect(types).toEqual([
+        'CollapseWarned',
+        'CasingBurstWarned',
+        'CollapseStarted',
+        'CasingBurst',
+      ])
       expect(before.length).toBeGreaterThan(0)
       expect(carvedAirOfTile(session.state().world, block, tile)).toEqual(before)
     })
@@ -96,6 +110,7 @@ describe('collapse reinforcement: weakness and warnings (ticket 365)', () => {
       session.advanceTo(DONE_TICK)
       expect(eventsOfBlock(session, block).map(({ type, tick }) => [type, tick])).toEqual([
         ['CollapseWarned', WARN_TICK],
+        ['CasingBurstWarned', WARN_TICK],
         ['CollapseCancelled', REFILL_TICK],
       ])
       expect(ofType(session.events(), 'CollapseStarted')).toEqual([])
@@ -111,6 +126,30 @@ describe('collapse reinforcement: weakness and warnings (ticket 365)', () => {
       session.advanceTo(DONE_TICK)
       expect(ofType(session.events(), 'CollapseWarned')).toEqual([])
       expect(ofType(session.events(), 'CollapseBraced')).toEqual([])
+    })
+  })
+})
+
+// Ticket 829: the burst reads the strength grade only, so lining never holds one.
+describe('collapse reinforcement: lining against a burst (ticket 829)', () => {
+  it('lets a burst through cells only lining reinforces, filling them', () =>
+    withRegistrations([reinforcementProbeSlice({ isLining: true })], () => {
+      const session = weakTunnelSession()
+      session.advanceTo(DONE_TICK)
+      expect(ofType(session.events(), 'CollapseWarned').length).toBeGreaterThan(0)
+      expect(ofType(session.events(), 'CasingBurst').length).toBeGreaterThan(0)
+      expect(session.state().collapse.blocks).toEqual([])
+    }))
+
+  it('still holds a forced collapse in cells lining reinforces', () => {
+    const [block] = tunnelBlocks()
+    withRegistrations([reinforcementProbeSlice({ isLining: true })], () => {
+      const session = createScriptedSession()
+      session.submit(WARN_TICK, poseAt(TUNNEL_MIDDLE_X, BAND_2_Y))
+      tunnelIntents(2).forEach((intent) => session.submit(WARN_TICK, intent))
+      session.submit(WARN_TICK + 1, forceCollapseCommand(block))
+      session.advanceTo(DONE_TICK)
+      expect(ofType(session.events(), 'CollapseWarned')).toEqual([])
     })
   })
 })

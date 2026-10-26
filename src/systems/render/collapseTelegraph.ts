@@ -6,11 +6,15 @@
  * place, one more segment as the warning runs on, so the same block always cracks the same way.
  * A braced block's countdown stands at what it had left when the brace caught it (ticket 357, as
  * its provider says through `collapseBraces`); when the brace ends the kernel warns it afresh, so
- * it shows the full 60 again. Presentation only: read from the authority's collapse list, written into scratch, never back.
+ * it shows its full hold again. A burst's telegraph runs over its own hold (ticket 829). Presentation only: read from the authority's collapse list, written into scratch, never back.
  */
 import { COLLAPSE_BLOCK_SAMPLES, COLLAPSE_WARN_TICKS } from '../../constants/balance'
 import { CRACK_SEGMENT_M, CRACK_TURN_RADIANS, CRACKS_PER_BLOCK } from '../../constants/scene'
-import type { CollapseState, CollapsingBlock } from '../authority/collapse/collapseState'
+import {
+  holdTicksOf,
+  type CollapseState,
+  type CollapsingBlock,
+} from '../authority/collapse/collapseState'
 import { blockOfId, firstSampleOfBlock } from '../world/collapseBlock'
 import { SAMPLES_PER_TILE } from '../world/sampleGrid'
 
@@ -24,6 +28,8 @@ export interface TelegraphBlock {
   progress: number
   /** Ticks since the warning started, a braced block's frozen where it was caught (ticket 830). */
   elapsedTicks: number
+  /** The ticks the warning holds before the refill: a burst's own (ticket 829), else 60. */
+  holdTicks: number
   /** The block's place as a crack seed. */
   seed: number
 }
@@ -42,6 +48,7 @@ export function createTelegraphSlots(count: number): TelegraphBlock[] {
     size: 0,
     progress: 0,
     elapsedTicks: 0,
+    holdTicks: COLLAPSE_WARN_TICKS,
     seed: 0,
   }))
 }
@@ -56,7 +63,7 @@ export function writeTelegraphBlocks(
   const count = Math.min(slots.length, collapse.blocks.length)
   for (let at = 0; at < count; at++) {
     const entry = collapse.blocks[at]
-    writeSlot(slots[at], entry.block, elapsedOfEntry(entry, tick, frozenTicksLeftOf))
+    writeSlot(slots[at], entry, elapsedOfEntry(entry, tick, frozenTicksLeftOf))
   }
   return count
 }
@@ -68,12 +75,12 @@ function elapsedOfEntry(
   frozenTicksLeftOf: FrozenTicksLeftReader,
 ): number {
   const frozenLeft = entry.isBraced === true ? frozenTicksLeftOf(entry.block) : null
-  return frozenLeft === null ? tick - entry.startTick : COLLAPSE_WARN_TICKS - frozenLeft
+  return frozenLeft === null ? tick - entry.startTick : holdTicksOf(entry) - frozenLeft
 }
 
-/** How far the telegraph has run `elapsedTicks` after the warning started. */
-export function telegraphProgress(elapsedTicks: number): number {
-  return Math.min(1, Math.max(0, elapsedTicks / COLLAPSE_WARN_TICKS))
+/** How far a telegraph holding `holdTicks` has run `elapsedTicks` after the warning started. */
+export function telegraphProgress(elapsedTicks: number, holdTicks = COLLAPSE_WARN_TICKS): number {
+  return Math.min(1, Math.max(0, elapsedTicks / holdTicks))
 }
 
 /** How many crack segments a block shows at `progress`: one at once, all by the refill. */
@@ -102,14 +109,15 @@ export function writeCrackSegment(block: TelegraphBlock, index: number, out: Flo
   }
 }
 
-function writeSlot(slot: TelegraphBlock, id: string, elapsedTicks: number): void {
-  const block = blockOfId(id)
+function writeSlot(slot: TelegraphBlock, entry: CollapsingBlock, elapsedTicks: number): void {
+  const block = blockOfId(entry.block)
   if (block === null) return
   const first = firstSampleOfBlock(block)
   slot.x0 = first.sx / SAMPLES_PER_TILE
   slot.y0 = first.sy / SAMPLES_PER_TILE
   slot.size = BLOCK_SIZE_M
-  slot.progress = telegraphProgress(elapsedTicks)
+  slot.holdTicks = holdTicksOf(entry)
+  slot.progress = telegraphProgress(elapsedTicks, slot.holdTicks)
   slot.elapsedTicks = elapsedTicks
   slot.seed = (first.sx * 73856093) ^ (first.sy * 19349663)
 }

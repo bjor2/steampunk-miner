@@ -1,7 +1,8 @@
 /**
  * The band whose casing grade a tile needs (decision #41 Systems & Economy, #43 Rule): its own
- * band, or inside the core the core's band (6, #6), which needs `casingGradeCoreMin`. The HUD's
- * grade telegraph and the collapse weak test read the same rule.
+ * band, or inside the core the core's band (6, #6), which the ladder clamps to the last ore band's
+ * grade (`requiredCasingGrade`, ticket 829). The HUD's grade telegraph and the collapse weak test
+ * read the same rule.
  *
  * A first-placed lining is priced by the band of the wall it lines (#76, #85: rock-side lining
  * touches the wall, not the bore's axis). A ring that straddles a band boundary pays the deeper

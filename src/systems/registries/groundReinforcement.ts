@@ -29,6 +29,12 @@ export interface ReinforcementProvider {
   id: string
   /** Whether the cell at (tx, ty) is reinforced. Pure in state, O(1), its own section only. */
   reinforces(state: AuthorityState, tx: number, ty: number): boolean
+  /**
+   * Set by a provider whose reinforcement is the lining itself (ticket 829, the GD lock: linings
+   * never act as strength grades): a burst reads the strength grade only, so its cells never hold
+   * one; every other collapse still reads them.
+   */
+  isLining?: true
 }
 
 export const REINFORCEMENT_REGISTRY = defineRegistry<ReinforcementProvider>('groundReinforcement')
@@ -49,8 +55,27 @@ export function hasReinforcementProviders(): boolean {
 
 /** Any provider reinforces the cell, and no kernel guard bars it. */
 export function isCellReinforced(state: AuthorityState, tx: number, ty: number): boolean {
-  if (!hasReinforcementProviders() || isReinforcementBarred(state, { tx, ty })) return false
-  return entriesOf(REINFORCEMENT_REGISTRY).some((provider) => provider.reinforces(state, tx, ty))
+  return isReinforcedBy(entriesOf(REINFORCEMENT_REGISTRY), state, tx, ty)
+}
+
+/** Any provider but the lining's reinforces the cell against a burst (ticket 829). */
+export function isCellReinforcedAgainstBurst(
+  state: AuthorityState,
+  tx: number,
+  ty: number,
+): boolean {
+  const providers = entriesOf(REINFORCEMENT_REGISTRY).filter((provider) => !provider.isLining)
+  return isReinforcedBy(providers, state, tx, ty)
+}
+
+function isReinforcedBy(
+  providers: readonly ReinforcementProvider[],
+  state: AuthorityState,
+  tx: number,
+  ty: number,
+): boolean {
+  if (providers.length === 0 || isReinforcementBarred(state, { tx, ty })) return false
+  return providers.some((provider) => provider.reinforces(state, tx, ty))
 }
 
 /** The kernel guards: no planet, lava, the core, or a dynamite or rig gate. */

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { COLLAPSE_FILL_TICKS, COLLAPSE_WARN_TICKS } from '../../../constants/balance'
+import { COLLAPSE_FILL_TICKS } from '../../../constants/balance'
 import type { CommandIntent } from '../../../systems/authority/authorityCommand'
 import { ofType } from '../../../systems/authority/charges/chargeFixtures'
 import { forceCollapseCommand } from '../../../systems/authority/collapse/collapseCommands'
@@ -8,6 +8,7 @@ import {
   poseAt,
   TUNNEL_FROM_X,
   TUNNEL_TO_X,
+  WEAK_TUNNEL_HOLD_TICKS,
 } from '../../../systems/authority/collapse/collapseFixtures'
 import { weakBlocksNearVehicles } from '../../../systems/authority/collapse/collapseWatch'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
@@ -27,13 +28,16 @@ import type { TilePoint } from '../../../systems/world/tileGrid'
  * body at y 252.5 m leaves the five air samples from 252.0 to 253.0 m, the last a sample inside the
  * stamp's radius and the next a sample and a half outside it, so the carve reaches a quarter
  * sample past the radius (the collapse fixture's 1.9 m carve is wider than any drill cuts). Each
- * ring is its own command, so a block warns while its far rings are still unlaid.
+ * ring is its own command, so a block warns while its far rings are still unlaid. One grade short,
+ * its blocks burst 20 s after they warn (ticket 829).
  */
 const BUILD_TICK = 10
-const DONE_TICK = BUILD_TICK + COLLAPSE_WARN_TICKS + COLLAPSE_FILL_TICKS + 5
+const DONE_TICK = BUILD_TICK + WEAK_TUNNEL_HOLD_TICKS + COLLAPSE_FILL_TICKS + 5
 const BORE_Y = BAND_2_Y + drillStampLiftMm()
 const BORE_RADIUS_MM = drillStampRadiusMm() + 25
 const WEAK_GRADE = 1
+/** The grade band 2 needs on planet 1: a tunnel lined at it never bursts. */
+const HOLDING_GRADE = 2
 
 const setLiningType = (liningType: string): CommandIntent => ({
   type: 'debug.setLiningType',
@@ -45,7 +49,7 @@ function tunnelAxis(): number[] {
   return Array.from({ length: count }, (_, at) => TUNNEL_FROM_X + at * 500)
 }
 
-function tunnelIntents(): CommandIntent[] {
+function tunnelIntents(grade: number): CommandIntent[] {
   const axis = tunnelAxis()
   return [
     FREEZE_ENEMIES,
@@ -56,20 +60,24 @@ function tunnelIntents(): CommandIntent[] {
     })),
     ...axis.map((x): CommandIntent => ({
       type: 'debug.lineCasing',
-      payload: { x, y: BORE_Y, grade: WEAK_GRADE },
+      payload: { x, y: BORE_Y, grade },
     })),
   ]
 }
 
-function buildTunnel(session: ScriptedSession): void {
-  tunnelIntents().forEach((intent) => session.submit(BUILD_TICK, intent))
+function buildTunnel(session: ScriptedSession, grade = WEAK_GRADE): void {
+  tunnelIntents(grade).forEach((intent) => session.submit(BUILD_TICK, intent))
 }
 
 /** The tunnel lined in `liningType`, laid by a scenario's lining (owned and selected). */
-function tunnelLinedIn(liningType: string, playerIds: readonly string[] = ['p1']): ScriptedSession {
+function tunnelLinedIn(
+  liningType: string,
+  playerIds: readonly string[] = ['p1'],
+  grade = WEAK_GRADE,
+): ScriptedSession {
   const session = createScriptedSession(playerIds)
   session.submit(1, setLiningType(liningType))
-  buildTunnel(session)
+  buildTunnel(session, grade)
   return session
 }
 
@@ -97,22 +105,22 @@ describe('casing-cement: cement lining reinforces the ground (ticket 367)', () =
     expect(reinforcedTunnelTiles(tunnelLinedIn('refractory'))).toBe(tunnelTiles().length)
   })
 
-  it('never refills a refractory-lined tunnel: each warning ends with its last ring', () => {
+  // Ticket 829: the burst reads the strength grade only; a lining is no strength grade.
+  it('lets a refractory-lined tunnel short of its grade burst all the same', () => {
     const session = tunnelLinedIn('refractory')
-    session.advanceTo(DONE_TICK)
-    const warned = ofType(session.events(), 'CollapseWarned')
-    expect(warned.length).toBeGreaterThan(0)
-    expect(ofType(session.events(), 'CollapseCancelled')).toHaveLength(warned.length)
-    expect(ofType(session.events(), 'CollapseStarted')).toEqual([])
-  })
-
-  it('never warns a block whose open cells are all cased, natural or forced', () => {
-    const standard = tunnelLinedIn('standard')
-    const [weak] = ofType(standard.events(), 'CollapseWarned')
-    const session = tunnelLinedIn('refractory')
-    session.submit(BUILD_TICK + 1, forceCollapseCommand(weak.block))
     session.advanceTo(DONE_TICK)
     expect(weakBlocksNearVehicles(session.state(), PARAMS)).toEqual([])
+    expect(ofType(session.events(), 'CollapseWarned').length).toBeGreaterThan(0)
+    expect(ofType(session.events(), 'CasingBurst').length).toBeGreaterThan(0)
+    expect(reinforcedTunnelTiles(session)).toBeLessThan(tunnelTiles().length)
+  })
+
+  it('never warns a forced collapse in a block whose open cells are all cased', () => {
+    const standard = tunnelLinedIn('standard')
+    const [weak] = ofType(standard.events(), 'CollapseWarned')
+    const session = tunnelLinedIn('refractory', ['p1'], HOLDING_GRADE)
+    session.submit(BUILD_TICK + 1, forceCollapseCommand(weak.block))
+    session.advanceTo(DONE_TICK)
     expect(warningsAfter(session.events(), BUILD_TICK)).toEqual([])
   })
 
@@ -123,8 +131,11 @@ describe('casing-cement: cement lining reinforces the ground (ticket 367)', () =
     expect(reinforcedTunnelTiles(session)).toBe(0)
   })
 
-  it('holds a cased tile for every player, owner or not', () => {
-    const session = tunnelLinedIn('refractory', ['p1', 'p2'])
+  it('holds a cased tile against a forced collapse for every player, owner or not', () => {
+    const standard = tunnelLinedIn('standard')
+    const [weak] = ofType(standard.events(), 'CollapseWarned')
+    const session = tunnelLinedIn('refractory', ['p1', 'p2'], HOLDING_GRADE)
+    session.submit(BUILD_TICK + 1, forceCollapseCommand(weak.block), 'p2')
     session.advanceTo(DONE_TICK)
     expect(session.vehicle('p2').lining.owned).toEqual(['standard'])
     expect(ofType(session.events(), 'CollapseStarted')).toEqual([])

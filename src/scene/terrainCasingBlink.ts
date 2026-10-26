@@ -50,7 +50,7 @@ function writeBlinkUniforms(
   const blocks: Vector4[] = material.uniforms.uBlinkBlocks.value
   for (let at = 0; at < presence.count; at++) {
     const block = presence.slots[at]
-    const share = blinkShareOf(block.elapsedTicks, presence.isMotionReduced)
+    const share = blinkShareOf(block.elapsedTicks, block.holdTicks, presence.isMotionReduced)
     blocks[at].set(block.x0 - renderOrigin.x, block.y0 - renderOrigin.y, block.size, share)
   }
   material.uniforms.uBlinkCount.value = presence.count

@@ -11,8 +11,9 @@
  * - first of all, the braces are brought in line (ticket 331): a braced block is skipped and never
  *   begins its refill, and one whose brace ended warns afresh from this tick;
  * - a reinforced cell (ticket 365) is never filled: its samples stay open and its lining stays;
- * - a block a bare blast rolled (D2 #861) crushes no vehicle, and its refill also leaves the rigs'
- *   cells and every cell a vehicle could not drill open (`blastCollapseOpenCells.ts`).
+ * - a block a bare blast rolled (D2 #861) or a burst (ticket 829) crushes no vehicle, and its refill
+ *   also leaves the rigs' cells and every cell a vehicle could not drill open
+ *   (`blastCollapseOpenCells.ts`); a burst also says `CasingBurst` as its refill starts.
  *
  * Collapse events concern no one player, so they carry only the tick; a crush carries the player
  * whose vehicle it hit. The ground changes as ordinary `GroundChanged`.
@@ -33,13 +34,21 @@ import { crushVehicle, isCrushable } from './collapseCrush'
 import {
   blockOfEntry,
   entryOfBlock,
+  isBurstEntry,
   refillTickOf,
   withoutCollapsingBlock,
   type CollapsingBlock,
 } from './collapseState'
 import { syncCollapseBracesAt } from './collapseBraceSync'
 import { keptOpenCellsOf } from './blastCollapseOpenCells'
-import { cancelCollapse, isCollapseHeld, vehicleBodiesOf, type VehicleBody } from './collapseWatch'
+import { burstOf } from './burstEvents'
+import {
+  cancelCollapse,
+  isCollapseHeld,
+  vehicleBodiesOf,
+  weaknessOf,
+  type VehicleBody,
+} from './collapseWatch'
 
 type TickStep = (state: AuthorityState) => TickOutcome
 
@@ -127,17 +136,33 @@ function crushAndAnnounce(
     vehiclesHit: caught.length,
   }
   const crushed = crushEach(state, caught, bandOfBlock(params, block), tick)
-  return { state: crushed.state, events: [announced, ...crushed.events] }
+  const burst = burstEventsOf(state, params, entry, tick)
+  return { state: crushed.state, events: [announced, ...burst, ...crushed.events] }
 }
 
-/** The crushable vehicles the refill catches; a bare blast's collapse crushes none (D2 #861). */
+/** A burst's own line as its refill starts (ticket 829); none for any other collapse. */
+function burstEventsOf(
+  state: AuthorityState,
+  params: PlanetParams,
+  entry: CollapsingBlock,
+  tick: number,
+): DomainEvent[] {
+  if (!isBurstEntry(entry)) return []
+  const weakness = weaknessOf(state, params, blockOfEntry(entry))
+  return weakness === null ? [] : [{ tick, ...burstOf(state, entry.block, weakness) }]
+}
+
+/**
+ * The crushable vehicles the refill catches; a bare blast's collapse (D2 #861) and a burst
+ * (ticket 829: it never damages the rig) crush none.
+ */
 function crushedBodiesOf(
   state: AuthorityState,
   entry: CollapsingBlock,
   bodies: readonly VehicleBody[],
   isCaught: readonly boolean[],
 ): VehicleBody[] {
-  if (entry.isBlast === true) return []
+  if (entry.isBlast === true || isBurstEntry(entry)) return []
   return bodies.filter(
     ({ playerId }, at) => isCaught[at] && isCrushable(state.players[playerId].vehicle),
   )

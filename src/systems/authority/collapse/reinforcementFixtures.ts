@@ -20,6 +20,8 @@ export interface ReinforcementProbe {
   gates?: Readonly<Record<string, string>>
   /** Answers false everywhere, for an OR across providers. */
   alsoRefusing?: boolean
+  /** Reinforces as lining does (ticket 829): never against a burst. */
+  isLining?: boolean
 }
 
 export function reinforcementProbeSlice(probe: ReinforcementProbe = {}): SliceDefinition {
@@ -37,12 +39,13 @@ export function keyOfTile({ tx, ty }: TilePoint): string {
   return `${tx},${ty}`
 }
 
-function providerOf({ cells, fromTick = 0 }: ReinforcementProbe): ReinforcementProvider {
+function providerOf({ cells, fromTick = 0, isLining }: ReinforcementProbe): ReinforcementProvider {
   const keys = cells === undefined ? null : new Set(cells.map(keyOfTile))
   return {
     id: PROBE_PROVIDER_ID,
     reinforces: (state, tx, ty) =>
       state.tick >= fromTick && (keys === null || keys.has(keyOfTile({ tx, ty }))),
+    ...(isLining === true ? { isLining: true as const } : {}),
   }
 }
 

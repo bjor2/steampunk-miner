@@ -1,7 +1,7 @@
 /**
- * The cells a bare blast's collapse leaves open (D2 #861; the Horizontal Scaler on #861: "a collapse
- * refills cells and keeps their ore. It never damages the rig, never takes money, never seals it
- * in"). The shared refill (`collapseRefill.ts`) already keeps every sample within a body's clearance
+ * The cells a bare blast's collapse and a burst leave open (D2 #861; the Horizontal Scaler on #861:
+ * "a collapse refills cells and keeps their ore. It never damages the rig, never takes money, never
+ * seals it in"; ticket 829 asks the same of a burst). The shared refill (`collapseRefill.ts`) already keeps every sample within a body's clearance
  * open and every reinforced cell; a blast's collapse also keeps open
  *
  * - the cell holding each vehicle's body centre, so it never refills the rig's cell;
@@ -21,18 +21,21 @@ import { isStandingVerdict } from '../../registries/gateChecks'
 import { vehicleOf, type AuthorityState } from '../authorityState'
 import { gateOfTile } from '../cellGates'
 import { ticksPerCell } from '../groundDrill'
-import { reinforcedCellsOf } from './collapseReinforcement'
-import type { CollapsingBlock } from './collapseState'
+import { burstReinforcedCellsOf, reinforcedCellsOf } from './collapseReinforcement'
+import { isBurstEntry, type CollapsingBlock } from './collapseState'
 import { vehicleBodiesOf } from './collapseWatch'
 
-/** The refill's view of the cells it must leave open: reinforced ones, and a blast's own. */
+/**
+ * The refill's view of the cells it must leave open: reinforced ones (for a burst, by more than
+ * lining), and a blast's or a burst's own.
+ */
 export function keptOpenCellsOf(
   state: AuthorityState,
   params: PlanetParams,
   entry: CollapsingBlock,
 ): CellReinforced {
-  const reinforced = reinforcedCellsOf(state)
-  if (entry.isBlast !== true) return reinforced
+  const reinforced = isBurstEntry(entry) ? burstReinforcedCellsOf(state) : reinforcedCellsOf(state)
+  if (entry.isBlast !== true && !isBurstEntry(entry)) return reinforced
   const rigCells = new Set(rigCellsOf(state).map(keyOfTile))
   const isUndrillable = undrillableCellsOf(state, params)
   return (tx, ty) => reinforced(tx, ty) || rigCells.has(`${tx},${ty}`) || isUndrillable(tx, ty)

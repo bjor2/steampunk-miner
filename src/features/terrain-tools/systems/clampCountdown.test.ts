@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { COLLAPSE_WARN_TICKS } from '../../../constants/balance'
 import { TICKS_PER_SECOND } from '../../../constants/physics'
-import { buildWeakTunnel } from '../../../systems/authority/collapse/collapseFixtures'
+import {
+  buildWeakTunnel,
+  WEAK_TUNNEL_HOLD_TICKS,
+} from '../../../systems/authority/collapse/collapseFixtures'
 import { setVehicleLoadoutCommand } from '../../../systems/authority/loadoutCommands'
 import {
   createScriptedSession,
@@ -19,16 +21,18 @@ import { clampLatticeOf } from './clampLattice'
 import { LODE_CLAMP_ID } from './lodeClamp'
 
 // The drawn crack countdown under a lode clamp (ticket 357, #285 follow-up 2): "the countdown
-// freezes while braced and is back at 60 after". The collapse specs' weak band-2 tunnel warns on
-// tick 10; the clamp acts on tick 26, so each braced block is caught with 44 ticks left, and is
-// let go on tick 100. The telegraph reads the frozen value through the kernel's collapseBraces
-// seam, as the scene does each frame.
+// freezes while braced and is back at 60 after", where the full countdown is now the block's own
+// burst hold (ticket 829). The collapse specs' weak band-2 tunnel warns on tick 10 and, one grade
+// short, holds 1200 ticks; the clamp acts on tick 1166, so each braced block is caught with 44 ticks
+// left, and is let go on tick 1240. The telegraph reads the frozen value through the kernel's
+// collapseBraces seam, as the scene does each frame.
 
 const WARN_TICK = 10
-const PRESS_TICK = 20
+const REFILL_TICK = WARN_TICK + WEAK_TUNNEL_HOLD_TICKS
+const PRESS_TICK = REFILL_TICK - 50
 const ACT_TICK = PRESS_TICK + 6
-const RELEASE_TICK = 100
-const CAUGHT_LEFT = COLLAPSE_WARN_TICKS - (ACT_TICK - WARN_TICK)
+const RELEASE_TICK = REFILL_TICK + 30
+const CAUGHT_LEFT = REFILL_TICK - ACT_TICK
 const AFTER_TICKS = 40
 
 function heldClamp(): ScriptedSession {
@@ -48,9 +52,9 @@ function drawnTicksLeftOf(session: ScriptedSession, blocks: readonly string[]): 
     frozenTicksLeftAt(state, block),
   )
   return state.collapse.blocks
-    .map((entry, at) => ({ block: entry.block, progress: slots[at].progress }))
+    .map((entry, at) => ({ block: entry.block, slot: slots[at] }))
     .filter(({ block }) => blocks.includes(block))
-    .map(({ progress }) => Math.round(COLLAPSE_WARN_TICKS * (1 - progress)))
+    .map(({ slot }) => Math.round(slot.holdTicks * (1 - slot.progress)))
 }
 
 /** Steps the session frame by frame to `untilTick`, noting each frame's tick and drawn countdown. */
@@ -89,11 +93,11 @@ describe('lode clamp: the drawn crack countdown (ticket 357)', () => {
     const session = heldClamp()
     const braced = bracedBlocksOf(session)
     session.submit(RELEASE_TICK, intentToReleaseSlot('powerup.1'))
-    expect(drawnTicksLeftOf(session, braced)).toEqual(braced.map(() => COLLAPSE_WARN_TICKS))
+    expect(drawnTicksLeftOf(session, braced)).toEqual(braced.map(() => WEAK_TUNNEL_HOLD_TICKS))
     for (let after = 1; after <= AFTER_TICKS; after++) {
       session.advanceTo(RELEASE_TICK + after)
       expect(drawnTicksLeftOf(session, braced)).toEqual(
-        braced.map(() => COLLAPSE_WARN_TICKS - after),
+        braced.map(() => WEAK_TUNNEL_HOLD_TICKS - after),
       )
     }
   })
@@ -106,7 +110,7 @@ describe('lode clamp: the drawn crack countdown (ticket 357)', () => {
     session.submit(RELEASE_TICK, intentToReleaseSlot('powerup.1'))
     const after = drawnByFrame(session, braced, framesPerSecond, RELEASE_TICK + AFTER_TICKS)
     for (const { tick, left } of after) {
-      expect(left).toEqual(braced.map(() => COLLAPSE_WARN_TICKS - (tick - RELEASE_TICK)))
+      expect(left).toEqual(braced.map(() => WEAK_TUNNEL_HOLD_TICKS - (tick - RELEASE_TICK)))
     }
   })
 })

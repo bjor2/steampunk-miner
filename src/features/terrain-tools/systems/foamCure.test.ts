@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { COLLAPSE_WARN_TICKS } from '../../../constants/balance'
 import { recordDomainEventsTo } from '../../../logging/domainEventLog'
 import { createMemorySink } from '../../../logging/eventSink'
 import { createRunLog } from '../../../logging/runLog'
@@ -11,6 +10,7 @@ import {
   poseAt,
   TUNNEL_FROM_X,
   TUNNEL_TO_X,
+  WEAK_TUNNEL_HOLD_TICKS,
 } from '../../../systems/authority/collapse/collapseFixtures'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import { setVehicleLoadoutCommand } from '../../../systems/authority/loadoutCommands'
@@ -37,13 +37,14 @@ import { foamCureMark, foamedCellsOf, sprayFoam, STABILISER_FOAM_ID } from './st
 // they never refill and a block whose open cells are all cured never warns again; below that Mark
 // foam only holds for its 600 ticks. Each new cured cell is billed one cell of standard first
 // lining at its own band. The scene is the collapse specs' weak band-2 tunnel: its blocks warn on
-// tick 10, and foam sprayed on tick 20 lapses on tick 620.
+// tick 10 and, one grade short, would burst on tick 1210 (ticket 829's 1200-tick hold); foam
+// sprayed 50 ticks before that lapses 600 ticks later, and a lapsed block warns for its full hold.
 
 const FOAM_SLOT = { 'powerup.1': STABILISER_FOAM_ID }
 const WARN_TICK = 10
-const SPRAY_TICK = 20
+const SPRAY_TICK = WARN_TICK + WEAK_TUNNEL_HOLD_TICKS - 50
 const LAPSE_TICK = SPRAY_TICK + 600
-const AFTER_REFILL_TICK = LAPSE_TICK + COLLAPSE_WARN_TICKS + 10
+const AFTER_REFILL_TICK = LAPSE_TICK + WEAK_TUNNEL_HOLD_TICKS + 10
 const TUNNEL_MIDDLE_X = (TUNNEL_FROM_X + TUNNEL_TO_X) / 2
 /** Far enough down the tree that every foam Mark is researched (a Mark every 3 planets). */
 const EVERY_MARK_PLANET = 60

@@ -9,6 +9,7 @@ import { FACING, type Facing } from '../../vehicle/vehiclePose'
 import type { CommandIntent } from '../authorityCommand'
 import { FREEZE_ENEMIES, GROUND, poseAbove, type ScriptedSession } from '../scriptedSession'
 import { stepOfMajor } from '../../economy/upgradeSteps'
+import { burstHoldTicks } from './burstHold'
 
 export const BAND_1_Y = 280500
 export const BAND_2_Y = 252500
@@ -97,8 +98,15 @@ export function parkAt(
 }
 
 /**
+ * How long the weak tunnel's blocks warn before they burst: it is one grade short of band 2, so
+ * 20 s (ticket 829, `burstHold.ts`).
+ */
+export const WEAK_TUNNEL_HOLD_TICKS = burstHoldTicks(1n)
+
+/**
  * A band-2 tunnel carved and lined at grade 1 with the ground's debug commands while the vehicle
- * sits in its middle: its blocks warn as soon as the lining is laid. It is the drill stamp's width,
+ * sits in its middle: its blocks warn as soon as the lining is laid, and burst after
+ * `WEAK_TUNNEL_HOLD_TICKS`. It is the drill stamp's width,
  * so the rings line its wall (ticket 662).
  */
 export function weakTunnelIntents(): CommandIntent[] {

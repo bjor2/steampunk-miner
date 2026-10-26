@@ -319,6 +319,12 @@ export const ARTEFACT_CACHE_OVERLAP_MM = 950
  */
 export const COLLAPSE_WARN_TICKS = 60
 export const COLLAPSE_FILL_TICKS = 30
+/**
+ * A burst's hold one grade short (ticket 829, Systems' row in the GD lock on casing grades by
+ * depth: `max(1 s, 20 s / 2^(delta - 1))`): 20 s, halving with each grade more short, never under
+ * #43's 1 s (`COLLAPSE_WARN_TICKS`).
+ */
+export const BURST_HOLD_ONE_SHORT_TICKS = 1200
 export const COLLAPSE_ACTIVE_RADIUS_MM = 16000
 /** A collapse block is the 4x4 m collision block (#36), 16 density samples a side. */
 export const COLLAPSE_BLOCK_SAMPLES = 16

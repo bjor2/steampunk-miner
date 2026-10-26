@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { COLLAPSE_WARN_TICKS } from '../../../constants/balance'
 import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { recordDomainEventsTo } from '../../../logging/domainEventLog'
 import { createMemorySink } from '../../../logging/eventSink'
@@ -9,7 +8,10 @@ import { withRegistrations } from '../../../registries/registrar'
 import type { SliceDefinition } from '../../../registries/sliceDefinition'
 import { advanceTicks } from '../../../systems/authority/advanceTicks'
 import type { AuthorityState } from '../../../systems/authority/authorityState'
-import { buildWeakTunnel } from '../../../systems/authority/collapse/collapseFixtures'
+import {
+  buildWeakTunnel,
+  WEAK_TUNNEL_HOLD_TICKS,
+} from '../../../systems/authority/collapse/collapseFixtures'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import { setVehicleLoadoutCommand } from '../../../systems/authority/loadoutCommands'
 import { BELOW_FLOOR, FLOOR, onHeatPlanet } from '../../../systems/authority/lava/lavaFixtures'
@@ -44,15 +46,16 @@ import { terrainToolsOf, terrainToolsStateProblems } from './terrainSection'
 // Stabiliser foam (the GD default ruling and the HS and VS pins on #381, ticket 381): a spray sets
 // foam on a forward cone of radius 2, never on a gated, core or lava cell, and holds every collapse
 // block under a set cell for 600 ticks through a timed `collapseBraces` provider beside the lode
-// clamp's. When the foam lapses the block warns afresh for 60 ticks; spraying again moves the end
-// on, never adds to it, and a clamp over the same block never stacks with it. The scene is the
-// collapse specs' weak band-2 tunnel: its blocks warn on tick 10 and would refill on tick 70.
+// clamp's. When the foam lapses the block warns afresh for its full hold; spraying again moves the
+// end on, never adds to it, and a clamp over the same block never stacks with it. The scene is the
+// collapse specs' weak band-2 tunnel: its blocks warn on tick 10 and, one grade short, would burst
+// on tick 1210 (ticket 829's 1200-tick hold), so the foam goes on 50 ticks before that.
 
 const FOAM_SLOT = { 'powerup.1': STABILISER_FOAM_ID }
 const WARN_TICK = 10
-const REFILL_TICK = WARN_TICK + COLLAPSE_WARN_TICKS
+const REFILL_TICK = WARN_TICK + WEAK_TUNNEL_HOLD_TICKS
 /** Foam is a consumable with no wind-up: it acts on the press. */
-const SPRAY_TICK = 20
+const SPRAY_TICK = REFILL_TICK - 50
 const BRACE_TICKS = 600
 const LAPSE_TICK = SPRAY_TICK + BRACE_TICKS
 const STEP_RATES = [30, 144] as const
@@ -201,14 +204,16 @@ describe('stabiliser foam: the timed brace', () => {
     expect(braced).toMatchObject(expected.map(() => ({ by: ['terrain-tools.stabiliser-foam'] })))
   })
 
-  it('holds its blocks past their refill for 600 ticks, then warns them afresh for 60', () => {
+  it('holds its blocks past their refill for 600 ticks, then warns them afresh for their full hold', () => {
     const session = sprayedTunnel()
-    session.advanceTo(LAPSE_TICK + COLLAPSE_WARN_TICKS + 10)
+    session.advanceTo(LAPSE_TICK + WEAK_TUNNEL_HOLD_TICKS + 10)
     const braced = blocksOf(session.events(), 'CollapseBraced')
     expect(braced.length).toBeGreaterThan(0)
     for (const block of braced) {
       expect(ticksOf(session, 'CollapseWarned', block)).toEqual([WARN_TICK, LAPSE_TICK])
-      expect(ticksOf(session, 'CollapseStarted', block)).toEqual([LAPSE_TICK + COLLAPSE_WARN_TICKS])
+      expect(ticksOf(session, 'CollapseStarted', block)).toEqual([
+        LAPSE_TICK + WEAK_TUNNEL_HOLD_TICKS,
+      ])
     }
     const unbraced = blocksOf(session.events(), 'CollapseWarned').filter(
       (block) => !braced.includes(block),
@@ -222,7 +227,7 @@ describe('stabiliser foam: the timed brace', () => {
     const again = SPRAY_TICK + 200
     const session = sprayedTunnel()
     session.submit(again, press())
-    session.advanceTo(again + BRACE_TICKS + COLLAPSE_WARN_TICKS + 10)
+    session.advanceTo(again + BRACE_TICKS + WEAK_TUNNEL_HOLD_TICKS + 10)
     const braced = blocksOf(session.events(), 'CollapseBraced')
     expect(braced.length).toBeGreaterThan(0)
     for (const block of braced) {
@@ -244,15 +249,15 @@ describe('stabiliser foam: the timed brace', () => {
     const session = foamTunnel({ 'powerup.1': STABILISER_FOAM_ID, 'powerup.2': LODE_CLAMP_ID })
     session.submit(SPRAY_TICK, press())
     session.submit(SPRAY_TICK, press('powerup.2'))
-    session.advanceTo(50)
+    session.advanceTo(SPRAY_TICK + 30)
     const clamped = new Set(bracedBlocksOf(session.state(), 'p1'))
     const braced = new Set(blocksOf(session.events(), 'CollapseBraced'))
-    const both = claimedBlocks(session.state(), 50).filter(
+    const both = claimedBlocks(session.state(), SPRAY_TICK + 30).filter(
       (block) => clamped.has(block) && braced.has(block),
     )
     expect(both.length).toBeGreaterThan(0)
-    session.submit(100, intentToReleaseSlot('powerup.2'))
-    session.advanceTo(LAPSE_TICK + COLLAPSE_WARN_TICKS + 10)
+    session.submit(SPRAY_TICK + 80, intentToReleaseSlot('powerup.2'))
+    session.advanceTo(LAPSE_TICK + WEAK_TUNNEL_HOLD_TICKS + 10)
     for (const block of both) {
       expect(ticksOf(session, 'CollapseWarned', block)).toEqual([WARN_TICK, LAPSE_TICK])
     }
@@ -278,7 +283,7 @@ describe('stabiliser foam: replay and save', () => {
     const runs = STEP_RATES.map((rate) => {
       const session = foamTunnel()
       session.submit(SPRAY_TICK, press())
-      stepInFrames(session, rate, LAPSE_TICK + COLLAPSE_WARN_TICKS + 10)
+      stepInFrames(session, rate, LAPSE_TICK + WEAK_TUNNEL_HOLD_TICKS + 10)
       return { events: session.events(), digest: stateDigest(session.state()) }
     })
     expect(runs[1]).toEqual(runs[0])
@@ -290,8 +295,8 @@ describe('stabiliser foam: replay and save', () => {
     const loaded = readSnapshot(JSON.parse(JSON.stringify(takeSnapshot(session.state()))))
     if (!('state' in loaded)) throw new Error(loaded.problems.join('; '))
     expect(foamedCellsOf(loaded.state, 'p1')).toEqual(foamedCellsOf(session.state(), 'p1'))
-    const original = advanceTicks(session.state(), BRACE_TICKS)
-    const resumed = advanceTicks(loaded.state, BRACE_TICKS)
+    const original = advanceTicks(session.state(), LAPSE_TICK - 20)
+    const resumed = advanceTicks(loaded.state, LAPSE_TICK - 20)
     expect(resumed.events).toEqual(original.events)
     expect(stateDigest(resumed.state)).toBe(stateDigest(original.state))
   })

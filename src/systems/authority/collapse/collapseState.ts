@@ -15,6 +15,13 @@
  *
  * A braced block (ticket 331, `collapseBraces`) stays in its warning past its refill tick and
  * never refills; when its brace ends it warns afresh from that tick (`collapseBraceSync.ts`).
+ *
+ * A burst (ticket 829: lining short of the grade its cell needs, every block that is neither forced
+ * nor a blast's) warns for its own hold, `burstHoldTicks` of how many grades short it is, written
+ * on the entry so a save, a load and a replay fire it on the same tick; every other block warns for
+ * `COLLAPSE_WARN_TICKS`. A burst crushes no vehicle and leaves the rig's cell and every cell a
+ * vehicle could not drill open, as a blast's collapse does (the GD: a burst never damages the rig,
+ * costs money or seals it in).
  */
 import { COLLAPSE_FILL_TICKS, COLLAPSE_WARN_TICKS } from '../../../constants/balance'
 import { bracesAt, type CollapseBrace } from '../../registries/collapseBraces'
@@ -38,6 +45,11 @@ export interface CollapsingBlock {
    * no vehicle and leaves the cells `blastCollapseOpenCells.ts` names open.
    */
   isBlast?: true
+  /**
+   * The ticks the warning holds before the refill (ticket 829's burst timer); absent holds
+   * `COLLAPSE_WARN_TICKS`, so a session with no burst keeps its snapshot and digest.
+   */
+  holdTicks?: number
 }
 
 export interface CollapseState {
@@ -47,7 +59,17 @@ export interface CollapseState {
 export const NO_COLLAPSE: CollapseState = { blocks: [] }
 
 export function refillTickOf(entry: CollapsingBlock): number {
-  return entry.startTick + COLLAPSE_WARN_TICKS
+  return entry.startTick + holdTicksOf(entry)
+}
+
+/** How long the block warns before its refill: its burst's hold, or #43's 60 ticks. */
+export function holdTicksOf(entry: CollapsingBlock): number {
+  return entry.holdTicks ?? COLLAPSE_WARN_TICKS
+}
+
+/** Lining too weak for its cell's grade: neither forced nor rolled by a blast (ticket 829). */
+export function isBurstEntry(entry: CollapsingBlock): boolean {
+  return !entry.isForced && entry.isBlast !== true
 }
 
 /** The first tick after the refill's last step. */

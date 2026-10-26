@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { COLLAPSE_WARN_TICKS } from '../../../constants/balance'
 import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { recordDomainEventsTo } from '../../../logging/domainEventLog'
 import { createMemorySink } from '../../../logging/eventSink'
@@ -7,7 +6,10 @@ import { createRunLog } from '../../../logging/runLog'
 import { runEventProblems } from '../../../logging/runEventSchema'
 import { advanceTicks } from '../../../systems/authority/advanceTicks'
 import type { AuthorityState } from '../../../systems/authority/authorityState'
-import { buildWeakTunnel } from '../../../systems/authority/collapse/collapseFixtures'
+import {
+  buildWeakTunnel,
+  WEAK_TUNNEL_HOLD_TICKS,
+} from '../../../systems/authority/collapse/collapseFixtures'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import { carveCircleCommand } from '../../../systems/authority/groundCommands'
 import { setVehicleLoadoutCommand } from '../../../systems/authority/loadoutCommands'
@@ -35,23 +37,29 @@ import { terrainToolsOf } from './terrainSection'
 // The lode clamp (GD lock on #246, the anchor verb; the GD, TD and G&V lines on #285, ticket 285):
 // a field held from its slot pins up to 8 diggable cells, moves none, and braces every collapse
 // block that contains or borders one. Every way the field ends (release, its length, a dry tank)
-// gives each braced block a fresh 60-tick warning, logs `magnet_used` once and starts the cooldown.
-// The scene is the collapse specs' weak band-2 tunnel: its blocks warn on tick 10 and would refill
-// on tick 70, the miner at rest in its middle with the clamp in slot 1.
+// gives each braced block a fresh warning of its full hold, logs `magnet_used` once and starts the
+// cooldown. The scene is the collapse specs' weak band-2 tunnel, the miner at rest in its middle
+// with the clamp in slot 1: its blocks warn on tick 10 and, one grade short, would burst on tick
+// 1210 (ticket 829's 1200-tick hold), so the clamp is pressed 50 ticks before that, as it was before
+// the refill when every warning held 60.
 
 const CLAMP_SLOT = { 'powerup.1': LODE_CLAMP_ID }
 const WARN_TICK = 10
-const REFILL_TICK = WARN_TICK + COLLAPSE_WARN_TICKS
-const PRESS_TICK = 20
+const REFILL_TICK = WARN_TICK + WEAK_TUNNEL_HOLD_TICKS
+const PRESS_TICK = REFILL_TICK - 50
 /** The clamp's wind-up is 6 ticks (terrain-tools.economy.json). */
 const ACT_TICK = PRESS_TICK + 6
 /** Mark 0 holds for the bought 180 ticks. */
 const FINISH_TICK = ACT_TICK + 180
-const RELEASE_TICK = 100
+const RELEASE_TICK = REFILL_TICK + 30
 /** Half a unit: 120 quanta, 30 ticks of the drill's draw. */
-const LOW_TANK_TICK = 40
+const LOW_TANK_TICK = REFILL_TICK - 30
 const LOW_TANK_UNITS = '0.5'
 const STEP_RATES = [30, 144] as const
+/** Past the fresh warning of a block the field let go of by its length (ticket 829's hold). */
+const PAST_FRESH_BURST_TICK = FINISH_TICK + WEAK_TUNNEL_HOLD_TICKS + 30
+/** The clamp's cooldown (terrain-tools.economy.json). */
+const COOLDOWN_TICKS = 1200
 
 /** The weak tunnel with the clamp slotted, warning from `WARN_TICK`. */
 function clampTunnel(): ScriptedSession {
@@ -101,15 +109,24 @@ function endTickOf(session: ScriptedSession): number {
   return used.tick
 }
 
-/** A field held from `ACT_TICK`, ended the way `end` names; answers the session past the refill. */
-function endedBy(end: 'release' | 'duration' | 'dry tank'): ScriptedSession {
+/** A field held from `ACT_TICK`, ended the way `end` names; answers the session at `untilTick`. */
+function endedBy(
+  end: 'release' | 'duration' | 'dry tank',
+  untilTick = PAST_FRESH_BURST_TICK,
+): ScriptedSession {
   const session = heldClamp()
   if (end === 'release') session.submit(RELEASE_TICK, intentToReleaseSlot('powerup.1'))
   if (end === 'dry tank')
     session.submit(LOW_TANK_TICK, { type: 'debug.setEnergy', payload: { energy: LOW_TANK_UNITS } })
-  session.advanceTo(FINISH_TICK + COLLAPSE_WARN_TICKS + 30)
+  session.advanceTo(untilTick)
   return session
 }
+
+/** What a burst's first step logs: its start and the ground it begins to refill. */
+const BURST_STEP_TYPES: readonly string[] = ['CollapseStarted', 'CasingBurst', 'GroundChanged']
+
+const withoutBurstStep = (events: readonly DomainEvent[]) =>
+  events.filter(({ type }) => !BURST_STEP_TYPES.includes(type))
 
 function magnetUsedLines(session: ScriptedSession) {
   const sink = createMemorySink()
@@ -195,18 +212,46 @@ describe('lode clamp: the brace', () => {
 
 describe('lode clamp: every way the field ends behaves the same', () => {
   it.each(['release', 'duration', 'dry tank'] as const)(
-    'gives every braced block a fresh 60-tick warning when the field ends by %s',
+    'gives every braced block a fresh warning of its full hold when the field ends by %s',
     (end) => {
       const session = endedBy(end)
       const endTick = endTickOf(session)
       const braced = bracedBlocks(session)
       expect(braced.length).toBeGreaterThan(0)
+      const fresh = session
+        .events()
+        .flatMap((event) =>
+          event.type === 'CasingBurstWarned' && event.tick === endTick ? [event] : [],
+        )
       for (const block of braced) {
         expect(warnTicksOf(session, block)).toEqual([WARN_TICK, endTick])
-        expect(startTicksOf(session, block)).toEqual([endTick + COLLAPSE_WARN_TICKS])
+        expect(fresh.find((warned) => warned.block === block)?.holdTicks).toBe(
+          WEAK_TUNNEL_HOLD_TICKS,
+        )
       }
     },
   )
+
+  it.each(['release', 'duration'] as const)(
+    'bursts every braced block its full hold after the field ends by %s',
+    (end) => {
+      const session = endedBy(end)
+      const endTick = endTickOf(session)
+      for (const block of bracedBlocks(session)) {
+        expect(startTicksOf(session, block)).toEqual([endTick + WEAK_TUNNEL_HOLD_TICKS])
+      }
+    },
+  )
+
+  // A dry tank strands the rig and the tow takes it home well inside the 20 s hold, so the fresh
+  // warnings are cancelled with no vehicle within 16 m (#43 acceptance 7, ticket 829's hold).
+  it('cancels the fresh warnings once the tow takes a dry rig away, bursting none', () => {
+    const session = endedBy('dry tank')
+    for (const block of bracedBlocks(session)) {
+      expect(startTicksOf(session, block)).toEqual([])
+    }
+    expect(ofType(session.events(), 'CollapseCancelled').length).toBeGreaterThan(0)
+  })
 
   it('ends on the release tick, at its length, or on the tick the tank runs dry', () => {
     expect(endTickOf(endedBy('release'))).toBe(RELEASE_TICK)
@@ -221,12 +266,15 @@ describe('lode clamp: every way the field ends behaves the same', () => {
   it.each(['release', 'duration', 'dry tank'] as const)(
     'counts the cooldown from the end by %s',
     (end) => {
-      const session = endedBy(end)
+      const session = endedBy(end, FINISH_TICK)
       const endTick = endTickOf(session)
-      session.submit(endTick + 1200 - 1, { type: 'debug.setEnergy', payload: { energy: '100' } })
-      const early = session.submit(endTick + 1200 - 1, press())
+      const readyTick = endTick + COOLDOWN_TICKS
+      session.submit(readyTick - 1, { type: 'debug.setEnergy', payload: { energy: '100' } })
+      const early = session.submit(readyTick - 1, press())
       expect(early).toMatchObject([{ reason: 'power-up-core.cooling_down' }])
-      expect(session.submit(endTick + 1200, press())).toEqual([])
+      // The braced blocks' fresh warning holds as long as the cooldown (ticket 829), so their burst
+      // lands on this tick beside the press.
+      expect(withoutBurstStep(session.submit(readyTick, press()))).toEqual([])
     },
   )
 
@@ -269,7 +317,7 @@ describe('lode clamp: draw and log', () => {
       session.submit(PRESS_TICK, press())
       stepInFrames(session, rate, RELEASE_TICK)
       session.submit(RELEASE_TICK, intentToReleaseSlot('powerup.1'))
-      stepInFrames(session, rate, RELEASE_TICK + COLLAPSE_WARN_TICKS + 10)
+      stepInFrames(session, rate, RELEASE_TICK + WEAK_TUNNEL_HOLD_TICKS + 10)
       return { events: session.events(), digest: stateDigest(session.state()) }
     })
     expect(runs[1]).toEqual(runs[0])
@@ -281,8 +329,8 @@ describe('lode clamp: draw and log', () => {
     const loaded = readSnapshot(JSON.parse(JSON.stringify(takeSnapshot(session.state()))))
     if (!('state' in loaded)) throw new Error(loaded.problems.join('; '))
     expect(fieldCells(loaded.state)).toEqual(fieldCells(session.state()))
-    const original = advanceTicks(session.state(), 300)
-    const resumed = advanceTicks(loaded.state, 300)
+    const original = advanceTicks(session.state(), PAST_FRESH_BURST_TICK)
+    const resumed = advanceTicks(loaded.state, PAST_FRESH_BURST_TICK)
     expect(ofType(original.events, 'terrain-tools.MagnetUsed')).toHaveLength(1)
     expect(resumed.events).toEqual(original.events)
     expect(stateDigest(resumed.state)).toBe(stateDigest(original.state))

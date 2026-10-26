@@ -12,6 +12,7 @@
  */
 import {
   isCommandCaused,
+  type BurstReport,
   type DomainEvent,
   type DomainEventBodies,
   type KernelDomainEventType,
@@ -120,6 +121,11 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'collapse',
     data: { block, samplesFilled, vehiclesHit },
   }),
+  CasingBurstWarned: ({ holdTicks, ...burst }) => ({
+    event: 'casing_burst_warning',
+    data: { ...burstFieldsOf(burst), holdTicks },
+  }),
+  CasingBurst: (burst) => ({ event: 'casing_burst', data: burstFieldsOf(burst) }),
   BoreFired: ({ aimed, bearing, rangeCells }) => ({
     event: 'bore_fired',
     data: { aimed, bearing, rangeCells },
@@ -499,4 +505,15 @@ export function causeOf(event: DomainEvent): { cmd?: CommandRef } {
  */
 function gradeToLog(grade: bigint): number {
   return countAsSafeInteger(grade)
+}
+
+/** A burst's fields with its grades as the log's integers (ticket 829). */
+function burstFieldsOf(burst: BurstReport) {
+  const { grade, required, delta, ...place } = burst
+  return {
+    ...place,
+    grade: gradeToLog(grade),
+    required: gradeToLog(required),
+    delta: gradeToLog(delta),
+  }
 }

@@ -18,6 +18,8 @@
  * steps, so a brace a slice ends on tick t is seen on tick t. A refill already under way is never
  * braced. With nothing collapsing it reads no registry and does nothing.
  */
+import { burstWarnedOf } from './burstEvents'
+import { burstHoldTicks, gradesShortOf } from './burstHold'
 import type { CollapseBrace } from '../../registries/collapseBraces'
 import { bracesAt } from '../../registries/collapseBraces'
 import type { PlanetParams } from '../../world/planetParams'
@@ -25,10 +27,12 @@ import type { BlockWeakness } from '../../world/collapseWeakness'
 import { withCollapse, type AuthorityState } from '../authorityState'
 import { chainEffects, unchanged, type RuleEffect } from '../commandRule'
 import type { TickOutcome } from '../combat/combatTick'
-import type { DomainEvent } from '../domainEvent'
+import type { DomainEvent, DomainEventBody } from '../domainEvent'
 import { planetParamsOf } from '../planetOfState'
 import {
   blockOfEntry,
+  holdTicksOf,
+  isBurstEntry,
   refillTickOf,
   withCollapsingBlock,
   type CollapsingBlock,
@@ -120,7 +124,17 @@ function endBrace(
   const { isBraced: _ended, ...unbraced } = entry
   const weakness = heldWeaknessOf(state, params, unbraced)
   if (weakness === null) return cancelCollapse(state, entry.block)
-  return warnAfresh(state, { ...unbraced, startTick: tick }, weakness)
+  return warnAfresh(state, freshEntryOf(unbraced, tick, weakness), weakness)
+}
+
+/** The entry warning afresh from `tick`; a burst's hold read again from its walls (ticket 829). */
+function freshEntryOf(
+  entry: CollapsingBlock,
+  tick: number,
+  weakness: BlockWeakness,
+): CollapsingBlock {
+  if (!isBurstEntry(entry)) return { ...entry, startTick: tick }
+  return { ...entry, startTick: tick, holdTicks: burstHoldTicks(gradesShortOf(weakness)) }
 }
 
 /** The block's warning restarted from its new `startTick`, said as a new warning says it. */
@@ -131,8 +145,17 @@ function warnAfresh(
 ): RuleEffect {
   return {
     state: withCollapse(state, withCollapsingBlock(state.collapse, entry)),
-    events: [collapseWarnedOf(entry.block, weakness)],
+    events: [collapseWarnedOf(entry.block, weakness), ...burstWarningsOf(state, entry, weakness)],
   }
+}
+
+function burstWarningsOf(
+  state: AuthorityState,
+  entry: CollapsingBlock,
+  weakness: BlockWeakness,
+): DomainEventBody[] {
+  if (!isBurstEntry(entry)) return []
+  return [burstWarnedOf(state, entry.block, weakness, holdTicksOf(entry))]
 }
 
 /**

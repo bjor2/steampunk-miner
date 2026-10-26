@@ -68,6 +68,18 @@ const HELD_STEP = {
   reserveLeft: { optional: 'money' },
 } as const satisfies PayloadFields
 
+/** What a burst's two lines name (ticket 829). */
+const BURST_FIELDS = {
+  block: 'text',
+  system: 'text',
+  place: 'text',
+  tx: 'integer',
+  ty: 'integer',
+  grade: 'integer',
+  required: 'integer',
+  delta: 'integer',
+} as const satisfies PayloadFields
+
 export const RUN_EVENT_REGISTRY = {
   // Run
   game_started: {
@@ -872,6 +884,15 @@ export const RUN_EVENT_REGISTRY = {
     level: 'core',
     payload: { block: 'text', samplesFilled: 'integer', vehiclesHit: 'integer' },
   },
+  // Ticket 829: lining short of the grade its cell needs warns for max(1 s, 20 s / 2^(delta - 1))
+  // and then bursts, the block's `collapse_warning` and `collapse` beside them. `system` and `place`
+  // are the planet's star-map address as index text; the cell is the weakest wall's.
+  casing_burst_warning: {
+    group: 'mining',
+    level: 'core',
+    payload: { ...BURST_FIELDS, holdTicks: 'integer' },
+  },
+  casing_burst: { group: 'mining', level: 'core', payload: BURST_FIELDS },
   // Ticket 861 (D2): a bare blast's collapse roll on one rim block, a draw of 0 to 9999 basis points
   // from hash(worldSeed, s, p, block, blastSeq) against its size's `collapseBp`; under it the block
   // collapses, logged as `collapse_warning` then `collapse` like any other. Sizes of chance 0 roll

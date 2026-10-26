@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { FACING } from '../vehicle/vehiclePose'
 import { blockContaining, blockIdOf } from '../world/collapseBlock'
-import { BAND_1_Y, BAND_2_Y, digAlong, poseAt, prepareDigger } from './collapse/collapseFixtures'
+import {
+  BAND_1_Y,
+  BAND_2_Y,
+  digAlong,
+  poseAt,
+  prepareDigger,
+  WEAK_TUNNEL_HOLD_TICKS,
+} from './collapse/collapseFixtures'
 import type { DomainEvent } from './domainEvent'
 import { createScriptedSession, type ScriptedSession } from './scriptedSession'
 
@@ -117,12 +124,14 @@ describe('breached casing in play (#94 acceptance 5 and 9)', () => {
     const { session, tick } = linedBandTwoTunnel()
     GNAWED_XS.forEach((x) => session.submit(tick, gnawAt(x)))
     const near = driveBack(session, tick + 1, DIG_TO_X, NEAR_X)
-    session.advanceTo(near + 120)
+    // A breach holds one grade under its band: the stretch bursts its 20 s hold later (ticket 829).
+    const burst = near + WEAK_TUNNEL_HOLD_TICKS + 60
+    session.advanceTo(burst)
     expect(ofType(session.events(), 'CollapseStarted').map(({ block }) => block)).toContain(
       GNAWED_BLOCK,
     )
     const before = session.events().length
-    digAlong(session, near + 121, BAND_2_Y, NEAR_X, DIG_FROM_X)
+    digAlong(session, burst + 1, BAND_2_Y, NEAR_X, DIG_FROM_X)
     expect(ofType(session.events().slice(before), 'CasingLined').length).toBeGreaterThan(0)
   })
 })

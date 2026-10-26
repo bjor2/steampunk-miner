@@ -26,14 +26,17 @@ import {
   poseAt,
   TUNNEL_FROM_X,
   TUNNEL_TO_X,
+  WEAK_TUNNEL_HOLD_TICKS,
 } from './collapseFixtures'
 import { nextCollapseTick } from './collapseState'
 
-// The weak band-2 tunnel warns its blocks at tick 10, so each would refill at 70.
+// The weak band-2 tunnel warns its blocks at tick 10, one grade short, so each would burst its
+// 20 s hold later (ticket 829); a brace caught before that ends past it.
 const WARN_TICK = 10
-const REFILL_TICK = WARN_TICK + COLLAPSE_WARN_TICKS
+const HOLD = WEAK_TUNNEL_HOLD_TICKS
+const REFILL_TICK = WARN_TICK + HOLD
 const BRACE_TICK = 20
-const END_TICK = 200
+const END_TICK = REFILL_TICK + 190
 const TUNNEL_MIDDLE_X = (TUNNEL_FROM_X + TUNNEL_TO_X) / 2
 
 /** The weak tunnel with the probe slice registered, and the first block it warned. */
@@ -56,14 +59,14 @@ const startTicksOf = (session: ScriptedSession, block: string) =>
     .filter((event) => event.block === block)
     .map(({ tick }) => tick)
 
-/** What a brace that ends on `END_TICK` must leave: a fresh warning then, the refill 60 later. */
+/** What a brace that ends on `END_TICK` must leave: a fresh warning then, the burst its hold later. */
 function expectFreshWarningAtEnd(session: ScriptedSession, block: string): void {
-  session.advanceTo(END_TICK + COLLAPSE_WARN_TICKS - 1)
+  session.advanceTo(END_TICK + HOLD - 1)
   expect(startTicksOf(session, block)).toEqual([])
-  session.advanceTo(END_TICK + COLLAPSE_WARN_TICKS)
+  session.advanceTo(END_TICK + HOLD)
   const warned = ofType(session.events(), 'CollapseWarned').filter((event) => event.block === block)
   expect(warned.map(({ tick }) => tick)).toEqual([WARN_TICK, END_TICK])
-  expect(startTicksOf(session, block)).toEqual([END_TICK + COLLAPSE_WARN_TICKS])
+  expect(startTicksOf(session, block)).toEqual([END_TICK + HOLD])
 }
 
 describe('collapse braces: holding a warning (ticket 331)', () => {
@@ -79,11 +82,11 @@ describe('collapse braces: holding a warning (ticket 331)', () => {
       expect(startTicksOf(session, block)).toEqual([])
       expect(startTicksOf(session, others[0])).toEqual([REFILL_TICK])
       expect(session.state().collapse.blocks).toEqual([
-        { block, startTick: WARN_TICK, isForced: false, isBraced: true },
+        { block, startTick: WARN_TICK, isForced: false, holdTicks: HOLD, isBraced: true },
       ])
     }))
 
-  it('warns afresh on the tick a release command ends the brace, and refills 60 ticks later', () =>
+  it('warns afresh on the tick a release command ends the brace, and bursts its hold later', () =>
     withRegistrations([braceProbeSlice()], () => {
       const { session, block } = braceableTunnel()
       session.submit(BRACE_TICK, braceCommand([block]))
@@ -125,6 +128,7 @@ describe('collapse braces: a brace never keeps a warning alive (ticket 331)', ()
       session.advanceTo(400)
       expect(eventsOfBlock(session, block).map(({ type, tick }) => [type, tick])).toEqual([
         ['CollapseWarned', WARN_TICK],
+        ['CasingBurstWarned', WARN_TICK],
         ['CollapseBraced', BRACE_TICK],
         ['CollapseCancelled', 30],
       ])
@@ -135,9 +139,10 @@ describe('collapse braces: a brace never keeps a warning alive (ticket 331)', ()
       const { session, block } = braceableTunnel()
       session.submit(BRACE_TICK, braceCommand([block]))
       session.submit(REFILL_TICK + 20, poseAt(TUNNEL_MIDDLE_X + 40000, BAND_2_Y))
-      session.advanceTo(400)
+      session.advanceTo(REFILL_TICK + 400)
       expect(eventsOfBlock(session, block).map(({ type, tick }) => [type, tick])).toEqual([
         ['CollapseWarned', WARN_TICK],
+        ['CasingBurstWarned', WARN_TICK],
         ['CollapseBraced', BRACE_TICK],
         ['CollapseCancelled', REFILL_TICK + 20],
       ])
@@ -147,9 +152,10 @@ describe('collapse braces: a brace never keeps a warning alive (ticket 331)', ()
     withRegistrations([braceProbeSlice()], () => {
       const { session, block } = braceableTunnel()
       session.submit(BRACE_TICK, braceCommand([block], { endTick: END_TICK, leaveAtEnd: true }))
-      session.advanceTo(400)
+      session.advanceTo(END_TICK + 200)
       expect(eventsOfBlock(session, block).map(({ type, tick }) => [type, tick])).toEqual([
         ['CollapseWarned', WARN_TICK],
+        ['CasingBurstWarned', WARN_TICK],
         ['CollapseBraced', BRACE_TICK],
         ['CollapseCancelled', END_TICK],
       ])
@@ -324,8 +330,8 @@ describe('collapse braces: the clock, saves and replays (ticket 331)', () => {
     }))
 
   it.each([
-    ['a clock step', { fromTick: REFILL_TICK, endTick: 150 }],
-    ['an untilTick', { fromTick: REFILL_TICK, untilTick: 180 }],
+    ['a clock step', { fromTick: REFILL_TICK, endTick: REFILL_TICK + 80 }],
+    ['an untilTick', { fromTick: REFILL_TICK, untilTick: REFILL_TICK + 110 }],
   ] as const)(
     'gives the same events and digest stepping every tick, batching or jumping, ended by %s',
     (_, options) => {
@@ -333,8 +339,9 @@ describe('collapse braces: the clock, saves and replays (ticket 331)', () => {
         withRegistrations([braceProbeSlice()], () => {
           const { session, block } = braceableTunnel()
           session.submit(BRACE_TICK, braceCommand([block], options))
-          for (let tick = BRACE_TICK + stride; tick < 400; tick += stride) session.advanceTo(tick)
-          session.advanceTo(400)
+          const end = REFILL_TICK + 340
+          for (let tick = BRACE_TICK + stride; tick < end; tick += stride) session.advanceTo(tick)
+          session.advanceTo(end)
           return { events: session.events(), digest: stateDigest(session.state()) }
         })
       const live = run(1)
@@ -379,10 +386,10 @@ describe('collapse braces: the clock, saves and replays (ticket 331)', () => {
       expect(loaded.state.collapse.blocks.find((entry) => entry.block === block)?.isBraced).toBe(
         true,
       )
-      const original = advanceTicks(session.state(), 400)
-      const resumed = advanceTicks(loaded.state, 400)
+      const original = advanceTicks(session.state(), END_TICK + HOLD + 100)
+      const resumed = advanceTicks(loaded.state, END_TICK + HOLD + 100)
       expect(ofType(original.events, 'CollapseStarted').map(({ tick }) => tick)).toEqual([
-        END_TICK + COLLAPSE_WARN_TICKS,
+        END_TICK + HOLD,
       ])
       expect(resumed.events).toEqual(original.events)
       expect(stateDigest(resumed.state)).toBe(stateDigest(original.state))

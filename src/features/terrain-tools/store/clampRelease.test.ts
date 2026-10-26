@@ -11,17 +11,20 @@ import {
   resetTouch,
 } from '../../../store/touchRuntime'
 import { createAuthorityState } from '../../../systems/authority/authorityState'
-import { weakTunnelIntents } from '../../../systems/authority/collapse/collapseFixtures'
+import {
+  weakTunnelIntents,
+  WEAK_TUNNEL_HOLD_TICKS,
+} from '../../../systems/authority/collapse/collapseFixtures'
 import { setVehicleLoadoutCommand } from '../../../systems/authority/loadoutCommands'
 import { createLoopbackAuthority } from '../../../systems/authority/loopbackAuthority'
 import { WORLD_SEED } from '../../../systems/authority/scriptedSession'
-import { COLLAPSE_WARN_TICKS } from '../../../constants/balance'
 import { bracedBlocksOf, LODE_CLAMP_ID } from '../systems/lodeClamp'
 
 // Letting go of the lode clamp on the keys and on touch (G&V feel line 2 and the GD call on #285,
 // ticket 285), played through the store's input and touch runtimes on the loaded slices: the
 // collapse specs' weak band-2 tunnel (seed 83921) warns as the clamp is slotted, the clamp is held
-// past the 400 ms card press, and its release starts every braced block's fresh 60-tick warning.
+// past the 400 ms card press, and its release starts every braced block's fresh warning, which
+// holds the tunnel's full burst hold (ticket 829: one grade short, 1200 ticks).
 // No gamepad adapter exists yet (#33); a gamepad's button-up will reach the same `releaseAction`.
 
 const WINDUP_TICKS = 6
@@ -91,7 +94,7 @@ function blockLines(event: string, blocks: readonly string[]) {
 
 /**
  * What every release path must leave: one release on its tick, the field ended, a fresh warning
- * logged on every braced block, and no refill before the 60 ticks are out.
+ * logged on every braced block, and no burst before its full hold is out.
  */
 function expectReleasedOn(upTick: number, braced: readonly string[]): void {
   expect(slotCommands().filter((command) => command.includes('release'))).toEqual([
@@ -100,11 +103,11 @@ function expectReleasedOn(upTick: number, braced: readonly string[]): void {
   expect(linesNamed('terrain-tools.magnet_used')).toHaveLength(1)
   const fresh = blockLines('collapse_warning', braced).filter(([tick]) => tick === upTick)
   expect(fresh.map(([, block]) => block).sort()).toEqual([...braced].sort())
-  stepTicks(COLLAPSE_WARN_TICKS - 1)
+  stepTicks(WEAK_TUNNEL_HOLD_TICKS - 1)
   expect(blockLines('collapse', braced)).toEqual([])
   stepTicks(1)
   expect(blockLines('collapse', braced).map(([tick]) => tick)).toEqual(
-    braced.map(() => upTick + COLLAPSE_WARN_TICKS),
+    braced.map(() => upTick + WEAK_TUNNEL_HOLD_TICKS),
   )
 }
 

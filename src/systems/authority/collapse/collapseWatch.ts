@@ -13,8 +13,10 @@
  * visited in `chunkKey`, then block-index order, so every machine logs the same sequence.
  *
  * A block whose open cells are all reinforced (ticket 365, `collapseReinforcement.ts`) is not weak:
- * it never warns, forced or not, and a warning it is in no longer holds. Reinforcement is read
- * before the braces (#331) ever are.
+ * it never warns, forced or not, and a warning it is in no longer holds. A burst (ticket 829) reads
+ * only reinforcement that is more than lining, as the strength grade alone decides whether lining
+ * holds, and warns for its own hold (`burstHold.ts`). Reinforcement is read before the braces
+ * (#331) ever are.
  */
 import { COLLAPSE_ACTIVE_RADIUS_MM } from '../../../constants/balance'
 import { requiredCasingGrade } from '../../economy/casingGrades'
@@ -33,12 +35,15 @@ import { weaknessOfBlock, type BlockWeakness } from '../../world/collapseWeaknes
 import type { BodyCentre } from '../../world/collapseRefill'
 import type { PlanetParams } from '../../world/planetParams'
 import { withCollapse, type AuthorityState } from '../authorityState'
-import { isBlockReinforced } from './collapseReinforcement'
+import { isBlockReinforced, isBlockReinforcedAgainstBurst } from './collapseReinforcement'
+import { burstWarnedOf } from './burstEvents'
+import { burstHoldTicks, gradesShortOf } from './burstHold'
 import { chainEffects, type RuleEffect } from '../commandRule'
 import type { DomainEventBody } from '../domainEvent'
 import {
   blockOfEntry,
   entryOfBlock,
+  isBurstEntry,
   isWarningAt,
   withCollapsingBlock,
   withoutCollapsingBlock,
@@ -57,8 +62,8 @@ export interface WeakBlock {
 }
 
 /**
- * A reinforced block never holds; else a forced block or one a bare blast rolled (D2 #861) always
- * does, any other only while weak with a vehicle within 16 m.
+ * A forced block or one a bare blast rolled (D2 #861) holds unless it is reinforced; a burst holds
+ * while weak with a vehicle within 16 m and not reinforced by more than its lining (ticket 829).
  */
 export function isCollapseHeld(
   state: AuthorityState,
@@ -66,19 +71,26 @@ export function isCollapseHeld(
   entry: CollapsingBlock,
 ): boolean {
   const block = blockOfEntry(entry)
-  if (isBlockReinforced(state, params, block)) return false
-  if (entry.isForced || entry.isBlast === true) return true
-  return isNearAnyVehicle(state, block) && weaknessOfBlock(state.world, params, block) !== null
+  if (isBurstEntry(entry)) return isNearAnyVehicle(state, block) && isWeak(state, params, block)
+  return !isBlockReinforced(state, params, block)
 }
 
-/** The block's weakness as the collapse rules read it: none while it is reinforced. */
+/**
+ * The block's weakness as the collapse rules read it: its lining short of the grade its cell needs,
+ * none while it is reinforced by more than lining (ticket 829: the burst reads the strength grade).
+ */
 export function weaknessOf(
   state: AuthorityState,
   params: PlanetParams,
   block: CollapseBlock,
 ): BlockWeakness | null {
   const weakness = weaknessOfBlock(state.world, params, block)
-  return weakness === null || isBlockReinforced(state, params, block) ? null : weakness
+  if (weakness === null) return null
+  return isBlockReinforcedAgainstBurst(state, params, block) ? null : weakness
+}
+
+function isWeak(state: AuthorityState, params: PlanetParams, block: CollapseBlock): boolean {
+  return weaknessOf(state, params, block) !== null
 }
 
 export function cancelCollapse(state: AuthorityState, id: string): RuleEffect {
@@ -88,17 +100,30 @@ export function cancelCollapse(state: AuthorityState, id: string): RuleEffect {
   }
 }
 
-/** Starts a block's telegraph at the state's tick and says so. */
-export function startWarning(
-  state: AuthorityState,
-  weak: WeakBlock,
-  isForced: boolean,
-): RuleEffect {
+/** Starts a forced block's 60-tick telegraph at the state's tick and says so. */
+export function startForcedWarning(state: AuthorityState, weak: WeakBlock): RuleEffect {
   const block = blockIdOf(weak.block)
-  const entry = { block, startTick: state.tick, isForced }
+  const entry = { block, startTick: state.tick, isForced: true }
   return {
     state: withCollapse(state, withCollapsingBlock(state.collapse, entry)),
     events: [collapseWarnedOf(block, weak.weakness)],
+  }
+}
+
+/**
+ * Starts a burst's telegraph at the state's tick (ticket 829): it holds for its walls' shortfall,
+ * and says so as #43 does and with the burst's own line.
+ */
+export function startBurstWarning(state: AuthorityState, weak: WeakBlock): RuleEffect {
+  const block = blockIdOf(weak.block)
+  const holdTicks = burstHoldTicks(gradesShortOf(weak.weakness))
+  const entry = { block, startTick: state.tick, isForced: false, holdTicks }
+  return {
+    state: withCollapse(state, withCollapsingBlock(state.collapse, entry)),
+    events: [
+      collapseWarnedOf(block, weak.weakness),
+      burstWarnedOf(state, block, weak.weakness, holdTicks),
+    ],
   }
 }
 
@@ -193,7 +218,7 @@ export function warnWeakBlocksNearVehicles(
   )
   return chainEffects(
     state,
-    fresh.map((weak) => (current: AuthorityState) => startWarning(current, weak, false)),
+    fresh.map((weak) => (current: AuthorityState) => startBurstWarning(current, weak)),
   )
 }
 

@@ -29,7 +29,7 @@ import { entryOfBlock } from '../collapse/collapseState'
 import {
   forcedWeaknessOf,
   startBlastWarning,
-  startWarning,
+  startBurstWarning,
   weaknessOf,
   type WeakBlock,
 } from '../collapse/collapseWatch'
@@ -176,7 +176,7 @@ function rolledCheckOf(
 }
 
 function effectOfCheck(check: BlockCheck): (state: AuthorityState) => RuleEffect {
-  if (check.verdict === 'weak') return (state) => startWarning(state, check.weak, false)
+  if (check.verdict === 'weak') return (state) => startBurstWarning(state, check.weak)
   return (state) => rolledEffectOf(state, check.weak, check.roll)
 }
 

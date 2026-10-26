@@ -3,7 +3,7 @@
  * bore's end plus its hold, each 4x4 m block holding a bored tile is checked once, nearest the
  * rig's firing point first, at most `BLAST_COLLAPSE_CHECKS_PER_TICK` a tick as a blast's rim is
  * (`blastCollapse.ts`). A block the bore's own rule finds weak (`boreWeakness.ts`) and not already
- * collapsing starts the existing warning through `startWarning`, so the dust telegraph, the
+ * collapsing starts the existing warning through `startForcedWarning`, so the dust telegraph, the
  * 60-tick warning, the 30-tick refill of all the block's carved air, the crush and the vehicle
  * clearance stay #43's.
  *
@@ -26,7 +26,7 @@ import type { PlanetParams } from '../../world/planetParams'
 import type { TilePoint } from '../../world/tileGrid'
 import type { AuthorityState } from '../authorityState'
 import { entryOfBlock } from '../collapse/collapseState'
-import { forcedWeaknessOf, startWarning, type WeakBlock } from '../collapse/collapseWatch'
+import { forcedWeaknessOf, startForcedWarning, type WeakBlock } from '../collapse/collapseWatch'
 import { chainEffects, type RuleEffect } from '../commandRule'
 import type { PendingBore } from './boreState'
 import { boreWeaknessOf } from './boreWeakness'
@@ -56,7 +56,7 @@ export function checkBoreBlocks(
   const fresh = freshWeakBlocksAmong(state, params, due)
   const effect = chainEffects(
     state,
-    fresh.map((weak) => (current: AuthorityState) => startWarning(current, weak, true)),
+    fresh.map((weak) => (current: AuthorityState) => startForcedWarning(current, weak)),
   )
   return { effect, bore: afterChecks(bore, due.length, disturbed.length) }
 }

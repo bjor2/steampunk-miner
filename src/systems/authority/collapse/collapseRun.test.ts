@@ -38,6 +38,7 @@ import {
   prepareDigger,
   TUNNEL_FROM_X,
   TUNNEL_TO_X,
+  WEAK_TUNNEL_HOLD_TICKS,
   weakTunnelIntents,
 } from './collapseFixtures'
 import { forceCollapseCommand } from './collapseCommands'
@@ -94,11 +95,11 @@ describe('collapse: a straight dig (#43 acceptance 8, 3)', () => {
     expect(warned.every(({ block }) => xSpanOf(blockOfId(block)!).to <= faceFrom)).toBe(true)
   })
 
-  it('refills each warned block exactly 60 ticks after its warning, unless cancelled', () => {
+  it('bursts each warned block exactly its 20 s hold after its warning, unless cancelled', () => {
     const session = createScriptedSession()
     prepareDigger(session, 0)
     const dug = digAlong(session, 0, BAND_2_Y, -31500, -11500)
-    parkAt(session, dug, dug + 600, -11500, BAND_2_Y)
+    parkAt(session, dug, dug + WEAK_TUNNEL_HOLD_TICKS + 600, -11500, BAND_2_Y)
     const events = session.events()
     const started = ofType(events, 'CollapseStarted')
     expect(started.length).toBeGreaterThan(4)
@@ -110,7 +111,9 @@ describe('collapse: a straight dig (#43 acceptance 8, 3)', () => {
           event.tick >= warning.tick,
       )
       expect(ended).toBeDefined()
-      if (ended?.type === 'CollapseStarted') expect(ended.tick - warning.tick).toBe(60)
+      if (ended?.type === 'CollapseStarted') {
+        expect(ended.tick - warning.tick).toBe(WEAK_TUNNEL_HOLD_TICKS)
+      }
     }
   })
 
@@ -171,21 +174,21 @@ describe('collapse: generated caves (#43 acceptance 1)', () => {
 })
 
 describe('collapse: warning and cancelling (#43 sequence 1, build note 2, acceptance 7)', () => {
-  it('warns every weak block within 16 m of the vehicle and refills it a second later', () => {
+  it('warns every weak block within 16 m of the vehicle and bursts it after its hold', () => {
     const session = createScriptedSession()
     buildWeakTunnel(session, 10)
     const warned = ofType(session.events(), 'CollapseWarned')
     expect(warned.length).toBeGreaterThan(4)
     expect(warned.every((event) => event.tick === 10)).toBe(true)
-    session.advanceTo(10 + COLLAPSE_WARN_TICKS - 1)
+    session.advanceTo(10 + WEAK_TUNNEL_HOLD_TICKS - 1)
     expect(ofType(session.events(), 'CollapseStarted')).toEqual([])
-    session.advanceTo(10 + COLLAPSE_WARN_TICKS)
+    session.advanceTo(10 + WEAK_TUNNEL_HOLD_TICKS)
     const started = ofType(session.events(), 'CollapseStarted')
     expect(started.map(({ block }) => block).sort()).toEqual(
       warned.map(({ block }) => block).sort(),
     )
-    expect(started.every((event) => event.tick === 10 + COLLAPSE_WARN_TICKS)).toBe(true)
-    session.advanceTo(10 + COLLAPSE_WARN_TICKS + COLLAPSE_FILL_TICKS)
+    expect(started.every((event) => event.tick === 10 + WEAK_TUNNEL_HOLD_TICKS)).toBe(true)
+    session.advanceTo(10 + WEAK_TUNNEL_HOLD_TICKS + COLLAPSE_FILL_TICKS)
     expect(session.state().collapse.blocks).toEqual([])
   })
 
@@ -213,10 +216,10 @@ describe('collapse: warning and cancelling (#43 sequence 1, build note 2, accept
     session.submit(400, poseAt(TUNNEL_MIDDLE_X, BAND_2_Y))
     const rewarned = ofType(session.events(), 'CollapseWarned').filter(({ tick }) => tick === 400)
     expect(rewarned.length).toBeGreaterThan(0)
-    session.advanceTo(400 + COLLAPSE_WARN_TICKS)
+    session.advanceTo(400 + WEAK_TUNNEL_HOLD_TICKS)
     const started = ofType(session.events(), 'CollapseStarted')
     expect(started.length).toBeGreaterThan(0)
-    expect(started.every(({ tick }) => tick === 400 + COLLAPSE_WARN_TICKS)).toBe(true)
+    expect(started.every(({ tick }) => tick === 400 + WEAK_TUNNEL_HOLD_TICKS)).toBe(true)
   })
 
   it('looks only at blocks near a vehicle, so a far weak tunnel stays frozen', () => {
@@ -312,9 +315,9 @@ describe('collapse: determinism (#43 acceptance 6)', () => {
     session.advanceTo(40)
     const loaded = readSnapshot(JSON.parse(JSON.stringify(takeSnapshot(session.state()))))
     if (!('state' in loaded)) throw new Error(loaded.problems.join('; '))
-    const original = advanceTicks(session.state(), 300)
-    const resumed = advanceTicks(loaded.state, 300)
-    expect(ofType(original.events, 'CollapseStarted')[0].tick).toBe(10 + COLLAPSE_WARN_TICKS)
+    const original = advanceTicks(session.state(), WEAK_TUNNEL_HOLD_TICKS + 300)
+    const resumed = advanceTicks(loaded.state, WEAK_TUNNEL_HOLD_TICKS + 300)
+    expect(ofType(original.events, 'CollapseStarted')[0].tick).toBe(10 + WEAK_TUNNEL_HOLD_TICKS)
     expect(resumed.events).toEqual(original.events)
     expect(stateDigest(resumed.state)).toBe(stateDigest(original.state))
   })
@@ -337,7 +340,7 @@ describe('collapse: determinism (#43 acceptance 6)', () => {
     const arrival: AuthorityCommand = { playerId: 'p2', tick: 50, seq: 1, ...poseAt(0, BAND_1_Y) }
     ;[host, guest].forEach((authority) => {
       authority.submit(arrival)
-      authority.advanceTo(300)
+      authority.advanceTo(WEAK_TUNNEL_HOLD_TICKS + 300)
     })
     expect(ofType(heard, 'CollapseStarted').length).toBeGreaterThan(0)
     expect(guest.snapshot().digest).toBe(host.snapshot().digest)
@@ -347,8 +350,9 @@ describe('collapse: determinism (#43 acceptance 6)', () => {
     const run = (stride: number) => {
       const session = createScriptedSession()
       buildWeakTunnel(session, 10)
-      for (let tick = 10 + stride; tick < 400; tick += stride) session.advanceTo(tick)
-      session.advanceTo(400)
+      const end = WEAK_TUNNEL_HOLD_TICKS + 400
+      for (let tick = 10 + stride; tick < end; tick += stride) session.advanceTo(tick)
+      session.advanceTo(end)
       return { events: session.events(), digest: stateDigest(session.state()) }
     }
     const fixedStep = run(1)
@@ -368,7 +372,11 @@ describe('collapse: the debug command (#43 debug API)', () => {
     expect(report.collapsing.map(({ block }) => block).sort()).toEqual(
       report.weakBlocks.map(({ block }) => block).sort(),
     )
-    expect(report.collapsing[0]).toMatchObject({ startTick: 10, refillTick: 70, phase: 'warning' })
+    expect(report.collapsing[0]).toMatchObject({
+      startTick: 10,
+      refillTick: 10 + WEAK_TUNNEL_HOLD_TICKS,
+      phase: 'warning',
+    })
   })
 
   it('refuses a block name that is not one, listing the problem and changing nothing', () => {

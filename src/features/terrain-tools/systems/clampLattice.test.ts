@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { COLLAPSE_WARN_TICKS } from '../../../constants/balance'
-import { buildWeakTunnel } from '../../../systems/authority/collapse/collapseFixtures'
+import {
+  buildWeakTunnel,
+  WEAK_TUNNEL_HOLD_TICKS,
+} from '../../../systems/authority/collapse/collapseFixtures'
+import { holdTicksOf, refillTickOf } from '../../../systems/authority/collapse/collapseState'
 import { setVehicleLoadoutCommand } from '../../../systems/authority/loadoutCommands'
 import {
   createScriptedSession,
@@ -14,14 +17,16 @@ import { clampHoldOf, LODE_CLAMP_ID } from './lodeClamp'
 
 // What the lode clamp's lattice shows (G&V feel line 3 on #285, ticket 285), read from the
 // authority state as the scene would: struts over exactly the braced blocks, each block's
-// countdown frozen while braced and back at the full 60 on the tick the brace ends, and the slot's
-// hold running from the act to the field's length. The collapse specs' weak band-2 tunnel warns
-// on tick 10; the clamp acts on tick 26 and is let go on tick 100.
+// countdown frozen while braced and back at its full hold on the tick the brace ends, and the
+// slot's hold running from the act to the field's length. The collapse specs' weak band-2 tunnel
+// warns on tick 10 and, one grade short, holds 1200 ticks before it bursts (ticket 829); the clamp
+// acts on tick 1166, 44 ticks before that, and is let go on tick 1240.
 
 const WARN_TICK = 10
-const PRESS_TICK = 20
+const REFILL_TICK = WARN_TICK + WEAK_TUNNEL_HOLD_TICKS
+const PRESS_TICK = REFILL_TICK - 50
 const ACT_TICK = PRESS_TICK + 6
-const RELEASE_TICK = 100
+const RELEASE_TICK = REFILL_TICK + 30
 const HOLD_TICKS = 180
 
 function heldClamp(): ScriptedSession {
@@ -48,7 +53,7 @@ describe('lode clamp lattice', () => {
 
   it('freezes each braced countdown at what it had left when the brace caught it', () => {
     const session = heldClamp()
-    const caughtLeft = COLLAPSE_WARN_TICKS - (ACT_TICK - WARN_TICK)
+    const caughtLeft = REFILL_TICK - ACT_TICK
     for (const tick of [ACT_TICK, ACT_TICK + 30, RELEASE_TICK - 1]) {
       session.advanceTo(tick)
       const lattice = clampLatticeOf(session.state(), 'p1')
@@ -65,11 +70,11 @@ describe('lode clamp lattice', () => {
     const { collapse, tick } = session.state()
     expect(clampLatticeOf(session.state(), 'p1')).toEqual([])
     const fresh = collapse.blocks.filter((entry) => braced.includes(entry.block))
-    expect(fresh.map((entry) => telegraphProgress(tick - entry.startTick))).toEqual(
-      braced.map(() => 0),
-    )
-    expect(fresh.map((entry) => entry.startTick + COLLAPSE_WARN_TICKS - tick)).toEqual(
-      braced.map(() => COLLAPSE_WARN_TICKS),
+    expect(
+      fresh.map((entry) => telegraphProgress(tick - entry.startTick, holdTicksOf(entry))),
+    ).toEqual(braced.map(() => 0))
+    expect(fresh.map((entry) => refillTickOf(entry) - tick)).toEqual(
+      braced.map(() => WEAK_TUNNEL_HOLD_TICKS),
     )
   })
 

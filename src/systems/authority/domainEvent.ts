@@ -169,6 +169,18 @@ export interface SoldItem {
 }
 
 /** The kernel's own domain events: the closed set its projections and rules are written against. */
+/** What a burst's lines name (ticket 829). */
+export interface BurstReport {
+  block: string
+  system: string
+  place: string
+  tx: number
+  ty: number
+  grade: bigint
+  required: bigint
+  delta: bigint
+}
+
 export interface KernelDomainEventBodies {
   PlanetChanged: { planetIndex: number }
   PlanetSeedChanged: { planetSeed: number }
@@ -277,6 +289,14 @@ export interface KernelDomainEventBodies {
   CollapseCancelled: { block: string }
   /** The refill starts: the samples it will fill and the vehicles it crushes. */
   CollapseStarted: { block: string; samplesFilled: number; vehiclesHit: number }
+  /**
+   * Lining short of its cell's grade starts its burst telegraph (ticket 829), beside the block's
+   * `CollapseWarned`: the planet's star-map address as index text, the weakest wall's cell, its
+   * grade, the grade the cell needs, how many short and how long it holds.
+   */
+  CasingBurstWarned: BurstReport & { holdTicks: number }
+  /** The burst: the block's refill starts, beside its `CollapseStarted` (ticket 829). */
+  CasingBurst: BurstReport
   /**
    * A bare blast's collapse roll on one rim block (D2 #861): the blast's `blastSeq`, the block, its
    * size's chance and the draw, 0 to 9999 basis points; under the chance it collapses, telegraphed

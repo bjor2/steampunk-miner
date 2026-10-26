@@ -33,9 +33,8 @@ import { chainEffects, unchanged, type RuleEffect } from '../../../systems/autho
 import { ownsItem } from '../../../systems/authority/loadoutRules'
 import { cellsMagnetMayHold } from '../../../systems/authority/magnet/shiftCellsByMagnet'
 import type { CollapsingBlock } from '../../../systems/authority/collapse/collapseState'
-import { entryOfBlock } from '../../../systems/authority/collapse/collapseState'
+import { entryOfBlock, holdTicksOf } from '../../../systems/authority/collapse/collapseState'
 import { followEnergyChange } from '../../../systems/authority/vehicleTransitions'
-import { COLLAPSE_WARN_TICKS } from '../../../constants/balance'
 import type { ClockStep } from '../../../systems/registries/clockSteps'
 import type {
   CollapseBraceClaim,
@@ -129,8 +128,9 @@ export function clampFrozenTicksLeftAt(state: AuthorityState, block: string): nu
  */
 export function frozenTicksLeftOf(entry: CollapsingBlock, brace: { startTick: number }): number {
   const caughtTick = Math.max(brace.startTick, entry.startTick)
-  const warned = Math.min(COLLAPSE_WARN_TICKS, caughtTick - entry.startTick)
-  return COLLAPSE_WARN_TICKS - warned
+  const hold = holdTicksOf(entry)
+  const warned = Math.min(hold, caughtTick - entry.startTick)
+  return hold - warned
 }
 
 /** The player's field's frozen countdown on `entry`, or none when it does not brace it. */

@@ -1,7 +1,8 @@
 /**
  * The arrival every pace harness shares (tickets 354 and 356): the pacing bot set down on a planet
- * with the on-curve levels, a little money and the hull whole, as a bot that played its way there
- * would arrive. `debug.setUpgrade` raises the hull level but keeps the planet-1 hull, so a harness
+ * with the on-curve levels, a little money, the hull whole and the casing cased to the planet
+ * before's bottom grade (ticket 829: the ladder's surface grade, which arrival never bursts), as a
+ * bot that played its way there would arrive. `debug.setUpgrade` raises the hull level but keeps the planet-1 hull, so a harness
  * that set only the levels arrived with 100 HP: the first electrified shock on P28 wrecked the bare
  * magnetic run, and it played a different planet from its baseline (ticket 354).
  *
@@ -9,6 +10,9 @@
  * whole nor the hull state the spec names. The tank stays as the levels leave it: a full tank sent
  * the first trip into a collapse on P28 (ticket 354). Only specs use it.
  */
+import { setCasingGradeCommand } from '../authority/casingDebugCommands'
+import { casingLadderOf } from '../economy/casingGrades'
+import { countAsSafeInteger } from '../wholeCount'
 import type { CommandIntent } from '../authority/authorityCommand'
 import { createAuthorityState, type AuthorityState } from '../authority/authorityState'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
@@ -45,7 +49,13 @@ export function paceArrivalOn(
     { type: 'debug.setMoney', payload: { amount: ARRIVAL_MONEY } },
     ...onCurveLevelCommandsOn(planet),
     setHullCommand(toCanonical(arrivalHullOn(planet, hull))),
+    setCasingGradeCommand(arrivalCasingGradeOn(planet)),
   ]
+}
+
+/** The planet's surface grade: what a bot cased to the planet before's core owns on arrival. */
+function arrivalCasingGradeOn(planet: number): number {
+  return countAsSafeInteger(casingLadderOf(planet).surfaceGrade)
 }
 
 /**
