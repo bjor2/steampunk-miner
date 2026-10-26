@@ -215,7 +215,7 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
     const digest = takeSessionSnapshot().digest
     game().moveFocus(1)
     const model = upgradeBayModel()
-    expect(model.casing).toMatchObject({ grade: 1, gradeText: '1 → 2', cost: { text: '240' } })
+    expect(model.casing).toMatchObject({ grade: 1n, gradeText: '1 → 2', cost: { text: '240' } })
     expect(model.preview).toMatchObject({
       highlight: 'drill_tip',
       visualTier: 1,
@@ -267,8 +267,8 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
     // `jump_drive_bought`; ticket 844 `ore_premium_ledger` and `ore_sale_lift`; ticket 848
     // `hazard_refill`, `hazard_bite`, `hazard_shove`, `hazard_drain` and `tool_acting`; ticket 860
     // `blast`; ticket 861 `blast_collapse_roll`; ticket 888 `planet_generated` and
-    // `ore_rules_refused`; ticket 869 `blast_radius_upgraded`; the controls and the HUD still add
-    // none.
+    // `ore_rules_refused`; ticket 869 `blast_radius_upgraded`; ticket 829 `casing_burst_warning`
+    // and `casing_burst`; the controls and the HUD still add none.
     expect(ALL_RUN_EVENT_NAMES).toHaveLength(
       62 +
         4 +
@@ -310,7 +310,8 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
         1 +
         1 +
         2 +
-        1,
+        1 +
+        2,
     )
   })
 })

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { toCanonicalJson } from '../authority/canonicalJson'
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { vehicleOf, type AuthorityState } from '../authority/authorityState'
 import { perCellShareAt } from '../authority/cutShare'
@@ -111,7 +112,7 @@ describe('save slot: determinism after a load on planet 200 (ticket 405)', () =>
   })
 
   it('answers each of the 600 ticks after a load with the same events as the unsaved run', () => {
-    expect(JSON.stringify(loaded.events)).toBe(JSON.stringify(unsaved.events))
+    expect(toCanonicalJson(loaded.events)).toBe(toCanonicalJson(unsaved.events))
   })
 
   it('holds the same digest every tick and the same snapshot text at the end', () => {

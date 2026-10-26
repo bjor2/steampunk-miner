@@ -121,9 +121,9 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'collapse',
     data: { block, samplesFilled, vehiclesHit },
   }),
-  CasingBurstWarned: ({ holdTicks, ...burst }) => ({
+  CasingBurstWarned: (burst) => ({
     event: 'casing_burst_warning',
-    data: { ...burstFieldsOf(burst), holdTicks },
+    data: { ...burstFieldsOf(burst), holdTicks: burst.holdTicks },
   }),
   CasingBurst: (burst) => ({ event: 'casing_burst', data: burstFieldsOf(burst) }),
   BoreFired: ({ aimed, bearing, rangeCells }) => ({
@@ -508,10 +508,13 @@ function gradeToLog(grade: bigint): number {
 }
 
 /** A burst's fields with its grades as the log's integers (ticket 829). */
-function burstFieldsOf(burst: BurstReport) {
-  const { grade, required, delta, ...place } = burst
+function burstFieldsOf({ block, system, place, tx, ty, grade, required, delta }: BurstReport) {
   return {
-    ...place,
+    block,
+    system,
+    place,
+    tx,
+    ty,
     grade: gradeToLog(grade),
     required: gradeToLog(required),
     delta: gradeToLog(delta),

@@ -210,7 +210,7 @@ describe('save migration chain', () => {
     const player = state.players.player_1
     expect(toCanonical(player.wallet)).toBe(saved.wallet)
     expect(player.vehicle.levels).toEqual(stepsOfMajors(saved.vehicle.levels))
-    expect(player.vehicle.casingGrade).toBe(saved.vehicle.casingGrade)
+    expect(player.vehicle.casingGrade).toBe(BigInt(saved.vehicle.casingGrade))
     expect(state.platform.coreBay).toBe(PLANET_1_SAVE.world.platform.coreBay)
   })
 
@@ -448,7 +448,7 @@ describe('save migration chain: levels to steps (#181)', () => {
     const { vehicle } = state.players.p1
     expect(vehicle.charges.slotLevel).toBe(3)
     expect(vehicle.charges.carriedBySize).toEqual({ '1': saved.vehicle.charges.carried })
-    expect(vehicle.casingGrade).toBe(2)
+    expect(vehicle.casingGrade).toBe(2n)
     expect(toCanonical(state.players.p1.wallet)).toBe(saved.wallet)
     expect(vehicle.pose).toEqual(saved.vehicle.pose)
   })

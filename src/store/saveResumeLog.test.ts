@@ -192,14 +192,21 @@ describe('save resume log (ticket 671)', () => {
     expect(stateDigest(readAuthorityState())).toBe(unbrokenDigest)
   })
 
-  // The dig runs at the drill's own speed into band 2, where a grade-1 casing caves in on the rig:
-  // the window holds cuts, casing, collapses, the rescue to the station and the autosave it writes.
-  it('cuts, caves in, rescues and saves in those 60 s, so the lines compared carry play', async () => {
+  // The dig runs at the drill's own speed into band 2, where its grade-1 lining is one grade short:
+  // the window holds cuts, casing, its burst warnings and their cancelling as the rig digs on past
+  // 16 m (ticket 829: a burst holds 20 s and never wrecks the rig), and the enemies it meets.
+  it('cuts, lines, warns of bursts and meets enemies in those 60 s, so the lines compared carry play', async () => {
     await dockAtStationAndSave()
     const lines = await linesOfDig(digPathOf(readAuthorityState(), game().playerId))
     const names = lines.map((line) => (JSON.parse(line) as RunEvent).event)
     expect(names).toEqual(
-      expect.arrayContaining(['drill_cut', 'collapse', 'rescue_triggered', 'checkpoint_saved']),
+      expect.arrayContaining([
+        'drill_cut',
+        'casing_lined',
+        'casing_burst_warning',
+        'collapse_cancelled',
+        'vehicle_damaged',
+      ]),
     )
     expect(names).not.toContain('command_rejected')
     expect(sink.events.flatMap(runEventProblems)).toEqual([])

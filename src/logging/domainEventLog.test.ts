@@ -421,6 +421,36 @@ describe('domain event log', () => {
     })
   })
 
+  // Ticket 829: a burst's two lines, beside its block's collapse lines.
+  it("records a burst's warning and burst as registered lines naming the planet, cell and grades", () => {
+    const burst = {
+      block: '0,8#17',
+      system: '1',
+      place: '6',
+      tx: 4,
+      ty: 264,
+      grade: 21n,
+      required: 22n,
+      delta: 1n,
+    }
+    recordDomainEvents({ playerId: 'p1', planet: 6, depthTiles: 48 }, [
+      { tick: 600, type: 'CasingBurstWarned', ...burst, holdTicks: 1200 },
+      { tick: 1800, type: 'CasingBurst', ...burst },
+    ])
+    expect(sink.events.map((event) => event.event)).toEqual([
+      'casing_burst_warning',
+      'casing_burst',
+    ])
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
+    expect(sink.events[0].data).toEqual({
+      ...burst,
+      grade: 21,
+      required: 22,
+      delta: 1,
+      holdTicks: 1200,
+    })
+  })
+
   it('records every platform event as a registered line with no envelope field in its payload', () => {
     recordDomainEvents({ playerId: 'p1', planet: 1, depthTiles: 0 }, platformEvents)
     expect(sink.events.map((event) => event.event)).toEqual([

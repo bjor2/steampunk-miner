@@ -1295,7 +1295,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/diagonalHeavyBot.test.ts` | 5 | 5 |
 | `src/logging/diveCasing.test.ts` | 4 | 4 |
 | `src/logging/diveSummaries.test.ts` | 4 | 4 |
-| `src/logging/domainEventLog.test.ts` | 21 | 21 |
+| `src/logging/domainEventLog.test.ts` | 22 | 22 |
 | `src/logging/downSpeedReport.test.ts` | 2 | 2 |
 | `src/logging/drillCutLine.test.ts` | 13 | 13 |
 | `src/logging/drillLadder.test.ts` | 3 | 3 |
