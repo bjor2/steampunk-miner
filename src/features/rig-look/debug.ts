@@ -4,11 +4,15 @@
  * local player's owned purchases and the band, step, finish band, pips, part, tint, finish and
  * hover line their rig shows,
  * from the same frames the vehicle look sources paint; `items` answers each drill type's item
- * track (ticket 623): its `n` and the parts it asks for. Read-only, so no command and no log line.
+ * track (ticket 623): its `n` and the parts it asks for. `getBodyWidth` answers the local rig's
+ * width level, its collider's half side, the body's drawn width and each held mount's seat on it
+ * (ticket 666). Read-only, so no command and no log line.
  */
 import type { DebugAction } from '../../debug/debugActionRegistry'
+import { readLocalBodyWidth } from './store/bodyWidthReads'
 import { readRigItemLookReadings, readRigLookReadings } from './store/rigLookReads'
 
 export const rigLookDebugActions: Readonly<Record<string, DebugAction>> = {
   getLooks: () => ({ ok: true, looks: readRigLookReadings(), items: readRigItemLookReadings() }),
+  getBodyWidth: () => ({ ok: true, ...readLocalBodyWidth() }),
 }
