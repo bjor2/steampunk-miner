@@ -7,6 +7,7 @@ import {
   poseAbove,
   surfaceOreTiles,
 } from '../../../systems/authority/scriptedSession'
+import { bodyGrowthMmAt } from '../../../systems/vehicle/drillBore'
 import { FACING } from '../../../systems/vehicle/vehiclePose'
 import { cellDensitySum } from '../../../systems/world/cellYield'
 import type { TilePoint } from '../../../systems/world/tileGrid'
@@ -50,14 +51,20 @@ function oreBesideBore() {
   return { ore, target: { tx: ore.tx - 1, ty: ore.ty - 1 } }
 }
 
+/**
+ * The wide rig's report above `tile`: the pose is the owned body's centre (ticket 750), so a rig
+ * two levels wide stands its growth higher than the bare body, its face where the bare one's is.
+ */
+function wideRigAbove(tile: TilePoint, drillTicks = 0) {
+  const report = poseAbove(tile, FACING.down, { drillTicks })
+  return { ...report, payload: { ...report.payload, y: report.payload.y + bodyGrowthMmAt(2) } }
+}
+
 function drillDownWith(slices: readonly SliceDefinition[], tile: TilePoint) {
   return withRegistrations(slices, () => {
     const session = createScriptedSession()
-    session.submit(1, poseAbove(tile, FACING.down))
-    const events = session.submit(
-      1 + DRILL_TICKS,
-      poseAbove(tile, FACING.down, { drillTicks: DRILL_TICKS }),
-    )
+    session.submit(1, wideRigAbove(tile))
+    const events = session.submit(1 + DRILL_TICKS, wideRigAbove(tile, DRILL_TICKS))
     return { events, world: session.state().world }
   })
 }

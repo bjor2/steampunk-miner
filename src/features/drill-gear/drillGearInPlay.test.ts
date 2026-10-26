@@ -10,6 +10,7 @@ import {
 } from '../../systems/authority/scriptedSession'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import { reactionToPress } from '../../systems/input/inputRouting'
+import { bodyGrowthMmAt } from '../../systems/vehicle/drillBore'
 import { FACING } from '../../systems/vehicle/vehiclePose'
 import { energyMaxQuantaOf } from '../../systems/vehicle/vehicleState'
 import { cellDensitySum } from '../../systems/world/cellYield'
@@ -46,10 +47,16 @@ function oreBesideBore() {
   return { ore, target: { tx: ore.tx - 1, ty: ore.ty - 1 } }
 }
 
-/** Drills the target for one report and answers whether the ore beside it was cut. */
+/**
+ * Drills the target for one report and answers whether the ore beside it was cut. The owned
+ * cutters make the rig one width level wide, and the pose is the owned body's centre (ticket
+ * 750), so the report stands its growth higher, its face where the bare body's is.
+ */
 function isOreBesideCut(session: ScriptedSession, ore: TilePoint, target: TilePoint): boolean {
+  const report = poseAbove(target, FACING.down, { drillTicks: DRILL_TICKS })
   const events = session.submit(10 + DRILL_TICKS, {
-    ...poseAbove(target, FACING.down, { drillTicks: DRILL_TICKS }),
+    ...report,
+    payload: { ...report.payload, y: report.payload.y + bodyGrowthMmAt(1) },
   })
   return ofType(events, 'TileDestroyed').some(
     (event) => event.type === 'TileDestroyed' && event.tx === ore.tx && event.ty === ore.ty,
