@@ -9,13 +9,15 @@
  * A cell a gate leaves standing is `blocked` before any bore (#142 acceptance 8), and a dynamite
  * shell is blasted open with a charge that frees it, or `blocked` until it carries one (#142
  * acceptance 9, `botCharges.ts`). A wall its own extractor opens is touched and waited out, then
- * bored or entered (ticket 237: the tune, the etch, the pull).
+ * bored or entered (ticket 237: the tune, the etch, the pull). A cell a gate cuts below the drill's
+ * speed (the blast bit's grind, D5 #864) is bored for its slowed time.
  * A sideways bore waits at least the drive's time over the tile (Bjor's ruling on #723,
  * `sidewaysBores.ts`), and a bore down at least the time local gravity lets the body gain the
  * drill's speed across it (Bjor's ruling on #724, `downBores.ts`); what it can afford and whether
  * a charge pays still read the drill's time.
  */
 import { heatThrottledDrill } from '../authority/heatRules'
+import { gatedDrillTimeOf, type GateVerdict } from '../registries/gateChecks'
 import { drillQuantumAt } from '../authority/stepBoundRead'
 import { isGravityRampedFacing } from '../vehicle/cutAxisCaps'
 import { driveSpeedOf } from '../vehicle/cutCapSpeed'
@@ -86,7 +88,7 @@ function boreOnce(session: BotSession, planet: BotPlanet, tile: TilePoint): Open
   const wait = extractorWaitOf(gate)
   if (wait !== null) return openWithExtractor(session, planet, tile, wait)
   if (isWallGate(gate)) return 'blocked'
-  return boreUngated(session, planet, tile)
+  return boreUngated(session, planet, tile, gate)
 }
 
 /** Touches the wall, waits its extractor out, then finds it open, drillable or still a wall. */
@@ -100,8 +102,9 @@ function openWithExtractor(
   standBy(session, planet.pilot, waitTicks + EXTRACTOR_SETTLE_TICKS)
   if (!isVehicleActive(session.vehicle())) return 'short'
   if (tileKindAt(session.state(), tile) === 'open') return 'opened'
-  if (isWallGate(drillGateAt(session, tile))) return 'blocked'
-  return boreUngated(session, planet, tile)
+  const gate = drillGateAt(session, tile)
+  if (isWallGate(gate)) return 'blocked'
+  return boreUngated(session, planet, tile, gate)
 }
 
 /** A shell blasted open is entered like a bored tile; one left standing is a wall. */
@@ -110,8 +113,13 @@ function outcomeOfOpening(session: BotSession, isOpen: boolean): OpenOutcome {
   return isVehicleActive(session.vehicle()) ? 'opened' : 'short'
 }
 
-function boreUngated(session: BotSession, planet: BotPlanet, tile: TilePoint): OpenOutcome {
-  const bore = tileBoreOf(session, planet, tile)
+function boreUngated(
+  session: BotSession,
+  planet: BotPlanet,
+  tile: TilePoint,
+  gate: GateVerdict | null,
+): OpenOutcome {
+  const bore = tileBoreOf(session, planet, tile, gate)
   if (bore === null) return 'blocked'
   const ticks = Math.ceil(bore.subSteps / bore.quantum)
   if (!canAffordBore(session, planet, ticks)) return 'short'
@@ -195,13 +203,19 @@ function sidewaysBoreAt(
 
 /**
  * The tile's drill time on the scripted clock (ticket 559), at the drill power the heat gauge
- * leaves (#113), in the rig's quantum; null when the tip cannot scratch it.
+ * leaves (#113), in the rig's quantum, slowed as the gate slows the authority's drill (the blast
+ * bit, D5 #864); null when the tip cannot scratch it.
  */
-function tileBoreOf(session: BotSession, planet: BotPlanet, tile: TilePoint): TileBore | null {
+function tileBoreOf(
+  session: BotSession,
+  planet: BotPlanet,
+  tile: TilePoint,
+  gate: GateVerdict | null,
+): TileBore | null {
   const state = session.state()
   const drill = heatThrottledDrill(state.planet.index, session.vehicle())
   const quantum = drillQuantumAt(state, session.playerId)
   const cell = cellOfTile(state, tile)
   const subSteps = boreSubSteps(drill, quantum, planet.layout.params, tile, cell)
-  return subSteps === null ? null : { subSteps, quantum }
+  return subSteps === null ? null : { subSteps: gatedDrillTimeOf(subSteps, gate), quantum }
 }

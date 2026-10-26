@@ -10,9 +10,15 @@ import type { BotPlanet } from '../../../systems/bot/botPilot'
 import { NO_TICKS, reportPoseIntent } from '../../../systems/bot/botPose'
 import { createBotSession, type BotSession } from '../../../systems/bot/botSession'
 import { openRouteTile } from '../../../systems/bot/gateRouteBlocks'
-import { paramsOfSession, tileKindAt } from '../../../systems/bot/botWorld'
+import { cellOfTile, paramsOfSession, tileKindAt } from '../../../systems/bot/botWorld'
 import { newMineLayout } from '../../../systems/bot/mineLayout'
+import { UPGRADE_IDS } from '../../../systems/economy/economyDefinition'
+import { stepOfMajor } from '../../../systems/economy/upgradeSteps'
+import { onCurveSteps, vehicleStatsAt } from '../../../systems/economy/vehicleStats'
+import { toCanonical } from '../../../systems/money'
 import type { TilePoint } from '../../../systems/world/tileGrid'
+import { BLAST_BIT_NODE_ID } from '../../dynamite'
+import { minTipMajorOfCell } from './canMine'
 import { FIXTURE_SEED, worldCellOfGate } from './gateFixtures'
 import type { CellGate, CellGateKind } from './gateTable'
 
@@ -72,6 +78,30 @@ function carveTile(session: BotSession, tile: TilePoint): void {
   })
 }
 
+/** More than the blast bit costs on its node curve. */
+const BLAST_BIT_BUDGET = '1e30'
+
+/** Researches the blast bit (D5 #864), on planet 7's curve with a full tank and a tip that scratches `tile`. */
+function grindWithBlastBit(session: BotSession, tile: TilePoint): void {
+  const wallet = toCanonical(session.state().players.p1.wallet)
+  session.submit({ type: 'debug.setMoney', payload: { amount: BLAST_BIT_BUDGET } })
+  session.submit({ type: 'tech-tree.unlock_node', payload: { nodeId: BLAST_BIT_NODE_ID } })
+  session.submit({ type: 'debug.setMoney', payload: { amount: wallet } })
+  const steps = { ...onCurveSteps(PLANET), drill_tip: tipStepScratching(session, tile) }
+  UPGRADE_IDS.forEach((upgradeId) =>
+    session.submit({ type: 'debug.setUpgrade', payload: { upgradeId, level: steps[upgradeId] } }),
+  )
+  const energyMax = vehicleStatsAt(steps).energyMax
+  session.submit({ type: 'debug.setEnergy', payload: { energy: String(energyMax) } })
+}
+
+/** The on-curve tip step, or the first one that scratches the tile when that is higher. */
+function tipStepScratching(session: BotSession, tile: TilePoint): number {
+  const params = paramsOfSession(session.state())
+  const major = minTipMajorOfCell(params, tile, cellOfTile(session.state(), tile))
+  return Math.max(onCurveSteps(PLANET).drill_tip, stepOfMajor(major))
+}
+
 function typesOf(session: BotSession): string[] {
   return session.events().map((event) => event.type)
 }
@@ -106,6 +136,22 @@ describe('bot: dynamite-gated shells and gate walls', () => {
     planet.chargePolicy = 'never'
     expect(openTile(session, planet, target)).toBe('blocked')
     expect(typesOf(session)).not.toContain('ChargePlanted')
+  })
+
+  it("bores a shell open in one bore timed at the blast bit's speed, logged as cleared by the drill", () => {
+    const { session, planet, target } = botFacing('dynamite', 0)
+    planet.chargePolicy = 'never'
+    grindWithBlastBit(session, target)
+    const before = session.events().length
+    expect(openTile(session, planet, target)).toBe('opened')
+    const bores = session
+      .events()
+      .slice(before)
+      .filter((event) => event.type === 'DrillDamageDealt')
+    expect(bores).toHaveLength(1)
+    expect(session.events()).toContainEqual(
+      expect.objectContaining({ type: 'mining-gates.GateCleared', ...target, method: 'drill' }),
+    )
   })
 
   it('takes a cell a gate leaves standing as a wall, with no bore against it', () => {
