@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-26T01:51:59Z",
+  "updated_at": "2026-10-26T01:55:07Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -23,10 +23,10 @@
     "steampunk-loop/3": {
       "loop": "steampunk-loop",
       "slot": "3",
-      "state": "idle",
-      "issue": null,
-      "note": "free; #889 not accepted (needs-fix), will retry",
-      "updated_at": "2026-10-26T01:51:59Z",
+      "state": "working",
+      "issue": 889,
+      "note": "tier fable, attempt 1/2",
+      "updated_at": "2026-10-26T01:55:07Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
@@ -870,6 +870,13 @@
   },
   "events": [
     {
+      "at": "2026-10-26T01:55:07Z",
+      "key": "steampunk-loop/3",
+      "state": "working",
+      "issue": 889,
+      "note": "tier fable, attempt 1/2"
+    },
+    {
       "at": "2026-10-26T01:51:59Z",
       "key": "steampunk-loop/3",
       "state": "idle",
@@ -1281,13 +1288,6 @@
       "state": "idle",
       "issue": null,
       "note": "free; #885 landed on main and closed"
-    },
-    {
-      "at": "2026-10-25T14:52:11Z",
-      "key": "steampunk-loop/1",
-      "state": "idle",
-      "issue": null,
-      "note": "free; #873 landed on main and closed"
     }
   ]
 }
