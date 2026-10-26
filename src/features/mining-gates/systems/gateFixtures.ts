@@ -28,11 +28,16 @@ import {
   type ResourceFamily,
 } from '../../../systems/world/worldCell'
 import { cellAt, EMPTY_WORLD } from '../../../systems/world/worldState'
+import { toCanonical } from '../../../systems/money'
+import { BLAST_BIT_NODE_ID } from '../../dynamite'
 import { oreFamilies } from '../../ores'
 import { cellGateOf, gateTableOfPlanet } from './cellGates'
 import type { CellGate, GatedEntry } from './gateTable'
 
 export const FIXTURE_SEED = PACING_WORLD_SEEDS['bot-slice'][0]
+
+/** More than the blast bit costs on its node curve. */
+const BLAST_BIT_BUDGET = '1e30'
 
 export interface GatedCellFixture {
   tile: TilePoint
@@ -63,6 +68,14 @@ export function setTipMajor(session: ScriptedSession, major: number, pips = 0): 
 
 export function grantItems(session: ScriptedSession, owned: string[]): void {
   session.submit(0, { type: 'debug.setVehicleLoadout', payload: { slots: {}, owned } })
+}
+
+/** Researches the blast bit (D5 #864) with money granted for it; the wallet is left as it was. */
+export function researchBlastBit(session: ScriptedSession): void {
+  const wallet = toCanonical(session.state().players.p1.wallet)
+  session.submit(0, { type: 'debug.setMoney', payload: { amount: BLAST_BIT_BUDGET } })
+  session.submit(0, { type: 'tech-tree.unlock_node', payload: { nodeId: BLAST_BIT_NODE_ID } })
+  session.submit(0, { type: 'debug.setMoney', payload: { amount: wallet } })
 }
 
 export function setCharges(session: ScriptedSession, size: number): void {

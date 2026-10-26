@@ -2,13 +2,15 @@
  * The dynamite slice (#149, spec #143; GD and TD locks on #149): the product surface of the size
  * ladder the kernel owns. The `dynamite-size` content with its icons (claiming `remote_detonator`),
  * the plunger `dynamite.detonate_charge` and its interlock, the plant key turning Detonate while a
- * charge is live, the HUD rack panel and the `detonate_refused` log line. The charges machine
+ * charge is live, the HUD rack panel, the `detonate_refused` log line and the `blastBit` drill node
+ * (D5 #864). The charges machine
  * (plant, fuse, live blast, rack, disarm) stays kernel. No side effects at import; the loader
  * calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { dynamiteDebugActions } from './debug'
 import { DYNAMITE_PROJECTIONS, DYNAMITE_RUN_EVENTS } from './logging'
+import { BLAST_BIT_NODE } from './systems/blastBit'
 import { DETONATE_REACTION, DETONATE_TOUCH_BINDING } from './systems/detonateReaction'
 import { DYNAMITE_RULES } from './systems/dynamiteCommands'
 import { dynamiteSizes } from './systems/dynamiteSizes'
@@ -18,6 +20,7 @@ export const slice: SliceDefinition = {
   id: 'dynamite',
   register(r) {
     r.content('dynamite-size', dynamiteSizes())
+    r.content('tech-node', [BLAST_BIT_NODE])
     r.commandRules(DYNAMITE_RULES)
     r.inputReaction(DETONATE_REACTION)
     r.touchBinding(DETONATE_TOUCH_BINDING)

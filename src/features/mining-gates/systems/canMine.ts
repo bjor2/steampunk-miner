@@ -8,8 +8,8 @@
  * | dense           | refused below its floor                 | refused (an anchor)     | refused |
  * | drill signature | blocked below its floor (scratch-only)  | refused (an anchor)     | refused |
  * | rig             | its extractor's verb, else its rule     | refused (an anchor)     | refused |
- * | dynamite        | refused (blast-only rock)               | cut by a type breaking  | refused |
- * |                 |                                         | its tier (`breaksGate`) |         |
+ * | dynamite        | refused (blast-only rock); cut slowly   | cut by a type breaking  | refused |
+ * |                 | with the blast bit                      | its tier (`breaksGate`) |         |
  *
  * An extractor's verb (tune, capture, mark, pull, tow) is `extractorVerdicts.ts`; the coil's own
  * pull is the one tool an extractor cell lets through.
@@ -21,7 +21,9 @@
  * an extractor id or `none`; for blast-only rock `type:<t>`, the first charge type that breaks its
  * tier, against `owned` when the rack carries a charge that does, else `price:<money>`, that
  * type's smallest size at this planet's dock (D4: never "locked", price is the only gate), and
- * against the blast's own `type:<t>` when a charge asks.
+ * against the blast's own `type:<t>` when a charge asks. Once the player owns the blast bit (D5
+ * #864) the drill cuts blast-only rock its tip scratches at `blastBitSpeedBp` of its speed, against
+ * `have: blast_bit`, so no `gate_hit` or hint is raised; a charge and a tool are answered as before.
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import { hardnessOfTile } from '../../../systems/authority/groundDrill'
@@ -42,6 +44,7 @@ import { carriedSizesOf } from '../../../systems/vehicle/vehicleCharges'
 import { canScratch } from '../../../systems/vehicle/drillRule'
 import type { PlanetParams } from '../../../systems/world/planetParams'
 import type { TilePoint } from '../../../systems/world/tileGrid'
+import { ownsBlastBit } from '../../dynamite'
 import { cellGateOf } from './cellGates'
 import {
   extractorDrillVerdictOf,
@@ -55,6 +58,8 @@ import type { CellGate } from './gateTable'
 const HIGHEST_MAJOR = 4096
 /** A shell's `have` while the rack carries a charge that opens it. */
 const OWNED = 'owned'
+/** A shell's `have` while the blast bit grinds it. */
+const BLAST_BIT = 'blast_bit'
 const ONE_CHARGE = 1
 
 export function canMine(query: GateQuery): GateVerdict | null {
@@ -68,7 +73,7 @@ export function canMine(query: GateQuery): GateVerdict | null {
 
 function drillVerdictOf(gate: CellGate, params: PlanetParams, query: GateQuery) {
   if (gate.kind === 'rig') return extractorDrillVerdictOf(gate.rig, query)
-  if (gate.kind === 'dynamite') return shellVerdictOf(gate.tier, standingOf(query, gate.tier))
+  if (gate.kind === 'dynamite') return shellDrillVerdictOf(gate.tier, params, query)
   if (isScratchable(params, query)) return null
   if (gate.kind === 'none' && !hasGateContent(params)) return null
   return tipVerdictOf(gate.kind === 'drillSignature' ? 'blocked' : 'refused', params, query)
@@ -80,6 +85,19 @@ function blastVerdictOf(gate: CellGate, params: PlanetParams, query: GateQuery, 
   if (gate.kind !== 'dynamite') return null
   const verdict = shellVerdictOf(gate.tier, `type:${chargeTypeOf(size)}`)
   return doesSizeBreakGate(size, gate.tier) ? { ...verdict, outcome: 'cut' as const } : verdict
+}
+
+/** Blast-only rock: a charge's, or the blast bit's slow cut where the tip scratches the cell. */
+function shellDrillVerdictOf(tier: number, params: PlanetParams, query: GateQuery): GateVerdict {
+  if (!ownsBlastBit(query.state, query.playerId))
+    return shellVerdictOf(tier, standingOf(query, tier))
+  if (!isScratchable(params, query)) return tipVerdictOf('refused', params, query)
+  return blastBitVerdictOf(tier)
+}
+
+function blastBitVerdictOf(tier: number): GateVerdict {
+  const slowCut = { outcome: 'cut' as const, drillSpeedBp: GATE_ROWS.blastBitSpeedBp }
+  return { ...shellVerdictOf(tier, BLAST_BIT), ...slowCut }
 }
 
 /** #142 "Constraints on other systems": a power-up never takes a gated cell, whatever is owned. */

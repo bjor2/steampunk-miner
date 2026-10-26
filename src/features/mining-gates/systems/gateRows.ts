@@ -56,6 +56,8 @@ export interface GateRows {
   dynamiteGateFromBand: number
   /** Basis points of a band's ore weight dynamite-gated cells may hold at most. */
   maxDynamiteBandShareBp: number
+  /** The share of the drill's speed, in basis points, it cuts blast-only rock at with the blast bit. */
+  blastBitSpeedBp: number
   rigFirstPlanet: number
   rigEveryPlanets: number
   rigPrice: BandOreCost
@@ -66,6 +68,8 @@ export interface GateRows {
 }
 
 const RIGLESS_OUTCOMES: readonly string[] = ['refused', 'lost']
+/** Full speed: a slowed cut is at most this and never 0, which would never cut at all. */
+const FULL_SPEED_BP = 10000
 
 export const GATE_ROWS: GateRows = loadGateRows(economyFile, rigsFile)
 
@@ -87,6 +91,11 @@ export function readGateRows(
       'dynamiteGate.maxBandShareBp',
       dynamite.maxBandShareBp,
     ),
+    blastBitSpeedBp: readSpeedShareBp(
+      reader,
+      'dynamiteGate.blastBitSpeedBp',
+      dynamite.blastBitSpeedBp,
+    ),
     rigFirstPlanet: reader.safeInteger('rigAvailability.first', availability.first),
     rigEveryPlanets: reader.safeInteger('rigAvailability.every', availability.every),
     rigPrice: readBandOreCost(reader, 'miningGates.rigPrice', gates.rigPrice),
@@ -98,6 +107,12 @@ export function readGateRows(
     rigs: readRigs(reader, reader.object('rigs', rigs).rigs),
   }
   return reader.problems.length > 0 ? { problems: reader.problems } : { rows }
+}
+
+function readSpeedShareBp(reader: FieldReader, path: string, raw: unknown): number {
+  const speedBp = reader.safeInteger(path, raw)
+  if (speedBp < 1 || speedBp > FULL_SPEED_BP) reader.record(`${path} must be 1 to ${FULL_SPEED_BP}`)
+  return speedBp
 }
 
 function loadGateRows(economy: unknown, rigs: unknown): GateRows {

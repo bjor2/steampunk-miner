@@ -3,12 +3,13 @@ import { chargePrice } from '../../../systems/economy/chargeSizes'
 import { ECONOMY } from '../../../systems/economy/economy'
 import { toCanonical } from '../../../systems/money'
 import { oreHardness, signatureHardness } from '../../../systems/economy/oreEconomy'
-import { canMine, minTipLevelOf } from './canMine'
+import { canMine, minTipLevelOf, minTipMajorOfCell } from './canMine'
 import {
   gatedCellOn,
   grantItems,
   paramsOn,
   queryOf,
+  researchBlastBit,
   sessionOn,
   setCharges,
   setTipMajor,
@@ -190,6 +191,60 @@ describe('canMine: dynamite (blast-only rock by tier, D4 #863)', () => {
   it('keeps a shell standing against a tool', () => {
     const { session, fixture } = gatedOn(7, 'dynamite')
     expect(canMine(queryOf(session, fixture, { tool: 'probe.drain' }))?.outcome).toBe('refused')
+  })
+})
+
+describe('canMine: the blast bit (D5 #864)', () => {
+  /** Blast-only rock of `lead` on `planet`, the bit researched and the tip scratching the cell. */
+  function grindableOn(planet: number, lead: number) {
+    const gated = gatedOn(planet, 'dynamite', (entry) => entry.entry.lead === lead)
+    researchBlastBit(gated.session)
+    const { tile, cell } = gated.fixture
+    setTipMajor(gated.session, minTipMajorOfCell(paramsOn(gated.session), tile, cell))
+    return gated
+  }
+
+  it('lets the drill cut blast-only rock at a quarter of its speed once the bit is researched', () => {
+    const { session, fixture } = grindableOn(7, 2)
+    expect(GATE_ROWS.blastBitSpeedBp).toBe(2500)
+    expect(canMine(queryOf(session, fixture))).toEqual({
+      outcome: 'cut',
+      gateKind: 'dynamite',
+      required: 'type:2',
+      have: 'blast_bit',
+      drillSpeedBp: GATE_ROWS.blastBitSpeedBp,
+    })
+  })
+
+  it('cuts tier-3 rock too, whatever the rack carries', () => {
+    const { session, fixture } = grindableOn(10, 2)
+    expect(fixture.gate).toEqual({ kind: 'dynamite', tier: 3 })
+    setCharges(session, 1)
+    expect(canMine(queryOf(session, fixture))?.outcome).toBe('cut')
+  })
+
+  it('asks the tip of rock it cannot scratch yet, as of any ordinary cell from planet 7', () => {
+    const { session, fixture } = gatedOn(7, 'dynamite', (gated) => gated.entry.lead === 2)
+    researchBlastBit(session)
+    const needed = minTipMajorOfCell(paramsOn(session), fixture.tile, fixture.cell)
+    setTipMajor(session, needed - 1)
+    expect(canMine(queryOf(session, fixture))).toEqual({
+      outcome: 'refused',
+      gateKind: 'drill',
+      required: `tip:${needed}`,
+      have: `tip:${needed - 1}`,
+    })
+  })
+
+  it('answers a charge and a tool on blast-only rock as without the bit', () => {
+    const { session, fixture } = gatedOn(10, 'dynamite', (gated) => gated.entry.lead === 2)
+    const answersOf = () =>
+      [{ blastSize: 5 }, { blastSize: 9 }, { tool: 'probe.drain' }].map((means) =>
+        canMine(queryOf(session, fixture, means)),
+      )
+    const without = answersOf()
+    researchBlastBit(session)
+    expect(answersOf()).toEqual(without)
   })
 })
 

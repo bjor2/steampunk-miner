@@ -520,6 +520,7 @@ A verdict answers the means in the query: `cut` opens the cell to it, `refused` 
 
 **Drill** (#156/#183, `src/systems/authority/drillGates.ts`), for ore cells only:
 - A `refused` or `blocked` verdict makes the `CellDrillTicks` answer `null` (not drillable).
+- **D5 (#864):** a `cut` may carry `drillSpeedBp`, its share of the drill's own speed. The cell's drill time, after every floor of the law, is divided by that share and rounded up (`gatedDrillTimeOf`), so the stamp, the swept cut, the gear and the bore gun all cut it that slowly, and the pacing bot times its bore the same way. `mining-gates` answers blast-only rock with `have: blast_bit` and `dynamiteGate.blastBitSpeedBp` (2500) once the dynamite slice's `tech.dynamite.blast_bit` node is researched. No `DrillGated` is raised, so neither is the hint, and the freed cell is logged as `GateCleared {gateKind: dynamite, method: drill}`.
 - `collectYieldedCells` skips `collectTile` for a `lost` verdict. `TileDestroyed` still fires.
 - **K2 (#185):** each stop is reported as the kernel domain event `DrillGated {tx, ty, oreId, family, tier, gateKind, outcome: refused|blocked|lost, required, have}`: a refused or blocked cell once per drill command that met it, a lost one right after its `TileDestroyed`. A command the gates refused entirely charges no energy and answers only its `DrillGated` events. It is logged as the core run event `gate_hit` with the same fields.
 

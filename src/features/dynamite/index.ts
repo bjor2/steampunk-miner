@@ -19,5 +19,6 @@ export {
   type DynamiteSize,
 } from './systems/dynamiteSizes'
 export { DETONATE_INTENT } from './systems/dynamiteCommands'
+export { BLAST_BIT_NODE_ID, ownsBlastBit } from './systems/blastBit'
 export { interlockReachMm } from './systems/plunger'
 export { liveChargeRingsOf, type ChargeRings } from './systems/chargeRings'
