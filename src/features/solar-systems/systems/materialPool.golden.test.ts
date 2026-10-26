@@ -8,14 +8,14 @@ import { systemMaterialPoolsOf } from './materialPool'
 // digests. A new stream, a roster or palette row, a moved mix or a new look row re-pins them with its
 // ticket; the seed is the lock's date. Ticket 888 re-pinned them for each run's least kinds under
 // the VS's band-trip bounds: a swapped band 3's fossil common splits in two (c5, c6). Ticket 890
-// re-pinned systems 2 and 10 for the epithet word "Bimetal" (was "Two-metal"), names only.
+// re-pinned systems 2, 10 and 1e6 for the epithet word "Bimetal" (was "Two-metal"), names only.
 
 const SEED = 20261024
 
 const GOLDEN = {
   system2: 'a26201078f57ff5c',
   system10: '8b5b925273d1e0b6',
-  system1e6: '06f390e848eb3691',
+  system1e6: 'cce9f17671adfa11',
 }
 
 function digestOf(system: bigint): string {
