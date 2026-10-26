@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-26T10:48:25+01:00",
+  "updated_at": "2026-10-26T10:50:24+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -19,12 +19,11 @@
       "slots": [
         {
           "slot": "C1",
-          "state": "busy",
-          "ticket": 921,
-          "grok_slot": 1,
-          "kind": "dev",
-          "since": "2026-10-26T09:18:00+01:00",
-          "wave": null
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C2",
@@ -69,8 +68,8 @@
         }
       ],
       "size": 6,
-      "used": 2,
-      "free": 4,
+      "used": 1,
+      "free": 5,
       "claims_last_hour": 0,
       "name": "Claude Max 1"
     },
@@ -191,17 +190,24 @@
           890
         ],
         "since": "2026-10-26T08:22:50+01:00"
+      },
+      {
+        "feature": 551,
+        "kind": "spec",
+        "title": "Systems proposal: drill speed x1.243 per purchase (level 20 about 50x), price rows, pacing",
+        "tickets": [
+          921
+        ],
+        "since": "2026-10-26T10:48:26+01:00"
       }
     ]
   },
   "grok": [
     {
       "slot": 1,
-      "state": "dev",
-      "ticket": 921,
-      "since": "2026-10-26T09:18:00+01:00",
-      "claude_slot": 1,
-      "wave": null
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 2,
@@ -275,12 +281,11 @@
   "claude": [
     {
       "slot": 1,
-      "state": "busy",
-      "ticket": 921,
-      "grok_slot": 1,
-      "since": "2026-10-26T09:18:00+01:00",
-      "account": 1,
-      "wave": null
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 1
     },
     {
       "slot": 2,
@@ -357,17 +362,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-26 08:50 CET",
+    "at": "2026-10-26 10:50 CET",
     "mode": "refill-dev",
-    "triggers": "#918",
+    "triggers": "#921",
     "started": "",
     "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 2,
-      "dev": 2,
+      "used": 1,
+      "dev": 1,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -375,8 +380,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 2,
-      "free": 8,
+      "used": 1,
+      "free": 9,
       "external": 0
     }
   },
