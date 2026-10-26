@@ -1261,6 +1261,22 @@
       ]
     },
     {
+      "why": "The gem-cut library (ticket 889): the gem-cuts slice's library, picks and pages, the kernel's overlay catalogue and cuts look, the hue-tinted shader branch, the roster's generated gems, and the library's shipped pages.",
+      "paths": [
+        "src/features/gem-cuts/**",
+        "src/systems/render/gemOverlays.json",
+        "src/systems/render/gemOverlays.ts",
+        "src/systems/render/gemCutsLook.ts",
+        "src/features/roster/systems/generatedRoster.ts",
+        "src/features/roster/systems/render/kindLookProvider.ts",
+        "src/scene/terrainKindShader.ts",
+        "src/scene/terrainKindLooks.ts",
+        "src/debug/debugKindLooks.ts",
+        "public/assets/ground/ground-gem-cut-atlas*/**"
+      ],
+      "specs": ["e2e/browser/gemCuts.spec.ts", "e2e/browser/skinContactSheet.spec.ts"]
+    },
+    {
       "why": "The first-contact rarity flourish (ticket 698): the store's reveal broadcast, the terrain's reveal uniform and its shader, the reveal timing, and the debug look read the spec holds across the first cut.",
       "paths": [
         "src/store/speciesRevealBroadcast.ts",

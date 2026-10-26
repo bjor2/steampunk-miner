@@ -7,7 +7,7 @@ earlier 12 per-act silhouettes; the HS asked for a planet-seeded facet or inclus
 of the hue, since a recolour alone is not enough). Every gem of a planet drawing its generated pool
 (system 1 from P6, every later system, feature-slices 3.101) draws one of these cuts, picked from
 the world seed, the planet's address and the gem's slot by the `gem-cuts` slice
-(`src/features/gem-cuts/`, feature-slices 3.102), coloured by its hue slot and laid under the
+(`src/features/gem-cuts/`, feature-slices 3.103), coloured by its hue slot and laid under the
 planet's overlay by the terrain shader. Nothing is authored per planet.
 
 The library is `src/features/gem-cuts/gemCuts.json`. It is append-only: a cut's cell is its place

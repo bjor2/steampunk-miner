@@ -243,6 +243,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/tripCap.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/useResolution.test.ts` | 4 | 4 |
 
+### `gem-cuts`: 2 files, 12 tests
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/features/gem-cuts/systems/gemCutLibrary.test.ts` | 6 | 6 |
+| `src/features/gem-cuts/systems/gemCutPick.test.ts` | 6 | 6 |
+
 ### `ground-gun`: 44 files, 284 tests
 
 | File | Tests | Sites |
@@ -561,16 +568,17 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/rig-look/systems/rigLookSource.test.ts` | 13 | 13 |
 | `src/features/rig-look/systems/rigLookTable.test.ts` | 32 | 32 |
 
-### `roster`: 24 files, 410 tests
+### `roster`: 25 files, 471 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/roster/kindLook.test.ts` | 26 | 17 |
+| `src/features/roster/kindLook.test.ts` | 27 | 18 |
 | `src/features/roster/rarityShares.test.ts` | 20 | 20 |
 | `src/features/roster/roster.byteIdentity.lane.test.ts` | 5 | 1 |
 | `src/features/roster/roster.byteIdentity.test.ts` | 29 | 15 |
 | `src/features/roster/roster.gemGlint.test.ts` | 9 | 5 |
 | `src/features/roster/roster.gemTier.test.ts` | 5 | 5 |
+| `src/features/roster/roster.generatedGemCuts.test.ts` | 60 | 9 |
 | `src/features/roster/roster.generatedPoolValue.test.ts` | 11 | 7 |
 | `src/features/roster/roster.generatedPoolsInPlay.test.ts` | 5 | 1 |
 | `src/features/roster/roster.p1Gems.test.ts` | 6 | 6 |
@@ -1489,7 +1497,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/fuelTenderLook.test.ts` | 33 | 18 |
 | `src/systems/render/fuelTenderLookSource.test.ts` | 4 | 4 |
 | `src/systems/render/gatePatterns.test.ts` | 10 | 10 |
+| `src/systems/render/gemCutsLook.test.ts` | 2 | 2 |
 | `src/systems/render/gemGlint.test.ts` | 15 | 15 |
+| `src/systems/render/gemOverlays.test.ts` | 6 | 6 |
 | `src/systems/render/gpuTier.test.ts` | 19 | 3 |
 | `src/systems/render/groundBlocks.test.ts` | 7 | 7 |
 | `src/systems/render/groundStrata.test.ts` | 6 | 6 |
@@ -1502,8 +1512,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/headlamp.test.ts` | 3 | 3 |
 | `src/systems/render/heatShimmer.test.ts` | 2 | 2 |
 | `src/systems/render/heatTiles.test.ts` | 3 | 3 |
-| `src/systems/render/heroAtlas.test.ts` | 15 | 15 |
-| `src/systems/render/kindLookTable.test.ts` | 20 | 20 |
+| `src/systems/render/heroAtlas.test.ts` | 18 | 18 |
+| `src/systems/render/kindLookTable.test.ts` | 21 | 21 |
 | `src/systems/render/kindLooks.test.ts` | 6 | 6 |
 | `src/systems/render/lookPartQuads.test.ts` | 6 | 6 |
 | `src/systems/render/mountedPartLook.test.ts` | 8 | 4 |

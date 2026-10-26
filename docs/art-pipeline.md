@@ -540,7 +540,7 @@ full chains and a full chain would blur one cell into the next. A new page ships
 ## Gem cuts
 
 The gem-cut library of [#889](https://github.com/bjor2/steampunk-miner/issues/889) (the
-`gem-cuts` slice's `gemCuts.json`, feature-slices 3.102): about 24 cuts, each one flat-shaded stone
+`gem-cuts` slice's `gemCuts.json`, feature-slices 3.103): about 24 cuts, each one flat-shaded stone
 built by `docs/art/gem-cuts/cut_marks.py` on the ore stage and rendered neutral (a grey body, white
 rim and facet glint) with the rock held out into a 256 px cell (`docs/art/gem-cuts/cells/`, the mask
 in alpha). The cells pack into hue-tinted atlas pages in library order, 16 a page

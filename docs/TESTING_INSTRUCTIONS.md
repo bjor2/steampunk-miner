@@ -543,6 +543,24 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   client gets the host's cells. `src/systems/world/generatorGolden.test.ts` holds P1 to P5 under rules
   14 as 13 made them and pins the pool chunks of P6, P8, P20, P40, 2.1 and g = 1e6. Money per minute
   against #551, planet minutes and felt speed are the Tester's: `npm run balance:report`.
+- **The gem-cut library and the planet overlay** (ticket 889, spec #878, feature-slices 3.103):
+  `src/features/gem-cuts/systems/gemCutLibrary.test.ts` holds the shipped library (about 24 cuts,
+  every one drawable under the current ore rules, 16 a hue-tinted page, a cut appended with a later
+  `since` hidden from older stamps, the append-only `since` order and the id rules refused);
+  `gemCutPick.test.ts` holds `gemCutPicks.golden.json`, the cuts and overlay of fixed addresses, with
+  the library and with a cut appended (the pick is a pure function of seed, address and slot; three
+  different cuts a planet; no cut under rules 13). `src/systems/render/gemOverlays.test.ts` and
+  `gemCutsLook.test.ts` hold the overlay catalogue (patterns of the kind look catalogue, strengths
+  within the cap) and the `uGemCuts` vector; `heroAtlas.test.ts` the hue-tinted pages after every
+  other page and where they begin, `kindLookTable.test.ts` the sprite id a look names.
+  `src/features/roster/roster.generatedGemCuts.test.ts` reads system 1's P6, P7, P8, P20, P40,
+  system 2's p1 and p3 and g = 1e6: three different library cuts on the tinted pages and no non-gem
+  cell, the look table carrying them over the rank glint, the overlay from data by the address, every
+  committed cut cell read as a gem at 24 px (640x360), 360 px and 1280+ from
+  `docs/art/gem-cuts/gem-cut-reads.json` (pinned to each cell's SHA-256, neutral and in the dimmest
+  hue slot), the price order, shared-g addresses apart, and nothing on a rules-13 P6 or on P1 to P5.
+  The browser half is `e2e/browser/gemCuts.spec.ts` (P6 and P8 at 640x360 at 24 px a cell, 360x640
+  and 1280x800, screenshots attached), the Tester's.
 - **The "solar system 2" re-baseline** (ticket 779, spec #774): `src/features/solar-systems/systemTwoPace.test.ts`
   judges the system 2 bars on hand-built tallies: planets at g 6 to 10, each 22-30 min, felt speed
   at least 0.9x the planet before (the jump's step against system 1's planet 5), drill + tip majors

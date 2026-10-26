@@ -48,7 +48,12 @@ export function heroReadOf(reads: HeroReads, speciesId: string): HeroCellRead | 
 
 /** Why a cell fails to read as a gem on a screen; empty when it reads. */
 export function gemReadProblemsOf(read: HeroCellRead): string[] {
-  return GEM_READ_SCREENS.flatMap((screen) => screenProblemsOf(read, screen))
+  return gemReadProblemsAt(read, GEM_READ_SCREENS)
+}
+
+/** The same read on any screens the pipeline measured: the gem-cut library adds 24 px (ticket 889). */
+export function gemReadProblemsAt(read: HeroCellRead, screens: readonly string[]): string[] {
+  return screens.flatMap((screen) => screenProblemsOf(read, screen))
 }
 
 function screenProblemsOf(read: HeroCellRead, screen: string): string[] {
