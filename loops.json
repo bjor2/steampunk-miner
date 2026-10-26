@@ -1,14 +1,14 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-26T08:15:01Z",
+  "updated_at": "2026-10-26T08:18:21Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
       "slot": "1",
-      "state": "idle",
-      "issue": null,
-      "note": "free",
-      "updated_at": "2026-10-26T08:15:01Z",
+      "state": "working",
+      "issue": 921,
+      "note": "started 2026-10-26 09:18 CET",
+      "updated_at": "2026-10-26T08:18:21Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
@@ -17,7 +17,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-26T08:15:01Z",
+      "updated_at": "2026-10-26T08:18:21Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
@@ -26,7 +26,7 @@
       "state": "working",
       "issue": 829,
       "note": "started 2026-10-26 06:20 CET",
-      "updated_at": "2026-10-26T08:15:01Z",
+      "updated_at": "2026-10-26T08:18:21Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
@@ -35,7 +35,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-26T08:15:01Z",
+      "updated_at": "2026-10-26T08:18:21Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
@@ -43,9 +43,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "1/10 Claude slots busy, 0/4 planner slots; no pickable build ticket; delegated 0 spec(s); planner slots 0/4",
+      "note": "2/10 Claude slots busy, 0/4 planner slots; spawned 1 worker(s); delegated 0 spec(s); planner slots 0/4",
       "extra": {
-        "active": 1,
+        "active": 2,
         "max": 10,
         "max_attempts": 2,
         "attempts": {
@@ -782,7 +782,7 @@
         "planner": [],
         "push_pending": null
       },
-      "updated_at": "2026-10-26T08:15:01Z",
+      "updated_at": "2026-10-26T08:18:21Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
@@ -800,7 +800,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-26T08:15:01Z",
+      "updated_at": "2026-10-26T08:18:21Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/6": {
@@ -809,7 +809,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-26T08:15:01Z",
+      "updated_at": "2026-10-26T08:18:21Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/7": {
@@ -818,7 +818,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-26T08:15:01Z",
+      "updated_at": "2026-10-26T08:18:21Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/8": {
@@ -827,7 +827,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-26T08:15:01Z",
+      "updated_at": "2026-10-26T08:18:21Z",
       "host": "grok-bot-vm-452660841"
     },
     "tester": {
@@ -846,7 +846,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-26T08:15:01Z",
+      "updated_at": "2026-10-26T08:18:21Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/11": {
@@ -873,11 +873,18 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-26T08:15:01Z",
+      "updated_at": "2026-10-26T08:18:21Z",
       "host": "grok-bot-vm-452660841"
     }
   },
   "events": [
+    {
+      "at": "2026-10-26T08:18:21Z",
+      "key": "steampunk-loop/1",
+      "state": "working",
+      "issue": 921,
+      "note": "started 2026-10-26 09:18 CET"
+    },
     {
       "at": "2026-10-26T07:48:55Z",
       "key": "steampunk-loop/1",
@@ -1290,13 +1297,6 @@
       "state": "idle",
       "issue": null,
       "note": "free; #892 landed on main and closed"
-    },
-    {
-      "at": "2026-10-25T22:38:06Z",
-      "key": "steampunk-loop/8",
-      "state": "working",
-      "issue": 903,
-      "note": "tier easy, attempt 1/2"
     }
   ]
 }
