@@ -2,10 +2,12 @@
  * The gate checks on the drill path (docs/standards/feature-slices.md 3.6, #142's `canMine`): for
  * ore cells only, a `refused` or `blocked` verdict makes the cell undrillable and a `lost` one
  * destroys it without cargo. Each says so in a `DrillGated` (K2): a standing cell once per drill
- * command that met it, a lost one beside its `TileDestroyed`. With no check registered the drill keeps today's
- * path exactly, so nothing here builds an ore query then.
+ * command that met it, a lost one beside its `TileDestroyed`. A `cut` naming a share of the drill's
+ * speed (D5 #864, `drillSpeedBp`) takes its drill time over that share, so every clock that times a
+ * cell through the gates (the stamp, the swept cut, the gear, the bore gun) cuts it as slowly. With
+ * no check registered the drill keeps today's path exactly, so nothing here builds an ore query then.
  */
-import { hasGateChecks, isStandingVerdict } from '../registries/gateChecks'
+import { gatedDrillTimeOf, hasGateChecks, isStandingVerdict } from '../registries/gateChecks'
 import type { YieldedCell } from '../world/cellYield'
 import type { CellDrillTicks } from '../world/groundEdit'
 import type { PlanetParams } from '../world/planetParams'
@@ -23,7 +25,10 @@ import type { DomainEventBody } from './domainEvent'
 
 /** The gates of one drill command. */
 export interface DrillGates {
-  /** `drillTicksOf`, answering null (not drillable) for an ore cell a gate refuses or blocks. */
+  /**
+   * `drillTicksOf`, answering null (not drillable) for an ore cell a gate refuses or blocks, and
+   * the slower time for one a gate cuts below full speed.
+   */
   drillTicksOf: CellDrillTicks
   /** `DrillGated` for each ore cell a gate refused or blocked, in the order the drill met them. */
   refusedEvents(): DomainEventBody[]
@@ -52,9 +57,9 @@ export function openDrillGates(
   const gates: CellGates = new Map()
   return {
     drillTicksOf: (tile, material, casingGrade) =>
-      isStanding(gateOfCell(gates, asker, { tile, cell: material }))
-        ? null
-        : drillTicksOf(tile, material, casingGrade),
+      gatedTicksOf(gateOfCell(gates, asker, { tile, cell: material }), () =>
+        drillTicksOf(tile, material, casingGrade),
+      ),
     refusedEvents: () => standingEventsOf(gates),
     lostEventOf: (yielded) => lostEventOf(gateOfCell(gates, asker, yielded)),
     canMine: (cell) => isCut(gateOfCell(gates, asker, cell)),
@@ -70,6 +75,14 @@ function ungatedDrill(drillTicksOf: CellDrillTicks): DrillGates {
     canMine: () => true,
     canMineUnreported: () => true,
   }
+}
+
+/** Null for a standing cell, which is never timed; else its time under the gate's speed. */
+function gatedTicksOf(gated: GatedCell | null, timeOf: () => number | null): number | null {
+  const verdict = gated?.verdict ?? null
+  if (verdict !== null && isStandingVerdict(verdict)) return null
+  const time = timeOf()
+  return time === null ? null : gatedDrillTimeOf(time, verdict)
 }
 
 function isCut(gated: GatedCell | null): boolean {

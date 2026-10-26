@@ -6,7 +6,9 @@
  * A verdict is the gate's answer to the means in the query: `cut` opens the cell (a blast frees it
  * whole, #142 "Dynamite-only share"), `refused` leaves it standing, `lost` breaks it without ore.
  * `blocked` leaves it standing too: #142's scratch-only cell, a drill-gated signature the tip only
- * scratches (the drill works it, it neither breaks nor yields), reported apart from a skid.
+ * scratches (the drill works it, it neither breaks nor yields), reported apart from a skid. A `cut`
+ * may name a share of the drill's own speed (D5 #864: `blastBit` grinds through blast-only rock at
+ * a quarter): the cell takes its drill time over that share, after every floor of the law.
  */
 import type { AuthorityState } from '../authority/authorityState'
 import type { TilePoint } from '../world/tileGrid'
@@ -43,6 +45,11 @@ export interface GateVerdict {
    * pacing bot can wait instead of routing round. Absent when standing by opens nothing.
    */
   opensAfterTicks?: number
+  /**
+   * For a `cut` by the drill: the share of its own speed it cuts the cell at, in basis points of
+   * full speed (D5 #864). Absent at full speed; read by `gatedDrillTimeOf`.
+   */
+  drillSpeedBp?: number
 }
 
 export interface GateCheck {
@@ -52,6 +59,8 @@ export interface GateCheck {
 }
 
 export const GATE_CHECK_REGISTRY = defineRegistry<GateCheck>('gateChecks')
+
+const FULL_SPEED_BP = 10000
 
 /** Higher wins: refused over blocked over lost over cut. */
 const OUTCOME_PRECEDENCE: Readonly<Record<GateOutcome, number>> = {
@@ -78,6 +87,15 @@ export function gateVerdictOf(query: GateQuery): GateVerdict | null {
 /** Whether the verdict leaves the cell standing against the means asked: refused or blocked. */
 export function isStandingVerdict(verdict: GateVerdict): boolean {
   return verdict.outcome === 'refused' || verdict.outcome === 'blocked'
+}
+
+/**
+ * A cell's drill time, in ticks or sub-steps, under the verdict's `drillSpeedBp`: the time over
+ * the share, rounded up, so a quarter speed takes four times as long; the time itself at full speed.
+ */
+export function gatedDrillTimeOf(time: number, verdict: GateVerdict | null): number {
+  const speedBp = verdict?.drillSpeedBp ?? FULL_SPEED_BP
+  return Math.ceil((time * FULL_SPEED_BP) / speedBp)
 }
 
 function strongerVerdict(held: GateVerdict | null, next: GateVerdict | null): GateVerdict | null {
