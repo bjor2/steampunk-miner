@@ -540,8 +540,8 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   `planetRoster.test.ts`, `planetSpecies.test.ts`, `rosterGems.test.ts` and `kindLook.test.ts` read
   `foothold-p6-p7` only under rules 13 (saves). `src/systems/authority/planetOreStamps.test.ts` is
   the TD's list: an old save with P6 and P7 visited loads on v_pre with main's digests, a mixed save
-  holds P6 on 13 and P8 on 14 across save, reload and travel back, an unvisited P9 takes 14 with one
-  digest across runs, a newer stamp is refused (with its `ore_rules_refused` rows), and a joining
+  holds P6 on 13 and P8 on `v_new` (15 since ticket 890) across save, reload and travel back, an
+  unvisited P9 takes `v_new` with one digest across runs, a newer stamp is refused (with its `ore_rules_refused` rows), and a joining
   client gets the host's cells. `src/systems/world/generatorGolden.test.ts` holds P1 to P5 under rules
   14 as 13 made them and pins the pool chunks of P6, P8, P20, P40, 2.1 and g = 1e6. Money per minute
   against #551, planet minutes and felt speed are the Tester's: `npm run balance:report`.
@@ -571,9 +571,18 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   library cuts read as gems at 24 px, 360 px and 1280+, the price order), gems only in bands 3 to 5
   in clusters of at most 3 cells, rarity that never falls band to band, a world seed per address and
   kind ids `system<s>-p<p>-<slot>` none shares, shared-g addresses (1.6 and 2.1, 1.11 and 3.1) on
-  other pools and gem looks, and every gem pick kept with a cut appended to the library.
+  other pools and gem looks, every gem pick kept with a cut appended to the library, and the #699
+  stem rule on generated species (the palette's `epithetWords` guard in `paletteRows.test.ts`).
   `src/features/roster/systems/rosterGuard.test.ts` runs the family-first bounds on the same planets
-  over the three pacing seeds.
+  over the three pacing seeds. Ore rules 15, the gem overlay walk (feature-slices 3.105):
+  `src/features/roster/roster.gemOverlayWalk.test.ts` lets no two planets of one act share a gem look
+  (`render/sharedGemLooks.ts`: one cut under one overlay in colours under 32 steps apart) on seeds 0,
+  1, 83921 and 4294967295, lists the one rules-14 pair as legacy, holds the pool, roster, gem tiers,
+  value, contact sheet and cells of every CI planet byte-identical under 14 and 15, and gives a
+  joining client the host's cells and looks on P12 stamped 14 and 15; `gemCutPick.test.ts` pins both
+  pick goldens and proves the walk pure, bounded and with room in every look group at P6 to P40 and
+  g = 40 and 1e6; `src/systems/authority/unknownOreRules.test.ts` refuses a join snapshot or a
+  travel event stamped with unknown rules, "update required".
 - **The "solar system 2" re-baseline** (ticket 779, spec #774): `src/features/solar-systems/systemTwoPace.test.ts`
   judges the system 2 bars on hand-built tallies: planets at g 6 to 10, each 22-30 min, felt speed
   at least 0.9x the planet before (the jump's step against system 1's planet 5), drill + tip majors
