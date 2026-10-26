@@ -30,7 +30,6 @@ describe('casing prices: the #894 share and arrival bars on the bot lane to plan
     expect(casingPriceProblemsOf(runs)).toEqual([])
   })
 
-  // On main every planet asks grades 1 to 5, so a bot that skipped casing could never reach a
-  // core; skipping becomes a real choice with #829's under-grade burst, which carries the row.
-  it.todo('earns less money per minute skipping casing than casing (re-drill counted, #829)')
+  // The skip-casing row ("earns less money per minute skipping casing than casing, re-drill
+  // counted") is ticket 829's, judged with its other bot rows by `casingPolicy.lane.test.ts`.
 })

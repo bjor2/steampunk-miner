@@ -832,7 +832,11 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   and lining paid 12-20% of everything bought on each of P1-P5, travel excluded; the next grade at
   most 25% of the money held on each jump in; collapses printed) are the lane
   `src/logging/casingPrice.lane.test.ts`, its tally and bars unit-specced in `casingSpend.test.ts`
-  and `casingPriceBars.test.ts`. The P3-P5 pacing diagnosis of ticket 907 is the lane
+  and `casingPriceBars.test.ts`. Ticket 829's bot rows (the on-curve bot buys four grades a planet
+  and never bursts, a run one grade short loses at most 5% of each planet's time, a run that skips
+  casing earns less a minute) are the lane `src/logging/casingPolicy.lane.test.ts`: the three
+  pacing seeds to planet 3's core under each `casingPolicy` (`botCasing.ts`), its bars
+  unit-specced in `casingPolicyBars.test.ts`. The P3-P5 pacing diagnosis of ticket 907 is the lane
   `src/logging/economyTrace.lane.test.ts`: the three pacing seeds to planet 5's core under
   kitPolicy off and on, folded into the per-planet economy trace (money on arrival, income per
   minute, the next useful upgrade and its wait, upgrades bought, deaths by cause, each trip's sale

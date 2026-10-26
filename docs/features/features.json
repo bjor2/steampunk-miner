@@ -279,9 +279,9 @@
             },
             {
               "title": "Casing grade",
-              "description": "Lining strength; each depth band needs a grade at least its number (the core needs 5). Buy higher grades at the Upgrade bay.",
+              "description": "Lining strength on one ladder that never ends: each planet's surface needs the grade the planet before's core did, and each band one more, four new grades a planet. The rig lays the best grade it owns; the depth dial shows and names the grade its band needs. Buy higher grades at the Upgrade bay.",
               "status": "built",
-              "issues": [41, 56]
+              "issues": [41, 56, 829]
             },
             {
               "title": "Visible lining",
@@ -348,9 +348,9 @@
             },
             {
               "title": "Casing blink and burst",
-              "description": "The lining of a warned stretch blinks red over the cracks (steady red with reduce motion), then bursts into sparks, a cement puff and debris as the walls refill.",
+              "description": "Lining short of the grade its ground needs holds 20 s one grade short, half that for each grade more (never under 1 s), blinks red for its last 3 s over the cracks (steady red with reduce motion), then bursts into sparks, a cement puff and debris as the walls refill. A burst never hurts the rig, costs nothing and never seals it in.",
               "status": "built",
-              "issues": [830]
+              "issues": [829, 830]
             },
             {
               "title": "Crush damage",
