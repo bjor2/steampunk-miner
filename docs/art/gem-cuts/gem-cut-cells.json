@@ -1,0 +1,480 @@
+{
+  "$comment": "The cells of the gem-cut library (ticket 889): one 256 px neutral albedo cell per cut, cell i of its page at column i mod 4, row i div 4, 248 px of content inside a 4 px gutter, in library order (a cut is only ever appended, so no cell moves). Rendered lit on the ore stage with the rock held out, so the alpha is the mask; the shader colours the cut by the gem's hue slot, lays the planet overlay over it and draws the rarity frame and the rank glint.",
+  "atlas": {
+    "sidePx": 1024,
+    "cellPx": 256,
+    "contentPx": 248,
+    "gutterPx": 4,
+    "cellsPerRow": 4
+  },
+  "pages": [
+    {
+      "page": 1,
+      "assetId": "ground-gem-cut-atlas"
+    },
+    {
+      "page": 2,
+      "assetId": "ground-gem-cut-atlas-page-2"
+    }
+  ],
+  "cells": [
+    {
+      "index": 0,
+      "page": 1,
+      "cutId": "gem-cut.brilliant",
+      "rect": {
+        "x": 4,
+        "y": 4,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 1,
+      "page": 1,
+      "cutId": "gem-cut.oval",
+      "rect": {
+        "x": 260,
+        "y": 4,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 2,
+      "page": 1,
+      "cutId": "gem-cut.cushion",
+      "rect": {
+        "x": 516,
+        "y": 4,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 3,
+      "page": 1,
+      "cutId": "gem-cut.emerald",
+      "rect": {
+        "x": 772,
+        "y": 4,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 4,
+      "page": 1,
+      "cutId": "gem-cut.asscher",
+      "rect": {
+        "x": 4,
+        "y": 260,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 5,
+      "page": 1,
+      "cutId": "gem-cut.princess",
+      "rect": {
+        "x": 260,
+        "y": 260,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 6,
+      "page": 1,
+      "cutId": "gem-cut.radiant",
+      "rect": {
+        "x": 516,
+        "y": 260,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 7,
+      "page": 1,
+      "cutId": "gem-cut.pear",
+      "rect": {
+        "x": 772,
+        "y": 260,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 8,
+      "page": 1,
+      "cutId": "gem-cut.marquise",
+      "rect": {
+        "x": 4,
+        "y": 516,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 9,
+      "page": 1,
+      "cutId": "gem-cut.heart",
+      "rect": {
+        "x": 260,
+        "y": 516,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 10,
+      "page": 1,
+      "cutId": "gem-cut.trillion",
+      "rect": {
+        "x": 516,
+        "y": 516,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 11,
+      "page": 1,
+      "cutId": "gem-cut.baguette",
+      "rect": {
+        "x": 772,
+        "y": 516,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 12,
+      "page": 1,
+      "cutId": "gem-cut.kite",
+      "rect": {
+        "x": 4,
+        "y": 772,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 13,
+      "page": 1,
+      "cutId": "gem-cut.shield",
+      "rect": {
+        "x": 260,
+        "y": 772,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 14,
+      "page": 1,
+      "cutId": "gem-cut.hexagon",
+      "rect": {
+        "x": 516,
+        "y": 772,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 15,
+      "page": 1,
+      "cutId": "gem-cut.octagon",
+      "rect": {
+        "x": 772,
+        "y": 772,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 0,
+      "page": 2,
+      "cutId": "gem-cut.lozenge",
+      "rect": {
+        "x": 4,
+        "y": 4,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 1,
+      "page": 2,
+      "cutId": "gem-cut.half-moon",
+      "rect": {
+        "x": 260,
+        "y": 4,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 2,
+      "page": 2,
+      "cutId": "gem-cut.bullet",
+      "rect": {
+        "x": 516,
+        "y": 4,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 3,
+      "page": 2,
+      "cutId": "gem-cut.trapeze",
+      "rect": {
+        "x": 772,
+        "y": 4,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 4,
+      "page": 2,
+      "cutId": "gem-cut.rose",
+      "rect": {
+        "x": 4,
+        "y": 260,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 5,
+      "page": 2,
+      "cutId": "gem-cut.briolette",
+      "rect": {
+        "x": 260,
+        "y": 260,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 6,
+      "page": 2,
+      "cutId": "gem-cut.checkerboard",
+      "rect": {
+        "x": 516,
+        "y": 260,
+        "w": 248,
+        "h": 248
+      }
+    },
+    {
+      "index": 7,
+      "page": 2,
+      "cutId": "gem-cut.sugarloaf",
+      "rect": {
+        "x": 772,
+        "y": 260,
+        "w": 248,
+        "h": 248
+      }
+    }
+  ],
+  "cuts": [
+    {
+      "cutId": "gem-cut.brilliant",
+      "name": "Brilliant",
+      "since": 14,
+      "shape": "a round brilliant: a girdle step and kite and star facets rising to an eight-sided table",
+      "cell": "cells/brilliant.png",
+      "blend": "blend/cut-brilliant.blend"
+    },
+    {
+      "cutId": "gem-cut.oval",
+      "name": "Oval",
+      "since": 14,
+      "shape": "an oval brilliant lying across the cell, a long table on a stepped crown",
+      "cell": "cells/oval.png",
+      "blend": "blend/cut-oval.blend"
+    },
+    {
+      "cutId": "gem-cut.cushion",
+      "name": "Cushion",
+      "since": 14,
+      "shape": "a square pillow with rounded corners, a girdle step and four kite facets to the table",
+      "cell": "cells/cushion.png",
+      "blend": "blend/cut-cushion.blend"
+    },
+    {
+      "cutId": "gem-cut.emerald",
+      "name": "Emerald",
+      "since": 14,
+      "shape": "a step-cut rectangle with clipped corners, three parallel crown steps",
+      "cell": "cells/emerald.png",
+      "blend": "blend/cut-emerald.blend"
+    },
+    {
+      "cutId": "gem-cut.asscher",
+      "name": "Asscher",
+      "since": 14,
+      "shape": "a step-cut square with wide clipped corners, deep concentric steps to a small table",
+      "cell": "cells/asscher.png",
+      "blend": "blend/cut-asscher.blend"
+    },
+    {
+      "cutId": "gem-cut.princess",
+      "name": "Princess",
+      "since": 14,
+      "shape": "a sharp square standing on a corner, four crown facets meeting at a point",
+      "cell": "cells/princess.png",
+      "blend": "blend/cut-princess.blend"
+    },
+    {
+      "cutId": "gem-cut.radiant",
+      "name": "Radiant",
+      "since": 14,
+      "shape": "a clipped-corner rectangle lying across the cell, with a brilliant crown of sixteen facets",
+      "cell": "cells/radiant.png",
+      "blend": "blend/cut-radiant.blend"
+    },
+    {
+      "cutId": "gem-cut.pear",
+      "name": "Pear",
+      "since": 14,
+      "shape": "a teardrop, round at the foot and drawn to a point at the head",
+      "cell": "cells/pear.png",
+      "blend": "blend/cut-pear.blend"
+    },
+    {
+      "cutId": "gem-cut.marquise",
+      "name": "Marquise",
+      "since": 14,
+      "shape": "a boat with two points, lying across the cell, a long narrow table",
+      "cell": "cells/marquise.png",
+      "blend": "blend/cut-marquise.blend"
+    },
+    {
+      "cutId": "gem-cut.heart",
+      "name": "Heart",
+      "since": 14,
+      "shape": "a heart with a cleft top and a point below, lobed crown facets",
+      "cell": "cells/heart.png",
+      "blend": "blend/cut-heart.blend"
+    },
+    {
+      "cutId": "gem-cut.trillion",
+      "name": "Trillion",
+      "since": 14,
+      "shape": "a triangle with softly curved sides, a three-fold crown",
+      "cell": "cells/trillion.png",
+      "blend": "blend/cut-trillion.blend"
+    },
+    {
+      "cutId": "gem-cut.baguette",
+      "name": "Baguette",
+      "since": 14,
+      "shape": "a long narrow step-cut bar standing upright, two crown steps",
+      "cell": "cells/baguette.png",
+      "blend": "blend/cut-baguette.blend"
+    },
+    {
+      "cutId": "gem-cut.kite",
+      "name": "Kite",
+      "since": 14,
+      "shape": "a kite with a short head and a long tail, a ridge down its middle",
+      "cell": "cells/kite.png",
+      "blend": "blend/cut-kite.blend"
+    },
+    {
+      "cutId": "gem-cut.shield",
+      "name": "Shield",
+      "since": 14,
+      "shape": "a five-sided shield, flat top and a point below, stepped crown",
+      "cell": "cells/shield.png",
+      "blend": "blend/cut-shield.blend"
+    },
+    {
+      "cutId": "gem-cut.hexagon",
+      "name": "Hexagon",
+      "since": 14,
+      "shape": "a wide hexagon with a flat top edge, six crown facets to a hexagonal table",
+      "cell": "cells/hexagon.png",
+      "blend": "blend/cut-hexagon.blend"
+    },
+    {
+      "cutId": "gem-cut.octagon",
+      "name": "Octagon",
+      "since": 14,
+      "shape": "a tall octagon, eight crown facets round a large table",
+      "cell": "cells/octagon.png",
+      "blend": "blend/cut-octagon.blend"
+    },
+    {
+      "cutId": "gem-cut.lozenge",
+      "name": "Lozenge",
+      "since": 14,
+      "shape": "a tall diamond rhombus, four crown facets meeting on a ridge",
+      "cell": "cells/lozenge.png",
+      "blend": "blend/cut-lozenge.blend"
+    },
+    {
+      "cutId": "gem-cut.half-moon",
+      "name": "Half-moon",
+      "since": 14,
+      "shape": "a half disc with its flat edge up, stepped crown along the curve",
+      "cell": "cells/half-moon.png",
+      "blend": "blend/cut-half-moon.blend"
+    },
+    {
+      "cutId": "gem-cut.bullet",
+      "name": "Bullet",
+      "since": 14,
+      "shape": "a bar with a pointed head and a square foot, standing upright",
+      "cell": "cells/bullet.png",
+      "blend": "blend/cut-bullet.blend"
+    },
+    {
+      "cutId": "gem-cut.trapeze",
+      "name": "Trapeze",
+      "since": 14,
+      "shape": "a wide trapezoid, the long side down, two crown steps",
+      "cell": "cells/trapeze.png",
+      "blend": "blend/cut-trapeze.blend"
+    },
+    {
+      "cutId": "gem-cut.rose",
+      "name": "Rose",
+      "since": 14,
+      "shape": "a small round dome of triangular facets rising to a point, no table",
+      "cell": "cells/rose.png",
+      "blend": "blend/cut-rose.blend"
+    },
+    {
+      "cutId": "gem-cut.briolette",
+      "name": "Briolette",
+      "since": 14,
+      "shape": "a hanging drop covered all over in small triangular facets, the point down",
+      "cell": "cells/briolette.png",
+      "blend": "blend/cut-briolette.blend"
+    },
+    {
+      "cutId": "gem-cut.checkerboard",
+      "name": "Checkerboard",
+      "since": 14,
+      "shape": "a wide cushion whose crown is a chequer of square facets",
+      "cell": "cells/checkerboard.png",
+      "blend": "blend/cut-checkerboard.blend"
+    },
+    {
+      "cutId": "gem-cut.sugarloaf",
+      "name": "Sugarloaf",
+      "since": 14,
+      "shape": "a steep four-sided pyramid on a small square foot, its four faces lit one at a time",
+      "cell": "cells/sugarloaf.png",
+      "blend": "blend/cut-sugarloaf.blend"
+    }
+  ]
+}

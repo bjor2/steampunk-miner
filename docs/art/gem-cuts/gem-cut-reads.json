@@ -1,0 +1,1067 @@
+{
+  "$comment": "The gem-read measures of every committed gem-cut cell at the three read screens (ticket 889, hero_reads.py over cut_post.py): highlights, facet edges, outline contrast and the bright-or-saturated share of the neutral cell (`screens`) and of the cell coloured by the dimmest hue slot of the materials table the shader's way (`dimmestTint`), with the SHA-256 of the cell. Look only.",
+  "screens": {
+    "640x360": 24,
+    "360x640": 30,
+    "1280x800": 67
+  },
+  "dimmestHueSlotHex": "#877673",
+  "cuts": [
+    {
+      "cutId": "gem-cut.brilliant",
+      "cellSha256": "fd3f78008fcdb2a8adf715d660724d51bf9f9d5600557cc2a00a8fe9af0d429d",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.392,
+          "outlineContrast": 2.6,
+          "brightOrSaturatedShare": 0.247
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.325,
+          "outlineContrast": 2.64,
+          "brightOrSaturatedShare": 0.257
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.17,
+          "outlineContrast": 2.64,
+          "brightOrSaturatedShare": 0.256
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.412,
+          "outlineContrast": 2.56,
+          "brightOrSaturatedShare": 0.24
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.335,
+          "outlineContrast": 2.61,
+          "brightOrSaturatedShare": 0.251
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.175,
+          "outlineContrast": 2.6,
+          "brightOrSaturatedShare": 0.253
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.oval",
+      "cellSha256": "5e00fb08e47ffca27cca4431f93746ee940da61ecf77ae24715e57bcc024be11",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.441,
+          "outlineContrast": 2.6,
+          "brightOrSaturatedShare": 0.208
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.372,
+          "outlineContrast": 2.59,
+          "brightOrSaturatedShare": 0.211
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.166,
+          "outlineContrast": 2.61,
+          "brightOrSaturatedShare": 0.215
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.445,
+          "outlineContrast": 2.57,
+          "brightOrSaturatedShare": 0.205
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.38,
+          "outlineContrast": 2.56,
+          "brightOrSaturatedShare": 0.208
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.167,
+          "outlineContrast": 2.58,
+          "brightOrSaturatedShare": 0.213
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.cushion",
+      "cellSha256": "266bf67242487bb3f845aa339df3bde31c88b765414ca65e3a2417aba4c5282c",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.47,
+          "outlineContrast": 2.64,
+          "brightOrSaturatedShare": 0.283
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.358,
+          "outlineContrast": 2.64,
+          "brightOrSaturatedShare": 0.291
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.165,
+          "outlineContrast": 2.66,
+          "brightOrSaturatedShare": 0.301
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.482,
+          "outlineContrast": 2.61,
+          "brightOrSaturatedShare": 0.28
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.364,
+          "outlineContrast": 2.61,
+          "brightOrSaturatedShare": 0.283
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.171,
+          "outlineContrast": 2.63,
+          "brightOrSaturatedShare": 0.291
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.emerald",
+      "cellSha256": "5a44b1ef01a029266251b887a76045f65b39e31f9c8e0fdac0107b2315dfebc6",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.511,
+          "outlineContrast": 2.6,
+          "brightOrSaturatedShare": 0.241
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.374,
+          "outlineContrast": 2.64,
+          "brightOrSaturatedShare": 0.261
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.208,
+          "outlineContrast": 2.61,
+          "brightOrSaturatedShare": 0.25
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.507,
+          "outlineContrast": 2.57,
+          "brightOrSaturatedShare": 0.241
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.374,
+          "outlineContrast": 2.6,
+          "brightOrSaturatedShare": 0.261
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.219,
+          "outlineContrast": 2.58,
+          "brightOrSaturatedShare": 0.25
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.asscher",
+      "cellSha256": "4621ec6ee85337cd83b6ee64d3ecd52d404aa499fe0881f514b6cdd2a3f3e578",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.41,
+          "outlineContrast": 2.59,
+          "brightOrSaturatedShare": 0.259
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.33,
+          "outlineContrast": 2.62,
+          "brightOrSaturatedShare": 0.254
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.157,
+          "outlineContrast": 2.63,
+          "brightOrSaturatedShare": 0.249
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.413,
+          "outlineContrast": 2.56,
+          "brightOrSaturatedShare": 0.259
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.339,
+          "outlineContrast": 2.58,
+          "brightOrSaturatedShare": 0.253
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.161,
+          "outlineContrast": 2.6,
+          "brightOrSaturatedShare": 0.249
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.princess",
+      "cellSha256": "730d4405679c0d234431eceb229f87b0bf6496e8be7a0e3c33549b19dc487e22",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.531,
+          "outlineContrast": 2.61,
+          "brightOrSaturatedShare": 0.177
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.432,
+          "outlineContrast": 2.61,
+          "brightOrSaturatedShare": 0.187
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.202,
+          "outlineContrast": 2.61,
+          "brightOrSaturatedShare": 0.194
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.541,
+          "outlineContrast": 2.57,
+          "brightOrSaturatedShare": 0.163
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.432,
+          "outlineContrast": 2.57,
+          "brightOrSaturatedShare": 0.178
+        },
+        "1280x800": {
+          "highlightCount": 4,
+          "facetEdgeShare": 0.206,
+          "outlineContrast": 2.58,
+          "brightOrSaturatedShare": 0.183
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.radiant",
+      "cellSha256": "5e9aa59e7ff0e26785ff87310507b2a0ded04fce5b18417ce02d42a6ced22784",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.489,
+          "outlineContrast": 2.66,
+          "brightOrSaturatedShare": 0.259
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.423,
+          "outlineContrast": 2.62,
+          "brightOrSaturatedShare": 0.26
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.217,
+          "outlineContrast": 2.63,
+          "brightOrSaturatedShare": 0.26
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.496,
+          "outlineContrast": 2.63,
+          "brightOrSaturatedShare": 0.259
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.406,
+          "outlineContrast": 2.59,
+          "brightOrSaturatedShare": 0.258
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.215,
+          "outlineContrast": 2.6,
+          "brightOrSaturatedShare": 0.259
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.pear",
+      "cellSha256": "456e24a6a6ccd807177f9e52cfffcbce9e5c39a2708cb1d18a3bd9bb40dfaa7e",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.531,
+          "outlineContrast": 2.44,
+          "brightOrSaturatedShare": 0.132
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.409,
+          "outlineContrast": 2.48,
+          "brightOrSaturatedShare": 0.138
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.205,
+          "outlineContrast": 2.49,
+          "brightOrSaturatedShare": 0.143
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.551,
+          "outlineContrast": 2.41,
+          "brightOrSaturatedShare": 0.13
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.409,
+          "outlineContrast": 2.45,
+          "brightOrSaturatedShare": 0.132
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.207,
+          "outlineContrast": 2.46,
+          "brightOrSaturatedShare": 0.142
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.marquise",
+      "cellSha256": "fd1954e951996e8246aa0ef58248d39bd7e64236ae355cf2b54ddcab8e1a8b89",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.599,
+          "outlineContrast": 2.56,
+          "brightOrSaturatedShare": 0.123
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.504,
+          "outlineContrast": 2.57,
+          "brightOrSaturatedShare": 0.124
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.24,
+          "outlineContrast": 2.59,
+          "brightOrSaturatedShare": 0.129
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.599,
+          "outlineContrast": 2.53,
+          "brightOrSaturatedShare": 0.115
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.517,
+          "outlineContrast": 2.54,
+          "brightOrSaturatedShare": 0.119
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.241,
+          "outlineContrast": 2.56,
+          "brightOrSaturatedShare": 0.124
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.heart",
+      "cellSha256": "f9e7933c89f64e5bc72ba2448cb22885e020c2197598529aab94a30977202575",
+      "screens": {
+        "640x360": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.554,
+          "outlineContrast": 2.61,
+          "brightOrSaturatedShare": 0.156
+        },
+        "360x640": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.472,
+          "outlineContrast": 2.59,
+          "brightOrSaturatedShare": 0.163
+        },
+        "1280x800": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.213,
+          "outlineContrast": 2.61,
+          "brightOrSaturatedShare": 0.168
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.575,
+          "outlineContrast": 2.57,
+          "brightOrSaturatedShare": 0.153
+        },
+        "360x640": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.485,
+          "outlineContrast": 2.56,
+          "brightOrSaturatedShare": 0.158
+        },
+        "1280x800": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.22,
+          "outlineContrast": 2.57,
+          "brightOrSaturatedShare": 0.164
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.trillion",
+      "cellSha256": "81cd44b847d275b0d0c9b0555f28406532a35747c675b564a1a07cd39852bef8",
+      "screens": {
+        "640x360": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.917,
+          "outlineContrast": 2.47,
+          "brightOrSaturatedShare": 0.064
+        },
+        "360x640": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.773,
+          "outlineContrast": 2.49,
+          "brightOrSaturatedShare": 0.069
+        },
+        "1280x800": {
+          "highlightCount": 4,
+          "facetEdgeShare": 0.432,
+          "outlineContrast": 2.53,
+          "brightOrSaturatedShare": 0.071
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.917,
+          "outlineContrast": 2.44,
+          "brightOrSaturatedShare": 0.059
+        },
+        "360x640": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.773,
+          "outlineContrast": 2.45,
+          "brightOrSaturatedShare": 0.066
+        },
+        "1280x800": {
+          "highlightCount": 4,
+          "facetEdgeShare": 0.445,
+          "outlineContrast": 2.5,
+          "brightOrSaturatedShare": 0.07
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.baguette",
+      "cellSha256": "9d5d3b9df1c62fa103378e297105220a0113bee455e9fc32c6b8ce71e1cf335e",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.639,
+          "outlineContrast": 2.51,
+          "brightOrSaturatedShare": 0.175
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.471,
+          "outlineContrast": 2.62,
+          "brightOrSaturatedShare": 0.212
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.228,
+          "outlineContrast": 2.62,
+          "brightOrSaturatedShare": 0.204
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.639,
+          "outlineContrast": 2.48,
+          "brightOrSaturatedShare": 0.175
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.471,
+          "outlineContrast": 2.59,
+          "brightOrSaturatedShare": 0.212
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.228,
+          "outlineContrast": 2.59,
+          "brightOrSaturatedShare": 0.204
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.kite",
+      "cellSha256": "bcf63de72ba3474ebd4bf9ffc8f7c9f519224d8af8cdfa19fcd45a2f81b8459f",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.679,
+          "outlineContrast": 2.52,
+          "brightOrSaturatedShare": 0.095
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.613,
+          "outlineContrast": 2.52,
+          "brightOrSaturatedShare": 0.099
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.319,
+          "outlineContrast": 2.55,
+          "brightOrSaturatedShare": 0.102
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.679,
+          "outlineContrast": 2.48,
+          "brightOrSaturatedShare": 0.095
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.608,
+          "outlineContrast": 2.48,
+          "brightOrSaturatedShare": 0.097
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.321,
+          "outlineContrast": 2.52,
+          "brightOrSaturatedShare": 0.101
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.shield",
+      "cellSha256": "8b2b7cf75be0084e5e67fe88a9882eb203010b75cd899bb5167e91478961fd15",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.56,
+          "outlineContrast": 2.63,
+          "brightOrSaturatedShare": 0.214
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.458,
+          "outlineContrast": 2.67,
+          "brightOrSaturatedShare": 0.238
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.221,
+          "outlineContrast": 2.69,
+          "brightOrSaturatedShare": 0.23
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.565,
+          "outlineContrast": 2.6,
+          "brightOrSaturatedShare": 0.21
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.458,
+          "outlineContrast": 2.64,
+          "brightOrSaturatedShare": 0.236
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.221,
+          "outlineContrast": 2.66,
+          "brightOrSaturatedShare": 0.229
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.hexagon",
+      "cellSha256": "5331f770d0527b4a07e3ff499ce0525ebb8231a7d2b98018f74181bc3bc65fe9",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.522,
+          "outlineContrast": 2.61,
+          "brightOrSaturatedShare": 0.207
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.422,
+          "outlineContrast": 2.63,
+          "brightOrSaturatedShare": 0.212
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.201,
+          "outlineContrast": 2.63,
+          "brightOrSaturatedShare": 0.219
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.531,
+          "outlineContrast": 2.58,
+          "brightOrSaturatedShare": 0.207
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.419,
+          "outlineContrast": 2.59,
+          "brightOrSaturatedShare": 0.211
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.202,
+          "outlineContrast": 2.6,
+          "brightOrSaturatedShare": 0.218
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.octagon",
+      "cellSha256": "93c8440e4c4c41ae72c5270a5a62e63f8a809aa5453e460d0d85e2f05ae39cb9",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.513,
+          "outlineContrast": 2.62,
+          "brightOrSaturatedShare": 0.227
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.382,
+          "outlineContrast": 2.64,
+          "brightOrSaturatedShare": 0.233
+        },
+        "1280x800": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.2,
+          "outlineContrast": 2.63,
+          "brightOrSaturatedShare": 0.237
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.517,
+          "outlineContrast": 2.58,
+          "brightOrSaturatedShare": 0.226
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.382,
+          "outlineContrast": 2.61,
+          "brightOrSaturatedShare": 0.233
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.2,
+          "outlineContrast": 2.6,
+          "brightOrSaturatedShare": 0.237
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.lozenge",
+      "cellSha256": "d9429b9afc9ac63a79cdd30f430672d74b17d544ea41c0c71cf9beaecae1f7c0",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.709,
+          "outlineContrast": 2.47,
+          "brightOrSaturatedShare": 0.075
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.588,
+          "outlineContrast": 2.5,
+          "brightOrSaturatedShare": 0.078
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.271,
+          "outlineContrast": 2.51,
+          "brightOrSaturatedShare": 0.084
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.716,
+          "outlineContrast": 2.44,
+          "brightOrSaturatedShare": 0.075
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.596,
+          "outlineContrast": 2.46,
+          "brightOrSaturatedShare": 0.077
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.271,
+          "outlineContrast": 2.48,
+          "brightOrSaturatedShare": 0.083
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.half-moon",
+      "cellSha256": "f166906a907b3fab5e848af2acd6b25ab9035256b7e6292bf956d47af9ab0dc9",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.465,
+          "outlineContrast": 2.33,
+          "brightOrSaturatedShare": 0.118
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.391,
+          "outlineContrast": 2.35,
+          "brightOrSaturatedShare": 0.12
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.187,
+          "outlineContrast": 2.36,
+          "brightOrSaturatedShare": 0.119
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.465,
+          "outlineContrast": 2.29,
+          "brightOrSaturatedShare": 0.115
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.399,
+          "outlineContrast": 2.31,
+          "brightOrSaturatedShare": 0.118
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.189,
+          "outlineContrast": 2.31,
+          "brightOrSaturatedShare": 0.117
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.bullet",
+      "cellSha256": "16fbea02c815c9f899708ce66d7db4a6e78d577ce7aac70aa591e4b11659567d",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.69,
+          "outlineContrast": 2.44,
+          "brightOrSaturatedShare": 0.111
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.537,
+          "outlineContrast": 2.47,
+          "brightOrSaturatedShare": 0.109
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.302,
+          "outlineContrast": 2.46,
+          "brightOrSaturatedShare": 0.106
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.648,
+          "outlineContrast": 2.4,
+          "brightOrSaturatedShare": 0.111
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.541,
+          "outlineContrast": 2.43,
+          "brightOrSaturatedShare": 0.107
+        },
+        "1280x800": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.303,
+          "outlineContrast": 2.43,
+          "brightOrSaturatedShare": 0.106
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.trapeze",
+      "cellSha256": "d6859277c243905aec1e5ae2ed89fb34183baefc3dfe227d549ae6e2b24acd68",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.592,
+          "outlineContrast": 2.62,
+          "brightOrSaturatedShare": 0.229
+        },
+        "360x640": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.486,
+          "outlineContrast": 2.68,
+          "brightOrSaturatedShare": 0.22
+        },
+        "1280x800": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.225,
+          "outlineContrast": 2.7,
+          "brightOrSaturatedShare": 0.223
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.592,
+          "outlineContrast": 2.59,
+          "brightOrSaturatedShare": 0.229
+        },
+        "360x640": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.486,
+          "outlineContrast": 2.66,
+          "brightOrSaturatedShare": 0.22
+        },
+        "1280x800": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.225,
+          "outlineContrast": 2.67,
+          "brightOrSaturatedShare": 0.223
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.rose",
+      "cellSha256": "7df2412d0d9d5044a5714da968b4b9c1543f318e6354b10b04b495c6c3dc5b31",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.445,
+          "outlineContrast": 2.49,
+          "brightOrSaturatedShare": 0.132
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.357,
+          "outlineContrast": 2.52,
+          "brightOrSaturatedShare": 0.132
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.185,
+          "outlineContrast": 2.52,
+          "brightOrSaturatedShare": 0.137
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.44,
+          "outlineContrast": 2.46,
+          "brightOrSaturatedShare": 0.132
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.364,
+          "outlineContrast": 2.48,
+          "brightOrSaturatedShare": 0.132
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.187,
+          "outlineContrast": 2.49,
+          "brightOrSaturatedShare": 0.136
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.briolette",
+      "cellSha256": "31da4a8196ddbc0ba0cba6fa20d915a062e0980d7ae491cea407aba719200989",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.656,
+          "outlineContrast": 2.59,
+          "brightOrSaturatedShare": 0.113
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.512,
+          "outlineContrast": 2.58,
+          "brightOrSaturatedShare": 0.112
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.233,
+          "outlineContrast": 2.61,
+          "brightOrSaturatedShare": 0.117
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.656,
+          "outlineContrast": 2.56,
+          "brightOrSaturatedShare": 0.109
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.533,
+          "outlineContrast": 2.55,
+          "brightOrSaturatedShare": 0.104
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.238,
+          "outlineContrast": 2.58,
+          "brightOrSaturatedShare": 0.109
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.checkerboard",
+      "cellSha256": "dc5a4ecfda7a3e493a670a11df2d66f2828af8493e452b6c78fda57f0a9db427",
+      "screens": {
+        "640x360": {
+          "highlightCount": 7,
+          "facetEdgeShare": 0.973,
+          "outlineContrast": 2.78,
+          "brightOrSaturatedShare": 0.314
+        },
+        "360x640": {
+          "highlightCount": 7,
+          "facetEdgeShare": 0.89,
+          "outlineContrast": 2.77,
+          "brightOrSaturatedShare": 0.309
+        },
+        "1280x800": {
+          "highlightCount": 5,
+          "facetEdgeShare": 0.522,
+          "outlineContrast": 2.78,
+          "brightOrSaturatedShare": 0.3
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 10,
+          "facetEdgeShare": 0.977,
+          "outlineContrast": 2.75,
+          "brightOrSaturatedShare": 0.309
+        },
+        "360x640": {
+          "highlightCount": 8,
+          "facetEdgeShare": 0.89,
+          "outlineContrast": 2.75,
+          "brightOrSaturatedShare": 0.297
+        },
+        "1280x800": {
+          "highlightCount": 6,
+          "facetEdgeShare": 0.533,
+          "outlineContrast": 2.76,
+          "brightOrSaturatedShare": 0.297
+        }
+      }
+    },
+    {
+      "cutId": "gem-cut.sugarloaf",
+      "cellSha256": "7235c56cb981301641afe87296aa0a91af8837ee1f3ad22c50927c1bde90d813",
+      "screens": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.5,
+          "outlineContrast": 2.6,
+          "brightOrSaturatedShare": 0.125
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.391,
+          "outlineContrast": 2.6,
+          "brightOrSaturatedShare": 0.142
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.273,
+          "outlineContrast": 2.54,
+          "brightOrSaturatedShare": 0.137
+        }
+      },
+      "dimmestTint": {
+        "640x360": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.5,
+          "outlineContrast": 2.57,
+          "brightOrSaturatedShare": 0.125
+        },
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.391,
+          "outlineContrast": 2.57,
+          "brightOrSaturatedShare": 0.142
+        },
+        "1280x800": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.271,
+          "outlineContrast": 2.51,
+          "brightOrSaturatedShare": 0.137
+        }
+      }
+    }
+  ]
+}

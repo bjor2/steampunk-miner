@@ -537,6 +537,22 @@ sRGB like every albedo map, but four mip levels it writes itself, since `toktx` 
 full chains and a full chain would blur one cell into the next. A new page ships with its own
 `art/assets/<id>.json` entry, `final`, or its heroes keep the shader look.
 
+## Gem cuts
+
+The gem-cut library of [#889](https://github.com/bjor2/steampunk-miner/issues/889) (the
+`gem-cuts` slice's `gemCuts.json`, feature-slices 3.102): about 24 cuts, each one flat-shaded stone
+built by `docs/art/gem-cuts/cut_marks.py` on the ore stage and rendered neutral (a grey body, white
+rim and facet glint) with the rock held out into a 256 px cell (`docs/art/gem-cuts/cells/`, the mask
+in alpha). The cells pack into hue-tinted atlas pages in library order, 16 a page
+(`ground-gem-cut-atlas`, then `-page-<n>`), which the roster appends to every act's own hero pages,
+so one library serves every generated planet; the terrain shader colours a cut by the gem's hue slot
+and lays the planet's overlay over it. The library is append-only: a cut's cell is its place in the
+list, and a new cut goes last with a `since` of the next ore rules version. `author_gem_cuts.py`
+renders the cells and the review sheet, `cut_post.py` the cells, page previews, the tinted
+game-scale strip, the distinctness report and `gem-cut-reads.json` (the #785 measures at 24, 30 and
+67 px a tile), and `encode_gem_cut_atlas.py` ships the pages (ETC1S sRGB, four mip levels, as the
+act pages). See [docs/art/gem-cuts/README.md](art/gem-cuts/README.md).
+
 ## Mineral skins
 
 The layer art of the mineral skins of [#576](https://github.com/bjor2/steampunk-miner/issues/576)

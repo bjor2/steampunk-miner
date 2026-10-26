@@ -5,7 +5,7 @@
       "id": "gem-cut.brilliant",
       "name": "Brilliant",
       "since": 14,
-      "shape": "a round brilliant: eight-sided table, kite and star facets on an eight-fold crown"
+      "shape": "a round brilliant: a girdle step and kite and star facets rising to an eight-sided table"
     },
     {
       "id": "gem-cut.oval",
@@ -17,7 +17,7 @@
       "id": "gem-cut.cushion",
       "name": "Cushion",
       "since": 14,
-      "shape": "a pillow square with rounded corners and a broad soft crown"
+      "shape": "a square pillow with rounded corners, a girdle step and four kite facets to the table"
     },
     {
       "id": "gem-cut.emerald",
@@ -41,7 +41,7 @@
       "id": "gem-cut.radiant",
       "name": "Radiant",
       "since": 14,
-      "shape": "a clipped-corner rectangle with a brilliant crown of sixteen facets"
+      "shape": "a clipped-corner rectangle lying across the cell, with a brilliant crown of sixteen facets"
     },
     {
       "id": "gem-cut.pear",
@@ -89,13 +89,13 @@
       "id": "gem-cut.hexagon",
       "name": "Hexagon",
       "since": 14,
-      "shape": "a regular hexagon with a flat top edge, six crown facets to a hexagonal table"
+      "shape": "a wide hexagon with a flat top edge, six crown facets to a hexagonal table"
     },
     {
       "id": "gem-cut.octagon",
       "name": "Octagon",
       "since": 14,
-      "shape": "a regular octagon, eight crown facets round a large table"
+      "shape": "a tall octagon, eight crown facets round a large table"
     },
     {
       "id": "gem-cut.lozenge",
@@ -125,25 +125,25 @@
       "id": "gem-cut.rose",
       "name": "Rose",
       "since": 14,
-      "shape": "a round dome of triangular facets rising to a point, no table"
+      "shape": "a small round dome of triangular facets rising to a point, no table"
     },
     {
       "id": "gem-cut.briolette",
       "name": "Briolette",
       "since": 14,
-      "shape": "a drop covered all over in small triangular facets, the point up"
+      "shape": "a hanging drop covered all over in small triangular facets, the point down"
     },
     {
       "id": "gem-cut.checkerboard",
       "name": "Checkerboard",
       "since": 14,
-      "shape": "a cushion whose crown is a chequer of square facets"
+      "shape": "a wide cushion whose crown is a chequer of square facets"
     },
     {
       "id": "gem-cut.sugarloaf",
       "name": "Sugarloaf",
       "since": 14,
-      "shape": "a four-sided pyramid with a square foot, its four faces lit one at a time"
+      "shape": "a steep four-sided pyramid on a small square foot, its four faces lit one at a time"
     }
   ]
 }

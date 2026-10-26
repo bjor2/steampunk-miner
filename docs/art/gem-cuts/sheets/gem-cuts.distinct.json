@@ -1,0 +1,2384 @@
+{
+  "tilePx": 40,
+  "cuts": {
+    "gem-cut.brilliant": {
+      "coverage": 0.525,
+      "hueDeg": 31.6,
+      "luma": 0.743,
+      "rockLuma": 0.245,
+      "contrast": 2.69
+    },
+    "gem-cut.oval": {
+      "coverage": 0.42,
+      "hueDeg": 36.8,
+      "luma": 0.734,
+      "rockLuma": 0.245,
+      "contrast": 2.66
+    },
+    "gem-cut.cushion": {
+      "coverage": 0.588,
+      "hueDeg": 31.6,
+      "luma": 0.747,
+      "rockLuma": 0.245,
+      "contrast": 2.7
+    },
+    "gem-cut.emerald": {
+      "coverage": 0.465,
+      "hueDeg": 36.1,
+      "luma": 0.738,
+      "rockLuma": 0.245,
+      "contrast": 2.67
+    },
+    "gem-cut.asscher": {
+      "coverage": 0.525,
+      "hueDeg": 35.4,
+      "luma": 0.735,
+      "rockLuma": 0.245,
+      "contrast": 2.66
+    },
+    "gem-cut.princess": {
+      "coverage": 0.36,
+      "hueDeg": 34.8,
+      "luma": 0.728,
+      "rockLuma": 0.245,
+      "contrast": 2.64
+    },
+    "gem-cut.radiant": {
+      "coverage": 0.495,
+      "hueDeg": 36.3,
+      "luma": 0.745,
+      "rockLuma": 0.245,
+      "contrast": 2.69
+    },
+    "gem-cut.pear": {
+      "coverage": 0.335,
+      "hueDeg": 34.1,
+      "luma": 0.699,
+      "rockLuma": 0.245,
+      "contrast": 2.54
+    },
+    "gem-cut.marquise": {
+      "coverage": 0.268,
+      "hueDeg": 31.0,
+      "luma": 0.729,
+      "rockLuma": 0.245,
+      "contrast": 2.64
+    },
+    "gem-cut.heart": {
+      "coverage": 0.341,
+      "hueDeg": 32.8,
+      "luma": 0.734,
+      "rockLuma": 0.245,
+      "contrast": 2.66
+    },
+    "gem-cut.trillion": {
+      "coverage": 0.165,
+      "hueDeg": 25.1,
+      "luma": 0.716,
+      "rockLuma": 0.245,
+      "contrast": 2.6
+    },
+    "gem-cut.baguette": {
+      "coverage": 0.36,
+      "hueDeg": 29.9,
+      "luma": 0.736,
+      "rockLuma": 0.245,
+      "contrast": 2.66
+    },
+    "gem-cut.kite": {
+      "coverage": 0.233,
+      "hueDeg": 30.6,
+      "luma": 0.721,
+      "rockLuma": 0.245,
+      "contrast": 2.61
+    },
+    "gem-cut.shield": {
+      "coverage": 0.406,
+      "hueDeg": 34.6,
+      "luma": 0.759,
+      "rockLuma": 0.245,
+      "contrast": 2.74
+    },
+    "gem-cut.hexagon": {
+      "coverage": 0.4,
+      "hueDeg": 38.2,
+      "luma": 0.739,
+      "rockLuma": 0.245,
+      "contrast": 2.67
+    },
+    "gem-cut.octagon": {
+      "coverage": 0.41,
+      "hueDeg": 35.2,
+      "luma": 0.74,
+      "rockLuma": 0.245,
+      "contrast": 2.68
+    },
+    "gem-cut.lozenge": {
+      "coverage": 0.258,
+      "hueDeg": 33.6,
+      "luma": 0.707,
+      "rockLuma": 0.245,
+      "contrast": 2.56
+    },
+    "gem-cut.half-moon": {
+      "coverage": 0.323,
+      "hueDeg": 31.5,
+      "luma": 0.658,
+      "rockLuma": 0.245,
+      "contrast": 2.4
+    },
+    "gem-cut.bullet": {
+      "coverage": 0.251,
+      "hueDeg": 29.3,
+      "luma": 0.693,
+      "rockLuma": 0.245,
+      "contrast": 2.52
+    },
+    "gem-cut.trapeze": {
+      "coverage": 0.396,
+      "hueDeg": 35.3,
+      "luma": 0.757,
+      "rockLuma": 0.245,
+      "contrast": 2.73
+    },
+    "gem-cut.rose": {
+      "coverage": 0.343,
+      "hueDeg": 34.4,
+      "luma": 0.71,
+      "rockLuma": 0.245,
+      "contrast": 2.57
+    },
+    "gem-cut.briolette": {
+      "coverage": 0.274,
+      "hueDeg": 30.1,
+      "luma": 0.734,
+      "rockLuma": 0.245,
+      "contrast": 2.65
+    },
+    "gem-cut.checkerboard": {
+      "coverage": 0.547,
+      "hueDeg": 35.3,
+      "luma": 0.782,
+      "rockLuma": 0.245,
+      "contrast": 2.82
+    },
+    "gem-cut.sugarloaf": {
+      "coverage": 0.302,
+      "hueDeg": 31.7,
+      "luma": 0.726,
+      "rockLuma": 0.245,
+      "contrast": 2.63
+    }
+  },
+  "pairs": [
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.oval",
+      "silhouetteDifference": 0.258,
+      "hueDifferenceDeg": 5.2,
+      "lumaDifference": 0.009,
+      "deutanDistance": 0.015
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.cushion",
+      "silhouetteDifference": 0.106,
+      "hueDifferenceDeg": 0.0,
+      "lumaDifference": 0.004,
+      "deutanDistance": 0.007
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.emerald",
+      "silhouetteDifference": 0.192,
+      "hueDifferenceDeg": 4.5,
+      "lumaDifference": 0.005,
+      "deutanDistance": 0.008
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.asscher",
+      "silhouetteDifference": 0.108,
+      "hueDifferenceDeg": 3.8,
+      "lumaDifference": 0.008,
+      "deutanDistance": 0.014
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.princess",
+      "silhouetteDifference": 0.314,
+      "hueDifferenceDeg": 3.2,
+      "lumaDifference": 0.015,
+      "deutanDistance": 0.025
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.radiant",
+      "silhouetteDifference": 0.234,
+      "hueDifferenceDeg": 4.7,
+      "lumaDifference": 0.002,
+      "deutanDistance": 0.004
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.pear",
+      "silhouetteDifference": 0.396,
+      "hueDifferenceDeg": 2.5,
+      "lumaDifference": 0.044,
+      "deutanDistance": 0.075
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.marquise",
+      "silhouetteDifference": 0.512,
+      "hueDifferenceDeg": 0.6,
+      "lumaDifference": 0.014,
+      "deutanDistance": 0.023
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.heart",
+      "silhouetteDifference": 0.363,
+      "hueDifferenceDeg": 1.2,
+      "lumaDifference": 0.009,
+      "deutanDistance": 0.014
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.trillion",
+      "silhouetteDifference": 0.686,
+      "hueDifferenceDeg": 6.5,
+      "lumaDifference": 0.027,
+      "deutanDistance": 0.046
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.baguette",
+      "silhouetteDifference": 0.454,
+      "hueDifferenceDeg": 1.7,
+      "lumaDifference": 0.007,
+      "deutanDistance": 0.011
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.kite",
+      "silhouetteDifference": 0.561,
+      "hueDifferenceDeg": 1.0,
+      "lumaDifference": 0.022,
+      "deutanDistance": 0.038
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.shield",
+      "silhouetteDifference": 0.275,
+      "hueDifferenceDeg": 3.0,
+      "lumaDifference": 0.016,
+      "deutanDistance": 0.028
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.hexagon",
+      "silhouetteDifference": 0.255,
+      "hueDifferenceDeg": 6.6,
+      "lumaDifference": 0.004,
+      "deutanDistance": 0.006
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.octagon",
+      "silhouetteDifference": 0.219,
+      "hueDifferenceDeg": 3.6,
+      "lumaDifference": 0.003,
+      "deutanDistance": 0.004
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.lozenge",
+      "silhouetteDifference": 0.524,
+      "hueDifferenceDeg": 2.0,
+      "lumaDifference": 0.036,
+      "deutanDistance": 0.062
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.half-moon",
+      "silhouetteDifference": 0.412,
+      "hueDifferenceDeg": 0.1,
+      "lumaDifference": 0.085,
+      "deutanDistance": 0.146
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.bullet",
+      "silhouetteDifference": 0.528,
+      "hueDifferenceDeg": 2.3,
+      "lumaDifference": 0.05,
+      "deutanDistance": 0.087
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.trapeze",
+      "silhouetteDifference": 0.306,
+      "hueDifferenceDeg": 3.7,
+      "lumaDifference": 0.014,
+      "deutanDistance": 0.025
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.rose",
+      "silhouetteDifference": 0.348,
+      "hueDifferenceDeg": 2.8,
+      "lumaDifference": 0.033,
+      "deutanDistance": 0.056
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.495,
+      "hueDifferenceDeg": 1.5,
+      "lumaDifference": 0.009,
+      "deutanDistance": 0.016
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.151,
+      "hueDifferenceDeg": 3.7,
+      "lumaDifference": 0.039,
+      "deutanDistance": 0.068
+    },
+    {
+      "a": "gem-cut.brilliant",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.424,
+      "hueDifferenceDeg": 0.1,
+      "lumaDifference": 0.017,
+      "deutanDistance": 0.03
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.cushion",
+      "silhouetteDifference": 0.335,
+      "hueDifferenceDeg": 5.2,
+      "lumaDifference": 0.013,
+      "deutanDistance": 0.022
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.emerald",
+      "silhouetteDifference": 0.405,
+      "hueDifferenceDeg": 0.7,
+      "lumaDifference": 0.004,
+      "deutanDistance": 0.007
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.asscher",
+      "silhouetteDifference": 0.305,
+      "hueDifferenceDeg": 1.4,
+      "lumaDifference": 0.001,
+      "deutanDistance": 0.001
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.princess",
+      "silhouetteDifference": 0.267,
+      "hueDifferenceDeg": 2.0,
+      "lumaDifference": 0.006,
+      "deutanDistance": 0.01
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.radiant",
+      "silhouetteDifference": 0.17,
+      "hueDifferenceDeg": 0.5,
+      "lumaDifference": 0.011,
+      "deutanDistance": 0.019
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.pear",
+      "silhouetteDifference": 0.463,
+      "hueDifferenceDeg": 2.7,
+      "lumaDifference": 0.035,
+      "deutanDistance": 0.061
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.marquise",
+      "silhouetteDifference": 0.363,
+      "hueDifferenceDeg": 5.8,
+      "lumaDifference": 0.005,
+      "deutanDistance": 0.009
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.heart",
+      "silhouetteDifference": 0.31,
+      "hueDifferenceDeg": 4.0,
+      "lumaDifference": 0.0,
+      "deutanDistance": 0.0
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.trillion",
+      "silhouetteDifference": 0.628,
+      "hueDifferenceDeg": 11.7,
+      "lumaDifference": 0.018,
+      "deutanDistance": 0.031
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.baguette",
+      "silhouetteDifference": 0.575,
+      "hueDifferenceDeg": 6.9,
+      "lumaDifference": 0.002,
+      "deutanDistance": 0.004
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.kite",
+      "silhouetteDifference": 0.525,
+      "hueDifferenceDeg": 6.2,
+      "lumaDifference": 0.013,
+      "deutanDistance": 0.023
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.shield",
+      "silhouetteDifference": 0.322,
+      "hueDifferenceDeg": 2.2,
+      "lumaDifference": 0.025,
+      "deutanDistance": 0.043
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.hexagon",
+      "silhouetteDifference": 0.115,
+      "hueDifferenceDeg": 1.4,
+      "lumaDifference": 0.005,
+      "deutanDistance": 0.008
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.octagon",
+      "silhouetteDifference": 0.356,
+      "hueDifferenceDeg": 1.6,
+      "lumaDifference": 0.006,
+      "deutanDistance": 0.01
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.lozenge",
+      "silhouetteDifference": 0.503,
+      "hueDifferenceDeg": 3.2,
+      "lumaDifference": 0.027,
+      "deutanDistance": 0.047
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.half-moon",
+      "silhouetteDifference": 0.258,
+      "hueDifferenceDeg": 5.3,
+      "lumaDifference": 0.076,
+      "deutanDistance": 0.132
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.bullet",
+      "silhouetteDifference": 0.579,
+      "hueDifferenceDeg": 7.5,
+      "lumaDifference": 0.041,
+      "deutanDistance": 0.072
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.trapeze",
+      "silhouetteDifference": 0.206,
+      "hueDifferenceDeg": 1.5,
+      "lumaDifference": 0.023,
+      "deutanDistance": 0.04
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.rose",
+      "silhouetteDifference": 0.247,
+      "hueDifferenceDeg": 2.4,
+      "lumaDifference": 0.024,
+      "deutanDistance": 0.042
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.534,
+      "hueDifferenceDeg": 6.7,
+      "lumaDifference": 0.0,
+      "deutanDistance": 0.001
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.249,
+      "hueDifferenceDeg": 1.5,
+      "lumaDifference": 0.048,
+      "deutanDistance": 0.082
+    },
+    {
+      "a": "gem-cut.oval",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.31,
+      "hueDifferenceDeg": 5.1,
+      "lumaDifference": 0.008,
+      "deutanDistance": 0.015
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.emerald",
+      "silhouetteDifference": 0.216,
+      "hueDifferenceDeg": 4.5,
+      "lumaDifference": 0.009,
+      "deutanDistance": 0.015
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.asscher",
+      "silhouetteDifference": 0.106,
+      "hueDifferenceDeg": 3.8,
+      "lumaDifference": 0.012,
+      "deutanDistance": 0.021
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.princess",
+      "silhouetteDifference": 0.387,
+      "hueDifferenceDeg": 3.2,
+      "lumaDifference": 0.019,
+      "deutanDistance": 0.032
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.radiant",
+      "silhouetteDifference": 0.24,
+      "hueDifferenceDeg": 4.7,
+      "lumaDifference": 0.002,
+      "deutanDistance": 0.003
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.pear",
+      "silhouetteDifference": 0.453,
+      "hueDifferenceDeg": 2.5,
+      "lumaDifference": 0.048,
+      "deutanDistance": 0.083
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.marquise",
+      "silhouetteDifference": 0.563,
+      "hueDifferenceDeg": 0.6,
+      "lumaDifference": 0.018,
+      "deutanDistance": 0.03
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.heart",
+      "silhouetteDifference": 0.42,
+      "hueDifferenceDeg": 1.2,
+      "lumaDifference": 0.013,
+      "deutanDistance": 0.022
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.trillion",
+      "silhouetteDifference": 0.719,
+      "hueDifferenceDeg": 6.5,
+      "lumaDifference": 0.031,
+      "deutanDistance": 0.053
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.baguette",
+      "silhouetteDifference": 0.49,
+      "hueDifferenceDeg": 1.7,
+      "lumaDifference": 0.011,
+      "deutanDistance": 0.018
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.kite",
+      "silhouetteDifference": 0.607,
+      "hueDifferenceDeg": 1.0,
+      "lumaDifference": 0.026,
+      "deutanDistance": 0.045
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.shield",
+      "silhouetteDifference": 0.312,
+      "hueDifferenceDeg": 3.0,
+      "lumaDifference": 0.012,
+      "deutanDistance": 0.021
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.hexagon",
+      "silhouetteDifference": 0.333,
+      "hueDifferenceDeg": 6.6,
+      "lumaDifference": 0.008,
+      "deutanDistance": 0.014
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.octagon",
+      "silhouetteDifference": 0.302,
+      "hueDifferenceDeg": 3.6,
+      "lumaDifference": 0.007,
+      "deutanDistance": 0.012
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.lozenge",
+      "silhouetteDifference": 0.574,
+      "hueDifferenceDeg": 2.0,
+      "lumaDifference": 0.04,
+      "deutanDistance": 0.069
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.half-moon",
+      "silhouetteDifference": 0.474,
+      "hueDifferenceDeg": 0.1,
+      "lumaDifference": 0.089,
+      "deutanDistance": 0.154
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.bullet",
+      "silhouetteDifference": 0.575,
+      "hueDifferenceDeg": 2.3,
+      "lumaDifference": 0.054,
+      "deutanDistance": 0.094
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.trapeze",
+      "silhouetteDifference": 0.35,
+      "hueDifferenceDeg": 3.7,
+      "lumaDifference": 0.01,
+      "deutanDistance": 0.018
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.rose",
+      "silhouetteDifference": 0.417,
+      "hueDifferenceDeg": 2.8,
+      "lumaDifference": 0.037,
+      "deutanDistance": 0.064
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.548,
+      "hueDifferenceDeg": 1.5,
+      "lumaDifference": 0.013,
+      "deutanDistance": 0.023
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.116,
+      "hueDifferenceDeg": 3.7,
+      "lumaDifference": 0.035,
+      "deutanDistance": 0.06
+    },
+    {
+      "a": "gem-cut.cushion",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.485,
+      "hueDifferenceDeg": 0.1,
+      "lumaDifference": 0.021,
+      "deutanDistance": 0.037
+    },
+    {
+      "a": "gem-cut.emerald",
+      "b": "gem-cut.asscher",
+      "silhouetteDifference": 0.192,
+      "hueDifferenceDeg": 0.7,
+      "lumaDifference": 0.003,
+      "deutanDistance": 0.006
+    },
+    {
+      "a": "gem-cut.emerald",
+      "b": "gem-cut.princess",
+      "silhouetteDifference": 0.226,
+      "hueDifferenceDeg": 1.3,
+      "lumaDifference": 0.01,
+      "deutanDistance": 0.017
+    },
+    {
+      "a": "gem-cut.emerald",
+      "b": "gem-cut.radiant",
+      "silhouetteDifference": 0.4,
+      "hueDifferenceDeg": 0.2,
+      "lumaDifference": 0.007,
+      "deutanDistance": 0.012
+    },
+    {
+      "a": "gem-cut.emerald",
+      "b": "gem-cut.pear",
+      "silhouetteDifference": 0.311,
+      "hueDifferenceDeg": 2.0,
+      "lumaDifference": 0.039,
+      "deutanDistance": 0.068
+    },
+    {
+      "a": "gem-cut.emerald",
+      "b": "gem-cut.marquise",
+      "silhouetteDifference": 0.564,
+      "hueDifferenceDeg": 5.1,
+      "lumaDifference": 0.009,
+      "deutanDistance": 0.015
+    },
+    {
+      "a": "gem-cut.emerald",
+      "b": "gem-cut.heart",
+      "silhouetteDifference": 0.418,
+      "hueDifferenceDeg": 3.3,
+      "lumaDifference": 0.004,
+      "deutanDistance": 0.007
+    },
+    {
+      "a": "gem-cut.emerald",
+      "b": "gem-cut.trillion",
+      "silhouetteDifference": 0.656,
+      "hueDifferenceDeg": 11.0,
+      "lumaDifference": 0.022,
+      "deutanDistance": 0.038
+    },
+    {
+      "a": "gem-cut.emerald",
+      "b": "gem-cut.baguette",
+      "silhouetteDifference": 0.366,
+      "hueDifferenceDeg": 6.2,
+      "lumaDifference": 0.002,
+      "deutanDistance": 0.003
+    },
+    {
+      "a": "gem-cut.emerald",
+      "b": "gem-cut.kite",
+      "silhouetteDifference": 0.504,
+      "hueDifferenceDeg": 5.5,
+      "lumaDifference": 0.017,
+      "deutanDistance": 0.03
+    },
+    {
+      "a": "gem-cut.emerald",
+      "b": "gem-cut.shield",
+      "silhouetteDifference": 0.3,
+      "hueDifferenceDeg": 1.5,
+      "lumaDifference": 0.021,
+      "deutanDistance": 0.036
+    },
+    {
+      "a": "gem-cut.emerald",
+      "b": "gem-cut.hexagon",
+      "silhouetteDifference": 0.337,
+      "hueDifferenceDeg": 2.1,
+      "lumaDifference": 0.001,
+      "deutanDistance": 0.002
+    },
+    {
+      "a": "gem-cut.emerald",
+      "b": "gem-cut.octagon",
+      "silhouetteDifference": 0.118,
+      "hueDifferenceDeg": 0.9,
+      "lumaDifference": 0.002,
+      "deutanDistance": 0.004
+    },
+    {
+      "a": "gem-cut.emerald",
+      "b": "gem-cut.lozenge",
+      "silhouetteDifference": 0.463,
+      "hueDifferenceDeg": 2.5,
+      "lumaDifference": 0.031,
+      "deutanDistance": 0.054
+    },
+    {
+      "a": "gem-cut.emerald",
+      "b": "gem-cut.half-moon",
+      "silhouetteDifference": 0.514,
+      "hueDifferenceDeg": 4.6,
+      "lumaDifference": 0.08,
+      "deutanDistance": 0.139
+    },
+    {
+      "a": "gem-cut.emerald",
+      "b": "gem-cut.bullet",
+      "silhouetteDifference": 0.464,
+      "hueDifferenceDeg": 6.8,
+      "lumaDifference": 0.045,
+      "deutanDistance": 0.079
+    },
+    {
+      "a": "gem-cut.emerald",
+      "b": "gem-cut.trapeze",
+      "silhouetteDifference": 0.383,
+      "hueDifferenceDeg": 0.8,
+      "lumaDifference": 0.019,
+      "deutanDistance": 0.033
+    },
+    {
+      "a": "gem-cut.emerald",
+      "b": "gem-cut.rose",
+      "silhouetteDifference": 0.3,
+      "hueDifferenceDeg": 1.7,
+      "lumaDifference": 0.028,
+      "deutanDistance": 0.049
+    },
+    {
+      "a": "gem-cut.emerald",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.431,
+      "hueDifferenceDeg": 6.0,
+      "lumaDifference": 0.004,
+      "deutanDistance": 0.008
+    },
+    {
+      "a": "gem-cut.emerald",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.298,
+      "hueDifferenceDeg": 0.8,
+      "lumaDifference": 0.044,
+      "deutanDistance": 0.075
+    },
+    {
+      "a": "gem-cut.emerald",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.349,
+      "hueDifferenceDeg": 4.4,
+      "lumaDifference": 0.012,
+      "deutanDistance": 0.022
+    },
+    {
+      "a": "gem-cut.asscher",
+      "b": "gem-cut.princess",
+      "silhouetteDifference": 0.314,
+      "hueDifferenceDeg": 0.6,
+      "lumaDifference": 0.007,
+      "deutanDistance": 0.011
+    },
+    {
+      "a": "gem-cut.asscher",
+      "b": "gem-cut.radiant",
+      "silhouetteDifference": 0.234,
+      "hueDifferenceDeg": 0.9,
+      "lumaDifference": 0.01,
+      "deutanDistance": 0.018
+    },
+    {
+      "a": "gem-cut.asscher",
+      "b": "gem-cut.pear",
+      "silhouetteDifference": 0.422,
+      "hueDifferenceDeg": 1.3,
+      "lumaDifference": 0.036,
+      "deutanDistance": 0.062
+    },
+    {
+      "a": "gem-cut.asscher",
+      "b": "gem-cut.marquise",
+      "silhouetteDifference": 0.532,
+      "hueDifferenceDeg": 4.4,
+      "lumaDifference": 0.006,
+      "deutanDistance": 0.009
+    },
+    {
+      "a": "gem-cut.asscher",
+      "b": "gem-cut.heart",
+      "silhouetteDifference": 0.361,
+      "hueDifferenceDeg": 2.6,
+      "lumaDifference": 0.001,
+      "deutanDistance": 0.001
+    },
+    {
+      "a": "gem-cut.asscher",
+      "b": "gem-cut.trillion",
+      "silhouetteDifference": 0.689,
+      "hueDifferenceDeg": 10.3,
+      "lumaDifference": 0.019,
+      "deutanDistance": 0.032
+    },
+    {
+      "a": "gem-cut.asscher",
+      "b": "gem-cut.baguette",
+      "silhouetteDifference": 0.487,
+      "hueDifferenceDeg": 5.5,
+      "lumaDifference": 0.001,
+      "deutanDistance": 0.003
+    },
+    {
+      "a": "gem-cut.asscher",
+      "b": "gem-cut.kite",
+      "silhouetteDifference": 0.571,
+      "hueDifferenceDeg": 4.8,
+      "lumaDifference": 0.014,
+      "deutanDistance": 0.024
+    },
+    {
+      "a": "gem-cut.asscher",
+      "b": "gem-cut.shield",
+      "silhouetteDifference": 0.255,
+      "hueDifferenceDeg": 0.8,
+      "lumaDifference": 0.024,
+      "deutanDistance": 0.042
+    },
+    {
+      "a": "gem-cut.asscher",
+      "b": "gem-cut.hexagon",
+      "silhouetteDifference": 0.279,
+      "hueDifferenceDeg": 2.8,
+      "lumaDifference": 0.004,
+      "deutanDistance": 0.007
+    },
+    {
+      "a": "gem-cut.asscher",
+      "b": "gem-cut.octagon",
+      "silhouetteDifference": 0.269,
+      "hueDifferenceDeg": 0.2,
+      "lumaDifference": 0.005,
+      "deutanDistance": 0.009
+    },
+    {
+      "a": "gem-cut.asscher",
+      "b": "gem-cut.lozenge",
+      "silhouetteDifference": 0.537,
+      "hueDifferenceDeg": 1.8,
+      "lumaDifference": 0.028,
+      "deutanDistance": 0.048
+    },
+    {
+      "a": "gem-cut.asscher",
+      "b": "gem-cut.half-moon",
+      "silhouetteDifference": 0.445,
+      "hueDifferenceDeg": 3.9,
+      "lumaDifference": 0.077,
+      "deutanDistance": 0.133
+    },
+    {
+      "a": "gem-cut.asscher",
+      "b": "gem-cut.bullet",
+      "silhouetteDifference": 0.556,
+      "hueDifferenceDeg": 6.1,
+      "lumaDifference": 0.042,
+      "deutanDistance": 0.073
+    },
+    {
+      "a": "gem-cut.asscher",
+      "b": "gem-cut.trapeze",
+      "silhouetteDifference": 0.294,
+      "hueDifferenceDeg": 0.1,
+      "lumaDifference": 0.022,
+      "deutanDistance": 0.039
+    },
+    {
+      "a": "gem-cut.asscher",
+      "b": "gem-cut.rose",
+      "silhouetteDifference": 0.348,
+      "hueDifferenceDeg": 1.0,
+      "lumaDifference": 0.025,
+      "deutanDistance": 0.043
+    },
+    {
+      "a": "gem-cut.asscher",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.516,
+      "hueDifferenceDeg": 5.3,
+      "lumaDifference": 0.001,
+      "deutanDistance": 0.002
+    },
+    {
+      "a": "gem-cut.asscher",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.127,
+      "hueDifferenceDeg": 0.1,
+      "lumaDifference": 0.047,
+      "deutanDistance": 0.081
+    },
+    {
+      "a": "gem-cut.asscher",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.424,
+      "hueDifferenceDeg": 3.7,
+      "lumaDifference": 0.009,
+      "deutanDistance": 0.016
+    },
+    {
+      "a": "gem-cut.princess",
+      "b": "gem-cut.radiant",
+      "silhouetteDifference": 0.273,
+      "hueDifferenceDeg": 1.5,
+      "lumaDifference": 0.017,
+      "deutanDistance": 0.029
+    },
+    {
+      "a": "gem-cut.princess",
+      "b": "gem-cut.pear",
+      "silhouetteDifference": 0.355,
+      "hueDifferenceDeg": 0.7,
+      "lumaDifference": 0.029,
+      "deutanDistance": 0.05
+    },
+    {
+      "a": "gem-cut.princess",
+      "b": "gem-cut.marquise",
+      "silhouetteDifference": 0.451,
+      "hueDifferenceDeg": 3.8,
+      "lumaDifference": 0.001,
+      "deutanDistance": 0.002
+    },
+    {
+      "a": "gem-cut.princess",
+      "b": "gem-cut.heart",
+      "silhouetteDifference": 0.294,
+      "hueDifferenceDeg": 2.0,
+      "lumaDifference": 0.006,
+      "deutanDistance": 0.011
+    },
+    {
+      "a": "gem-cut.princess",
+      "b": "gem-cut.trillion",
+      "silhouetteDifference": 0.581,
+      "hueDifferenceDeg": 9.7,
+      "lumaDifference": 0.012,
+      "deutanDistance": 0.021
+    },
+    {
+      "a": "gem-cut.princess",
+      "b": "gem-cut.baguette",
+      "silhouetteDifference": 0.5,
+      "hueDifferenceDeg": 4.9,
+      "lumaDifference": 0.008,
+      "deutanDistance": 0.014
+    },
+    {
+      "a": "gem-cut.princess",
+      "b": "gem-cut.kite",
+      "silhouetteDifference": 0.451,
+      "hueDifferenceDeg": 4.2,
+      "lumaDifference": 0.007,
+      "deutanDistance": 0.013
+    },
+    {
+      "a": "gem-cut.princess",
+      "b": "gem-cut.shield",
+      "silhouetteDifference": 0.292,
+      "hueDifferenceDeg": 0.2,
+      "lumaDifference": 0.031,
+      "deutanDistance": 0.053
+    },
+    {
+      "a": "gem-cut.princess",
+      "b": "gem-cut.hexagon",
+      "silhouetteDifference": 0.169,
+      "hueDifferenceDeg": 3.4,
+      "lumaDifference": 0.011,
+      "deutanDistance": 0.019
+    },
+    {
+      "a": "gem-cut.princess",
+      "b": "gem-cut.octagon",
+      "silhouetteDifference": 0.209,
+      "hueDifferenceDeg": 0.4,
+      "lumaDifference": 0.012,
+      "deutanDistance": 0.021
+    },
+    {
+      "a": "gem-cut.princess",
+      "b": "gem-cut.lozenge",
+      "silhouetteDifference": 0.427,
+      "hueDifferenceDeg": 1.2,
+      "lumaDifference": 0.021,
+      "deutanDistance": 0.037
+    },
+    {
+      "a": "gem-cut.princess",
+      "b": "gem-cut.half-moon",
+      "silhouetteDifference": 0.408,
+      "hueDifferenceDeg": 3.3,
+      "lumaDifference": 0.07,
+      "deutanDistance": 0.121
+    },
+    {
+      "a": "gem-cut.princess",
+      "b": "gem-cut.bullet",
+      "silhouetteDifference": 0.509,
+      "hueDifferenceDeg": 5.5,
+      "lumaDifference": 0.035,
+      "deutanDistance": 0.062
+    },
+    {
+      "a": "gem-cut.princess",
+      "b": "gem-cut.trapeze",
+      "silhouetteDifference": 0.231,
+      "hueDifferenceDeg": 0.5,
+      "lumaDifference": 0.029,
+      "deutanDistance": 0.05
+    },
+    {
+      "a": "gem-cut.princess",
+      "b": "gem-cut.rose",
+      "silhouetteDifference": 0.151,
+      "hueDifferenceDeg": 0.4,
+      "lumaDifference": 0.018,
+      "deutanDistance": 0.031
+    },
+    {
+      "a": "gem-cut.princess",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.453,
+      "hueDifferenceDeg": 4.7,
+      "lumaDifference": 0.006,
+      "deutanDistance": 0.009
+    },
+    {
+      "a": "gem-cut.princess",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.342,
+      "hueDifferenceDeg": 0.5,
+      "lumaDifference": 0.054,
+      "deutanDistance": 0.093
+    },
+    {
+      "a": "gem-cut.princess",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.16,
+      "hueDifferenceDeg": 3.1,
+      "lumaDifference": 0.002,
+      "deutanDistance": 0.005
+    },
+    {
+      "a": "gem-cut.radiant",
+      "b": "gem-cut.pear",
+      "silhouetteDifference": 0.511,
+      "hueDifferenceDeg": 2.2,
+      "lumaDifference": 0.046,
+      "deutanDistance": 0.08
+    },
+    {
+      "a": "gem-cut.radiant",
+      "b": "gem-cut.marquise",
+      "silhouetteDifference": 0.467,
+      "hueDifferenceDeg": 5.3,
+      "lumaDifference": 0.016,
+      "deutanDistance": 0.027
+    },
+    {
+      "a": "gem-cut.radiant",
+      "b": "gem-cut.heart",
+      "silhouetteDifference": 0.333,
+      "hueDifferenceDeg": 3.5,
+      "lumaDifference": 0.011,
+      "deutanDistance": 0.019
+    },
+    {
+      "a": "gem-cut.radiant",
+      "b": "gem-cut.trillion",
+      "silhouetteDifference": 0.683,
+      "hueDifferenceDeg": 11.2,
+      "lumaDifference": 0.029,
+      "deutanDistance": 0.05
+    },
+    {
+      "a": "gem-cut.radiant",
+      "b": "gem-cut.baguette",
+      "silhouetteDifference": 0.61,
+      "hueDifferenceDeg": 6.4,
+      "lumaDifference": 0.009,
+      "deutanDistance": 0.015
+    },
+    {
+      "a": "gem-cut.radiant",
+      "b": "gem-cut.kite",
+      "silhouetteDifference": 0.594,
+      "hueDifferenceDeg": 5.7,
+      "lumaDifference": 0.024,
+      "deutanDistance": 0.042
+    },
+    {
+      "a": "gem-cut.radiant",
+      "b": "gem-cut.shield",
+      "silhouetteDifference": 0.339,
+      "hueDifferenceDeg": 1.7,
+      "lumaDifference": 0.014,
+      "deutanDistance": 0.024
+    },
+    {
+      "a": "gem-cut.radiant",
+      "b": "gem-cut.hexagon",
+      "silhouetteDifference": 0.192,
+      "hueDifferenceDeg": 1.9,
+      "lumaDifference": 0.006,
+      "deutanDistance": 0.011
+    },
+    {
+      "a": "gem-cut.radiant",
+      "b": "gem-cut.octagon",
+      "silhouetteDifference": 0.398,
+      "hueDifferenceDeg": 1.1,
+      "lumaDifference": 0.005,
+      "deutanDistance": 0.009
+    },
+    {
+      "a": "gem-cut.radiant",
+      "b": "gem-cut.lozenge",
+      "silhouetteDifference": 0.573,
+      "hueDifferenceDeg": 2.7,
+      "lumaDifference": 0.038,
+      "deutanDistance": 0.066
+    },
+    {
+      "a": "gem-cut.radiant",
+      "b": "gem-cut.half-moon",
+      "silhouetteDifference": 0.361,
+      "hueDifferenceDeg": 4.8,
+      "lumaDifference": 0.087,
+      "deutanDistance": 0.151
+    },
+    {
+      "a": "gem-cut.radiant",
+      "b": "gem-cut.bullet",
+      "silhouetteDifference": 0.631,
+      "hueDifferenceDeg": 7.0,
+      "lumaDifference": 0.052,
+      "deutanDistance": 0.091
+    },
+    {
+      "a": "gem-cut.radiant",
+      "b": "gem-cut.trapeze",
+      "silhouetteDifference": 0.213,
+      "hueDifferenceDeg": 1.0,
+      "lumaDifference": 0.012,
+      "deutanDistance": 0.021
+    },
+    {
+      "a": "gem-cut.radiant",
+      "b": "gem-cut.rose",
+      "silhouetteDifference": 0.342,
+      "hueDifferenceDeg": 1.9,
+      "lumaDifference": 0.035,
+      "deutanDistance": 0.061
+    },
+    {
+      "a": "gem-cut.radiant",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.588,
+      "hueDifferenceDeg": 6.2,
+      "lumaDifference": 0.011,
+      "deutanDistance": 0.02
+    },
+    {
+      "a": "gem-cut.radiant",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.147,
+      "hueDifferenceDeg": 1.0,
+      "lumaDifference": 0.037,
+      "deutanDistance": 0.063
+    },
+    {
+      "a": "gem-cut.radiant",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.389,
+      "hueDifferenceDeg": 4.6,
+      "lumaDifference": 0.019,
+      "deutanDistance": 0.034
+    },
+    {
+      "a": "gem-cut.pear",
+      "b": "gem-cut.marquise",
+      "silhouetteDifference": 0.539,
+      "hueDifferenceDeg": 3.1,
+      "lumaDifference": 0.03,
+      "deutanDistance": 0.052
+    },
+    {
+      "a": "gem-cut.pear",
+      "b": "gem-cut.heart",
+      "silhouetteDifference": 0.513,
+      "hueDifferenceDeg": 1.3,
+      "lumaDifference": 0.035,
+      "deutanDistance": 0.061
+    },
+    {
+      "a": "gem-cut.pear",
+      "b": "gem-cut.trillion",
+      "silhouetteDifference": 0.54,
+      "hueDifferenceDeg": 9.0,
+      "lumaDifference": 0.017,
+      "deutanDistance": 0.03
+    },
+    {
+      "a": "gem-cut.pear",
+      "b": "gem-cut.baguette",
+      "silhouetteDifference": 0.3,
+      "hueDifferenceDeg": 4.2,
+      "lumaDifference": 0.037,
+      "deutanDistance": 0.065
+    },
+    {
+      "a": "gem-cut.pear",
+      "b": "gem-cut.kite",
+      "silhouetteDifference": 0.361,
+      "hueDifferenceDeg": 3.5,
+      "lumaDifference": 0.022,
+      "deutanDistance": 0.037
+    },
+    {
+      "a": "gem-cut.pear",
+      "b": "gem-cut.shield",
+      "silhouetteDifference": 0.448,
+      "hueDifferenceDeg": 0.5,
+      "lumaDifference": 0.06,
+      "deutanDistance": 0.104
+    },
+    {
+      "a": "gem-cut.pear",
+      "b": "gem-cut.hexagon",
+      "silhouetteDifference": 0.415,
+      "hueDifferenceDeg": 4.1,
+      "lumaDifference": 0.04,
+      "deutanDistance": 0.069
+    },
+    {
+      "a": "gem-cut.pear",
+      "b": "gem-cut.octagon",
+      "silhouetteDifference": 0.252,
+      "hueDifferenceDeg": 1.1,
+      "lumaDifference": 0.041,
+      "deutanDistance": 0.071
+    },
+    {
+      "a": "gem-cut.pear",
+      "b": "gem-cut.lozenge",
+      "silhouetteDifference": 0.257,
+      "hueDifferenceDeg": 0.5,
+      "lumaDifference": 0.008,
+      "deutanDistance": 0.014
+    },
+    {
+      "a": "gem-cut.pear",
+      "b": "gem-cut.half-moon",
+      "silhouetteDifference": 0.489,
+      "hueDifferenceDeg": 2.6,
+      "lumaDifference": 0.041,
+      "deutanDistance": 0.071
+    },
+    {
+      "a": "gem-cut.pear",
+      "b": "gem-cut.bullet",
+      "silhouetteDifference": 0.25,
+      "hueDifferenceDeg": 4.8,
+      "lumaDifference": 0.006,
+      "deutanDistance": 0.012
+    },
+    {
+      "a": "gem-cut.pear",
+      "b": "gem-cut.trapeze",
+      "silhouetteDifference": 0.469,
+      "hueDifferenceDeg": 1.2,
+      "lumaDifference": 0.058,
+      "deutanDistance": 0.1
+    },
+    {
+      "a": "gem-cut.pear",
+      "b": "gem-cut.rose",
+      "silhouetteDifference": 0.327,
+      "hueDifferenceDeg": 0.3,
+      "lumaDifference": 0.011,
+      "deutanDistance": 0.019
+    },
+    {
+      "a": "gem-cut.pear",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.394,
+      "hueDifferenceDeg": 4.0,
+      "lumaDifference": 0.035,
+      "deutanDistance": 0.06
+    },
+    {
+      "a": "gem-cut.pear",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.478,
+      "hueDifferenceDeg": 1.2,
+      "lumaDifference": 0.083,
+      "deutanDistance": 0.143
+    },
+    {
+      "a": "gem-cut.pear",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.339,
+      "hueDifferenceDeg": 2.4,
+      "lumaDifference": 0.027,
+      "deutanDistance": 0.046
+    },
+    {
+      "a": "gem-cut.marquise",
+      "b": "gem-cut.heart",
+      "silhouetteDifference": 0.386,
+      "hueDifferenceDeg": 1.8,
+      "lumaDifference": 0.005,
+      "deutanDistance": 0.009
+    },
+    {
+      "a": "gem-cut.marquise",
+      "b": "gem-cut.trillion",
+      "silhouetteDifference": 0.534,
+      "hueDifferenceDeg": 5.9,
+      "lumaDifference": 0.013,
+      "deutanDistance": 0.023
+    },
+    {
+      "a": "gem-cut.marquise",
+      "b": "gem-cut.baguette",
+      "silhouetteDifference": 0.651,
+      "hueDifferenceDeg": 1.1,
+      "lumaDifference": 0.007,
+      "deutanDistance": 0.012
+    },
+    {
+      "a": "gem-cut.marquise",
+      "b": "gem-cut.kite",
+      "silhouetteDifference": 0.496,
+      "hueDifferenceDeg": 0.4,
+      "lumaDifference": 0.008,
+      "deutanDistance": 0.015
+    },
+    {
+      "a": "gem-cut.marquise",
+      "b": "gem-cut.shield",
+      "silhouetteDifference": 0.447,
+      "hueDifferenceDeg": 3.6,
+      "lumaDifference": 0.03,
+      "deutanDistance": 0.051
+    },
+    {
+      "a": "gem-cut.marquise",
+      "b": "gem-cut.hexagon",
+      "silhouetteDifference": 0.342,
+      "hueDifferenceDeg": 7.2,
+      "lumaDifference": 0.01,
+      "deutanDistance": 0.017
+    },
+    {
+      "a": "gem-cut.marquise",
+      "b": "gem-cut.octagon",
+      "silhouetteDifference": 0.511,
+      "hueDifferenceDeg": 4.2,
+      "lumaDifference": 0.011,
+      "deutanDistance": 0.019
+    },
+    {
+      "a": "gem-cut.marquise",
+      "b": "gem-cut.lozenge",
+      "silhouetteDifference": 0.478,
+      "hueDifferenceDeg": 2.6,
+      "lumaDifference": 0.022,
+      "deutanDistance": 0.039
+    },
+    {
+      "a": "gem-cut.marquise",
+      "b": "gem-cut.half-moon",
+      "silhouetteDifference": 0.308,
+      "hueDifferenceDeg": 0.5,
+      "lumaDifference": 0.071,
+      "deutanDistance": 0.123
+    },
+    {
+      "a": "gem-cut.marquise",
+      "b": "gem-cut.bullet",
+      "silhouetteDifference": 0.612,
+      "hueDifferenceDeg": 1.7,
+      "lumaDifference": 0.036,
+      "deutanDistance": 0.064
+    },
+    {
+      "a": "gem-cut.marquise",
+      "b": "gem-cut.trapeze",
+      "silhouetteDifference": 0.405,
+      "hueDifferenceDeg": 4.3,
+      "lumaDifference": 0.028,
+      "deutanDistance": 0.048
+    },
+    {
+      "a": "gem-cut.marquise",
+      "b": "gem-cut.rose",
+      "silhouetteDifference": 0.384,
+      "hueDifferenceDeg": 3.4,
+      "lumaDifference": 0.019,
+      "deutanDistance": 0.033
+    },
+    {
+      "a": "gem-cut.marquise",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.572,
+      "hueDifferenceDeg": 0.9,
+      "lumaDifference": 0.005,
+      "deutanDistance": 0.008
+    },
+    {
+      "a": "gem-cut.marquise",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.518,
+      "hueDifferenceDeg": 4.3,
+      "lumaDifference": 0.053,
+      "deutanDistance": 0.091
+    },
+    {
+      "a": "gem-cut.marquise",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.417,
+      "hueDifferenceDeg": 0.7,
+      "lumaDifference": 0.003,
+      "deutanDistance": 0.007
+    },
+    {
+      "a": "gem-cut.heart",
+      "b": "gem-cut.trillion",
+      "silhouetteDifference": 0.645,
+      "hueDifferenceDeg": 7.7,
+      "lumaDifference": 0.018,
+      "deutanDistance": 0.031
+    },
+    {
+      "a": "gem-cut.heart",
+      "b": "gem-cut.baguette",
+      "silhouetteDifference": 0.561,
+      "hueDifferenceDeg": 2.9,
+      "lumaDifference": 0.002,
+      "deutanDistance": 0.004
+    },
+    {
+      "a": "gem-cut.heart",
+      "b": "gem-cut.kite",
+      "silhouetteDifference": 0.459,
+      "hueDifferenceDeg": 2.2,
+      "lumaDifference": 0.013,
+      "deutanDistance": 0.024
+    },
+    {
+      "a": "gem-cut.heart",
+      "b": "gem-cut.shield",
+      "silhouetteDifference": 0.198,
+      "hueDifferenceDeg": 1.8,
+      "lumaDifference": 0.025,
+      "deutanDistance": 0.043
+    },
+    {
+      "a": "gem-cut.heart",
+      "b": "gem-cut.hexagon",
+      "silhouetteDifference": 0.29,
+      "hueDifferenceDeg": 5.4,
+      "lumaDifference": 0.005,
+      "deutanDistance": 0.008
+    },
+    {
+      "a": "gem-cut.heart",
+      "b": "gem-cut.octagon",
+      "silhouetteDifference": 0.384,
+      "hueDifferenceDeg": 2.4,
+      "lumaDifference": 0.006,
+      "deutanDistance": 0.01
+    },
+    {
+      "a": "gem-cut.heart",
+      "b": "gem-cut.lozenge",
+      "silhouetteDifference": 0.444,
+      "hueDifferenceDeg": 0.8,
+      "lumaDifference": 0.027,
+      "deutanDistance": 0.047
+    },
+    {
+      "a": "gem-cut.heart",
+      "b": "gem-cut.half-moon",
+      "silhouetteDifference": 0.412,
+      "hueDifferenceDeg": 1.3,
+      "lumaDifference": 0.076,
+      "deutanDistance": 0.132
+    },
+    {
+      "a": "gem-cut.heart",
+      "b": "gem-cut.bullet",
+      "silhouetteDifference": 0.563,
+      "hueDifferenceDeg": 3.5,
+      "lumaDifference": 0.041,
+      "deutanDistance": 0.073
+    },
+    {
+      "a": "gem-cut.heart",
+      "b": "gem-cut.trapeze",
+      "silhouetteDifference": 0.346,
+      "hueDifferenceDeg": 2.5,
+      "lumaDifference": 0.023,
+      "deutanDistance": 0.039
+    },
+    {
+      "a": "gem-cut.heart",
+      "b": "gem-cut.rose",
+      "silhouetteDifference": 0.3,
+      "hueDifferenceDeg": 1.6,
+      "lumaDifference": 0.024,
+      "deutanDistance": 0.042
+    },
+    {
+      "a": "gem-cut.heart",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.46,
+      "hueDifferenceDeg": 2.7,
+      "lumaDifference": 0.0,
+      "deutanDistance": 0.001
+    },
+    {
+      "a": "gem-cut.heart",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.382,
+      "hueDifferenceDeg": 2.5,
+      "lumaDifference": 0.048,
+      "deutanDistance": 0.082
+    },
+    {
+      "a": "gem-cut.heart",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.327,
+      "hueDifferenceDeg": 1.1,
+      "lumaDifference": 0.008,
+      "deutanDistance": 0.015
+    },
+    {
+      "a": "gem-cut.trillion",
+      "b": "gem-cut.baguette",
+      "silhouetteDifference": 0.641,
+      "hueDifferenceDeg": 4.8,
+      "lumaDifference": 0.02,
+      "deutanDistance": 0.035
+    },
+    {
+      "a": "gem-cut.trillion",
+      "b": "gem-cut.kite",
+      "silhouetteDifference": 0.507,
+      "hueDifferenceDeg": 5.5,
+      "lumaDifference": 0.005,
+      "deutanDistance": 0.008
+    },
+    {
+      "a": "gem-cut.trillion",
+      "b": "gem-cut.shield",
+      "silhouetteDifference": 0.644,
+      "hueDifferenceDeg": 9.5,
+      "lumaDifference": 0.043,
+      "deutanDistance": 0.074
+    },
+    {
+      "a": "gem-cut.trillion",
+      "b": "gem-cut.hexagon",
+      "silhouetteDifference": 0.618,
+      "hueDifferenceDeg": 13.1,
+      "lumaDifference": 0.023,
+      "deutanDistance": 0.04
+    },
+    {
+      "a": "gem-cut.trillion",
+      "b": "gem-cut.octagon",
+      "silhouetteDifference": 0.61,
+      "hueDifferenceDeg": 10.1,
+      "lumaDifference": 0.024,
+      "deutanDistance": 0.042
+    },
+    {
+      "a": "gem-cut.trillion",
+      "b": "gem-cut.lozenge",
+      "silhouetteDifference": 0.491,
+      "hueDifferenceDeg": 8.5,
+      "lumaDifference": 0.009,
+      "deutanDistance": 0.016
+    },
+    {
+      "a": "gem-cut.trillion",
+      "b": "gem-cut.half-moon",
+      "silhouetteDifference": 0.617,
+      "hueDifferenceDeg": 6.4,
+      "lumaDifference": 0.058,
+      "deutanDistance": 0.101
+    },
+    {
+      "a": "gem-cut.trillion",
+      "b": "gem-cut.bullet",
+      "silhouetteDifference": 0.546,
+      "hueDifferenceDeg": 4.2,
+      "lumaDifference": 0.023,
+      "deutanDistance": 0.041
+    },
+    {
+      "a": "gem-cut.trillion",
+      "b": "gem-cut.trapeze",
+      "silhouetteDifference": 0.614,
+      "hueDifferenceDeg": 10.2,
+      "lumaDifference": 0.041,
+      "deutanDistance": 0.071
+    },
+    {
+      "a": "gem-cut.trillion",
+      "b": "gem-cut.rose",
+      "silhouetteDifference": 0.555,
+      "hueDifferenceDeg": 9.3,
+      "lumaDifference": 0.006,
+      "deutanDistance": 0.011
+    },
+    {
+      "a": "gem-cut.trillion",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.568,
+      "hueDifferenceDeg": 5.0,
+      "lumaDifference": 0.018,
+      "deutanDistance": 0.03
+    },
+    {
+      "a": "gem-cut.trillion",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.705,
+      "hueDifferenceDeg": 10.2,
+      "lumaDifference": 0.066,
+      "deutanDistance": 0.113
+    },
+    {
+      "a": "gem-cut.trillion",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.533,
+      "hueDifferenceDeg": 6.6,
+      "lumaDifference": 0.01,
+      "deutanDistance": 0.016
+    },
+    {
+      "a": "gem-cut.baguette",
+      "b": "gem-cut.kite",
+      "silhouetteDifference": 0.42,
+      "hueDifferenceDeg": 0.7,
+      "lumaDifference": 0.015,
+      "deutanDistance": 0.027
+    },
+    {
+      "a": "gem-cut.baguette",
+      "b": "gem-cut.shield",
+      "silhouetteDifference": 0.479,
+      "hueDifferenceDeg": 4.7,
+      "lumaDifference": 0.023,
+      "deutanDistance": 0.039
+    },
+    {
+      "a": "gem-cut.baguette",
+      "b": "gem-cut.hexagon",
+      "silhouetteDifference": 0.538,
+      "hueDifferenceDeg": 8.3,
+      "lumaDifference": 0.003,
+      "deutanDistance": 0.004
+    },
+    {
+      "a": "gem-cut.baguette",
+      "b": "gem-cut.octagon",
+      "silhouetteDifference": 0.326,
+      "hueDifferenceDeg": 5.3,
+      "lumaDifference": 0.004,
+      "deutanDistance": 0.006
+    },
+    {
+      "a": "gem-cut.baguette",
+      "b": "gem-cut.lozenge",
+      "silhouetteDifference": 0.375,
+      "hueDifferenceDeg": 3.7,
+      "lumaDifference": 0.029,
+      "deutanDistance": 0.051
+    },
+    {
+      "a": "gem-cut.baguette",
+      "b": "gem-cut.half-moon",
+      "silhouetteDifference": 0.638,
+      "hueDifferenceDeg": 1.6,
+      "lumaDifference": 0.078,
+      "deutanDistance": 0.136
+    },
+    {
+      "a": "gem-cut.baguette",
+      "b": "gem-cut.bullet",
+      "silhouetteDifference": 0.302,
+      "hueDifferenceDeg": 0.6,
+      "lumaDifference": 0.043,
+      "deutanDistance": 0.076
+    },
+    {
+      "a": "gem-cut.baguette",
+      "b": "gem-cut.trapeze",
+      "silhouetteDifference": 0.59,
+      "hueDifferenceDeg": 5.4,
+      "lumaDifference": 0.021,
+      "deutanDistance": 0.036
+    },
+    {
+      "a": "gem-cut.baguette",
+      "b": "gem-cut.rose",
+      "silhouetteDifference": 0.456,
+      "hueDifferenceDeg": 4.5,
+      "lumaDifference": 0.026,
+      "deutanDistance": 0.046
+    },
+    {
+      "a": "gem-cut.baguette",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.288,
+      "hueDifferenceDeg": 0.2,
+      "lumaDifference": 0.002,
+      "deutanDistance": 0.005
+    },
+    {
+      "a": "gem-cut.baguette",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.554,
+      "hueDifferenceDeg": 5.4,
+      "lumaDifference": 0.046,
+      "deutanDistance": 0.078
+    },
+    {
+      "a": "gem-cut.baguette",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.503,
+      "hueDifferenceDeg": 1.8,
+      "lumaDifference": 0.01,
+      "deutanDistance": 0.019
+    },
+    {
+      "a": "gem-cut.kite",
+      "b": "gem-cut.shield",
+      "silhouetteDifference": 0.452,
+      "hueDifferenceDeg": 4.0,
+      "lumaDifference": 0.038,
+      "deutanDistance": 0.066
+    },
+    {
+      "a": "gem-cut.kite",
+      "b": "gem-cut.hexagon",
+      "silhouetteDifference": 0.503,
+      "hueDifferenceDeg": 7.6,
+      "lumaDifference": 0.018,
+      "deutanDistance": 0.032
+    },
+    {
+      "a": "gem-cut.kite",
+      "b": "gem-cut.octagon",
+      "silhouetteDifference": 0.438,
+      "hueDifferenceDeg": 4.6,
+      "lumaDifference": 0.019,
+      "deutanDistance": 0.034
+    },
+    {
+      "a": "gem-cut.kite",
+      "b": "gem-cut.lozenge",
+      "silhouetteDifference": 0.185,
+      "hueDifferenceDeg": 3.0,
+      "lumaDifference": 0.014,
+      "deutanDistance": 0.024
+    },
+    {
+      "a": "gem-cut.kite",
+      "b": "gem-cut.half-moon",
+      "silhouetteDifference": 0.581,
+      "hueDifferenceDeg": 0.9,
+      "lumaDifference": 0.063,
+      "deutanDistance": 0.108
+    },
+    {
+      "a": "gem-cut.kite",
+      "b": "gem-cut.bullet",
+      "silhouetteDifference": 0.288,
+      "hueDifferenceDeg": 1.3,
+      "lumaDifference": 0.028,
+      "deutanDistance": 0.049
+    },
+    {
+      "a": "gem-cut.kite",
+      "b": "gem-cut.trapeze",
+      "silhouetteDifference": 0.534,
+      "hueDifferenceDeg": 4.7,
+      "lumaDifference": 0.036,
+      "deutanDistance": 0.063
+    },
+    {
+      "a": "gem-cut.kite",
+      "b": "gem-cut.rose",
+      "silhouetteDifference": 0.392,
+      "hueDifferenceDeg": 3.8,
+      "lumaDifference": 0.011,
+      "deutanDistance": 0.018
+    },
+    {
+      "a": "gem-cut.kite",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.21,
+      "hueDifferenceDeg": 0.5,
+      "lumaDifference": 0.013,
+      "deutanDistance": 0.022
+    },
+    {
+      "a": "gem-cut.kite",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.598,
+      "hueDifferenceDeg": 4.7,
+      "lumaDifference": 0.061,
+      "deutanDistance": 0.105
+    },
+    {
+      "a": "gem-cut.kite",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.403,
+      "hueDifferenceDeg": 1.1,
+      "lumaDifference": 0.005,
+      "deutanDistance": 0.008
+    },
+    {
+      "a": "gem-cut.shield",
+      "b": "gem-cut.hexagon",
+      "silhouetteDifference": 0.285,
+      "hueDifferenceDeg": 3.6,
+      "lumaDifference": 0.02,
+      "deutanDistance": 0.035
+    },
+    {
+      "a": "gem-cut.shield",
+      "b": "gem-cut.octagon",
+      "silhouetteDifference": 0.291,
+      "hueDifferenceDeg": 0.6,
+      "lumaDifference": 0.019,
+      "deutanDistance": 0.033
+    },
+    {
+      "a": "gem-cut.shield",
+      "b": "gem-cut.lozenge",
+      "silhouetteDifference": 0.41,
+      "hueDifferenceDeg": 1.0,
+      "lumaDifference": 0.052,
+      "deutanDistance": 0.09
+    },
+    {
+      "a": "gem-cut.shield",
+      "b": "gem-cut.half-moon",
+      "silhouetteDifference": 0.454,
+      "hueDifferenceDeg": 3.1,
+      "lumaDifference": 0.101,
+      "deutanDistance": 0.175
+    },
+    {
+      "a": "gem-cut.shield",
+      "b": "gem-cut.bullet",
+      "silhouetteDifference": 0.506,
+      "hueDifferenceDeg": 5.3,
+      "lumaDifference": 0.066,
+      "deutanDistance": 0.115
+    },
+    {
+      "a": "gem-cut.shield",
+      "b": "gem-cut.trapeze",
+      "silhouetteDifference": 0.362,
+      "hueDifferenceDeg": 0.7,
+      "lumaDifference": 0.002,
+      "deutanDistance": 0.003
+    },
+    {
+      "a": "gem-cut.shield",
+      "b": "gem-cut.rose",
+      "silhouetteDifference": 0.264,
+      "hueDifferenceDeg": 0.2,
+      "lumaDifference": 0.049,
+      "deutanDistance": 0.085
+    },
+    {
+      "a": "gem-cut.shield",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.403,
+      "hueDifferenceDeg": 4.5,
+      "lumaDifference": 0.025,
+      "deutanDistance": 0.044
+    },
+    {
+      "a": "gem-cut.shield",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.274,
+      "hueDifferenceDeg": 0.7,
+      "lumaDifference": 0.023,
+      "deutanDistance": 0.039
+    },
+    {
+      "a": "gem-cut.shield",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.357,
+      "hueDifferenceDeg": 2.9,
+      "lumaDifference": 0.033,
+      "deutanDistance": 0.058
+    },
+    {
+      "a": "gem-cut.hexagon",
+      "b": "gem-cut.octagon",
+      "silhouetteDifference": 0.277,
+      "hueDifferenceDeg": 3.0,
+      "lumaDifference": 0.001,
+      "deutanDistance": 0.002
+    },
+    {
+      "a": "gem-cut.hexagon",
+      "b": "gem-cut.lozenge",
+      "silhouetteDifference": 0.48,
+      "hueDifferenceDeg": 4.6,
+      "lumaDifference": 0.032,
+      "deutanDistance": 0.056
+    },
+    {
+      "a": "gem-cut.hexagon",
+      "b": "gem-cut.half-moon",
+      "silhouetteDifference": 0.264,
+      "hueDifferenceDeg": 6.7,
+      "lumaDifference": 0.081,
+      "deutanDistance": 0.14
+    },
+    {
+      "a": "gem-cut.hexagon",
+      "b": "gem-cut.bullet",
+      "silhouetteDifference": 0.553,
+      "hueDifferenceDeg": 8.9,
+      "lumaDifference": 0.046,
+      "deutanDistance": 0.081
+    },
+    {
+      "a": "gem-cut.hexagon",
+      "b": "gem-cut.trapeze",
+      "silhouetteDifference": 0.19,
+      "hueDifferenceDeg": 2.9,
+      "lumaDifference": 0.018,
+      "deutanDistance": 0.031
+    },
+    {
+      "a": "gem-cut.hexagon",
+      "b": "gem-cut.rose",
+      "silhouetteDifference": 0.189,
+      "hueDifferenceDeg": 3.8,
+      "lumaDifference": 0.029,
+      "deutanDistance": 0.05
+    },
+    {
+      "a": "gem-cut.hexagon",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.501,
+      "hueDifferenceDeg": 8.1,
+      "lumaDifference": 0.005,
+      "deutanDistance": 0.009
+    },
+    {
+      "a": "gem-cut.hexagon",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.269,
+      "hueDifferenceDeg": 2.9,
+      "lumaDifference": 0.043,
+      "deutanDistance": 0.074
+    },
+    {
+      "a": "gem-cut.hexagon",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.255,
+      "hueDifferenceDeg": 6.5,
+      "lumaDifference": 0.013,
+      "deutanDistance": 0.024
+    },
+    {
+      "a": "gem-cut.octagon",
+      "b": "gem-cut.lozenge",
+      "silhouetteDifference": 0.392,
+      "hueDifferenceDeg": 1.6,
+      "lumaDifference": 0.033,
+      "deutanDistance": 0.058
+    },
+    {
+      "a": "gem-cut.octagon",
+      "b": "gem-cut.half-moon",
+      "silhouetteDifference": 0.458,
+      "hueDifferenceDeg": 3.7,
+      "lumaDifference": 0.082,
+      "deutanDistance": 0.142
+    },
+    {
+      "a": "gem-cut.octagon",
+      "b": "gem-cut.bullet",
+      "silhouetteDifference": 0.397,
+      "hueDifferenceDeg": 5.9,
+      "lumaDifference": 0.047,
+      "deutanDistance": 0.083
+    },
+    {
+      "a": "gem-cut.octagon",
+      "b": "gem-cut.trapeze",
+      "silhouetteDifference": 0.35,
+      "hueDifferenceDeg": 0.1,
+      "lumaDifference": 0.017,
+      "deutanDistance": 0.029
+    },
+    {
+      "a": "gem-cut.octagon",
+      "b": "gem-cut.rose",
+      "silhouetteDifference": 0.208,
+      "hueDifferenceDeg": 0.8,
+      "lumaDifference": 0.03,
+      "deutanDistance": 0.052
+    },
+    {
+      "a": "gem-cut.octagon",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.356,
+      "hueDifferenceDeg": 5.1,
+      "lumaDifference": 0.006,
+      "deutanDistance": 0.011
+    },
+    {
+      "a": "gem-cut.octagon",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.349,
+      "hueDifferenceDeg": 0.1,
+      "lumaDifference": 0.042,
+      "deutanDistance": 0.072
+    },
+    {
+      "a": "gem-cut.octagon",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.283,
+      "hueDifferenceDeg": 3.5,
+      "lumaDifference": 0.014,
+      "deutanDistance": 0.026
+    },
+    {
+      "a": "gem-cut.lozenge",
+      "b": "gem-cut.half-moon",
+      "silhouetteDifference": 0.527,
+      "hueDifferenceDeg": 2.1,
+      "lumaDifference": 0.049,
+      "deutanDistance": 0.085
+    },
+    {
+      "a": "gem-cut.lozenge",
+      "b": "gem-cut.bullet",
+      "silhouetteDifference": 0.246,
+      "hueDifferenceDeg": 4.3,
+      "lumaDifference": 0.014,
+      "deutanDistance": 0.025
+    },
+    {
+      "a": "gem-cut.lozenge",
+      "b": "gem-cut.trapeze",
+      "silhouetteDifference": 0.51,
+      "hueDifferenceDeg": 1.7,
+      "lumaDifference": 0.05,
+      "deutanDistance": 0.087
+    },
+    {
+      "a": "gem-cut.lozenge",
+      "b": "gem-cut.rose",
+      "silhouetteDifference": 0.356,
+      "hueDifferenceDeg": 0.8,
+      "lumaDifference": 0.003,
+      "deutanDistance": 0.006
+    },
+    {
+      "a": "gem-cut.lozenge",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.253,
+      "hueDifferenceDeg": 3.5,
+      "lumaDifference": 0.027,
+      "deutanDistance": 0.046
+    },
+    {
+      "a": "gem-cut.lozenge",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.569,
+      "hueDifferenceDeg": 1.7,
+      "lumaDifference": 0.075,
+      "deutanDistance": 0.129
+    },
+    {
+      "a": "gem-cut.lozenge",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.377,
+      "hueDifferenceDeg": 1.9,
+      "lumaDifference": 0.019,
+      "deutanDistance": 0.032
+    },
+    {
+      "a": "gem-cut.half-moon",
+      "b": "gem-cut.bullet",
+      "silhouetteDifference": 0.613,
+      "hueDifferenceDeg": 2.2,
+      "lumaDifference": 0.035,
+      "deutanDistance": 0.059
+    },
+    {
+      "a": "gem-cut.half-moon",
+      "b": "gem-cut.trapeze",
+      "silhouetteDifference": 0.362,
+      "hueDifferenceDeg": 3.8,
+      "lumaDifference": 0.099,
+      "deutanDistance": 0.171
+    },
+    {
+      "a": "gem-cut.half-moon",
+      "b": "gem-cut.rose",
+      "silhouetteDifference": 0.343,
+      "hueDifferenceDeg": 2.9,
+      "lumaDifference": 0.052,
+      "deutanDistance": 0.09
+    },
+    {
+      "a": "gem-cut.half-moon",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.622,
+      "hueDifferenceDeg": 1.4,
+      "lumaDifference": 0.076,
+      "deutanDistance": 0.131
+    },
+    {
+      "a": "gem-cut.half-moon",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.411,
+      "hueDifferenceDeg": 3.8,
+      "lumaDifference": 0.124,
+      "deutanDistance": 0.214
+    },
+    {
+      "a": "gem-cut.half-moon",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.423,
+      "hueDifferenceDeg": 0.2,
+      "lumaDifference": 0.068,
+      "deutanDistance": 0.117
+    },
+    {
+      "a": "gem-cut.bullet",
+      "b": "gem-cut.trapeze",
+      "silhouetteDifference": 0.592,
+      "hueDifferenceDeg": 6.0,
+      "lumaDifference": 0.064,
+      "deutanDistance": 0.112
+    },
+    {
+      "a": "gem-cut.bullet",
+      "b": "gem-cut.rose",
+      "silhouetteDifference": 0.448,
+      "hueDifferenceDeg": 5.1,
+      "lumaDifference": 0.017,
+      "deutanDistance": 0.031
+    },
+    {
+      "a": "gem-cut.bullet",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.321,
+      "hueDifferenceDeg": 0.8,
+      "lumaDifference": 0.041,
+      "deutanDistance": 0.071
+    },
+    {
+      "a": "gem-cut.bullet",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.602,
+      "hueDifferenceDeg": 6.0,
+      "lumaDifference": 0.089,
+      "deutanDistance": 0.155
+    },
+    {
+      "a": "gem-cut.bullet",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.488,
+      "hueDifferenceDeg": 2.4,
+      "lumaDifference": 0.033,
+      "deutanDistance": 0.057
+    },
+    {
+      "a": "gem-cut.trapeze",
+      "b": "gem-cut.rose",
+      "silhouetteDifference": 0.257,
+      "hueDifferenceDeg": 0.9,
+      "lumaDifference": 0.047,
+      "deutanDistance": 0.081
+    },
+    {
+      "a": "gem-cut.trapeze",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.546,
+      "hueDifferenceDeg": 5.2,
+      "lumaDifference": 0.023,
+      "deutanDistance": 0.041
+    },
+    {
+      "a": "gem-cut.trapeze",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.307,
+      "hueDifferenceDeg": 0.0,
+      "lumaDifference": 0.025,
+      "deutanDistance": 0.043
+    },
+    {
+      "a": "gem-cut.trapeze",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.237,
+      "hueDifferenceDeg": 3.6,
+      "lumaDifference": 0.031,
+      "deutanDistance": 0.055
+    },
+    {
+      "a": "gem-cut.rose",
+      "b": "gem-cut.briolette",
+      "silhouetteDifference": 0.398,
+      "hueDifferenceDeg": 4.3,
+      "lumaDifference": 0.024,
+      "deutanDistance": 0.041
+    },
+    {
+      "a": "gem-cut.rose",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.374,
+      "hueDifferenceDeg": 0.9,
+      "lumaDifference": 0.072,
+      "deutanDistance": 0.124
+    },
+    {
+      "a": "gem-cut.rose",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.196,
+      "hueDifferenceDeg": 2.7,
+      "lumaDifference": 0.016,
+      "deutanDistance": 0.027
+    },
+    {
+      "a": "gem-cut.briolette",
+      "b": "gem-cut.checkerboard",
+      "silhouetteDifference": 0.561,
+      "hueDifferenceDeg": 5.2,
+      "lumaDifference": 0.048,
+      "deutanDistance": 0.083
+    },
+    {
+      "a": "gem-cut.briolette",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.43,
+      "hueDifferenceDeg": 1.6,
+      "lumaDifference": 0.008,
+      "deutanDistance": 0.014
+    },
+    {
+      "a": "gem-cut.checkerboard",
+      "b": "gem-cut.sugarloaf",
+      "silhouetteDifference": 0.447,
+      "hueDifferenceDeg": 3.6,
+      "lumaDifference": 0.056,
+      "deutanDistance": 0.097
+    }
+  ],
+  "leastDifferentPair": ["gem-cut.brilliant", "gem-cut.cushion"]
+}
