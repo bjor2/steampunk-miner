@@ -73,6 +73,29 @@ export async function jumpOnCarriedFuelTo(page: Page, place: number, press: Pres
   await confirmJumpTo(page, place, press)
 }
 
+/**
+ * Shows the destination, buys its fuel shortfall if the tank has one, and jumps there; answers the
+ * milliseconds from the confirming press to control (ticket 905: a tank the pacing bot left may
+ * already hold the hop, and Buy fuel is drawn only for a shortfall).
+ */
+export async function buyAnyShortfallAndJumpTo(
+  page: Page,
+  place: number,
+  press: Press,
+): Promise<number> {
+  await showPlanetOnTheStrip(page, place, press)
+  await buyShownFuelShortfall(page, place, press)
+  return confirmJumpTo(page, place, press)
+}
+
+/** The shown planet's Buy fuel pressed when drawn; it goes once the tank holds the jump. */
+async function buyShownFuelShortfall(page: Page, place: number, press: Press): Promise<void> {
+  const buyFuel = page.getByTestId(starMapBuyFuelIdOf(place))
+  if ((await buyFuel.count()) === 0) return
+  await press(buyFuel)
+  await expect(buyFuel).toHaveCount(0)
+}
+
 /** The shown planet's Jump pressed twice; the milliseconds from the confirm to control there. */
 async function confirmJumpTo(page: Page, place: number, press: Press): Promise<number> {
   const jump = page.getByTestId(starMapJumpIdOf(place))

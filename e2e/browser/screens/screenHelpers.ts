@@ -91,7 +91,7 @@ export async function settledStats(page: Page) {
 /** What `teleportToDock` refuses with when the rig already sits in a bay (`setPlanet` docks it). */
 const ALREADY_DOCKED = 'the vehicle is already docked'
 
-type BayName = 'sell' | 'upgrade'
+export type BayName = 'sell' | 'upgrade'
 
 /**
  * Docked at a bay with its screen open behind the shutter. A rig already docked there is only
@@ -136,7 +136,8 @@ async function openShutterBay(page: Page): Promise<string | null> {
   return (await shutterOf(page)).bay
 }
 
-async function waitForOpenBay(page: Page, bay: BayName): Promise<void> {
+/** The shutter stands open over `bay`: the rig is docked there with its screen drawn. */
+export async function waitForOpenBay(page: Page, bay: BayName): Promise<void> {
   await expect.poll(() => shutterOf(page), { timeout: 30_000 }).toEqual({ bay, phase: 'open' })
 }
 

@@ -652,7 +652,14 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   save (world seed 1, the browser's) on planet 2 by a fuel jump (ticket 756), with no debug command and a script that
   replays to the same digest; `src/debug/debugBot.test.ts` holds the live replay to the bot's digest
   with `debugApplied` false; `src/features/ores/systems/hazardNearDock.test.ts` holds each of
-  planets 2 to 5 on seed 1 to its own pocket kind within 20 columns of the dock.
+  planets 2 to 5 on seed 1 to its own pocket kind within 20 columns of the dock. The phone run
+  (ticket 905), `e2e/browser/mobile/freshSavePlanets.spec.ts`, plays the same five planets in
+  the Pixel 7 project at 360x640: the bot plays to the planet before, the touch Dock button docks,
+  the last hop goes by taps on the star map (any fuel shortfall bought, the jump confirmed), the
+  landing makes the same checks (`freshSaveLandings.ts`), and the planet's own kit item and an
+  Outfitter step are bought by taps. Every `test.step` title starts `P<n>:`, so a red run names the
+  planet and the step. The iPhone 13 project skips it: WebKit cannot launch on the box, so that
+  phone is unverified for this loop.
 - **R3 re-baseline under the radius rule** (ticket 644, GD lock R3 on #302 6306854642, its addendum
   6306861669, the VS guards on #305 6306854175 and the Campaign Scaling room's rows on #644): the
   lane `src/logging/radiusRebaseline.lane.test.ts` plays `bot-slice` to planet 10's core on the three

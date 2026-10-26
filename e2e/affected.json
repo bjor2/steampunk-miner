@@ -603,7 +603,7 @@
       "specs": ["e2e/browser/planetCard.spec.ts"]
     },
     {
-      "why": "A fresh save reaches each of P1-P5 by the pacing bot's bought travel and lands on its hazard, pool and card line (ticket 656).",
+      "why": "A fresh save reaches each of P1-P5 by the pacing bot's bought travel and lands on its hazard, pool and card line (ticket 656); on the Pixel 7 at 360x640 the last hop, the merchant and the shop go by taps (ticket 905).",
       "paths": [
         "src/debug/debugBot.ts",
         "src/systems/bot/botArrival.ts",
@@ -619,9 +619,16 @@
         "src/features/ores/systems/hazardNearDock.ts",
         "src/features/ores/systems/hazardPockets.ts",
         "src/features/ores/systems/hazardCardSource.ts",
-        "src/features/ores/systems/kindRows.ts"
+        "src/features/ores/systems/kindRows.ts",
+        "src/features/planet-kit/ui/MerchantPanel.tsx",
+        "src/systems/input/touchControls.ts",
+        "e2e/browser/freshSaveLandings.ts",
+        "e2e/browser/starMapJumps.ts"
       ],
-      "specs": ["e2e/browser/freshSavePlanets.spec.ts"]
+      "specs": [
+        "e2e/browser/freshSavePlanets.spec.ts",
+        "e2e/browser/mobile/freshSavePlanets.spec.ts"
+      ]
     },
     {
       "why": "The game stage fits every screen cell, either way up (ticket 483).",
