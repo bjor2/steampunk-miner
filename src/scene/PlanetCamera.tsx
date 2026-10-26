@@ -11,7 +11,8 @@
  * the world root (ticket 339). The zoom is metres down the screen's height in either orientation,
  * so a portrait screen shows desktop's vertical metres and narrows across, and the lean across it
  * is scaled by its half width (ticket 484), as it is across a desktop screen, whose spare width
- * goes to the look-ahead (ticket 767).
+ * goes to the look-ahead (ticket 767). A rig grown by its width level is framed by its side, so it
+ * keeps its size on screen (ticket 750, `widthZoomOf`).
  */
 import { useFrame, type Size } from '@react-three/fiber'
 import { useMemo } from 'react'
@@ -26,13 +27,13 @@ import {
 } from '../systems/render/cameraTurn'
 import {
   createSpeedFraming,
-  framedShortAxisOf,
   leadOffsetInto,
   leanReachOf,
   stepSpeedFraming,
   type FramedView,
   type LeanReach,
   type SpeedFraming,
+  widthFramedShortAxisOf,
 } from '../systems/render/speedFraming'
 import { layoutKindOf } from '../systems/views/designSystem'
 import { readFittedScreen } from '../ui/stage/screenFit'
@@ -43,6 +44,7 @@ import {
   pixelsPerMetreOf,
   shownViewShortAxisOf,
   viewHorizontalMetresOf,
+  widthZoomOf,
 } from '../systems/render/viewZoom'
 import { followLagOf } from '../systems/render/cameraFollow'
 import { cameraPresence } from './cameraPresence'
@@ -145,7 +147,8 @@ function easePlayerZoom(zoom: PlayerZoom, size: Size, chosen: number, dt: number
 
 function showFraming(size: Size, zoom: PlayerZoom, framing: SpeedFraming): void {
   const cap = maxViewVerticalOf(size.width, size.height)
-  const vertical = framedShortAxisOf(framing, zoom.shownMetres, cap)
+  const widthZoom = widthZoomOf(vehiclePresence.bodyHalfSide)
+  const vertical = widthFramedShortAxisOf(framing, zoom.shownMetres, cap, widthZoom)
   cameraPresence.viewShortAxisMetres = vertical
   cameraPresence.viewHorizontalMetres = viewHorizontalMetresOf(size.width, size.height, vertical)
   cameraPresence.feltSpeedCellsPerSecond = framing.feltSpeed

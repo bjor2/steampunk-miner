@@ -72,6 +72,7 @@ import { drillPresence } from './drillPresence'
 import { motionPresence } from './motionPresence'
 import { stepVehicleParts } from './partMotionPresence'
 import { renderPresence } from './renderPresence'
+import { vehiclePresence } from './vehiclePresence'
 import { createVehicleStage, type VehicleStage } from './vehicleStage'
 
 const HALF_TILE = 0.5
@@ -153,6 +154,7 @@ export function createVehicleLoop(fixedFlags?: DevFlags): VehicleLoop {
       useGameStore.getState().noteDigGravityLimit(result.isGravityLimited)
       stepVehicleParts(result.pose, result.flags)
       renderPresence.groundColliders = controller.colliderCount()
+      vehiclePresence.bodyHalfSide = controller.bodyHalfSide()
     },
   }
 }

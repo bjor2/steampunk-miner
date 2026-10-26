@@ -14,6 +14,7 @@ import { renderPresence } from '../scene/renderPresence'
 import { gpuPresence, renderQualityPresence } from '../scene/renderQualityPresence'
 import { KERNEL_SCENE_LAYER_BUDGET, type SceneLayerBudget } from '../scene/registries/sceneLayers'
 import { sprayPresence } from '../scene/sprayPresence'
+import { vehiclePresence } from '../scene/vehiclePresence'
 import { useGameStore } from '../store/gameStore'
 import { shownPlanetCardOf } from '../store/planetCardSlice'
 import {
@@ -416,7 +417,8 @@ function screenLayoutNow(): DebugResult<{ layout: ScreenLayout }> {
  */
 function cameraViewOnScreen(): CameraView & SpeedView & FollowView {
   const { widthPixels, heightPixels, viewShortAxisMetres, feltSpeedCellsPerSecond } = cameraPresence
-  const view = cameraViewOf(widthPixels, heightPixels, viewShortAxisMetres)
+  const bodyHalfSide = vehiclePresence.bodyHalfSide
+  const view = cameraViewOf(widthPixels, heightPixels, viewShortAxisMetres, bodyHalfSide)
   const extent = {
     verticalMetres: viewShortAxisMetres,
     horizontalMetres: view.viewHorizontalMetres,

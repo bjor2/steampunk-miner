@@ -12,6 +12,11 @@
  *
  * The player's setting stays 8 to 20 m on every screen; the camera shows at most the screen
  * shape's cap (#173), so a 21:9 monitor keeps the #38 draw budget and a 16:9 one is unchanged.
+ *
+ * A rig grown wider by its width level (GD lock on #662 Part B, ticket 750) is framed by its side:
+ * the setting and the cap both scale by the collider's side over the bare 0.9 m (`widthZoomOf`),
+ * so the rig keeps its size on screen at every level, on a phone and at 1280+, and the speed
+ * framing's pull-back still shows its 1 s of ground ahead (`speedFraming.ts`).
  */
 import { VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import {
@@ -44,8 +49,16 @@ export interface CameraView {
   viewHorizontalMetres: number
   /** Pixels per world metre: `camera.zoom` of the orthographic camera. */
   pixelsPerMetre: number
-  /** The 0.9 m vehicle collider's projected height as a share of the vertical extent. */
+  /** The vehicle collider's projected height as a share of the vertical extent (0.9 m bare). */
   vehicleColliderShare: number
+}
+
+/**
+ * How many times more the camera shows for a collider of half side `bodyHalfSide` (m) than for the
+ * bare 0.9 m one (ticket 750): its side over the bare side, never under 1.
+ */
+export function widthZoomOf(bodyHalfSide: number): number {
+  return Math.max(1, (2 * bodyHalfSide) / VEHICLE_COLLIDER_SIZE)
 }
 
 /** The view one `zoom_in` step gives: fewer metres, never under 8 m. */
@@ -125,12 +138,13 @@ export function cameraViewOf(
   widthPixels: number,
   heightPixels: number,
   viewShortAxisMetres: number,
+  bodyHalfSide = VEHICLE_COLLIDER_SIZE / 2,
 ): CameraView {
   return {
     viewShortAxisMetres,
     maxViewShortAxisMetres: maxViewVerticalOf(widthPixels, heightPixels),
     viewHorizontalMetres: viewHorizontalMetresOf(widthPixels, heightPixels, viewShortAxisMetres),
     pixelsPerMetre: pixelsPerMetreOf(heightPixels, viewShortAxisMetres),
-    vehicleColliderShare: VEHICLE_COLLIDER_SIZE / viewShortAxisMetres,
+    vehicleColliderShare: (2 * bodyHalfSide) / viewShortAxisMetres,
   }
 }

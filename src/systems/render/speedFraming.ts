@@ -97,6 +97,20 @@ export function framedShortAxisOf(framing: SpeedFraming, playerShown: number, ca
   return Math.min(cap, Math.max(playerShown, framing.pullBack))
 }
 
+/**
+ * `framedShortAxisOf` for a rig grown by `widthZoom` (`viewZoom.ts`, ticket 750): the player's
+ * zoom and the cap scale with it, so the rig keeps its size on screen; the pull-back for speed
+ * does not, and it never shows less than the 1 s ahead a bare rig sees, as both bounds only grow.
+ */
+export function widthFramedShortAxisOf(
+  framing: SpeedFraming,
+  playerShown: number,
+  cap: number,
+  widthZoom: number,
+): number {
+  return framedShortAxisOf(framing, playerShown * widthZoom, cap * widthZoom)
+}
+
 /** Metres of ground visible ahead of the rig: `h (1 + f)` with `h` half the short axis. */
 export function groundAheadOf(shortAxis: number, leadShare: number): number {
   return (shortAxis / 2) * (1 + leadShare)
