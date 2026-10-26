@@ -1040,6 +1040,20 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   airborne rig-heavy release that keeps its ramp (skipped since ticket 552 until their phases are
   re-paired at purchase 12, as no purchase cuts the 14.47 m/s they were read at), and one-step checks through `cutTickFor` (swept cut off
   reads no toe; a gated cell still stops the body) on the ground of `src/physics/toeStopFixtures.ts`.
+- **The rig's width body** (ticket 750, GD lock on #662 Part B): `src/physics/widthBody.test.ts`
+  drives the live loop with a fake width source (`withRegistrations`, the level changed between
+  holds as a purchase does). It checks five things. The collider grows on the dock's pad within
+  half a second, its wheels never sinking or leaping. The pose stands the owned body on the
+  collider's wheels. In a bare shaft it grows only into the clearance the cut left, never its
+  walls. A Mark bought mid-shaft clears within two seconds of drilling on, never stopped with the
+  gate open for more than 2 ticks. Straight-down pace at width levels 1 (30 and 144 frames/s) and
+  2, and a level tunnel at level 1, stay within 95% of the bare rig's. The specs dig at -11.5 m
+  west of the dock, off its pad and east of the hill face (about 20 s). The pure rules sit
+  beside it: `vehicle/bodyGrowth.test.ts` (step, wait limit, climb, the owned centre),
+  `vehicle/ownedBodyStamp.test.ts` (floor, band, face, contact, toe and casing floor round the
+  owned body; the bare level unchanged), `render/widthZoom.test.ts` (the rig's size on screen and
+  the 1 s ahead from level 1 to 1e6, phone and desktop) and `vehicle/wagonFit.test.ts` (the
+  shipped `hull.hitch` and a wagon of the rig's width in its bore along every aim).
 - **Riding the cut face** (ticket 570): `src/physics/cutFaceRide.test.ts` plays down legs at drill
   purchases 1, 10 and 20 (1.5, 10.7 and 94 m/s on planet 1) on a column and a tilted column at 30
   and 144 frames/s, and a level leg turned out of a down bore, in the live loop with

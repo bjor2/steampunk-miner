@@ -34,6 +34,12 @@
           "issues": [7]
         },
         {
+          "title": "Wider rig with drill width",
+          "description": "Each drill width level (the side cutters, Mark 2, Wide) widens the bore and the rig itself by a metre. The rig grows up from its wheels into ground its cut has opened and waits where rock is still in the way. The camera pulls back with it, so the rig keeps its size on screen. Its wider look and the mounts on its edge come later.",
+          "status": "partial",
+          "issues": [749, 750, 666]
+        },
+        {
           "group": true,
           "title": "Energy",
           "description": "One shared energy tank powers everything; it is your clock on every trip.",

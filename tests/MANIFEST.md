@@ -1406,6 +1406,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/tunnelling.test.ts` | 10 | 2 |
 | `src/physics/vehicleLoop.test.ts` | 13 | 13 |
 | `src/physics/vehiclePhysics.test.ts` | 8 | 2 |
+| `src/physics/widthBody.test.ts` | 8 | 6 |
 
 ### `registries`
 
@@ -1549,6 +1550,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/vehiclePreviewLook.test.ts` | 5 | 5 |
 | `src/systems/render/viewZoom.test.ts` | 25 | 19 |
 | `src/systems/render/visibleChunks.test.ts` | 7 | 7 |
+| `src/systems/render/widthZoom.test.ts` | 6 | 6 |
 
 ### `replay`
 
@@ -1862,6 +1864,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/aheadBearingLatch.test.ts` | 11 | 11 |
 | `src/systems/vehicle/aim.test.ts` | 11 | 11 |
 | `src/systems/vehicle/bandDig.test.ts` | 8 | 8 |
+| `src/systems/vehicle/bodyGrowth.test.ts` | 22 | 22 |
 | `src/systems/vehicle/bodySpeedDips.test.ts` | 6 | 6 |
 | `src/systems/vehicle/boreWidthStamp.test.ts` | 4 | 4 |
 | `src/systems/vehicle/carryDebt.test.ts` | 8 | 8 |
@@ -1896,6 +1899,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/lineCellStep.test.ts` | 6 | 6 |
 | `src/systems/vehicle/motionEffects.test.ts` | 13 | 13 |
 | `src/systems/vehicle/motionGlide.test.ts` | 8 | 7 |
+| `src/systems/vehicle/ownedBodyStamp.test.ts` | 9 | 9 |
 | `src/systems/vehicle/poseReport.test.ts` | 19 | 19 |
 | `src/systems/vehicle/returnReserve.test.ts` | 4 | 4 |
 | `src/systems/vehicle/stepBound.test.ts` | 12 | 12 |
@@ -1907,6 +1911,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/vehicleControls.test.ts` | 20 | 20 |
 | `src/systems/vehicle/vehicleReadout.test.ts` | 3 | 3 |
 | `src/systems/vehicle/vehicleStats.test.ts` | 8 | 8 |
+| `src/systems/vehicle/wagonFit.test.ts` | 3 | 3 |
 | `src/systems/vehicle/workshopMilestones.test.ts` | 12 | 12 |
 
 ### `views`
