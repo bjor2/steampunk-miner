@@ -1040,6 +1040,23 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   no unlined run past one cell along either wall, and no aimed leg meets more of its lining than
   the straight-down leg at its purchase (the dig-pace bar). The straight legs stay
   `casingPerMetre.lane.test.ts`'s.
+- **The diagonal-heavy pacing bot** (ticket 899, the VS's check moved from #833): the bot's tile
+  model bores at any 1/64-turn aim through the player's nose rule (`openTileAlongAim`, the report
+  carrying the aim as the analog stick sends it), a 45 degree step √2 m with the drive cap on its
+  sideways part and the gravity ramp along its aim; a cardinal aim's report is its facing's, field
+  for field. `digPolicy: 'diagonal_heavy'` (default `cardinal`) digs the ore galleries as zigzags
+  of 45 degree legs (`zigzagGallery.ts`, `galleryWays.ts`). `src/systems/bot/botAimedDig.test.ts`
+  bores the nose tile at aims 48, 53, 56 and 40, bills each ring of a 45 degree leg 1414 mm where a
+  straight leg bills 1000 and prices every ring by the per-metre rule; `zigzagGallery.test.ts` holds
+  the gallery shape, the way back and its energy; `src/logging/diagonalHeavyBot.test.ts` plays seed
+  83921's planet 1 to its core under the flag (at least half the cut at 45 degrees, every command
+  accepted, deterministic) and checks the default cuts nothing at 45 degrees. The lane
+  `src/logging/diagonalHeavy.lane.test.ts` (Tester) plays the three pacing seeds to planet 5's core
+  under both policies and judges `diagonalHeavyBars.ts` (unit-specced in `diagonalHeavyBars.test.ts`):
+  45 degree share at least 50%, 22-30 minutes a core, money a minute within ±5% of the cardinal
+  run, casing 12-20% of spend and the next grade at most 25% of money on arrival (#894), every ring
+  on the per-metre rule and lining a metre cut 0.85x-1.10x the cardinal run's; it writes the
+  run-comparison log `tests/balance/diagonal-heavy.comparison.ndjson` beside the baseline.
 - **Cut-follow at the starting drill** (ticket 430): `src/physics/cutFollowStartingRigs.test.ts`
   plays 8 s legs down, level and up in the live loop with `drill.sweptCut` on, at stored
   drill_power 1 and 2 (tip 0; purchases since ticket 552, 1.50 and 1.86 m/s, the old stored 1 and 20) and #400's two rigs, and holds a down cut to the drill's speed
