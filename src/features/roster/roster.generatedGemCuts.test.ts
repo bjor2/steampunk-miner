@@ -20,10 +20,16 @@ import {
 import { GEM_CUT_LIBRARY, gemCutPagesOf } from '../gem-cuts'
 import { GEM_OVERLAYS } from '../../systems/render/gemOverlays'
 import {
+  cutReadOf,
+  cutReadsOfSheet,
+  CUT_READ_SCREENS,
+  CUT_READS,
+  GEM_CUTS_ART,
+} from './materialsCiFixtures'
+import {
   gemReadProblemsAt,
   priceOrderProblemsOf,
   type HeroCellRead,
-  type HeroReads,
 } from './systems/render/gemRead'
 import {
   gemOverlayOfPlanet,
@@ -45,22 +51,6 @@ import {
 
 const SEED = 20261024
 const GEMS_PER_PLANET = 3
-const READ_SCREENS = ['640x360', '360x640', '1280x800']
-const GEM_CUTS_ART = new URL('../../../docs/art/gem-cuts/', import.meta.url)
-
-interface CutRead {
-  cutId: string
-  cellSha256: string
-  screens: HeroCellRead['screens']
-  dimmestTint: HeroCellRead['screens']
-}
-
-/** The pipeline's measures of every committed cut cell (`cut_post.py`). */
-const CUT_READS = JSON.parse(readFileSync(new URL('gem-cut-reads.json', GEM_CUTS_ART), 'utf8')) as {
-  screens: Record<string, number>
-  cuts: CutRead[]
-}
-
 /** The addresses read: system 1's P6 to P40, system 2's first and third planets, g = 1e6. */
 const ADDRESSES: { label: string; params: PlanetParams }[] = [
   ...[6, 7, 8, 20, 40].map((place) => ({
@@ -74,23 +64,6 @@ const ADDRESSES: { label: string; params: PlanetParams }[] = [
 
 function gemRowsOf(sheet: PlanetContactSheet): ContactSheetRow[] {
   return sheet.rows.filter((row) => row.gemRank !== null)
-}
-
-function cutReadOf(cutId: string): CutRead {
-  const read = CUT_READS.cuts.find((cut) => cut.cutId === cutId)
-  if (read === undefined) throw new Error(`${cutId} has no read in gem-cut-reads.json`)
-  return read
-}
-
-/** The cut reads keyed by the species that draws each, so the price-order rule can read them. */
-function readsOfSheet(sheet: PlanetContactSheet): HeroReads {
-  return {
-    screens: CUT_READS.screens,
-    heroes: gemRowsOf(sheet).map((row) => ({
-      ...cutReadOf(row.gemCut ?? ''),
-      speciesId: row.speciesId,
-    })),
-  }
 }
 
 function cellSha256Of(cutId: string): string {
@@ -161,7 +134,7 @@ describe('generated gem cuts (ticket 889)', () => {
     )
     const stale = CUT_READS.cuts.filter((cut) => cut.cellSha256 !== cellSha256Of(cut.cutId))
     expect(stale.map((cut) => cut.cutId)).toEqual([])
-    expect(Object.keys(CUT_READS.screens).sort()).toEqual([...READ_SCREENS].sort())
+    expect(Object.keys(CUT_READS.screens).sort()).toEqual([...CUT_READ_SCREENS].sort())
     expect(CUT_READS.screens['640x360']).toBe(24)
   })
 
@@ -174,8 +147,8 @@ describe('generated gem cuts (ticket 889)', () => {
         screens: read.screens,
       }
       const tinted: HeroCellRead = { ...neutral, screens: read.dimmestTint }
-      expect(gemReadProblemsAt(neutral, READ_SCREENS)).toEqual([])
-      expect(gemReadProblemsAt(tinted, READ_SCREENS)).toEqual([])
+      expect(gemReadProblemsAt(neutral, CUT_READ_SCREENS)).toEqual([])
+      expect(gemReadProblemsAt(tinted, CUT_READ_SCREENS)).toEqual([])
     })
   }
 
@@ -183,8 +156,10 @@ describe('generated gem cuts (ticket 889)', () => {
     'scores no cheaper gem of $label above a pricier one, nor under its top non-gem, on k plus the bright or saturated share',
     ({ params }) => {
       const sheet = planetContactSheetOf(params)
-      const reads = readsOfSheet(sheet)
-      const problems = READ_SCREENS.flatMap((screen) => priceOrderProblemsOf(sheet, reads, screen))
+      const reads = cutReadsOfSheet(sheet)
+      const problems = CUT_READ_SCREENS.flatMap((screen) =>
+        priceOrderProblemsOf(sheet, reads, screen),
+      )
       expect(problems).toEqual([])
     },
   )

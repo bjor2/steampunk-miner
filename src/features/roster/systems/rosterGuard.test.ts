@@ -5,6 +5,7 @@ import type { ResourceFamily } from '../../../systems/world/worldCell'
 import { oreFamilies, ORE_ROWS, rarityTiers } from '../../ores'
 import { oreMixOf } from '../../planet-mix'
 import { MATERIAL_POOL_RULES } from '../../solar-systems'
+import { ciPlanetsOf } from '../materialsCiFixtures'
 import { isGeneratedPoolPlanet } from './generatedRoster'
 import { planetRosterOf } from './planetRoster'
 import { rareClusterKindsOf } from './rosterClusterKinds'
@@ -20,6 +21,8 @@ import { SHARE_ROWS } from './shareRows'
 // band 3 (fossil commons, from P4) is read too. A cell only the relic signature paints is the
 // slotless 16th material and asks for no kind (E1, Systems and TD on #453). From ore rules 14 P6 and
 // P7 draw their generated pools (ticket 888), held to the same bounds by each run's least kinds.
+// Ticket 890 widens the generated rows to every planet the roster can emit from a pool: system 1's
+// P6 to P40 and the five planets of systems 2, 3, 40 and 1e6, on the same three seeds.
 
 const SEED = 83921
 const SEEDS = [83921, 31415, 27182]
@@ -135,7 +138,17 @@ function labelOf(params: PlanetParams): string {
 }
 
 const MIXED = ROSTERED.filter((params) => params.planetIndex >= 3 && !isGeneratedPoolPlanet(params))
-const GENERATED = ROSTERED.filter(isGeneratedPoolPlanet)
+/** Every generated planet the guard reads (ticket 890), labelled by its address `<s>.<p>`. */
+const GENERATED_CASES = SEEDS.flatMap((seed) =>
+  ciPlanetsOf(seed).map(({ label, params }) => [`${label} seed ${seed}`, params] as const),
+)
+/** The authored rosters of P1 to P5, then every generated planet. */
+const GUARDED_CASES = [
+  ...ROSTERED.filter((params) => !isGeneratedPoolPlanet(params)).map(
+    (params) => [labelOf(params), params] as const,
+  ),
+  ...GENERATED_CASES,
+]
 /** Option B's rows (#453), appended after Systems' 15 slots for a swapped band 3's fossil commons. */
 const APPENDED_SLOT_IDS = ['mixed.c5', 'mixed.c6']
 
@@ -183,7 +196,12 @@ describe('roster guard (Systems, ticket 446)', () => {
     expect(ROSTERED.filter(hasSwappedBand3).length).toBeGreaterThan(0)
   })
 
-  it.each(ROSTERED.map((params) => [labelOf(params), params] as const))(
+  it('reads every generated planet of system 1 P6 to P40 and of systems 2, 3, 40 and 1e6 (ticket 890)', () => {
+    expect(GENERATED_CASES).toHaveLength(SEEDS.length * (35 + 4 * 5))
+    expect(GENERATED_CASES.filter(([, params]) => !isGeneratedPoolPlanet(params))).toEqual([])
+  })
+
+  it.each(GUARDED_CASES)(
     'gives every painted (band, tier, family) cell of %s the live kinds its bound needs',
     (_, params) => {
       const short = kindedCellsOf(params).filter((cell) => cell.nLive < guardOf(cell))
@@ -191,7 +209,7 @@ describe('roster guard (Systems, ticket 446)', () => {
     },
   )
 
-  it.each(ROSTERED.map((params) => [labelOf(params), params] as const))(
+  it.each(GUARDED_CASES)(
     'holds every kind of %s within its band-trip bound, in whole basis points',
     (_, params) => {
       const cells = paintedCellsOf(params)
@@ -203,7 +221,7 @@ describe('roster guard (Systems, ticket 446)', () => {
     },
   )
 
-  it.each(ROSTERED.map((params) => [labelOf(params), params] as const))(
+  it.each(GUARDED_CASES)(
     "keeps the band mean of %s: its kinds and the signature's own share make the whole band trip",
     (_, params) => {
       const cells = paintedCellsOf(params)
@@ -252,7 +270,7 @@ describe('roster guard (Systems, ticket 446)', () => {
     },
   )
 
-  it.each(GENERATED.map((params) => [labelOf(params), params] as const))(
+  it.each(GENERATED_CASES)(
     'draws every kind of the generated pool of %s, 15 to 17 of them (ticket 888)',
     (_, params) => {
       const drawn = drawnSlotIdsOf(params)

@@ -572,7 +572,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/rig-look/systems/rigLookSource.test.ts` | 13 | 13 |
 | `src/features/rig-look/systems/rigLookTable.test.ts` | 32 | 32 |
 
-### `roster`: 25 files, 471 tests
+### `roster`: 26 files, 2437 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -585,6 +585,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/roster/roster.generatedGemCuts.test.ts` | 60 | 9 |
 | `src/features/roster/roster.generatedPoolValue.test.ts` | 11 | 7 |
 | `src/features/roster/roster.generatedPoolsInPlay.test.ts` | 5 | 1 |
+| `src/features/roster/roster.materialsCi.test.ts` | 1329 | 16 |
 | `src/features/roster/roster.p1Gems.test.ts` | 6 | 6 |
 | `src/features/roster/roster.p2OwnKinds.test.ts` | 5 | 5 |
 | `src/features/roster/roster.p2Pool.test.ts` | 3 | 3 |
@@ -597,7 +598,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/roster/systems/render/gemRead.test.ts` | 7 | 7 |
 | `src/features/roster/systems/rosterFold.test.ts` | 6 | 6 |
 | `src/features/roster/systems/rosterGems.test.ts` | 10 | 10 |
-| `src/features/roster/systems/rosterGuard.test.ts` | 85 | 12 |
+| `src/features/roster/systems/rosterGuard.test.ts` | 722 | 13 |
 | `src/features/roster/systems/rosterSpecies.test.ts` | 11 | 7 |
 | `src/features/roster/systems/shareRows.test.ts` | 2 | 2 |
 | `src/features/roster/systems/tripLedger.test.ts` | 4 | 4 |

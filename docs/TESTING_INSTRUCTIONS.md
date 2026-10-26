@@ -536,7 +536,7 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   system 2's p1 and p3 and checks every species the codex met is its planet's pool kind;
   `roster.generatedPoolValue.test.ts` holds the top gem >= 1.5x and R3 >= 1.15x on paper along g in
   system 1 (P5 to P40) and systems 2 and 3, the jump hop 1.5 -> 2.1, and the ladder at g = 1, 5, 30,
-  40 and 1e6 on Money; `rosterGuard.test.ts` runs the family-first bounds on the generated P6 and P7;
+  40 and 1e6 on Money; `rosterGuard.test.ts` runs the family-first bounds on the generated P6 and P7 (ticket 890 widens it);
   `planetRoster.test.ts`, `planetSpecies.test.ts`, `rosterGems.test.ts` and `kindLook.test.ts` read
   `foothold-p6-p7` only under rules 13 (saves). `src/systems/authority/planetOreStamps.test.ts` is
   the TD's list: an old save with P6 and P7 visited loads on v_pre with main's digests, a mixed save
@@ -563,6 +563,17 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   hue slot), the price order, shared-g addresses apart, and nothing on a rules-13 P6 or on P1 to P5.
   The browser half is `e2e/browser/gemCuts.spec.ts` (P6 and P8 at 640x360 at 24 px a cell, 360x640
   and 1280x800, screenshots attached), the Tester's.
+- **The materials CI of every generated planet** (ticket 890, spec #878): `src/features/roster/roster.materialsCi.test.ts`
+  runs P1 to P5's materials checks on every planet the roster can emit from a pool, system 1's P6 to
+  P40 and the five planets of systems 2, 3, 40 and 1e6 (`materialsCiFixtures.ts`), over the species
+  audit's two seeds: the contact sheet (every slot skinned, every pair read apart, at least 15
+  distinct looks), the species audit (15 species, own names, sprites and skins), the gem read (three
+  library cuts read as gems at 24 px, 360 px and 1280+, the price order), gems only in bands 3 to 5
+  in clusters of at most 3 cells, rarity that never falls band to band, a world seed per address and
+  kind ids `system<s>-p<p>-<slot>` none shares, shared-g addresses (1.6 and 2.1, 1.11 and 3.1) on
+  other pools and gem looks, and every gem pick kept with a cut appended to the library.
+  `src/features/roster/systems/rosterGuard.test.ts` runs the family-first bounds on the same planets
+  over the three pacing seeds.
 - **The "solar system 2" re-baseline** (ticket 779, spec #774): `src/features/solar-systems/systemTwoPace.test.ts`
   judges the system 2 bars on hand-built tallies: planets at g 6 to 10, each 22-30 min, felt speed
   at least 0.9x the planet before (the jump's step against system 1's planet 5), drill + tip majors
