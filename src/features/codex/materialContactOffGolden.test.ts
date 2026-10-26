@@ -19,7 +19,8 @@ import { withMaterialContact } from './systems/materialFixtures'
 // 118), moved all four again, and only them. Ticket 888 gave planet 80 its generated pool's
 // species, so the record moves money-past-1e40 too: with the switch off it replays to the digests
 // of its stamp-14 planet with no species touched. Ticket 894's casing prices (protocol 121) moved
-// every pin again.
+// every pin again. Ticket 890 stamps a fresh planet 80 with ore rules 15 (the gem overlay walk),
+// which alone moves money-past-1e40's pins: with P80 held on 14 they replay as before.
 
 type MovedDigests = Readonly<Record<string, Readonly<Record<number, string>>>>
 
@@ -29,7 +30,7 @@ const PROTOCOL_88_DIGESTS: MovedDigests = {
   'collapse-band-2-grade-1': { 2125: '4557304bd522c918' },
   'dig-and-return': { 247: 'df5150891e41f71a', 3600: '85652eb86f98e6ac', 4000: '99a320b209396c35' },
   'mined-order-mixed': { 307: '7b5b8d6a23d6222c' },
-  'money-past-1e40': { 124: '2db1693d76e14ec9', 166: 'f9a357a85f1f599c', 2000: 'be0ac79106274807' },
+  'money-past-1e40': { 124: 'c2719b8d8770131c', 166: 'c4743c284170afc1', 2000: 'b31bb5386a1b1e68' },
 }
 
 /** Protocol 88's charged digests (A6, `drill.exactCarry` on) of the same goldens. */

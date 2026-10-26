@@ -603,8 +603,13 @@ import type { JsonCount } from '../wholeCount'
  *    31), and every blast reads the planter's owned level when it blows, so its `BlastStarted`
  *    carries it and its ground r² widens while the base r² stays. A rig that never buys a level
  *    moves no digest.
+ * 125: ore rules 15 (ticket 890, the TD's row on #890): the gem overlay walks to a free one in the
+ *    planet's look group, so no two planets of an act lay one overlay. Rules-14 planets keep their
+ *    picks. Wire shape unchanged: the stamp rides where it did, and a client that knows no rules 15
+ *    refuses a join or travel stamped 15 ("update required"), never re-picks. A run that stays on
+ *    rules-14 planets moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 124
+export const AUTHORITY_PROTOCOL_VERSION = 125
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

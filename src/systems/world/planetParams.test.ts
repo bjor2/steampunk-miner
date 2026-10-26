@@ -14,6 +14,7 @@ import {
   DEEP_RARE_WINDOW_ORE_RULES,
   DEPTH_CURVE_ORE_RULES,
   freshPlanetParamsFor,
+  GEM_OVERLAY_WALK_ORE_RULES,
   GENERATED_POOLS_ORE_RULES,
   freshRadiusTilesOf,
   HAZARD_POCKET_ORE_RULES,
@@ -166,18 +167,19 @@ describe('planet params ore rules (ticket 445)', () => {
     expect(Object.keys(stamped).at(-1)).toBe('oreRulesVersion')
   })
 
-  it('stamps planet 1 with its gems, rules 12 (713), planets 2 to 5 with the P2-P5 gem tier, rules 13 (741), and planets from 6 with the generated pools, rules 14 (888)', () => {
+  it('stamps planet 1 with its gems, rules 12 (713), planets 2 to 5 with the P2-P5 gem tier, rules 13 (741), and planets from 6 with the gem overlay walk over the generated pools, rules 15 (888, 890)', () => {
     const stamps = [1, 2, 3, 4, 5, 6, 7, 60].map(
       (index) => freshPlanetParamsFor(1, index).oreRulesVersion,
     )
     expect(ORE_RULES_FROM_PLANET).toBe(1)
-    expect(ORE_RULES_VERSION).toBe(14)
+    expect(ORE_RULES_VERSION).toBe(15)
     expect(DEEP_RARE_WINDOW_ORE_RULES).toBe(11)
     expect(P1_GEMS_ORE_RULES).toBe(12)
     expect(P2_TO_P5_GEMS_ORE_RULES).toBe(13)
-    expect(GENERATED_POOLS_ORE_RULES).toBe(ORE_RULES_VERSION)
+    expect(GENERATED_POOLS_ORE_RULES).toBe(14)
+    expect(GEM_OVERLAY_WALK_ORE_RULES).toBe(ORE_RULES_VERSION)
     expect(P2_OWN_KINDS_ORE_RULES).toBe(9)
-    expect(stamps).toEqual([12, 13, 13, 13, 13, 14, 14, 14])
+    expect(stamps).toEqual([12, 13, 13, 13, 13, 15, 15, 15])
   })
 
   it('stamps a planet a save holds state for with no stamp as the build before the generated pools would (ticket 888)', () => {
@@ -186,6 +188,14 @@ describe('planet params ore rules (ticket 445)', () => {
     )
     expect(before).toEqual([12, 13, 13, 13, 13])
     expect(oreRulesStampBefore(6, ORE_RULES_VERSION + 1)).toBe(oreRulesVersionOnEntry(6))
+  })
+
+  it('leaves the stamps of planets 1 to 5 where rules 14 put them, the walk starting at planet 6 (ticket 890)', () => {
+    const stamps = [1, 2, 3, 4, 5, 6].map((index) =>
+      oreRulesStampBefore(index, GEM_OVERLAY_WALK_ORE_RULES),
+    )
+    expect(stamps).toEqual([12, 13, 13, 13, 13, 14])
+    expect([1, 2, 3, 4, 5].map(oreRulesVersionOnEntry)).toEqual(stamps.slice(0, 5))
   })
 
   it('holds hazard pockets only on a planet from 2 entered under ore rules 8 (ticket 652)', () => {

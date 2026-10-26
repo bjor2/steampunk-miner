@@ -40,6 +40,7 @@ export type { MaterialPool, PoolKind } from './systems/materialPool'
 export { planetMaterialPoolOf, systemMaterialPoolsOf } from './systems/materialPool'
 export {
   firstSystemPoolOf,
+  lookGroupAt,
   lookGroupOf,
   lookGroupPoolsOf,
   materialPoolAt,

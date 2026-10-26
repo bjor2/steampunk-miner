@@ -56,6 +56,7 @@ import { heldArtefactProblems, type HeldArtefact } from './heldArtefact'
 import { isJsonObject, isWholeNumber } from './payloadFields'
 import { isPortableSystem, systemOfPlanet, withSystem, type SessionPlanet } from './planetOfState'
 import { isKnownOreRulesVersion } from '../world/planetParams'
+import { unknownOreRulesProblemOf } from './unknownOreRules'
 import { awayOreRulesFieldOf, awayOreRulesProblems } from './planetOreStamps'
 import {
   platformOfPortable,
@@ -404,7 +405,7 @@ function planetProblems(planet: unknown): string[] {
   return [
     ...(isKnownOreRulesVersion(planet.oreRulesVersion)
       ? []
-      : ['snapshot.state.planet.oreRulesVersion is not ore rules this build knows']),
+      : [unknownOreRulesProblemOf('snapshot.state.planet.oreRulesVersion')]),
     ...(isPortableSystem(planet.system)
       ? []
       : ['snapshot.state.planet.system must be a system index from "2", or be left out']),

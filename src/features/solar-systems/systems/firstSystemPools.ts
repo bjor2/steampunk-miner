@@ -32,6 +32,7 @@ import {
   type PoolPlanet,
 } from './materialPool'
 import { MATERIAL_POOL_RULES, type MaterialPoolRules } from './materialPoolRules'
+import { planetsPerSystem } from './newContentSlots'
 import { poolOreValueOf, type RunSale } from './poolGemShare'
 import { placedKindLooksOf } from './poolKindLooks'
 
@@ -74,6 +75,17 @@ export function lookGroupOf(place: number): number[] {
   let last = place
   while (isOfAct(last + 1)) last += 1
   return Array.from({ length: last - first + 1 }, (_, at) => first + at)
+}
+
+/**
+ * The places of `system` whose looks are walked together with `place`'s, in place order: system 1's
+ * act run from P6 (`lookGroupOf`), a later system's every planet. The gem overlay walks the same
+ * group (ticket 890).
+ */
+export function lookGroupAt(system: bigint, place: bigint): bigint[] {
+  if (system !== FIRST_SYSTEM)
+    return Array.from({ length: planetsPerSystem() }, (_, at) => BigInt(at + 1))
+  return lookGroupOf(planetIndexOfCampaign(place)).map(BigInt)
 }
 
 function draftOfPlace(

@@ -26,10 +26,11 @@ import { stateDigest } from './stateDigest'
 // The ore rules stamp of each planet (ticket 888, the TD's storage and test rows): stamped once at
 // the first generation of (s, p), never migrated, kept for the planets the session has left and
 // read back when it lands there again. `v_pre` is ore rules 13, the stamp before the generated
-// pools; `v_new` is 14.
+// pools; `v_new` is the stamp a planet first generated now takes, 15 since the gem overlay walk
+// (ticket 890).
 
 const V_PRE = GENERATED_POOLS_ORE_RULES - 1
-const V_NEW = GENERATED_POOLS_ORE_RULES
+const V_NEW = ORE_RULES_VERSION
 /** Chunks across bands 1 to 5 and the core of a planet of a few hundred tiles. */
 const CHUNKS = [
   [0, 0],
@@ -173,11 +174,11 @@ describe('planet ore rules stamps (ticket 888)', () => {
       state: { ...snapshot.state, planet: { ...snapshot.state.planet, oreRulesVersion: newer } },
     }
     expect(readSnapshot(onNewer).problems).toContain(
-      'snapshot.state.planet.oreRulesVersion is not ore rules this build knows',
+      'snapshot.state.planet.oreRulesVersion is not ore rules this build knows: update required',
     )
     const leftNewer = { ...snapshot, state: { ...snapshot.state, awayOreRules: { '1:5': newer } } }
     expect(readSnapshot(leftNewer).problems).toContain(
-      'snapshot.state.awayOreRules["1:5"] is not ore rules this build knows',
+      'snapshot.state.awayOreRules["1:5"] is not ore rules this build knows: update required',
     )
     const saved = throughJson(saveSlotOf(takeSnapshot(onSix), 1))
     const world = { ...saved.world, oreRulesVersion: newer, awayOreRules: { '1:5': newer } }

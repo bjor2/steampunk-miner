@@ -30,10 +30,10 @@ function onPlanet(state: AuthorityState, planetIndex: number): AuthorityState {
 }
 
 describe('ore rules stamp', () => {
-  it("stamps planet 1 with its gems' rules 12, P2 to P5 with the gem tier's 13 and P6 on with the generated pools' 14", () => {
+  it("stamps planet 1 with its gems' rules 12, P2 to P5 with the gem tier's 13 and P6 on with the gem overlay walk's 15", () => {
     const planets = [1, 2, 3, 5, 6, 10].map((index) => sessionOn(index).planet)
-    expect(planets.map((planet) => planet.oreRulesVersion)).toEqual([12, 13, 13, 13, 14, 14])
-    expect(ORE_RULES_VERSION).toBe(14)
+    expect(planets.map((planet) => planet.oreRulesVersion)).toEqual([12, 13, 13, 13, 15, 15])
+    expect(ORE_RULES_VERSION).toBe(15)
   })
 
   it('keeps a planet a save holds without the stamp on the legacy rows', () => {
@@ -98,7 +98,7 @@ describe('ore rules stamp', () => {
       world: { ...file.world, oreRulesVersion: ORE_RULES_VERSION + 1 },
     })
     expect(fromSnapshot.problems).toEqual([
-      'snapshot.state.planet.oreRulesVersion is not ore rules this build knows',
+      'snapshot.state.planet.oreRulesVersion is not ore rules this build knows: update required',
     ])
     expect(fromSave.problems).toContain(
       'save.world.params differ from the params this build generates for its seed and planet',

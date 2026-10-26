@@ -10,6 +10,7 @@ import { planetParamsAt } from '../../systems/starMap/systemPlanetParams'
 import {
   freshPlanetParamsFor,
   ORE_RULES_VERSION,
+  planetParamsFor,
   type PlanetParams,
 } from '../../systems/world/planetParams'
 import type { HeroCellRead, HeroReads } from './systems/render/gemRead'
@@ -31,29 +32,43 @@ export const LAST_AUDITED_PLACE = 40
 export const CI_SYSTEMS: readonly bigint[] = [2n, 3n, 40n, 1_000_000n]
 export const PLANETS_PER_SYSTEM = 5
 
-export function firstSystemPlanetOf(worldSeed: number, place: number): CiPlanet {
-  return { label: `1.${place}`, system: 1n, place, params: freshPlanetParamsFor(worldSeed, place) }
+/** System 1's planet, fresh, or under `oreRulesVersion` where one is named (ticket 890: 14 vs 15). */
+export function firstSystemPlanetOf(
+  worldSeed: number,
+  place: number,
+  oreRulesVersion?: number,
+): CiPlanet {
+  const params =
+    oreRulesVersion === undefined
+      ? freshPlanetParamsFor(worldSeed, place)
+      : planetParamsFor(worldSeed, place, oreRulesVersion)
+  return { label: `1.${place}`, system: 1n, place, params }
 }
 
-export function systemPlanetOf(worldSeed: number, system: bigint, place: number): CiPlanet {
+export function systemPlanetOf(
+  worldSeed: number,
+  system: bigint,
+  place: number,
+  oreRulesVersion = ORE_RULES_VERSION,
+): CiPlanet {
   const campaignIndex = Number(planetsBefore(system)) + place
   return {
     label: `${system}.${place}`,
     system,
     place,
-    params: planetParamsAt(worldSeed, system, campaignIndex, ORE_RULES_VERSION),
+    params: planetParamsAt(worldSeed, system, campaignIndex, oreRulesVersion),
   }
 }
 
 /** System 1's P6 to P40, then every planet of each later CI system, in that order. */
-export function ciPlanetsOf(worldSeed: number): CiPlanet[] {
+export function ciPlanetsOf(worldSeed: number, oreRulesVersion = ORE_RULES_VERSION): CiPlanet[] {
   const firstSystem = Array.from(
     { length: LAST_AUDITED_PLACE - FIRST_GENERATED_PLACE + 1 },
-    (_, at) => firstSystemPlanetOf(worldSeed, FIRST_GENERATED_PLACE + at),
+    (_, at) => firstSystemPlanetOf(worldSeed, FIRST_GENERATED_PLACE + at, oreRulesVersion),
   )
   const later = CI_SYSTEMS.flatMap((system) =>
     Array.from({ length: PLANETS_PER_SYSTEM }, (_, at) =>
-      systemPlanetOf(worldSeed, system, at + 1),
+      systemPlanetOf(worldSeed, system, at + 1, oreRulesVersion),
     ),
   )
   return [...firstSystem, ...later]

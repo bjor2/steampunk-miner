@@ -18,4 +18,4 @@ export {
   loadGemCutLibrary,
 } from './systems/gemCutLibrary'
 export type { PlanetAddress } from './systems/gemCutPick'
-export { planetGemCutsOf, planetGemOverlayOf } from './systems/gemCutPick'
+export { overlayRoomProblems, planetGemCutsOf, planetGemOverlayOf } from './systems/gemCutPick'

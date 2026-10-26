@@ -1,8 +1,9 @@
 /** Read-only (feature-slices.md 3.14): the cuts and overlay an address draws, for eye checks. */
 import type { DebugAction } from '../../debug/debugActionRegistry'
 import type { DebugResult } from '../../debug/debugScreens'
-import { readIndexText } from '../../systems/starMap/planetAddress'
-import { ORE_RULES_VERSION } from '../../systems/world/planetParams'
+import { FIRST_PLANET, FIRST_SYSTEM, readIndexText } from '../../systems/starMap/planetAddress'
+import { GENERATED_POOLS_FIRST_PLANET, ORE_RULES_VERSION } from '../../systems/world/planetParams'
+import { lookGroupAt, planetsPerSystem } from '../solar-systems'
 import { planetGemCutsOf, planetGemOverlayOf } from './systems/gemCutPick'
 
 /** The slots of the three gems a generated pool holds, as the read names them. */
@@ -23,10 +24,20 @@ function cutsOfAddress(
   if (systemIndex === null || placeIndex === null || typeof worldSeed !== 'number') {
     return { ok: false, problems: ['system and place are index texts, worldSeed a number'] }
   }
+  if (!isPoolAddress(systemIndex, placeIndex)) {
+    return { ok: false, problems: ['only a planet that draws a generated pool draws gem cuts'] }
+  }
   const address = { worldSeed, system: systemIndex, place: placeIndex }
   return {
     ok: true,
     cuts: [...planetGemCutsOf(address, SAMPLE_SLOTS, ORE_RULES_VERSION)],
-    overlay: planetGemOverlayOf(address).id,
+    overlay: planetGemOverlayOf(address, lookGroupAt(systemIndex, placeIndex), ORE_RULES_VERSION)
+      .id,
   }
+}
+
+/** System 1 from P6, or one of a later system's planets: the addresses with a look group. */
+function isPoolAddress(system: bigint, place: bigint): boolean {
+  if (system === FIRST_SYSTEM) return place >= BigInt(GENERATED_POOLS_FIRST_PLANET)
+  return place >= FIRST_PLANET && place <= BigInt(planetsPerSystem())
 }

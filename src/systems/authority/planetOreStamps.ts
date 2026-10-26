@@ -28,6 +28,7 @@ import type { AuthorityState } from './authorityState'
 import { isJsonObject } from './payloadFields'
 import { corePlanetKeyOf, isCorePlanetKey } from './planetCoreBays'
 import type { SessionPlanet } from './planetOfState'
+import { unknownOreRulesProblemOf } from './unknownOreRules'
 
 export type AwayOreRules = Readonly<Record<string, number>>
 
@@ -75,9 +76,7 @@ export function awayOreRulesProblems(stamps: unknown, path: string): string[] {
   if (entries.length === 0) return [`${path} holds no stamp, so it must be left out`]
   return entries.flatMap(([key, stamp]) => [
     ...(isCorePlanetKey(key) ? [] : [`${path} key "${key}" is not a planet's s:p`]),
-    ...(isStampThisBuildKnows(stamp)
-      ? []
-      : [`${path}["${key}"] is not ore rules this build knows`]),
+    ...(isStampThisBuildKnows(stamp) ? [] : [unknownOreRulesProblemOf(`${path}["${key}"]`)]),
   ])
 }
 

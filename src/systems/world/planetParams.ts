@@ -125,11 +125,12 @@ export interface PlanetParams {
  * planet (ticket 737), 11 the rare windows from band 3 on from planet 3 (ticket 738), 12 planet 1's
  * three gems after the legacy slots (ticket 713), 13 the gem tier of planets 2 to 5 on three of
  * their rare and mythic kinds (ticket 741), a price that moves no cell, 14 the generated material
- * pools of every planet after system 1's P5 (ticket 888). The stamp
+ * pools of every planet after system 1's P5 (ticket 888), 15 the gem overlay walked to one no
+ * other planet of the look group lays (ticket 890), a look that moves no cell. The stamp
  * records the ground rules a planet was entered under, its rock's hardness, its species pool and
  * its size with them.
  */
-export const ORE_RULES_VERSION = 14
+export const ORE_RULES_VERSION = 15
 
 /** The ore rules that add the depth density curve (ticket 448). */
 export const DEPTH_CURVE_ORE_RULES = 3
@@ -199,6 +200,12 @@ const P2_TO_P5_GEMS_FIRST_PLANET = 2
 export const GENERATED_POOLS_ORE_RULES = 14
 
 /**
+ * The ore rules that walk a generated planet's gem overlay to one no other planet of its look group
+ * lays (ticket 890, GD lock of 26 Oct: HS row 3): the look alone, so it needs no generator bump.
+ */
+export const GEM_OVERLAY_WALK_ORE_RULES = 15
+
+/**
  * The first planet of system 1 that draws a generated material pool (ticket 888, GD lock M1 on the
  * Materials Expansion): P1 to P5 keep their authored species byte for byte.
  */
@@ -217,7 +224,8 @@ export const GENERATED_POOLS_FIRST_PLANET = 6
  * the deep rare window from planet 3 (ticket 738: P1 and P2 draw rare from band 3 already), P1's
  * gems from planet 1 (ticket 713: the `ores` slice's own slots name P1's pool alone), the gems of
  * P2 to P5 from planet 2 (ticket 741: the `ores` slice's gem table names their pools alone), the
- * generated pools from planet 6 (ticket 888: a later system's planets all sit at `g >= 6`).
+ * generated pools from planet 6 (ticket 888: a later system's planets all sit at `g >= 6`), the
+ * gem overlay walk where the generated pools start (ticket 890: P1 to P5 draw no overlay).
  */
 const ORE_RULES_FIRST_PLANETS: readonly number[] = [
   3,
@@ -233,6 +241,7 @@ const ORE_RULES_FIRST_PLANETS: readonly number[] = [
   DEEP_RARE_WINDOW_FIRST_PLANET,
   P1_GEMS_FIRST_PLANET,
   P2_TO_P5_GEMS_FIRST_PLANET,
+  GENERATED_POOLS_FIRST_PLANET,
   GENERATED_POOLS_FIRST_PLANET,
 ]
 
@@ -286,7 +295,8 @@ export function planetParamsFor(
  * P2's pool, the registry radius, the hazard pockets and P2's own kinds leave as they were (tickets
  * 448, 625, 632, 643, 652, 709); the rare clusters change it, so it was stamped 10 (ticket 737),
  * and its gems change it again, so it is stamped 12 (ticket 713). Planets 2 to 5 are stamped 13,
- * the gem tier of P2 to P5 (ticket 741), and planets 6 on 14, the generated pools (ticket 888).
+ * the gem tier of P2 to P5 (ticket 741), and planets 6 on 15, the generated pools (ticket 888)
+ * with the gem overlay walk (ticket 890).
  */
 export function oreRulesVersionOnEntry(planetIndex: number): number | undefined {
   return oreRulesStampBefore(planetIndex, ORE_RULES_VERSION + 1)

@@ -14,7 +14,8 @@
  *   so a stored cell's slot reads back the kind it was drawn as.
  * - **Species.** A kind is its own species, its procedural look the pool's (no copy). A gem kind
  *   is a hero drawn from the gem-cut library (ticket 889): the `gem-cuts` slice picks its cut and
- *   the planet's overlay from the address and the stamp, so nothing is authored per planet.
+ *   the planet's overlay from the address and the stamp, from rules 15 walked over the planet's
+ *   look group (ticket 890), so nothing is authored per planet.
  *
  * One pool per planet and stamp, cached, so the per-patch fold allocates none.
  */
@@ -30,7 +31,7 @@ import type { GemOverlay } from '../../../systems/render/gemOverlays'
 import { planetGemCutsOf, planetGemOverlayOf, type PlanetAddress } from '../../gem-cuts'
 import { MATERIAL_RARITIES, type Material, type MaterialRarity } from '../../materials'
 import type { KindSlot } from '../../ores'
-import { materialPoolAt, type MaterialPool, type PoolKind } from '../../solar-systems'
+import { lookGroupAt, materialPoolAt, type MaterialPool, type PoolKind } from '../../solar-systems'
 
 /** A generated planet's roster: its pool, the slots the fold draws and the species they wear. */
 interface GeneratedRoster {
@@ -111,7 +112,11 @@ function rosterOfPool(
       pool.kinds.map((kind) => speciesOfKind(pool, kind, gemCuts.has(kind.id))),
     ),
     gemCuts,
-    gemOverlay: planetGemOverlayOf(address),
+    gemOverlay: planetGemOverlayOf(
+      address,
+      lookGroupAt(address.system, address.place),
+      oreRulesVersion,
+    ),
   })
 }
 

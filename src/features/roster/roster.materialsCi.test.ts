@@ -37,7 +37,9 @@ import {
 // 3, 40 and 1e6, over the species audit's two seeds. Each planet shows at least 15 distinct looks,
 // keeps its gems in bands 3 to 5 in clusters of at most 3 cells, and grows rarer with depth; every
 // address gets its own seed and ids, so addresses sharing a g (#781) still draw their own pools and
-// gem looks; and appending a cut to the library moves no pick of any planet already stamped.
+// gem looks; appending a cut to the library moves no pick of any planet already stamped; and no two
+// species of a planet share a #699 stem (P&N's Q2 ruling). HS row 3, no shared gem look within an
+// act, is `roster.gemOverlayWalk.test.ts`'s (ore rules 15).
 
 const CASES = ciPlanetCases()
 const LOOK_FLOOR = 15
