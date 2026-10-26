@@ -36,6 +36,14 @@ export function vehicleAttachPointOf(art: ArtCatalogue, attachId: AttachId): Att
   return sidecar === null ? null : attachPointOf(sidecar, attachId)
 }
 
+/**
+ * The point's x across the vehicle's frame, m, where a part that keeps its size on a wider rig is
+ * mounted (ticket 913); 0 when the vehicle has no such point, where nothing hangs anyway.
+ */
+export function vehicleAttachXOf(art: ArtCatalogue, attachId: AttachId): number {
+  return vehicleAttachPointOf(art, attachId)?.atM[0] ?? 0
+}
+
 /** The asset's quads in the vehicle's frame at its point; empty when the vehicle has no such point. */
 export function mountedPartQuadsOf(art: ArtCatalogue, mount: PartMount): AssetQuad[] {
   const point = vehicleAttachPointOf(art, mount.attachId)

@@ -4,7 +4,7 @@ import { artCatalogueOf } from '../art/artCatalogue'
 import { assetQuadsOf } from '../art/assetLook'
 import { vehicleSidecar } from '../art/sidecarFixtures'
 import { ATTACH_IDS, type AttachId } from '../registries/vehicleAttach'
-import { mountedPartQuadsOf, vehicleAttachPointOf } from './mountedPartLook'
+import { mountedPartQuadsOf, vehicleAttachPointOf, vehicleAttachXOf } from './mountedPartLook'
 
 // The #166 echo sounder on its own point (#162 mortar pick: the horn keeps `hull.roof.aft`).
 const SOUNDER = { assetId: 'vehicle-item-power-echo-sounder', attachId: 'hull.roof.aft' } as const
@@ -45,6 +45,11 @@ describe('mounted part look (#235)', () => {
 
   it('draws nothing at a point the vehicle does not place', () => {
     expect(mountedPartQuadsOf(vehicleWithNoPoints(), SOUNDER)).toEqual([])
+  })
+
+  it('reads the x a part that keeps its size is mounted at, 0 where the vehicle has no point', () => {
+    expect(vehicleAttachXOf(SHIPPED_ART, 'hull.hitch')).toBe(atMOf('hull.hitch')![0])
+    expect(vehicleAttachXOf(vehicleWithNoPoints(), 'hull.hitch')).toBe(0)
   })
 
   it.each(AETHERIC_POINTS)('draws a part at %s, a spot no other point takes', (attachId) => {

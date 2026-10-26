@@ -652,3 +652,12 @@ export const SKY_BAND_CURTAIN_REPEAT_M = 24
  */
 export const VEHICLE_OUTLINE_MARGIN_M = 0.06
 export const VEHICLE_OUTLINE_Z = 0.095
+
+/**
+ * The rig's code-side `body` anchor (ticket 913, the TD ruling on #666 Q3), metres in the
+ * vehicle's frame: the chassis centre, the middle of the shipped sidecar's `t1-chassis`. The hull
+ * root's width scale pivots on its x, the collider's centre, and the parts that keep their size
+ * (the turret, the coal tender) take their edge offsets from it. Code only: no sidecar point, so
+ * nothing claims it and no art changes.
+ */
+export const BODY_ANCHOR_M = { x: 0, y: -0.137 } as const
