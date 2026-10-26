@@ -22,6 +22,7 @@ import {
   portableFuelField,
 } from '../vehicle/vehicleFuel'
 import { isPortableJumpDrive } from '../vehicle/vehicleJumpDrive'
+import { isPortableBlastRadiusLevel } from '../vehicle/vehicleCharges'
 import { upgradeLevelsProblems } from '../vehicle/vehicleStats'
 import type { VehicleMode, VehicleState } from '../vehicle/vehicleState'
 import {
@@ -130,7 +131,9 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(isPortableGun(vehicle.gun) ? [] : [`${path}.gun must hold a whole level and a gun mode`]),
     ...(isPortableCharges(vehicle.charges)
       ? []
-      : [`${path}.charges must hold a rack flag, counts by size and a planted charge or null`]),
+      : [
+          `${path}.charges must hold a rack flag, counts by size, a planted charge or null and a Blast Radius level from 1 or none`,
+        ]),
     ...(isPortableLining(vehicle.lining)
       ? []
       : [`${path}.lining must hold an owned active lining type and the owned types`]),
@@ -276,7 +279,8 @@ function isPortableCharges(charges: unknown): boolean {
     typeof charges.isRackMounted === 'boolean' &&
     isWholeNumber(charges.slotLevel) &&
     isCarriedBySize(charges.carriedBySize) &&
-    (charges.planted === null || isPlantedCharge(charges.planted))
+    (charges.planted === null || isPlantedCharge(charges.planted)) &&
+    isPortableBlastRadiusLevel(charges.radiusLevel)
   )
 }
 

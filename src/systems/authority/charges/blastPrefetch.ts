@@ -8,14 +8,21 @@
 import { COLLAPSE_BLOCK_SAMPLES } from '../../../constants/balance'
 import { MM_PER_METRE } from '../../../constants/physics'
 import { chargeRadiusMm } from '../../economy/chargeSizes'
+import {
+  blastRadiusLevelOf,
+  type PlantedCharge,
+  type VehicleCharges,
+} from '../../vehicle/vehicleCharges'
 import type { PlanetParams } from '../../world/planetParams'
 import { SAMPLES_PER_TILE } from '../../world/sampleGrid'
 import { chunkKey, chunkOfTile, type TilePoint } from '../../world/tileGrid'
 import { generatedChunkOf, isGeneratedChunkHeld } from '../../world/worldState'
 import type { AuthorityState } from '../authorityState'
 import { planetParamsOf } from '../planetOfState'
-import { groundRadiusMmOf, UNOWNED_RADIUS_LEVEL } from './blastDisc'
-import { liveChargesOf } from './chargeRules'
+import { groundRadiusMmOf } from './blastDisc'
+
+/** A planter's rack with its live charge: the charge and the level it will blow at. */
+type PlanterCharges = VehicleCharges & { planted: PlantedCharge }
 
 export interface ChunkPoint {
   cx: number
@@ -39,16 +46,26 @@ export function prefetchPlantedBlastChunks(state: AuthorityState, ticks: number)
 
 /** The planted charges' blast chunks not generated yet, in charge then row order. */
 export function chunksAwaitingPrefetch(state: AuthorityState, params: PlanetParams): ChunkPoint[] {
-  const chunks = liveChargesOf(state).flatMap((charge) =>
-    blastChunksOf(charge, plantedGroundReachMmOf(charge.size, params)),
+  const chunks = plantersOf(state).flatMap((charges) =>
+    blastChunksOf(charges.planted, plantedGroundReachMmOf(charges, params)),
   )
   return uniqueChunks(chunks).filter(({ cx, cy }) => !isGeneratedChunkHeld(params, cx, cy))
 }
 
 /** The ground a planted charge will clear: its rung at the planter's level (`blastDisc.ts`). */
-function plantedGroundReachMmOf(size: number, params: PlanetParams): number {
-  const disc = { radiusMm: chargeRadiusMm(size), radiusLevel: UNOWNED_RADIUS_LEVEL }
+function plantedGroundReachMmOf(charges: PlanterCharges, params: PlanetParams): number {
+  const disc = {
+    radiusMm: chargeRadiusMm(charges.planted.size),
+    radiusLevel: blastRadiusLevelOf(charges),
+  }
   return groundRadiusMmOf(disc, params)
+}
+
+/** The racks with a live charge on the wall, in player order. */
+function plantersOf(state: AuthorityState): PlanterCharges[] {
+  return Object.values(state.players)
+    .map((player) => player.vehicle.charges)
+    .filter((charges): charges is PlanterCharges => charges.planted !== null)
 }
 
 /** Every chunk a blast of this radius and its collapse rim read, bottom row first. */

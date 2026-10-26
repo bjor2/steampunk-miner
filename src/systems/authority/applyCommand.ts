@@ -41,6 +41,7 @@ import {
 import { CASING_RULES } from './casingRules'
 import { CHARGE_RULES } from './charges/chargeRules'
 import { CHARGE_SHOP_RULES } from './charges/chargeShopRules'
+import { BLAST_RADIUS_RULES } from './charges/blastRadiusRules'
 import { sliceCommandRuleOf } from '../registries/commandRules'
 import { followCollapse } from './collapse/collapseFollow'
 import { DEBUG_COMMAND_RULES } from './debugCommandRules'
@@ -113,6 +114,7 @@ const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
   ...REFINERY_COLLECTION_RULES,
   ...CHARGE_RULES,
   ...CHARGE_SHOP_RULES,
+  ...BLAST_RADIUS_RULES,
   ...LOADOUT_RULES,
   ...VEHICLE_ITEM_RULES,
   ...BORE_FIRE_RULES,

@@ -24,8 +24,9 @@ import type { PlanetParams } from '../../world/planetParams'
 export type BlastDisc = Pick<BlastEvent, 'radiusMm' | 'radiusLevel'>
 
 /**
- * The Blast Radius level a planter owns: D9 (#869) sells and saves it per player, read at
- * detonation in its place; until it lands nobody owns a level, so every blast is its rung's.
+ * The level of a rig that owns no Blast Radius level, and of a live blast from a save made before
+ * the disc record: its blast is its rung's. D9 (#869) sells the owned level, read at detonation
+ * (`vehicleCharges.ts` `blastRadiusLevelOf`).
  */
 export const UNOWNED_RADIUS_LEVEL = 0
 

@@ -22,6 +22,7 @@ export const KERNEL_ITEMS = {
   guns: itemRefOf('module', 'guns'),
   charges: itemRefOf('module', 'charges'),
   chargeRack: itemRefOf('module', 'charge_rack'),
+  blastRadius: itemRefOf('module', 'blast_radius'),
   refinerySlot: itemRefOf('module', 'refinery_slot'),
 } as const satisfies Readonly<Record<string, ItemRef>>
 

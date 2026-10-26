@@ -268,7 +268,7 @@ describe('session snapshot: blasting charges (#109)', () => {
       },
     }
     expect(readSnapshot(broken).problems).toContain(
-      'snapshot.state.players.p1.vehicle.charges must hold a rack flag, counts by size and a planted charge or null',
+      'snapshot.state.players.p1.vehicle.charges must hold a rack flag, counts by size, a planted charge or null and a Blast Radius level from 1 or none',
     )
   })
 
@@ -280,7 +280,7 @@ describe('session snapshot: blasting charges (#109)', () => {
       state: { ...snapshot.state, players: { p1: { ...snapshot.state.players.p1, vehicle } } },
     }
     expect(readSnapshot(broken).problems).toContain(
-      'snapshot.state.players.p1.vehicle.charges must hold a rack flag, counts by size and a planted charge or null',
+      'snapshot.state.players.p1.vehicle.charges must hold a rack flag, counts by size, a planted charge or null and a Blast Radius level from 1 or none',
     )
   })
 })

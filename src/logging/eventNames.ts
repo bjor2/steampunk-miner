@@ -413,6 +413,12 @@ export const RUN_EVENT_REGISTRY = {
     level: 'core',
     payload: { from: 'integer', to: 'integer', price: 'money', ...HELD_STEP },
   },
+  // D9 (#869): one level of the Blast Radius track bought, uncapped, money only.
+  blast_radius_upgraded: {
+    group: 'platform',
+    level: 'core',
+    payload: { from: 'integer', to: 'integer', price: 'money', ...HELD_STEP },
+  },
   purchase_made: { group: 'platform', level: 'core', payload: 'unspecified' },
   // The Refinery bay (#105). The envelope's `planet` is where the line happened: the queue's and
   // the slot's planet, the platform's when a batch is ready, and the Sell bay's on collection, so

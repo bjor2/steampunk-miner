@@ -47,6 +47,8 @@ export function purchaseLabelOf(event: DomainEvent): string | null {
       return 'gun'
     case 'ChargeRackUpgraded':
       return 'charge_rack'
+    case 'BlastRadiusUpgraded':
+      return 'blast_radius'
     case 'LiningTypeUnlocked':
       return 'lining'
     case 'RefinerySlotBought':

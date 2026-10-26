@@ -6,7 +6,8 @@
  * `carveCircle`, `fillCircle` and `lineCasing` in `groundDebugRules.ts`, `setCasingGrade` in
  * `casingRules.ts`, `setGunLevel` in `gunRules.ts`, `setLiningType` in `liningRules.ts`, `setHeat`
  * in `heatRules.ts`, `setArtefact` in `artefactRules.ts`, `forceCollapse` in
- * `collapse/collapseDebugRules.ts`, `setCharges` in `charges/chargeRules.ts`, `setVehicleLoadout` in
+ * `collapse/collapseDebugRules.ts`, `setCharges` in `charges/chargeRules.ts`,
+ * `setBlastRadiusLevel` in `charges/blastRadiusRules.ts`, `setVehicleLoadout` in
  * `loadoutRules.ts`, `setFlags` in `devFlagRules.ts`, `setPremiumLedger` in
  * `premium/premiumLedgerDebugRules.ts`, `placeHazard` in `hazards/hazardDebugRules.ts`.
  */
@@ -16,6 +17,7 @@ import type { AuthorityState } from './authorityState'
 import { ARTEFACT_DEBUG_RULES } from './artefactRules'
 import { CASING_DEBUG_RULES } from './casingRules'
 import { CHARGE_DEBUG_RULES } from './charges/chargeRules'
+import { BLAST_RADIUS_DEBUG_RULES } from './charges/blastRadiusRules'
 import { COLLAPSE_DEBUG_RULES } from './collapse/collapseDebugRules'
 import { COMBAT_DEBUG_RULES } from './combat/combatDebugRules'
 import { DEV_FLAG_DEBUG_RULES } from './devFlagRules'
@@ -76,6 +78,7 @@ export const DEBUG_COMMAND_RULES: {
   ...ARTEFACT_DEBUG_RULES,
   ...COLLAPSE_DEBUG_RULES,
   ...CHARGE_DEBUG_RULES,
+  ...BLAST_RADIUS_DEBUG_RULES,
   ...DEV_FLAG_DEBUG_RULES,
   ...PREMIUM_LEDGER_DEBUG_RULES,
   ...HAZARD_DEBUG_RULES,

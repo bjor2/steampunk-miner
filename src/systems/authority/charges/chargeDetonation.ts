@@ -13,11 +13,11 @@
  * D1 (#860): the blast is a disc record, its rung, the planter's Blast Radius level read now and
  * the session's `blastSeq`, which counts every blast and is saved, so a reload never renumbers one.
  * The planter and enemy hits keep to the rung's own radius; its ground disc (`blastDisc.ts`) is
- * what the level widens.
+ * what the level widens. The level is the one the planter owns when the charge blows (D9 #869),
+ * so a charge bought or planted before a level was bought blows at the new radius.
  */
 import { chargeRadiusMm, chargeTypeOf } from '../../economy/chargeSizes'
 import { applyBlastEffects, type BlastEvent } from '../../registries/blastEffects'
-import type { PlantedCharge } from '../../vehicle/vehicleCharges'
 import type { PlanetParams } from '../../world/planetParams'
 import type { AuthorityState } from '../authorityState'
 import { stampedFor, type TickOutcome } from '../combat/combatTick'
@@ -25,7 +25,8 @@ import type { DetonationTrigger, DomainEventBody } from '../domainEvent'
 import { planetParamsOf } from '../planetOfState'
 import { hitEnemiesInBlast, hitPlanterInBlast } from './blastHits'
 import { chargesOf, withCharges } from './chargeRules'
-import { baseR2Of, groundR2Of, groundRadiusMmOf, UNOWNED_RADIUS_LEVEL } from './blastDisc'
+import { blastRadiusLevelOf, type PlantedCharge } from '../../vehicle/vehicleCharges'
+import { baseR2Of, groundR2Of, groundRadiusMmOf } from './blastDisc'
 import { blastSeqOf, withBlastSeq } from './blastSeq'
 import { startLiveBlast } from './liveBlast'
 
@@ -64,17 +65,11 @@ export function detonatePlantedCharge(
   tick: number,
   by: DetonationTrigger,
 ): TickOutcome {
-  return detonatePlantedChargeAtLevel(state, playerId, {
-    tick,
-    by,
-    radiusLevel: UNOWNED_RADIUS_LEVEL,
-  })
+  const radiusLevel = blastRadiusLevelOf(chargesOf(state, playerId))
+  return detonatePlantedChargeAtLevel(state, playerId, { tick, by, radiusLevel })
 }
 
-/**
- * The charge blows at the planter's Blast Radius level read at detonation: the seam D9 (#869)
- * feeds the owned level through; until then every charge blows at the unowned level 0.
- */
+/** The charge blows at `detonation.radiusLevel`: the owned level, or a spec's level of choice. */
 export function detonatePlantedChargeAtLevel(
   state: AuthorityState,
   playerId: string,

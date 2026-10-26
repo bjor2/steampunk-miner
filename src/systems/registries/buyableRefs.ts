@@ -68,6 +68,7 @@ export function kernelCommandBuys(): {
     plantCharge: NOT_A_BUY,
     restockCharges: [KERNEL_ITEMS.charges],
     buyChargeRackSlot: [KERNEL_ITEMS.chargeRack],
+    buyBlastRadiusLevel: [KERNEL_ITEMS.blastRadius],
     equipItem: NOT_A_BUY,
     buyVehicleItem: soldVehicleItemRefs(),
     'ground_gun.fire': NOT_A_BUY,

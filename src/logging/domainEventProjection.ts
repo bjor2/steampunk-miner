@@ -430,6 +430,10 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'charge_rack_upgraded',
     data: { from, to, price, ...heldStepFieldsOf(held) },
   }),
+  BlastRadiusUpgraded: ({ from, to, price, ...held }) => ({
+    event: 'blast_radius_upgraded',
+    data: { from, to, price, ...heldStepFieldsOf(held) },
+  }),
   CasingUpgraded: ({ from, to, price, ...held }) => ({
     event: 'casing_upgraded',
     data: { from, to, price, ...heldStepFieldsOf(held) },

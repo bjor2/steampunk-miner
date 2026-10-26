@@ -18,10 +18,15 @@ export const RELEASED_OR_FOCUS = 'release_or_focus'
 const GUNS_ROW = 'auto_guns'
 const RACK_ROW = 'blasting_charges'
 const CASING_ROW = 'casing'
+/** The Blast Radius level line under `blasting_charges` has no schedule row of its own (D9 #869). */
+const BLAST_RADIUS_ROW = 'blast_radius'
 
 export interface PurchaseChain {
   playerId: string
-  /** The row held: an upgrade track, `auto_guns`, `blasting_charges` (the rack) or `casing`. */
+  /**
+   * The row held: an upgrade track, `auto_guns`, `blasting_charges` (the rack), `blast_radius` or
+   * `casing`.
+   */
   track: string
   chain: number
   steps: number
@@ -96,6 +101,8 @@ const CHAIN_FOLDS: { readonly [N in RunEventName]?: ChainFold<N> } = {
     foldStep(tally, event, { track: GUNS_ROW, ...stepped(event.data) }),
   charge_rack_upgraded: (tally, event) =>
     foldStep(tally, event, { track: RACK_ROW, ...stepped(event.data) }),
+  blast_radius_upgraded: (tally, event) =>
+    foldStep(tally, event, { track: BLAST_RADIUS_ROW, ...stepped(event.data) }),
   casing_upgraded: (tally, event) =>
     foldStep(tally, event, { track: CASING_ROW, ...stepped(event.data) }),
   command_rejected: stopRefusedChain,

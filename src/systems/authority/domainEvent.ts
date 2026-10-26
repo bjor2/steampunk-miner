@@ -656,6 +656,8 @@ export interface KernelDomainEventBodies {
   ChargesRestocked: { size: number; count: number; price: string }
   /** One rack slot bought: slot level `from` to `to`, for `price` (#109). */
   ChargeRackUpgraded: PurchaseChainStamp & { from: number; to: number; price: string }
+  /** One Blast Radius level bought: level `from` to `to`, for `price` (D9 #869). */
+  BlastRadiusUpgraded: PurchaseChainStamp & { from: number; to: number; price: string }
   /** One casing grade bought (#41): `price` as a canonical string. */
   CasingUpgraded: PurchaseChainStamp & { from: number; to: number; price: string }
   UpgradePurchased: PurchaseChainStamp & {

@@ -700,6 +700,8 @@ export interface KernelCommandPayloads {
   restockCharges: { size: number; count: number }
   /** The Upgrade bay adds one slot to the rack (#109). */
   buyChargeRackSlot: { chain: number }
+  /** The Upgrade bay raises the Blast Radius track one level, uncapped (D9 #869). */
+  buyBlastRadiusLevel: { chain: number }
   /**
    * The loadout (#162 TD lock, K4): puts an owned item in a slot that accepts it, or empties the
    * slot with a null item; docked at the platform only. A refusal is answered as `EquipRefused`.
@@ -763,6 +765,8 @@ export interface KernelCommandPayloads {
   'debug.setGunLevel': { level: number }
   /** A mounted rack with `slotLevel` bought slots carrying only `carried` charges of `size` (#109). */
   'debug.setCharges': { size: number; carried: number; slotLevel: number }
+  /** The rig's Blast Radius level, no price (D9 #869). */
+  'debug.setBlastRadiusLevel': { level: number }
   /** Sets the vehicle's casing grade directly (#41 `debug.setCasingGrade`). */
   'debug.setCasingGrade': { grade: number }
   /** Owns and selects a lining type, with no unlock or price (#113 scenarios). */

@@ -4,6 +4,9 @@
  * charge it has planted. A charge of size n takes `rackSlotsOf(n)` slots, and the carried charges'
  * slots never pass the rack's capacity (`sum(count * rackSlots(size)) <= capacity`, the TD lock on
  * #149). The rack is not a vehicle track, so it never moves the visual tier.
+ *
+ * The Blast Radius level (D9 #869) is the planter's, not a charge's: every blast reads the level
+ * owned when it blows, so a charge bought before a level is never stranded at the old radius.
  */
 import { MM_PER_METRE } from '../../constants/physics'
 import { rackCapacity } from '../economy/blastingCharges'
@@ -32,6 +35,11 @@ export interface VehicleCharges {
   carriedBySize: CarriedBySize
   /** One live charge per vehicle at a time; null when none is planted. */
   planted: PlantedCharge | null
+  /**
+   * Blast Radius levels bought (D9 #869), uncapped; absent at 0, so a rig that never bought one
+   * saves and digests as before.
+   */
+  radiusLevel?: number
 }
 
 export const NO_CHARGES: VehicleCharges = {
@@ -44,6 +52,23 @@ export const NO_CHARGES: VehicleCharges = {
 /** The rack's slots: its start size plus the bought ones. */
 export function rackCapacityOf(charges: VehicleCharges): number {
   return rackCapacity(charges.slotLevel)
+}
+
+/** The Blast Radius level the rig owns: every blast it sets off reads it (D9 #869). */
+export function blastRadiusLevelOf(charges: Pick<VehicleCharges, 'radiusLevel'>): number {
+  return charges.radiusLevel ?? 0
+}
+
+/** The charges at Blast Radius `level`, the key dropped at 0. */
+export function withBlastRadiusLevel(charges: VehicleCharges, level: number): VehicleCharges {
+  const { radiusLevel: _held, ...rest } = charges
+  return level > 0 ? { ...rest, radiusLevel: level } : rest
+}
+
+/** Whether a saved Blast Radius level is a whole level from 1, or left out. */
+export function isPortableBlastRadiusLevel(level: unknown): boolean {
+  if (level === undefined) return true
+  return Number.isSafeInteger(level) && (level as number) > 0
 }
 
 export function carriedOf(charges: VehicleCharges, size: number): number {
