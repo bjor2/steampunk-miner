@@ -16,7 +16,8 @@
  * and 48aad988d5ddd282. Ticket 662's 1.2 m bore and its casing trail, rings measured from the
  * hole each tick cut (protocol 118), moved both again, still the only two the charge moves, and
  * ticket 894's casing prices (protocol 121, economy rules 4) moved them once more with every golden
- * that lines or buys a grade. Spec support for the kill-switch pins; it reads, never writes.
+ * that lines or buys a grade, and ticket 829's ladder (protocol 126) once more, the two digs now
+ * parked past a 20 s burst. Spec support for the kill-switch pins; it reads, never writes.
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import type { GoldenRun } from './goldenRun'
@@ -25,8 +26,8 @@ const GOLDEN_FOLDER = new URL('../../tests/golden/', import.meta.url)
 
 /** The end digest of each golden the charge moves, with the exact carry off, by tick. */
 export const UNCHARGED_DIGESTS: Readonly<Record<string, Readonly<Record<number, string>>>> = {
-  'casing-lined-band-2': { 2137: '7d83301c63f0f346' },
-  'collapse-band-2-grade-1': { 2125: '3b868f65318cf3ad' },
+  'casing-lined-band-2': { 3037: 'a0f36686adb822fa' },
+  'collapse-band-2-grade-1': { 3025: '646533e1f9f50dab' },
 }
 
 export function committedGoldenRuns(): GoldenRun[] {

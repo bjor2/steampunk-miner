@@ -25,15 +25,17 @@ type MovedDigests = Readonly<Record<string, Readonly<Record<number, string>>>>
 /**
  * Protocol 121's digests (#894's casing prices) at the 0.5 m clearance, by tick, of the goldens the
  * 0.15 m bore moves; money-past-1e40's from protocol 124, whose fresh planet 80 takes ore rules 15
- * (ticket 890: the stamp alone moves them).
+ * (ticket 890: the stamp alone moves them). Ticket 829's ladder (protocol 126) moved the two casing
+ * digs, now parked past a 20 s burst, and money-past-1e40's early ticks, whose end the bore no
+ * longer moves.
  */
 const WIDE_BORE_DIGESTS: MovedDigests = {
-  'casing-lined-band-2': { 2137: 'bbd47e411dc7ecc8' },
-  'collapse-band-2-grade-1': { 2125: 'cee741a48a0c5075' },
+  'casing-lined-band-2': { 3037: '247d79a3a80f1d7c' },
+  'collapse-band-2-grade-1': { 3025: 'd6184d8895ce031d' },
   'destroyed-and-towed': { 704: 'e66dc96093fe4d24' },
   'dig-and-return': { 247: '4c15a692846812a7', 3600: '3b0028560b157e31', 4000: 'd803ac9fbce777f8' },
   'mined-order-mixed': { 307: 'f712d702536b3c05' },
-  'money-past-1e40': { 124: '0be882b96f135a8e', 166: 'f014ea64bc74b681', 2000: 'f786d38f86c509b8' },
+  'money-past-1e40': { 124: '42a57e690da858cb', 166: '5e2d46b3e6b64752' },
 }
 
 const goldens = committedGoldenRuns().map((golden) => [golden.name, golden] as const)

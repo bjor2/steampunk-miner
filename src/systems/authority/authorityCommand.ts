@@ -613,8 +613,15 @@ import type { JsonCount } from '../wholeCount'
  *    119 left that rest free, so a rig just past a cell a tick read up to a quarter over the drill
  *    law (P1's stored drill step 18 at 1258 mm a tick where its sub-steps allow 1008). A cleared
  *    start cell is open ground and still free. A rig at most a cell a tick steps as before.
+ * 127: casing grades by depth (ticket 829, the GD lock re-pinning #41): a cell needs
+ *    `q_surface(g) + band + biomeDelta`, the vehicle's `casingGrade` is an uncapped bigint (a JSON
+ *    count) and grades past 5 cost `r = 3.375^(1/4)` more each (economy rules 7). A casing sample
+ *    keeps its grade as a slot of its planet's window, the plain grade on planets 1 and 2. Lining
+ *    short of its cell's grade bursts after `max(60, 1200 >> (delta - 1))` ticks, the hold on its
+ *    collapse entry (`holdTicks`), with `CasingBurstWarned` and `CasingBurst`; a burst crushes no
+ *    vehicle, and lining never reinforces against one. A client before 127 reads none of it.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 126
+export const AUTHORITY_PROTOCOL_VERSION = 127
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

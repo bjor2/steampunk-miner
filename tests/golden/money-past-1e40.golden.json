@@ -5,7 +5,7 @@
   "authorityProtocolVersion": 126,
   "logSchemaVersion": 7,
   "numberFormatVersion": 1,
-  "economyRulesVersion": 6,
+  "economyRulesVersion": 7,
   "sliceSections": {
     "aetheric": 1,
     "aetheric.heat": 1,
@@ -216,17 +216,17 @@
     {
       "tick": 124,
       "scope": "dock",
-      "digest": "1399265e826c9171"
+      "digest": "76bb967659da780a"
     },
     {
       "tick": 166,
       "scope": "dock",
-      "digest": "40e35d0a38ad7500"
+      "digest": "628c457ba8ffe175"
     },
     {
       "tick": 2000,
       "scope": "end",
-      "digest": "a7a84d7098575f13"
+      "digest": "8ddd5b0f2d02f816"
     }
   ],
   "minedOrder": [

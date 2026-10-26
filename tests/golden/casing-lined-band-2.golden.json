@@ -5,7 +5,7 @@
   "authorityProtocolVersion": 126,
   "logSchemaVersion": 7,
   "numberFormatVersion": 1,
-  "economyRulesVersion": 6,
+  "economyRulesVersion": 7,
   "sliceSections": {
     "aetheric": 1,
     "aetheric.heat": 1,
@@ -30,7 +30,7 @@
     "terrain-tools.cured-foam": 1
   },
   "worldSeed": 83921,
-  "endTick": 2137,
+  "endTick": 3037,
   "commands": [
     {
       "playerId": "p1",
@@ -1260,8 +1260,113 @@
     },
     {
       "playerId": "p1",
-      "tick": 2017,
+      "tick": 2065,
       "seq": 137,
+      "type": "reportPose",
+      "payload": {}
+    },
+    {
+      "playerId": "p1",
+      "tick": 2125,
+      "seq": 138,
+      "type": "reportPose",
+      "payload": {}
+    },
+    {
+      "playerId": "p1",
+      "tick": 2185,
+      "seq": 139,
+      "type": "reportPose",
+      "payload": {}
+    },
+    {
+      "playerId": "p1",
+      "tick": 2245,
+      "seq": 140,
+      "type": "reportPose",
+      "payload": {}
+    },
+    {
+      "playerId": "p1",
+      "tick": 2305,
+      "seq": 141,
+      "type": "reportPose",
+      "payload": {}
+    },
+    {
+      "playerId": "p1",
+      "tick": 2365,
+      "seq": 142,
+      "type": "reportPose",
+      "payload": {}
+    },
+    {
+      "playerId": "p1",
+      "tick": 2425,
+      "seq": 143,
+      "type": "reportPose",
+      "payload": {}
+    },
+    {
+      "playerId": "p1",
+      "tick": 2485,
+      "seq": 144,
+      "type": "reportPose",
+      "payload": {}
+    },
+    {
+      "playerId": "p1",
+      "tick": 2545,
+      "seq": 145,
+      "type": "reportPose",
+      "payload": {}
+    },
+    {
+      "playerId": "p1",
+      "tick": 2605,
+      "seq": 146,
+      "type": "reportPose",
+      "payload": {}
+    },
+    {
+      "playerId": "p1",
+      "tick": 2665,
+      "seq": 147,
+      "type": "reportPose",
+      "payload": {}
+    },
+    {
+      "playerId": "p1",
+      "tick": 2725,
+      "seq": 148,
+      "type": "reportPose",
+      "payload": {}
+    },
+    {
+      "playerId": "p1",
+      "tick": 2785,
+      "seq": 149,
+      "type": "reportPose",
+      "payload": {}
+    },
+    {
+      "playerId": "p1",
+      "tick": 2845,
+      "seq": 150,
+      "type": "reportPose",
+      "payload": {}
+    },
+    {
+      "playerId": "p1",
+      "tick": 2905,
+      "seq": 151,
+      "type": "reportPose",
+      "payload": {}
+    },
+    {
+      "playerId": "p1",
+      "tick": 2917,
+      "seq": 152,
       "type": "debug.forceCollapse",
       "payload": {
         "block": "-1,7#57"
@@ -1270,9 +1375,9 @@
   ],
   "digests": [
     {
-      "tick": 2137,
+      "tick": 3037,
       "scope": "end",
-      "digest": "453d497c5fabf64d"
+      "digest": "8e543f14567a670f"
     }
   ],
   "minedOrder": [

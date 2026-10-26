@@ -24,8 +24,11 @@ const DIG_FROM_X = -31500
 const DIG_TO_X = -23500
 /** Back 4 m along the bore without drilling, past the lined blocks behind the face. */
 const BACK_TO_X = -27500
-/** Ten seconds beside the bore: long past a 60-tick warning and its 30-tick refill. */
-const PARK_TICKS = 600
+/**
+ * Twenty-five seconds beside the bore: past a grade-1 wall's 20 s burst hold in band 2 (ticket 829)
+ * and its 30-tick refill.
+ */
+const PARK_TICKS = 1500
 const PARK_EVERY_TICKS = 60
 /** The planet 1 cache sits in band 3 (#46), where crawlers spawn; they are frozen first. */
 const CACHE_PLANET_1 = artefactCacheTile(planetParamsFor(WORLD_SEED, 1))
@@ -42,7 +45,8 @@ export const SECOND_SLICE_GOLDEN_SCRIPTS: readonly GoldenScript[] = [
   casingDigScript({
     name: 'collapse-band-2-grade-1',
     description:
-      'Grade 1 digs 8 m into band 2: the lined blocks behind warn for 60 ticks and refill (#43).',
+      'Grade 1 digs 8 m into band 2: the lined blocks behind, one grade short, warn for 20 s and ' +
+      'burst (#43, ticket 829).',
     casingGrade: 1,
     forcedBlock: null,
   }),

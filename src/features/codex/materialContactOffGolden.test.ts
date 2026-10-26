@@ -20,24 +20,25 @@ import { withMaterialContact } from './systems/materialFixtures'
 // species, so the record moves money-past-1e40 too: with the switch off it replays to the digests
 // of its stamp-14 planet with no species touched. Ticket 894's casing prices (protocol 121) moved
 // every pin again. Ticket 890 stamps a fresh planet 80 with ore rules 15 (the gem overlay walk),
-// which alone moves money-past-1e40's pins: with P80 held on 14 they replay as before.
+// which alone moves money-past-1e40's pins: with P80 held on 14 they replay as before. Ticket 829's
+// ladder (protocol 126) moved every pin of the two digs and money-past-1e40 again.
 
 type MovedDigests = Readonly<Record<string, Readonly<Record<number, string>>>>
 
 /** Protocol 88's digests of the goldens the record moves, by tick (91's for the two digs). */
 const PROTOCOL_88_DIGESTS: MovedDigests = {
-  'casing-lined-band-2': { 2137: 'f10d98b8f1cbd07b' },
-  'collapse-band-2-grade-1': { 2125: '4557304bd522c918' },
+  'casing-lined-band-2': { 3037: 'c39a4b79742d7763' },
+  'collapse-band-2-grade-1': { 3025: 'bb84dbe40deffed4' },
   'dig-and-return': { 247: 'df5150891e41f71a', 3600: '85652eb86f98e6ac', 4000: '99a320b209396c35' },
   'mined-order-mixed': { 307: '7b5b8d6a23d6222c' },
-  'money-past-1e40': { 124: 'c2719b8d8770131c', 166: 'c4743c284170afc1', 2000: 'b31bb5386a1b1e68' },
+  'money-past-1e40': { 124: '752db6af0e4c6f6d', 166: '2c232851909f7b82', 2000: '490efd0f20fad4fd' },
 }
 
 /** Protocol 88's charged digests (A6, `drill.exactCarry` on) of the same goldens. */
 const PROTOCOL_88_CHARGED_DIGESTS: MovedDigests = {
   ...PROTOCOL_88_DIGESTS,
-  'casing-lined-band-2': { 2137: 'cfe68776179e5afe' },
-  'collapse-band-2-grade-1': { 2125: 'f211e3c5a65093e8' },
+  'casing-lined-band-2': { 3037: '69ba8a96fdf44cd0' },
+  'collapse-band-2-grade-1': { 3025: 'c803e94a52b789ab' },
 }
 
 const goldens = committedGoldenRuns().map((golden) => [golden.name, golden] as const)

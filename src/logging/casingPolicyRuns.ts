@@ -49,16 +49,7 @@ export function casingPolicyRunOf(
     onEvents: (state, events) => events.forEach((event) => tallyEvent(tally, state, event)),
   })
   scenarioStartOf(scenario).forEach((intent) => session.submit(intent))
-  const planet = botPlanetOf(
-    session,
-    'blast',
-    [],
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    policy,
-  )
+  const planet = { ...botPlanetOf(session, 'blast'), casingPolicy: policy }
   playSliceFrom(session, planet, {
     lastPlanet: CASING_POLICY_BARS.lastPlanet,
     maxTicks: BUDGET_TICKS,
