@@ -35,8 +35,8 @@
         },
         {
           "title": "Wider rig with drill width",
-          "description": "Each drill width level (the side cutters, Mark 2, Wide) widens the bore and the rig itself by a metre. The rig grows up from its wheels into ground its cut has opened and waits where rock is still in the way. The camera pulls back with it, so the rig keeps its size on screen. The rig and its drill head are drawn as wide as the rig really is, while the turret and coal tender keep their size on its edges. The check that every mount sits on the body at each width comes later.",
-          "status": "partial",
+          "description": "Each drill width level (the side cutters, Mark 2, Wide) widens the bore and the rig itself by a metre. The rig grows up from its wheels into ground its cut has opened and waits where rock is still in the way. The camera pulls back with it, so the rig keeps its size on screen. The rig and its drill head are drawn as wide as the rig really is, while the turret and coal tender keep their size on its edges. At every width level each mount is checked to sit on the body, nothing drawn twice.",
+          "status": "built",
           "issues": [749, 750, 913, 666]
         },
         {

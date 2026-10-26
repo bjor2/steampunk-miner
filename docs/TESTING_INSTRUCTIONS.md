@@ -1083,6 +1083,18 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   authority, economy, vehicle, store or log module imports the drawn width, so the committed goldens
   replay byte for byte whatever width a rig is drawn at, and no reader of it imports the local
   `vehiclePresence`.
+- **Held mounts on the widened rig** (ticket 666, B3 folded in by the #666 lock):
+  `src/features/rig-look/systems/render/heldMountSeats.test.ts` is the B3 fold test. Every part
+  ticket 913 holds to size (the turret's trunnion at each of its looks, the tender's `hull.hitch`
+  and the drill head's mount) sits on the drawn body, or no further past its edge than the hitch.
+  Its trace (share of the drawn half width, overhang past the edge, drawn size over authored) is
+  byte-identical to the bare rig's at width levels 0 to 3 (the shipped Marks), 10, 101 and 1e6,
+  so the mounts move by position only. `e2e/browser/rigBodyWidth.spec.ts` plays width levels 0 to
+  3 at the max loadout on the dock's pad. Through the rig look's `getBodyWidth()` it waits for the
+  collider to settle at the width row, then checks the drawn width within 0.05 m and that no mount
+  is unseated; through `vehicleParts()` it checks that nothing is drawn twice. It tells Bare and
+  Wide apart in one rig crop at 360 px and 1280 px under a held clock (the #590 threshold), and
+  attaches shots of each level on the pad and after a short dig down, for review.
 - **Riding the cut face** (ticket 570): `src/physics/cutFaceRide.test.ts` plays down legs at drill
   purchases 1, 10 and 20 (1.5, 10.7 and 94 m/s on planet 1) on a column and a tilted column at 30
   and 144 frames/s, and a level leg turned out of a down bore, in the live loop with
