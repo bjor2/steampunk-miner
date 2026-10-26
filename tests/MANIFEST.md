@@ -173,11 +173,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/drill-look/drillLook.test.ts` | 6 | 6 |
 | `src/features/drill-look/systems/render/drillLookSteps.test.ts` | 8 | 8 |
 
-### `dynamite`: 6 files, 24 tests
+### `dynamite`: 7 files, 27 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/dynamite/logging.test.ts` | 2 | 2 |
+| `src/features/dynamite/systems/blastBit.test.ts` | 3 | 3 |
 | `src/features/dynamite/systems/chargeRings.test.ts` | 2 | 2 |
 | `src/features/dynamite/systems/detonateReaction.test.ts` | 3 | 3 |
 | `src/features/dynamite/systems/dynamiteSizes.test.ts` | 4 | 4 |
@@ -325,7 +326,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mineral-skins/systems/signatureMaterial.test.ts` | 4 | 4 |
 | `src/features/mineral-skins/systems/skinTable.test.ts` | 22 | 22 |
 
-### `mining-gates`: 26 files, 163 tests
+### `mining-gates`: 26 files, 168 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -334,9 +335,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-gates/store/gateHintStore.test.ts` | 3 | 3 |
 | `src/features/mining-gates/systems/botExtractorBuys.test.ts` | 3 | 3 |
 | `src/features/mining-gates/systems/botExtractors.test.ts` | 4 | 2 |
-| `src/features/mining-gates/systems/botGates.test.ts` | 7 | 7 |
+| `src/features/mining-gates/systems/botGates.test.ts` | 8 | 8 |
 | `src/features/mining-gates/systems/botShaftJog.test.ts` | 2 | 1 |
-| `src/features/mining-gates/systems/canMine.test.ts` | 21 | 21 |
+| `src/features/mining-gates/systems/canMine.test.ts` | 25 | 25 |
 | `src/features/mining-gates/systems/cellGates.test.ts` | 1 | 1 |
 | `src/features/mining-gates/systems/coreRoute.test.ts` | 5 | 2 |
 | `src/features/mining-gates/systems/dynamiteCells.test.ts` | 3 | 3 |
@@ -972,7 +973,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/downCutFront.test.ts` | 3 | 3 |
 | `src/systems/authority/drillEventStream.lane.test.ts` | 8 | 1 |
 | `src/systems/authority/drillEventStream.test.ts` | 27 | 5 |
-| `src/systems/authority/drillGates.test.ts` | 11 | 11 |
+| `src/systems/authority/drillGates.test.ts` | 13 | 13 |
 | `src/systems/authority/drillGearCut.test.ts` | 30 | 28 |
 | `src/systems/authority/drillStep.test.ts` | 23 | 23 |
 | `src/systems/authority/drillStepAim.test.ts` | 8 | 5 |
