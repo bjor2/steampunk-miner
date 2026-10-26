@@ -37,6 +37,7 @@
  *   a tick, doubled for a rig whose band-1 cells would cost fewer than 100, so no rig is held to
  *   the old 3600 m/s one-sub-step floor; the cursor keeps the quantum its carry and dig time are in.
  */
+import { widthLevelOf } from '../registries/boreWidth'
 import { flagsOf } from './devFlagState'
 import { isCutGateOpen, type CutGate } from '../vehicle/cutGate'
 import type { DriveSigns } from '../vehicle/driveSigns'
@@ -102,6 +103,8 @@ export interface Sweep {
   share: number
   /** The step the rig may take next while it cuts (ticket 334's cutting bound). */
   cuttingMm: number
+  /** The rig's width level (ticket 750, `registries/boreWidth.ts`): the body the stamp is round. */
+  widthLevel: number
   /** The sub-steps a tick the rig's cut counts in (ticket 558, `vehicle/drillQuantum.ts`). */
   quantum: number
 }
@@ -221,6 +224,7 @@ function sweepOf(state: AuthorityState, playerId: string, step: SweptStep): Swee
     rear,
     crossed,
     cuttingMm,
+    widthLevel: widthLevelOf(state, playerId),
     path: sweepPathOf(cursor, step.pose, { stamp, aheadMm }, state.tick),
     gate,
     share: perCellShareAt(state, playerId),

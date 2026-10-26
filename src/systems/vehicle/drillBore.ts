@@ -47,6 +47,15 @@ export function bodyHalfMmAt(widthLevel: number): number {
   return Math.ceil(bodyWidthMmAt(widthLevel) / 2)
 }
 
+/**
+ * How much further the owned body's sides lie from its centre at `widthLevel` than the bare body's,
+ * mm (ticket 750): its face ahead and its wheels below lie this much further out, so the rules that
+ * place the drill round the body (`drillStamp.ts`, `drillContact.ts`) move them by it.
+ */
+export function bodyGrowthMmAt(widthLevel: number): number {
+  return bodyHalfMmAt(widthLevel) - BODY_HALF_SIZE_MM
+}
+
 /** The stamp's radius along a facing at `widthLevel`: half the body plus the clearance. */
 export function boreRadiusMmAt(widthLevel: number): number {
   return bodyHalfMmAt(widthLevel) + DRILL_BORE_ROWS.sideClearanceMm
@@ -89,6 +98,11 @@ export function drillStampRadiusMmAlong(aim: Aim): number {
  */
 export function bodyReachMmAlong(aim: Aim): number {
   return squareReachMmAlong(aim, BODY_HALF_SIZE_MM)
+}
+
+/** How far the body of `widthLevel` reaches from its centre along `aim`, as `bodyReachMmAlong`. */
+export function bodyReachMmAlongAt(aim: Aim, widthLevel: number): number {
+  return squareReachMmAlong(aim, bodyHalfMmAt(widthLevel))
 }
 
 /** How far a square of half side `halfMm` reaches from its centre along `aim`, rounded up. */

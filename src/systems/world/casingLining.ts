@@ -28,7 +28,7 @@
  * Never refused: a grade too low for the band still lines (#41). The dock pad is never lined, as it
  * is never carved. A player grade above 15 lines at 15, the most a sample holds.
  */
-import { BODY_HALF_SIZE_MM, CASING_LINING_WIDTH_MM } from '../../constants/balance'
+import { CASING_LINING_WIDTH_MM, DRILL_BORE_ROWS } from '../../constants/balance'
 import { UP_VECTOR_SCALE } from '../../constants/physics'
 import { drillStampLiftMm, drillStampRadiusMm } from '../vehicle/drillBore'
 import { cellSampleIndices } from './cellYield'
@@ -187,7 +187,7 @@ export function lineRingSamples(
 
 /** The samples of the band and its floor box in row order, as full-weight stamp samples. */
 export function ringSamplesOf(ring: CasingRing): WeightedSample[] {
-  const outer = Math.max(ring.clearMm + ring.widthMm, floorBoxDepthMm() + MM_PER_SAMPLE)
+  const outer = Math.max(ring.clearMm + ring.widthMm, floorBoxDepthMm(ring) + MM_PER_SAMPLE)
   const box = ringShapeBoxOf(ring, outer)
   const isInRing = ringTestOf(ring)
   const samples: WeightedSample[] = []
@@ -215,8 +215,16 @@ function isInFloorBox(ring: CasingRing, up: PlanetUp, sx: number, sy: number): b
   const dy = sy * MM_PER_SAMPLE - ring.yMm
   const depth = -(dx * up.upx + dy * up.upy)
   const across = Math.abs(dx * up.upy - dy * up.upx)
-  const isUnder = depth > 0 && depth <= floorBoxDepthMm() * UP_VECTOR_SCALE
-  return isUnder && across <= BODY_HALF_SIZE_MM * UP_VECTOR_SCALE
+  const isUnder = depth > 0 && depth <= floorBoxDepthMm(ring) * UP_VECTOR_SCALE
+  return isUnder && across <= ringBodyHalfMmOf(ring) * UP_VECTOR_SCALE
+}
+
+/**
+ * Half the side of the body whose bore the ring lines (ticket 750): its bore's radius, which the
+ * ring is read round (`casingRingAround`), less the side clearance; the bare body's on a bare ring.
+ */
+function ringBodyHalfMmOf(ring: CasingRing): number {
+  return ring.clearMm + CASING_LINING_WIDTH_MM - DRILL_BORE_ROWS.sideClearanceMm
 }
 
 /**
@@ -227,8 +235,8 @@ function isInFloorBox(ring: CasingRing, up: PlanetUp, sx: number, sy: number): b
  * wheels' width past it at the lower floor, and at a pose report every tick that stamp lies nearer
  * the step than at 12-tick reports (#514's casing cadence spec).
  */
-function floorBoxDepthMm(): number {
-  return drillStampLiftMm() + BODY_HALF_SIZE_MM + 3 * MM_PER_SAMPLE
+function floorBoxDepthMm(ring: CasingRing): number {
+  return drillStampLiftMm() + ringBodyHalfMmOf(ring) + 3 * MM_PER_SAMPLE
 }
 
 function ringStepOf(session: EditSession, sample: WeightedSample, lining: RingLining): RingStep {

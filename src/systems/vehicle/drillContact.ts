@@ -16,6 +16,7 @@
  * the body's corners on every cut, so the live loop bites by `sweptDrillContactOf` on both paths.
  */
 import { VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
+import { BARE_WIDTH_LEVEL, bodyHalfMmAt } from './drillBore'
 import { ISO_DENSITY, MM_PER_SAMPLE, SAMPLES_PER_TILE } from '../world/sampleGrid'
 import {
   discSamplesOf,
@@ -53,6 +54,16 @@ export interface DrillAim {
   stamp: DiscStamp
   /** How far past the face ground is in the way, mm; `IN_THE_WAY_MM` when absent. */
   inTheWayMm?: number
+  /**
+   * The body's width level (ticket 750): its face lies half its side ahead of `centreMm` and its
+   * width spans that much either side; the bare body when absent.
+   */
+  widthLevel?: number
+}
+
+/** Half the side of the body `aim` is taken from, mm: its face ahead, its width either side. */
+export function bodyHalfMmOfAim(aim: DrillAim): number {
+  return bodyHalfMmAt(aim.widthLevel ?? BARE_WIDTH_LEVEL)
 }
 
 /**
@@ -66,9 +77,10 @@ export function inTheWayMmOf(cuttingBoundMm: number): number {
 
 export function drillContactOf(ground: DrillableGround, aim: DrillAim): DrillContact {
   let contact: DrillContact = 'none'
+  const halfMm = bodyHalfMmOfAim(aim)
   for (const sample of discSamplesOf(aim.stamp)) {
     if (!isCuttable(ground, sample)) continue
-    const place = placeOf(aim, sample)
+    const place = placeOf(aim, sample, halfMm)
     if (place === 'inTheWay') return place
     if (place === 'ahead') contact = place
   }
@@ -79,8 +91,9 @@ export function drillContactOf(ground: DrillableGround, aim: DrillAim): DrillCon
 export function sweptDrillContactOf(ground: DrillableGround, aim: DrillAim): DrillContact {
   const contact = drillContactOf(ground, aim)
   if (contact !== 'none') return contact
+  const faceMm = bodyHalfMmOfAim(aim)
   const isBiting = (sample: WeightedSample) =>
-    isCuttable(ground, sample) && aheadOf(aim, sample) >= HALF_BODY_MM
+    isCuttable(ground, sample) && aheadOf(aim, sample) >= faceMm
   return discSamplesOf(aim.stamp).some(isBiting) ? 'ahead' : 'none'
 }
 
@@ -96,13 +109,15 @@ export function isCuttable(ground: DrillableGround, sample: WeightedSample): boo
   return kind !== CELL_KIND.indestructible && kind !== CELL_KIND.lava
 }
 
-/** Within reach of the face across the body, else in the stamp's core ahead of the centre. */
-function placeOf(aim: DrillAim, sample: WeightedSample): DrillContact {
+/**
+ * Within reach of the face across the body (`halfMm` its half side), else in the stamp's core
+ * ahead of the centre.
+ */
+function placeOf(aim: DrillAim, sample: WeightedSample, halfMm: number): DrillContact {
   const ahead = aheadOf(aim, sample)
   const across = acrossOf(aim, sample)
-  const isPastFace =
-    ahead >= HALF_BODY_MM && ahead <= HALF_BODY_MM + (aim.inTheWayMm ?? IN_THE_WAY_MM)
-  if (isPastFace && Math.abs(across) <= HALF_BODY_MM) return 'inTheWay'
+  const isPastFace = ahead >= halfMm && ahead <= halfMm + (aim.inTheWayMm ?? IN_THE_WAY_MM)
+  if (isPastFace && Math.abs(across) <= halfMm) return 'inTheWay'
   return isInClearedCore(aim.stamp, sample.weight) && ahead > 0 ? 'ahead' : 'none'
 }
 

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { withRegistrations } from '../../registries/registrar'
 import { widthLevelOf } from '../registries/boreWidth'
-import { boreRadiusMmAt } from '../vehicle/drillBore'
+import { bodyGrowthMmAt, boreRadiusMmAt } from '../vehicle/drillBore'
 import type { DomainEventBody } from './domainEvent'
 import { createScriptedSession } from './scriptedSession'
 import {
@@ -69,7 +69,9 @@ describe('bore width kernel', () => {
     const bare = legAtWidth(0)
     const wide = legAtWidth(1)
     const bareReachMm = reachAlongOf(COLUMN_LEG, lastStateOf(bare))
-    const wideReachMm = reachAlongOf(COLUMN_LEG, lastStateOf(wide))
+    // The pose is the owned body's centre (ticket 750), so the wider rig's face, and the front it
+    // cuts ahead of it, lie its growth further down the leg: the reach is read from the face.
+    const wideReachMm = reachAlongOf(COLUMN_LEG, lastStateOf(wide)) - bodyGrowthMmAt(1)
     // Within the #662 Part B bar of +-1%: a wider stamp clears the line's cells whole, which moves
     // where a bite's price stops falling by a few cm over the leg.
     expect(Math.abs(wideReachMm - bareReachMm)).toBeLessThanOrEqual(bareReachMm / 100)

@@ -32,6 +32,7 @@
  * as a report's cut is (`scriptedDrillClockOf`), so a cell may clear in a fraction of a tick and a
  * rig past 60 cells/s bores more than one cell a tick at the player's price.
  */
+import { widthLevelOf } from '../registries/boreWidth'
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { casingHardness } from '../economy/casingGrades'
 import { coreHardness, blockHardness, oreSalePrice, oreTier } from '../economy/oreEconomy'
@@ -258,10 +259,12 @@ export function drillAtPose(
   clock: DrillClock = WHOLE_TICK_CLOCK,
 ): RuleEffect {
   const { pose, drive, isLifting, tail, cellsBeside } = reported
-  const atBore = (stamp: DiscStamp) => boreStampOf(state, playerId, stamp, pose)
+  const atBore = (stamp: DiscStamp) =>
+    stampSweptFrom(boreStampOf(state, playerId, stamp, pose), tail)
+  const level = widthLevelOf(state, playerId)
   const bits = {
-    cut: { pose, disc: stampSweptFrom(atBore(reportCutStampOf(pose, isLifting)), tail), drive },
-    gear: { pose, disc: stampSweptFrom(atBore(drillStampOf(pose, isLifting)), tail), drive },
+    cut: { pose, disc: atBore(reportCutStampOf(pose, isLifting, level)), drive },
+    gear: { pose, disc: atBore(drillStampOf(pose, isLifting, level)), drive },
   }
   const carve: CarveIn = (request) =>
     carveRunOnWithGear(state, params, playerId, bits, request, cellsBeside)

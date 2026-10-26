@@ -14,11 +14,12 @@
  * - Nothing here cuts below the stamp's level floor or adds a clearing rule: the stamp's floor stays
  *   what the body rides on.
  */
-import { BODY_HALF_SIZE_MM, CARRY_RELEASE_MARGIN_SAMPLES } from '../../constants/balance'
+import { CARRY_RELEASE_MARGIN_SAMPLES } from '../../constants/balance'
 import { UP_VECTOR_SCALE } from '../../constants/physics'
 import type { CarryGround, CarryReach } from '../vehicle/carryWalk'
 import { sweptStampOf, type SweepPath } from '../vehicle/sweptCut'
 import { aimVectorOfPose } from '../vehicle/aim'
+import { BARE_WIDTH_LEVEL, bodyHalfMmAt } from '../vehicle/drillBore'
 import { type IntegerVector, type VehiclePose } from '../vehicle/vehiclePose'
 import { carveDisc, type CellDrillTicks } from '../world/groundEdit'
 import type { PlanetParams } from '../world/planetParams'
@@ -43,25 +44,28 @@ interface NextStepSlab {
 
 /**
  * The carry's cell while the stamp must leave it standing; null once released, or with no carry.
- * `cuttingMm` is the step the rig may take next while it cuts (`stepBoundRead.ts`).
+ * `cuttingMm` is the step the rig may take next while it cuts (`stepBoundRead.ts`); the slab is
+ * the owned body's of `widthLevel` (ticket 750), its face half that body's side past the pose.
  */
 export function heldCarryCellOf(
   target: TilePoint | null,
   pose: VehiclePose,
   cuttingMm: number,
+  widthLevel = BARE_WIDTH_LEVEL,
 ): TilePoint | null {
   if (target === null) return null
-  return hasSampleInSlab(target, nextStepSlabOf(pose, cuttingMm)) ? null : target
+  const slab = nextStepSlabOf(pose, cuttingMm, bodyHalfMmAt(widthLevel))
+  return hasSampleInSlab(target, slab) ? null : target
 }
 
-function nextStepSlabOf(pose: VehiclePose, cuttingMm: number): NextStepSlab {
+function nextStepSlabOf(pose: VehiclePose, cuttingMm: number, halfMm: number): NextStepSlab {
   const margin = CARRY_RELEASE_MARGIN_SAMPLES * MM_PER_SAMPLE
   return {
     pose,
     facing: aimVectorOfPose(pose),
-    nearest: BODY_HALF_SIZE_MM * UP_VECTOR_SCALE,
-    furthest: (BODY_HALF_SIZE_MM + cuttingMm + margin) * UP_VECTOR_SCALE,
-    halfWidth: (BODY_HALF_SIZE_MM + margin) * UP_VECTOR_SCALE,
+    nearest: halfMm * UP_VECTOR_SCALE,
+    furthest: (halfMm + cuttingMm + margin) * UP_VECTOR_SCALE,
+    halfWidth: (halfMm + margin) * UP_VECTOR_SCALE,
   }
 }
 
@@ -144,6 +148,8 @@ export interface ReleasingSweep {
   step: { pose: VehiclePose }
   /** The step the rig may take next while it cuts (`stepBoundRead.ts`). */
   cuttingMm: number
+  /** The rig's width level (ticket 750): the body whose next step releases a cell. */
+  widthLevel: number
 }
 
 /** A crossed cell, and the sub-step where the stamp's centre enters it. */
@@ -175,7 +181,7 @@ function releasedPriceOf(
   crossing: CellCrossing,
 ): number | null {
   const { pose } = sweep.step
-  if (heldCarryCellOf(crossing.tile, pose, sweep.cuttingMm) !== null) return null
+  if (heldCarryCellOf(crossing.tile, pose, sweep.cuttingMm, sweep.widthLevel) !== null) return null
   const world = stampBiteOf(params, request, sweep, crossing)
   return carryGroundOf(params, { ...request, world }).cellAt(crossing.tile).price
 }

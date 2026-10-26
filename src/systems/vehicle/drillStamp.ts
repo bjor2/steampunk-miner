@@ -22,23 +22,34 @@
  *
  * A report whose bite runs on from its previous pose (ticket 537) cuts its stamp as the capsule
  * from that pose's stamp centre, the tail (`authority/reportedCapsule.ts` picks it).
+ *
+ * A rig of a width level (ticket 750, GD lock on #662 Part B) is placed round the body it owns:
+ * the pose is that body's centre (`bodyGrowth.ts`), its face and wheels lie `bodyGrowthMmAt`
+ * further out, so every stamp sits that much further ahead and a level floor that much lower, and
+ * the floor band spans its wheels. The bare level (the default) is every rule's stamp as before;
+ * the host grows the radius to the level's bore (`boreWidthStamp.ts`).
  */
 import {
-  BODY_HALF_SIZE_MM,
   CUT_FACE_MARGIN_MM,
   DRILL_REPORT_STAMP_LENGTH_MM,
   DRILL_STAMP_OFFSET_MM,
 } from '../../constants/balance'
-import { TICKS_PER_SECOND, UP_VECTOR_SCALE, VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
+import { TICKS_PER_SECOND, UP_VECTOR_SCALE } from '../../constants/physics'
 import { centreDistanceFloorMmOf } from '../world/exactSquares'
 import type { FloorBand } from '../world/floorBand'
 import type { DiscStamp, StampPoint } from '../world/stampShape'
 import { MM_PER_SAMPLE } from '../world/sampleGrid'
-import { bodyReachMmAlong, drillStampLiftMm, drillStampRadiusMmAlong } from './drillBore'
+import {
+  BARE_WIDTH_LEVEL,
+  bodyHalfMmAt,
+  bodyReachMmAlong,
+  bodyReachMmAlongAt,
+  drillStampLiftMm,
+  drillStampRadiusMmAlong,
+} from './drillBore'
 import { AIM, aimOfPose, aimVectorOfPose, isSidewaysAim, type Aim } from './aim'
 import type { VehiclePose } from './vehiclePose'
 
-const HALF_BODY_MM = (VEHICLE_COLLIDER_SIZE * 1000) / 2
 /** Contacts let a resting body sink a few mm into its floor; that must not drop the floor. */
 const FLOOR_JITTER_MM = 20
 /**
@@ -51,8 +62,13 @@ const FLOOR_JITTER_MM = 20
  */
 const CUTTING_FLOOR_JITTER_MM = 35
 
-export function drillStampOf(pose: VehiclePose, isLifting: boolean): DiscStamp {
-  return stampAheadBy(pose, isLifting, DRILL_STAMP_OFFSET_MM)
+export function drillStampOf(
+  pose: VehiclePose,
+  isLifting: boolean,
+  widthLevel = BARE_WIDTH_LEVEL,
+): DiscStamp {
+  const aheadMm = DRILL_STAMP_OFFSET_MM + faceGrowthMmAlong(aimOfPose(pose), widthLevel)
+  return stampAheadBy(pose, isLifting, aheadMm, widthLevel)
 }
 
 /**
@@ -61,10 +77,18 @@ export function drillStampOf(pose: VehiclePose, isLifting: boolean): DiscStamp {
  * ahead as #36's wide disc did. The stamp's own centre stays where the casing, the gear and the
  * report capsule's tail read it (`drillStampOf`).
  */
-export function reportCutStampOf(pose: VehiclePose, isLifting: boolean): DiscStamp {
-  const stamp = drillStampOf(pose, isLifting)
+export function reportCutStampOf(
+  pose: VehiclePose,
+  isLifting: boolean,
+  widthLevel = BARE_WIDTH_LEVEL,
+): DiscStamp {
+  const stamp = drillStampOf(pose, isLifting, widthLevel)
   if (stamp.floorRadiusMm !== null) return stamp
-  const head = stampAheadBy(pose, isLifting, DRILL_STAMP_OFFSET_MM + DRILL_REPORT_STAMP_LENGTH_MM)
+  const aheadMm =
+    DRILL_STAMP_OFFSET_MM +
+    DRILL_REPORT_STAMP_LENGTH_MM +
+    faceGrowthMmAlong(aimOfPose(pose), widthLevel)
+  const head = stampAheadBy(pose, isLifting, aheadMm, widthLevel)
   return { ...head, tail: { xMm: stamp.xMm, yMm: stamp.yMm } }
 }
 
@@ -74,8 +98,12 @@ export function reportCutStampOf(pose: VehiclePose, isLifting: boolean): DiscSta
  * between the front and the face it leaves. The authority's cut and the client's bite both read
  * it, so they never disagree on where the stamp is.
  */
-export function sweptStampAheadMmOf(stepMm: number, aim: Aim): number {
-  return bodyFaceMmAlong(aim) + stepMm + CUT_FACE_MARGIN_MM + MM_PER_SAMPLE / 2
+export function sweptStampAheadMmOf(
+  stepMm: number,
+  aim: Aim,
+  widthLevel = BARE_WIDTH_LEVEL,
+): number {
+  return bodyFaceMmAlong(aim, widthLevel) + stepMm + CUT_FACE_MARGIN_MM + MM_PER_SAMPLE / 2
 }
 
 /**
@@ -83,8 +111,16 @@ export function sweptStampAheadMmOf(stepMm: number, aim: Aim): number {
  * reach between the four facings (ticket 791), so a diagonal cut's face clears the corner that
  * leads it instead of holding the body on it.
  */
-export function bodyFaceMmAlong(aim: Aim): number {
-  return bodyReachMmAlong(aim)
+export function bodyFaceMmAlong(aim: Aim, widthLevel = BARE_WIDTH_LEVEL): number {
+  return bodyReachMmAlongAt(aim, widthLevel)
+}
+
+/**
+ * How much further ahead the face of the body of `widthLevel` lies along `aim` than the bare
+ * body's (ticket 750): what a stamp placed from the bare body's offsets moves on by.
+ */
+export function faceGrowthMmAlong(aim: Aim, widthLevel: number): number {
+  return bodyReachMmAlongAt(aim, widthLevel) - bodyReachMmAlong(aim)
 }
 
 /**
@@ -130,8 +166,9 @@ export function sweptDrillStampOf(
   pose: VehiclePose,
   isLifting: boolean,
   aheadMm: number,
+  widthLevel = BARE_WIDTH_LEVEL,
 ): DiscStamp {
-  return stampAheadBy(pose, isLifting, aheadMm)
+  return stampAheadBy(pose, isLifting, aheadMm, widthLevel)
 }
 
 /**
@@ -145,9 +182,11 @@ export function stepReachStampOf(
   pose: VehiclePose,
   isLifting: boolean,
   aheadMm: number,
+  widthLevel = BARE_WIDTH_LEVEL,
 ): DiscStamp {
-  const stamp = drillStampOf(pose, isLifting)
-  return { ...stampAheadBy(pose, isLifting, aheadMm), tail: { xMm: stamp.xMm, yMm: stamp.yMm } }
+  const stamp = drillStampOf(pose, isLifting, widthLevel)
+  const ahead = stampAheadBy(pose, isLifting, aheadMm, widthLevel)
+  return { ...ahead, tail: { xMm: stamp.xMm, yMm: stamp.yMm } }
 }
 
 /**
@@ -158,10 +197,12 @@ export function cuttingDrillStampOf(
   pose: VehiclePose,
   isLifting: boolean,
   aheadMm: number,
+  widthLevel = BARE_WIDTH_LEVEL,
 ): DiscStamp {
-  const stamp = stampAheadBy(pose, isLifting, aheadMm)
+  const stamp = stampAheadBy(pose, isLifting, aheadMm, widthLevel)
   if (stamp.floorRadiusMm === null) return stamp
-  return { ...stamp, floorRadiusMm: wheelFloorRadiusOf(pose, CUTTING_FLOOR_JITTER_MM) }
+  const floor = { jitterMm: CUTTING_FLOOR_JITTER_MM, widthLevel }
+  return { ...stamp, floorRadiusMm: wheelFloorRadiusOf(pose, floor) }
 }
 
 /**
@@ -174,10 +215,11 @@ export function cuttingReachStampOf(
   pose: VehiclePose,
   isLifting: boolean,
   aheadMm: number,
+  widthLevel = BARE_WIDTH_LEVEL,
 ): DiscStamp {
-  const face = drillStampOf(pose, isLifting)
+  const face = drillStampOf(pose, isLifting, widthLevel)
   return {
-    ...cuttingDrillStampOf(pose, isLifting, aheadMm),
+    ...cuttingDrillStampOf(pose, isLifting, aheadMm, widthLevel),
     tail: { xMm: face.xMm, yMm: face.yMm },
   }
 }
@@ -187,7 +229,12 @@ export function stampSweptFrom(stamp: DiscStamp, tail: StampPoint | null): DiscS
   return tail === null ? stamp : { ...stamp, tail }
 }
 
-function stampAheadBy(pose: VehiclePose, isLifting: boolean, aheadMm: number): DiscStamp {
+function stampAheadBy(
+  pose: VehiclePose,
+  isLifting: boolean,
+  aheadMm: number,
+  widthLevel: number,
+): DiscStamp {
   const ahead = aimVectorOfPose(pose)
   const isLevelCut = isSideways(pose) && !isLifting
   const lift = isLevelCut ? drillStampLiftMm() : 0
@@ -195,15 +242,17 @@ function stampAheadBy(pose: VehiclePose, isLifting: boolean, aheadMm: number): D
     xMm: pose.x + scaled(ahead.x, aheadMm) + scaled(pose.upx, lift),
     yMm: pose.y + scaled(ahead.y, aheadMm) + scaled(pose.upy, lift),
     radiusMm: drillStampRadiusMmAlong(aimOfPose(pose)),
-    floorRadiusMm: isLevelCut ? wheelFloorRadiusOf(pose, FLOOR_JITTER_MM) : null,
+    floorRadiusMm: isLevelCut
+      ? wheelFloorRadiusOf(pose, { jitterMm: FLOOR_JITTER_MM, widthLevel })
+      : null,
     edge: 'boreWall',
-    ...(isLevelCut ? { floorBand: floorBandOf(pose) } : {}),
+    ...(isLevelCut ? { floorBand: floorBandOf(pose, widthLevel) } : {}),
   }
 }
 
 /** A level cut's band under its disc, across the wheels' width (GD lock on #662, Q2). */
-function floorBandOf(pose: VehiclePose): FloorBand {
-  return { upx: pose.upx, upy: pose.upy, halfWidthMm: BODY_HALF_SIZE_MM }
+function floorBandOf(pose: VehiclePose, widthLevel: number): FloorBand {
+  return { upx: pose.upx, upy: pose.upy, halfWidthMm: bodyHalfMmAt(widthLevel) }
 }
 
 /** Straight left or right: a diagonal cut follows its path, as a lifting one does (ticket 791). */
@@ -211,13 +260,20 @@ function isSideways(pose: VehiclePose): boolean {
   return isSidewaysAim(aimOfPose(pose))
 }
 
+/** The allowance a floor gives a body resting a hair into it, and the body's width level. */
+interface WheelFloor {
+  jitterMm: number
+  widthLevel: number
+}
+
 /**
  * The wheels' distance from the planet's centre rounded down to whole samples, in mm, after
  * allowing `jitterMm` for a body resting a hair into its floor: never meaningfully above the
- * wheels, so the floor never leaves a lip the drill may not cut.
+ * wheels, so the floor never leaves a lip the drill may not cut. The wheels are the owned body's,
+ * half its side under the pose (ticket 750).
  */
-function wheelFloorRadiusOf(pose: VehiclePose, jitterMm: number): number {
-  const wheels = centreDistanceFloorMmOf(pose.x, pose.y) - HALF_BODY_MM
+function wheelFloorRadiusOf(pose: VehiclePose, { jitterMm, widthLevel }: WheelFloor): number {
+  const wheels = centreDistanceFloorMmOf(pose.x, pose.y) - bodyHalfMmAt(widthLevel)
   return Math.floor((wheels + jitterMm) / MM_PER_SAMPLE) * MM_PER_SAMPLE
 }
 

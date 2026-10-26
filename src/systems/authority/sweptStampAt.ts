@@ -3,8 +3,9 @@
  *
  * - **Travelling** (the cut gate shut): a cutting step's bound ahead of the pose
  *   (`travelStampAheadMmAt`), as the body may cover more than the drill's step.
- * Either stamp is grown to the player's bore (ticket 749, `boreStamp.ts`); its centre stays the
- * bare body's, so the front and the rear it is held to are where they were.
+ * Either stamp is grown to the player's bore (ticket 749, `boreStamp.ts`) and placed round the
+ * body the player's width level owns (ticket 750): the pose is that body's centre, so the stamp
+ * sits ahead of its face and a level floor under its wheels, as the bare body's do round it.
  *
  * - **Cutting** (the gate open): at the front of this tick's step (`sweptStampAheadMmOf`), the step
  *   the drill law gives (`frontStepMmAt`), or on the first cutting tick after travel the body's own
@@ -28,6 +29,7 @@ import { aimOfPose, aimVectorOfPose } from '../vehicle/aim'
 import type { VehiclePose } from '../vehicle/vehiclePose'
 import { MM_PER_SAMPLE } from '../world/sampleGrid'
 import type { DiscStamp, StampPoint } from '../world/stampShape'
+import { widthLevelOf } from '../registries/boreWidth'
 import { vehicleOf, type AuthorityState } from './authorityState'
 import { boreStampOf } from './boreStamp'
 import { frontStepMmAt, type CutFollowStep } from './cutFollowRead'
@@ -62,9 +64,10 @@ export function sweptStampAt(
   const { pose, isLifting, gate } = step
   if (!isCutGateOpen(gate)) return placedTravellingAt(pose, isLifting, state, playerId)
   const stepMm = cutFrontStepMmAt(state, playerId, step)
-  const aheadMm = sweptStampAheadMmOf(stepMm, aimOfPose(pose))
-  const cutting = boreStampOf(state, playerId, cuttingDrillStampOf(pose, isLifting, aheadMm), pose)
-  const placed = placedAt(pose, cutting, aheadMm)
+  const level = widthLevelOf(state, playerId)
+  const aheadMm = sweptStampAheadMmOf(stepMm, aimOfPose(pose), level)
+  const atFront = cuttingDrillStampOf(pose, isLifting, aheadMm, level)
+  const placed = placedAt(pose, boreStampOf(state, playerId, atFront, pose), aheadMm)
   const cursor = continuedCursorOf(state, playerId, pose)
   if (cursor === null) return placed
   const stamp = withinCursorReach(placed.stamp, { cursor, pose, stepMm })
@@ -77,9 +80,10 @@ function placedTravellingAt(
   state: AuthorityState,
   playerId: string,
 ): PlacedStamp {
-  const aheadMm = travelStampAheadMmAt(state, playerId)
-  const travelling = boreStampOf(state, playerId, sweptDrillStampOf(pose, isLifting, aheadMm), pose)
-  return placedAt(pose, travelling, aheadMm)
+  const aheadMm = travelStampAheadMmAt(state, playerId, aimOfPose(pose))
+  const level = widthLevelOf(state, playerId)
+  const ahead = sweptDrillStampOf(pose, isLifting, aheadMm, level)
+  return placedAt(pose, boreStampOf(state, playerId, ahead, pose), aheadMm)
 }
 
 function placedAt(pose: VehiclePose, stamp: DiscStamp, aheadMm: number): PlacedStamp {

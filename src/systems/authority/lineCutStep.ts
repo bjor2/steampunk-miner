@@ -9,6 +9,7 @@
  * and a cell the drill may not cut cost nothing, as the slab's lead leaves them out: the carry
  * walk stops at such a cell, and the body drives up to its face.
  */
+import { widthLevelOf } from '../registries/boreWidth'
 import { aimOfPose, aimVectorOfPose } from '../vehicle/aim'
 import { sweptStampAheadMmOf } from '../vehicle/drillStamp'
 import { isWithinOneCell, stepPaidAlongMm, type FrontLine } from '../vehicle/lineCellStep'
@@ -51,7 +52,7 @@ function stepAlongFrontLineMm(state: AuthorityState, playerId: string, at: StepA
 /** The front's line from a riding cut's stamp at no step, along the aim, to the cutting bound. */
 function frontLineOf(state: AuthorityState, playerId: string, pose: VehiclePose): FrontLine {
   const aim = aimVectorOfPose(pose)
-  const aheadMm = sweptStampAheadMmOf(0, aimOfPose(pose))
+  const aheadMm = sweptStampAheadMmOf(0, aimOfPose(pose), widthLevelOf(state, playerId))
   const from = {
     xMm: pose.x + Math.floor((aim.x * aheadMm) / UP_VECTOR_SCALE),
     yMm: pose.y + Math.floor((aim.y * aheadMm) / UP_VECTOR_SCALE),

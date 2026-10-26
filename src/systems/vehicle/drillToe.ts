@@ -6,7 +6,7 @@
  * under `ISO_DENSITY` or sit below the stamp's floor line. A let-go stop ramp that drives into it
  * bounces the body back, so the stop treats it as the face.
  *
- * The box, in the body's frame: ahead from the face (`HALF_BODY_MM`) to the in-the-way reach past
+ * The box, in the body's frame: ahead from the face (half the body's side) to the in-the-way reach past
  * it, up from just over the floor under the face to the body's top, on a 25 mm grid (a tenth of a
  * sample). Its lowest row is read off the ground, not a constant: one step above the floor straight
  * under the face. Only a level facing has a toe; down or up, the face is the floor or the roof the
@@ -15,7 +15,7 @@
  */
 import { UP_VECTOR_SCALE } from '../../constants/physics'
 import { ISO_DENSITY, MM_PER_SAMPLE } from '../world/sampleGrid'
-import { HALF_BODY_MM } from './drillContact'
+import { BARE_WIDTH_LEVEL, bodyHalfMmAt } from './drillBore'
 import { aimOfPose, aimVectorOfPose, isSidewaysAim } from './aim'
 import type { IntegerVector, VehiclePose } from './vehiclePose'
 
@@ -29,28 +29,36 @@ export interface ToeGround {
   densityAt(sx: number, sy: number): number
 }
 
-/** The body's centre in mm, and its facing and up at the 1024 scale. */
+/** The body's centre in mm, its facing and up at the 1024 scale, and half its side in mm. */
 interface BodyFrame {
   centre: IntegerVector
   facing: IntegerVector
   up: IntegerVector
+  halfMm: number
 }
 
 /**
  * Whether blended-solid ground lies in the box ahead of the body's face, up to `reachMm` past it
- * (the in-the-way reach, `inTheWayMmOf`), from just over the floor to the body's top.
+ * (the in-the-way reach, `inTheWayMmOf`), from just over the floor to the body's top. The body is
+ * the one the rig's width level owns (ticket 750), the pose its centre.
  */
-export function solidToeAheadOf(ground: ToeGround, pose: VehiclePose, reachMm: number): boolean {
+export function solidToeAheadOf(
+  ground: ToeGround,
+  pose: VehiclePose,
+  reachMm: number,
+  widthLevel = BARE_WIDTH_LEVEL,
+): boolean {
   if (!isSidewaysAim(aimOfPose(pose))) return false
-  const frame = bodyFrameOf(pose)
+  const frame = bodyFrameOf(pose, widthLevel)
   return isSolidInToeBox(ground, frame, lowestToeRowOf(ground, frame), reachMm)
 }
 
-function bodyFrameOf(pose: VehiclePose): BodyFrame {
+function bodyFrameOf(pose: VehiclePose, widthLevel: number): BodyFrame {
   return {
     centre: { x: pose.x, y: pose.y },
     facing: aimVectorOfPose(pose),
     up: { x: pose.upx, y: pose.upy },
+    halfMm: bodyHalfMmAt(widthLevel),
   }
 }
 
@@ -59,8 +67,8 @@ function bodyFrameOf(pose: VehiclePose): BodyFrame {
  * reads solid there is floor (its jitter), so the first open row starts the box.
  */
 function lowestToeRowOf(ground: ToeGround, frame: BodyFrame): number {
-  let row = -HALF_BODY_MM
-  while (row <= HALF_BODY_MM && isSolidAt(ground, frame, HALF_BODY_MM, row)) {
+  let row = -frame.halfMm
+  while (row <= frame.halfMm && isSolidAt(ground, frame, frame.halfMm, row)) {
     row += TOE_STEP_MM
   }
   return row
@@ -72,8 +80,8 @@ function isSolidInToeBox(
   lowestRow: number,
   reachMm: number,
 ): boolean {
-  for (let ahead = HALF_BODY_MM; ahead <= HALF_BODY_MM + reachMm; ahead += TOE_STEP_MM) {
-    for (let row = lowestRow; row <= HALF_BODY_MM; row += TOE_STEP_MM) {
+  for (let ahead = frame.halfMm; ahead <= frame.halfMm + reachMm; ahead += TOE_STEP_MM) {
+    for (let row = lowestRow; row <= frame.halfMm; row += TOE_STEP_MM) {
       if (isSolidAt(ground, frame, ahead, row)) return true
     }
   }

@@ -9,14 +9,11 @@
  * planet 1 in about 5 ticks).
  */
 import { DRILL_SUBSTEPS_PER_TICK, STEP_BOUND_TOLERANCE_MM } from '../../constants/balance'
-import {
-  MM_PER_METRE,
-  TICKS_PER_SECOND,
-  UP_VECTOR_SCALE,
-  VEHICLE_COLLIDER_SIZE,
-} from '../../constants/physics'
+import { MM_PER_METRE, TICKS_PER_SECOND, UP_VECTOR_SCALE } from '../../constants/physics'
 import { blockHardness } from '../economy/oreEconomy'
 import { startLevels, vehicleStatsAt } from '../economy/vehicleStats'
+import { widthLevelOf } from '../registries/boreWidth'
+import { bodyHalfMmAt } from '../vehicle/drillBore'
 import { NO_DRIVE } from '../vehicle/driveSigns'
 import { div, fromSafeInteger, mul, type BigStat } from '../money'
 import { drillWorkPerTick, subStepsPerTile, tileWorkToBreak } from '../vehicle/drillRule'
@@ -261,12 +258,17 @@ export function movingDownAt(
  */
 function bodyAlongAfter(state: AuthorityState, leg: Leg, along: number, isFirst: boolean): number {
   if (isFirst) return along
-  const open = { limitMm: cutStepMmAt(state), faceWidthMm: BODY_FACE_WIDTH_MM, scanMm: 1 }
+  const open = { limitMm: cutStepMmAt(state), faceWidthMm: bodyFaceWidthMmAt(state), scanMm: 1 }
   return along + openRunAheadOf(state, leg, along, open)
 }
 
-/** The body's face across, less a sample's play each side: the width it moves into ground by. */
-const BODY_FACE_WIDTH_MM = VEHICLE_COLLIDER_SIZE * MM_PER_METRE - 2 * 25
+/**
+ * The body's face across, less a sample's play each side: the width it moves into ground by. The
+ * body is the one the rig's width level owns (ticket 750), as the host cuts round it.
+ */
+function bodyFaceWidthMmAt(state: AuthorityState): number {
+  return 2 * bodyHalfMmAt(widthLevelOf(state, 'p1')) - 2 * 25
+}
 
 /** The law's cut step where the rig stands: the cutting bound less its tolerance. */
 export function cutStepMmAt(state: AuthorityState): number {
@@ -274,9 +276,6 @@ export function cutStepMmAt(state: AuthorityState): number {
 }
 
 const FACE_SCAN_MM = 25
-
-/** The body's collider face: half its 0.9 m square ahead of its centre. */
-const BODY_HALF_MM = (VEHICLE_COLLIDER_SIZE * MM_PER_METRE) / 2
 
 /**
  * How far the body's face, judged `faceWidthMm` across, can move on from `along` before it meets
@@ -290,7 +289,8 @@ export function openRunAheadOf(
 ): number {
   const reader = groundReaderOf(state.world, PARAMS)
   const offsets = [-faceWidthMm / 2, 0, faceWidthMm / 2]
-  const isOpen = (run: number) => isFaceOpenAt(reader, leg, along + run, offsets)
+  const faceMm = bodyHalfMmAt(widthLevelOf(state, 'p1'))
+  const isOpen = (run: number) => isFaceOpenAt(reader, leg, along + run + faceMm, offsets)
   const steps = scanMm < FACE_SCAN_MM ? [COARSE_SCAN_MM, FACE_SCAN_MM, scanMm] : [FACE_SCAN_MM]
   let run = 0
   for (const step of steps) {
@@ -309,15 +309,15 @@ interface OpenRun {
   scanMm?: number
 }
 
-/** The body's face, with its centre `along` mm down the leg, lies in open ground at each offset. */
+/** The body's face, `faceAlong` mm down the leg, lies in open ground at each offset. */
 function isFaceOpenAt(
   reader: GroundReader,
   leg: Leg,
-  along: number,
+  faceAlong: number,
   offsetsMm: readonly number[],
 ): boolean {
   const facing = facingOfLeg(leg)
-  const centre = pointAlong(leg, along + BODY_HALF_MM)
+  const centre = pointAlong(leg, faceAlong)
   return offsetsMm.every((acrossMm) => {
     const xMm = centre.xMm - (facing.y * acrossMm) / UP_VECTOR_SCALE
     const yMm = centre.yMm + (facing.x * acrossMm) / UP_VECTOR_SCALE

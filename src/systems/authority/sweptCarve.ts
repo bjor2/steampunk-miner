@@ -113,7 +113,7 @@ export function carveSweepAheadOfTravel(by: CarveBy, cut: SweepRequest): SweptCa
   const bit = bitAt(sweep, pointAtStep(sweep.path, reach.reachedStep))
   const read = drillGearReadAt(state, params, playerId, bit, request.gates)
   const cells = cutCellsWithin(bit.disc, read, sweep.share)
-  const held = heldCarryCellOf(reach.target, sweep.step.pose, sweep.cuttingMm)
+  const held = heldCarryCellOf(reach.target, sweep.step.pose, sweep.cuttingMm, sweep.widthLevel)
   const stampWalk = by.walks.stampOf({ sweep, request, clear: reach.reachedStep, cells })
   const carved = carveStampWithRead(
     params,

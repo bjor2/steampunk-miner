@@ -5,15 +5,20 @@
  *
  * A pure integer read of the densities, the cell kinds and the integer pose, the same measure as
  * the drill's contact (`drillContact.ts`), so the authority and a client reading the same world
- * get the same answer.
+ * get the same answer. The face and width are the aim's body's (ticket 750, `DrillAim.widthLevel`).
  */
-import { VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import { SAMPLES_PER_TILE } from '../world/sampleGrid'
 import { discSamplesOf, isInClearedCore, type WeightedSample } from '../world/stampShape'
 import type { TilePoint } from '../world/tileGrid'
-import { acrossOf, aheadOf, isCuttable, type DrillAim, type DrillableGround } from './drillContact'
+import {
+  acrossOf,
+  aheadOf,
+  bodyHalfMmOfAim,
+  isCuttable,
+  type DrillAim,
+  type DrillableGround,
+} from './drillContact'
 
-const HALF_BODY_MM = (VEHICLE_COLLIDER_SIZE * 1000) / 2
 const BASIS_POINTS = 10000
 
 export interface LeadingSlab {
@@ -24,7 +29,8 @@ export interface LeadingSlab {
 }
 
 export function leadingSlabOf(ground: DrillableGround, aim: DrillAim): LeadingSlab {
-  const slab = discSamplesOf(aim.stamp).filter((sample) => isInSlab(aim, sample))
+  const halfMm = bodyHalfMmOfAim(aim)
+  const slab = discSamplesOf(aim.stamp).filter((sample) => isInSlab(aim, sample, halfMm))
   const uncut = slab.filter((sample) => isCuttable(ground, sample))
   return { uncutBp: shareInBasisPoints(uncut.length, slab.length), uncutTiles: tilesOf(uncut) }
 }
@@ -44,9 +50,10 @@ export function slabOfStep(front: LeadingSlab, reach: LeadingSlab): LeadingSlab 
   return { uncutBp: Math.max(front.uncutBp, reach.uncutBp), uncutTiles }
 }
 
-function isInSlab(aim: DrillAim, sample: WeightedSample): boolean {
+/** In the stamp's cleared core, past the face and within the width of a body of half side `halfMm`. */
+function isInSlab(aim: DrillAim, sample: WeightedSample, halfMm: number): boolean {
   if (!isInClearedCore(aim.stamp, sample.weight)) return false
-  return aheadOf(aim, sample) >= HALF_BODY_MM && Math.abs(acrossOf(aim, sample)) <= HALF_BODY_MM
+  return aheadOf(aim, sample) >= halfMm && Math.abs(acrossOf(aim, sample)) <= halfMm
 }
 
 function shareInBasisPoints(part: number, whole: number): number {

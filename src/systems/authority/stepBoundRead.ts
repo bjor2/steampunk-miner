@@ -15,6 +15,9 @@
  *   front of its own step instead (ticket 570, `vehicle/drillStamp.ts`).
  */
 import { DRILL_STAMP_OFFSET_MM } from '../../constants/balance'
+import { widthLevelOf } from '../registries/boreWidth'
+import type { Aim } from '../vehicle/aim'
+import { faceGrowthMmAlong } from '../vehicle/drillStamp'
 import { CLOSED_CUT_GATE, idledCutGate, isCutGateOpen, type CutGate } from '../vehicle/cutGate'
 import { drillQuantumOfVehicle } from '../vehicle/drillQuantum'
 import { stepBoundMmOf, stepBoundsOf, type StepBounds } from '../vehicle/stepBound'
@@ -46,8 +49,10 @@ export function cutGateLeftAt(cursor: SweptCut | undefined, tick: number): CutGa
 /**
  * How far ahead of the pose the stamp a travelling tick cuts with sits (the cut gate shut), and
  * the stamp the cut-follow reads: the report's, plus the cutting bound, so it covers the step the
- * rig may take next. A cutting tick's stamp sits at its front instead (ticket 570).
+ * rig may take next. A cutting tick's stamp sits at its front instead (ticket 570). A rig of a
+ * width level places it from its owned body's face along `aim` (ticket 750).
  */
-export function travelStampAheadMmAt(state: AuthorityState, playerId: string): number {
-  return DRILL_STAMP_OFFSET_MM + stepBoundsAt(state, playerId).cuttingMm
+export function travelStampAheadMmAt(state: AuthorityState, playerId: string, aim: Aim): number {
+  const faceGrowthMm = faceGrowthMmAlong(aim, widthLevelOf(state, playerId))
+  return DRILL_STAMP_OFFSET_MM + faceGrowthMm + stepBoundsAt(state, playerId).cuttingMm
 }

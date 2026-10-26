@@ -42,6 +42,7 @@ import { groundReaderOf } from '../world/groundReader'
 import type { PlanetParams } from '../world/planetParams'
 import type { DiscStamp } from '../world/stampShape'
 import type { TilePoint } from '../world/tileGrid'
+import { widthLevelOf } from '../registries/boreWidth'
 import { vehicleOf, type AuthorityState } from './authorityState'
 import { gravityRampedFrontStepMmAt } from './downCutFront'
 import { gatedCellTimeReader, lawStepMmOf } from './lineCutStep'
@@ -113,12 +114,18 @@ function slabReadOf(state: AuthorityState, playerId: string, step: CutFollowStep
   const reported = vehicleOf(state, playerId).pose
   if (params === null || reported === null) return null
   const pose = steppedPoseOf(reported, step)
-  const aheadMm = travelStampAheadMmAt(state, playerId)
+  const aheadMm = travelStampAheadMmAt(state, playerId, aimOfPose(pose))
   const reader = groundReaderOf(state.world, params)
-  const aimWith = (stamp: DiscStamp) => ({ centreMm: pose, facing: aimVectorOfPose(pose), stamp })
-  const front = leadingSlabOf(reader, aimWith(sweptDrillStampOf(pose, step.isLifting, aheadMm)))
-  const reach = leadingSlabOf(reader, aimWith(stepReachStampOf(pose, step.isLifting, aheadMm)))
-  return { params, pose, slab: slabOfStep(front, reach), aim: aimOfPose(pose) }
+  const widthLevel = widthLevelOf(state, playerId)
+  const facing = aimVectorOfPose(pose)
+  const aimWith = (stamp: DiscStamp) => ({ centreMm: pose, facing, stamp, widthLevel })
+  const front = sweptDrillStampOf(pose, step.isLifting, aheadMm, widthLevel)
+  const reach = stepReachStampOf(pose, step.isLifting, aheadMm, widthLevel)
+  const slab = slabOfStep(
+    leadingSlabOf(reader, aimWith(front)),
+    leadingSlabOf(reader, aimWith(reach)),
+  )
+  return { params, pose, slab, aim: aimOfPose(pose) }
 }
 
 /**

@@ -1,3 +1,4 @@
+import { AIM, aimOfPose } from '../systems/vehicle/aim'
 import RAPIER from '@dimforge/rapier3d-compat'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { DEV_FLAGS, type DevFlags } from '../constants/devFlags'
@@ -134,7 +135,8 @@ async function playAtDrill(drillPower: number, { flags, isExactCarry }: Path): P
         if (step % 60 === 0) store.useGameStore.getState().setEnergy('150')
         const reportedPose = store.readLocalVehicle().pose
         const playerId = store.useGameStore.getState().playerId
-        const stampAheadMm = bounds.travelStampAheadMmAt(readAuthorityState(), playerId)
+        const aim = reportedPose === null ? AIM.down : aimOfPose(reportedPose)
+        const stampAheadMm = bounds.travelStampAheadMmAt(readAuthorityState(), playerId, aim)
         loop.step(watched.controller, intent)
         watched.controller.stepWorld()
         const cursor = store.readLocalVehicle().sweptCut
