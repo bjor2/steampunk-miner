@@ -9,8 +9,11 @@
  *   type          1 (breaking) sizes 1-4, 2 (deep) 5-8, 3 (biggest) 9-12: types are verbs, sizes
  *                 scale; each type's `breaksGate[]` names the gate tiers its blast breaks
  *   sold          every size on every planet, its price the only gate (D4 #863)
- *   price         ceilMilli(count * 2 * 1.8^(n - 1) * V(t(p, 5)) * paceScale(p)), through
- *                 `bandOrePriceAt`, never its raw worth (Systems on #218)
+ *   price         count * ceil(k_dyn * V(t_top(g)) * cells(L_i)^0.85) on planet g (D6 #865, the
+ *                 VS update of 25 Oct): t_top is band 5's tier, cells the base disc's tiles
+ *                 the level-0 stamp clears, so the Blast Radius level never reprices a charge; no
+ *                 paceScale. k_dyn is 0.1, the least round value over #143 guard 1's floor
+ *                 (`chargeSizeTrade.ts`: 0.094 on seed 83921), so size 1 costs 68 on P1
  *   kept          0.4 * 0.8^(n - 1) of the ordinary ore the blast breaks
  *   rack slots    1 1 1 2 2 3 4 5 6 8 8 8 (a full rack holds 8)
  *   fuse          120 120 120 150 180 210 ticks; sizes 7-12 are remote, fired by the plunger
@@ -23,6 +26,8 @@
  *                 1250 2500 3750 5000 for 5-8 and 5000 for 9-12 (D6 #865, rolled by D2 #861)
  */
 import { MM_PER_METRE } from '../../constants/physics'
+import { baseTilesSqOf } from '../authority/charges/blastDisc'
+import { inRadiusCount } from '../authority/charges/blastFront'
 import {
   ceil,
   cmp,
@@ -31,16 +36,18 @@ import {
   fromSafeInteger,
   mul,
   toSafeInteger,
+  powRatio,
   type BigStat,
   type Money,
 } from '../money'
-import { bandOrePriceAt } from './bandOreCost'
 import { growGeometric } from './curveFamilies'
 import { ECONOMY } from './economy'
-import type { BandOreCost } from './economyDefinition'
+import { oreTier, oreValue } from './oreEconomy'
 
-const { sizes, gateTiers } = ECONOMY.blastingCharges
+const { sizes, gateTiers, price: priceRows } = ECONOMY.blastingCharges
 const MM_PER_TILE = fromSafeInteger(MM_PER_METRE)
+/** Each size's `cells^e`, worked out on first ask: its Newton roots are the price's only cost. */
+const CELLS_WEIGHT_BY_SIZE = new Map<number, BigStat>()
 
 /** One size of the ladder as #143 reads it (`chargeSpec(n, p)`), priced for one charge on `p`. */
 export interface ChargeSpec {
@@ -198,20 +205,31 @@ export function rackSlotsOf(size: number): number {
   return sizes.rackSlots[indexOfSize(size)]
 }
 
-/** One charge of this size as a `bandOre` cost: its ore units of band `oreUnitsBand`. */
-export function chargeCostOf(size: number): BandOreCost {
-  const oreUnits = growGeometric(sizes.oreUnitsBase, sizes.oreUnitsRatio, indexOfSize(size))
-  return { band: sizes.oreUnitsBand, oreUnits }
+/** `cells(L_i)`: the tiles the size's base disc clears, whatever the Blast Radius level. */
+export function chargeBaseCellsOf(size: number): number {
+  return inRadiusCount(baseTilesSqOf(chargeRadiusMm(size)))
+}
+
+/** One charge of `size` on planet `planetIndex`: `ceil(k_dyn * V(t_top(g)) * cells(L_i)^e)`. */
+export function chargeUnitPrice(size: number, planetIndex: number): Money {
+  const worth = oreValue(oreTier(planetIndex, priceRows.worthBand))
+  return ceil(mul(mul(priceRows.kDyn, worth), cellsWeightOfSize(size)))
 }
 
 /**
- * `count` charges of `size` bought on planet `planetIndex`: the ceiled `bandOrePriceAt` of all
- * their ore units, worth and pace both of the planet they are bought on, rounded once.
+ * `count` charges of `size` bought on planet `planetIndex`: `count` whole unit prices, so a stock
+ * costs what its charges do one by one.
  */
 export function chargePrice(size: number, count: number, planetIndex: number): Money {
-  const { band, oreUnits } = chargeCostOf(size)
-  const bought = { band, oreUnits: mul(fromSafeInteger(count), oreUnits) }
-  return bandOrePriceAt(bought, planetIndex, planetIndex)
+  return mul(fromSafeInteger(count), chargeUnitPrice(size, planetIndex))
+}
+
+function cellsWeightOfSize(size: number): BigStat {
+  const known = CELLS_WEIGHT_BY_SIZE.get(size)
+  if (known !== undefined) return known
+  const weight = powRatio(fromSafeInteger(chargeBaseCellsOf(size)), priceRows.cellsExponent)
+  CELLS_WEIGHT_BY_SIZE.set(size, weight)
+  return weight
 }
 
 /** The self hit grows with the radius: `r(n) / r(1)`, 1 for size 1 (#143 "Self-hit"). */

@@ -5,7 +5,7 @@
   "authorityProtocolVersion": 122,
   "logSchemaVersion": 7,
   "numberFormatVersion": 1,
-  "economyRulesVersion": 5,
+  "economyRulesVersion": 6,
   "sliceSections": {
     "aetheric": 1,
     "aetheric.heat": 1,

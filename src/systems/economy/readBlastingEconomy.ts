@@ -1,14 +1,17 @@
 /**
  * Reads the `blasting_charges` part of `economy.json` (spec #109, the size ladder of K8 #218, its
  * 12 rows of 3 types and the Blast Radius track's growth from D1 #860, the bare blast's collapse
- * chance per size from D2 #861, the gate tiers of blast-only rock from D4 #863).
+ * chance per size from D2 #861, the gate tiers of blast-only rock from D4 #863, the charge price,
+ * the track's curve and the dynamite nodes' price anchors from D6 #865).
  */
 import { BASIS_POINTS } from '../../constants/balance'
-import { add, ceil, cmp, fromCanonical, type BigStat } from '../money'
+import { add, ceil, cmp, fromCanonical, ZERO_MONEY, type BigStat } from '../money'
 import type {
   BlastGateTiers,
   BlastingChargeRules,
+  BlastNodePriceAnchors,
   BlastRadiusTrack,
+  ChargePriceRows,
   ChargeSizeLadder,
   CostCurve,
 } from './economyDefinition'
@@ -18,6 +21,9 @@ const PATH = 'blastingCharges'
 const SIZES_PATH = `${PATH}.sizes`
 const TRACK_PATH = `${PATH}.radiusTrack`
 const GATE_TIERS_PATH = `${PATH}.gateTiers`
+const PRICE_PATH = `${PATH}.price`
+const ANCHORS_PATH = `${PATH}.nodePriceAnchors`
+const ONE = fromCanonical('1')
 /** The only growth whose square is linear in the level, so r² stays an integer (TD on #860). */
 const SQUARE_ROOT = '0.5'
 
@@ -41,14 +47,40 @@ export function readBlastingCharges(
       rules.botBlastThresholdTicks,
     ),
     radiusTrack: readRadiusTrack(reader, reader.object(TRACK_PATH, rules.radiusTrack)),
+    price: readChargePrice(reader, reader.object(PRICE_PATH, rules.price)),
+    nodePriceAnchors: readNodePriceAnchors(
+      reader,
+      reader.object(ANCHORS_PATH, rules.nodePriceAnchors),
+    ),
     gateTiers: readGateTiers(reader, reader.object(GATE_TIERS_PATH, rules.gateTiers)),
     sizes: readChargeSizes(reader, reader.object(SIZES_PATH, rules.sizes)),
   }
   checkRackSlotCurve(reader, read, costCurves)
   checkChargeSizes(reader, read)
   checkRadiusTrack(reader, read.radiusTrack)
+  checkRadiusTrackCurve(reader, read.radiusTrack, costCurves)
+  checkChargePrice(reader, read.price)
+  checkNodePriceAnchors(reader, read.nodePriceAnchors)
   checkGateTiers(reader, read)
   return read
+}
+
+function readChargePrice(reader: FieldReader, price: Record<string, unknown>): ChargePriceRows {
+  return {
+    kDyn: reader.money(`${PRICE_PATH}.kDyn`, price.kDyn),
+    worthBand: reader.safeInteger(`${PRICE_PATH}.worthBand`, price.worthBand),
+    cellsExponent: reader.money(`${PRICE_PATH}.cellsExponent`, price.cellsExponent),
+  }
+}
+
+function readNodePriceAnchors(
+  reader: FieldReader,
+  anchors: Record<string, unknown>,
+): BlastNodePriceAnchors {
+  return {
+    blastCasing: reader.safeInteger(`${ANCHORS_PATH}.blastCasing`, anchors.blastCasing),
+    blastBit: reader.safeInteger(`${ANCHORS_PATH}.blastBit`, anchors.blastBit),
+  }
 }
 
 function readGateTiers(reader: FieldReader, tiers: Record<string, unknown>): BlastGateTiers {
@@ -62,6 +94,7 @@ function readRadiusTrack(reader: FieldReader, track: Record<string, unknown>): B
   return {
     levelDivisor: reader.safeInteger(`${TRACK_PATH}.levelDivisor`, track.levelDivisor),
     exponent: reader.money(`${TRACK_PATH}.exponent`, track.exponent),
+    costCurveId: reader.text(`${TRACK_PATH}.costCurveId`, track.costCurveId),
   }
 }
 
@@ -76,9 +109,6 @@ function readChargeSizes(reader: FieldReader, sizes: Record<string, unknown>): C
       .map((tiers, index) =>
         readIntegerList(reader, `${SIZES_PATH}.breaksGateByType[${index}]`, tiers),
       ),
-    oreUnitsBand: reader.safeInteger(`${SIZES_PATH}.oreUnitsBand`, sizes.oreUnitsBand),
-    oreUnitsBase: reader.money(`${SIZES_PATH}.oreUnitsBase`, sizes.oreUnitsBase),
-    oreUnitsRatio: reader.money(`${SIZES_PATH}.oreUnitsRatio`, sizes.oreUnitsRatio),
     keptBase: reader.money(`${SIZES_PATH}.keptBase`, sizes.keptBase),
     keptRatio: reader.money(`${SIZES_PATH}.keptRatio`, sizes.keptRatio),
     rackSlots: readIntegerList(reader, `${SIZES_PATH}.rackSlots`, sizes.rackSlots),
@@ -104,6 +134,45 @@ function checkRackSlotCurve(
     reader.record(`${PATH}.rackSlotCostCurveId ${rules.rackSlotCostCurveId} has no bandOre curve`)
   } else if (rules.rackStart + curve.oreUnitsByLevel.length !== rules.rackMax) {
     reader.record(`${PATH}.rackMax must be rackStart plus one per ${curve.id} level`)
+  }
+}
+
+/** The track is a level line priced per purchase, like the vehicle tracks (D6 #865). */
+function checkRadiusTrackCurve(
+  reader: FieldReader,
+  track: BlastRadiusTrack,
+  costCurves: readonly CostCurve[],
+): void {
+  const curve = costCurves.find((candidate) => candidate.id === track.costCurveId)
+  if (curve === undefined || curve.family !== 'geometricPerPurchase') {
+    reader.record(
+      `${TRACK_PATH}.costCurveId ${track.costCurveId} has no geometricPerPurchase curve`,
+    )
+  }
+}
+
+/** A positive coefficient, a band that exists, and a cells exponent above 0 and at most 1. */
+function checkChargePrice(reader: FieldReader, price: ChargePriceRows): void {
+  const checks: [boolean, string][] = [
+    [cmp(price.kDyn, ZERO_MONEY) > 0, 'kDyn must be above 0'],
+    [price.worthBand >= 1, 'worthBand must be at least 1'],
+    [
+      cmp(price.cellsExponent, ZERO_MONEY) > 0 && cmp(price.cellsExponent, ONE) <= 0,
+      'cellsExponent must lie above 0 and at most 1',
+    ],
+  ]
+  checks
+    .filter(([isMet]) => !isMet)
+    .forEach(([, problem]) => reader.record(`${PRICE_PATH}.${problem}`))
+}
+
+/** Planets from 1, Blast Casing anchored no later than `blastBit` (the order the VS rows give). */
+function checkNodePriceAnchors(reader: FieldReader, anchors: BlastNodePriceAnchors): void {
+  if (anchors.blastCasing < 1 || anchors.blastBit < 1) {
+    reader.record(`${ANCHORS_PATH} must name planets from 1`)
+  }
+  if (anchors.blastCasing > anchors.blastBit) {
+    reader.record(`${ANCHORS_PATH}.blastCasing must not be anchored after blastBit`)
   }
 }
 

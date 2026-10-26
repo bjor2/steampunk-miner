@@ -3,18 +3,16 @@ import { ceilMilli, cmp, mul, toCanonical } from '../money'
 import { bandOrePrice, bandOrePriceAt, bandOreWorth, bandOreWorthAt } from './bandOreCost'
 import { cementGradeOreCostOf } from './casingCementGrades'
 import { cementGradeCount } from './casingPrices'
-import { chargeCostOf, chargeSizeCount, chargeSizesUpTo } from './chargeSizes'
 import { ECONOMY } from './economy'
 import type { BandOreCost } from './economyDefinition'
 import { oreTier, oreValue } from './oreEconomy'
 import { paceScale } from './planetEconomy'
 
-// Every band-ore cost economy.json prices today: the gun mount and levels, each charge size (K8
-// #218), and each casing_cement grade (ticket 366).
+// Every band-ore cost economy.json prices today: the gun mount and levels and each casing_cement
+// grade (ticket 366). The charges left the family with D6 #865 (`chargeUnitPrice`).
 const FIXTURE_COSTS: readonly BandOreCost[] = [
   ECONOMY.gun.mountCost,
   ECONOMY.gun.levelCost,
-  ...chargeSizesUpTo(chargeSizeCount()).map(chargeCostOf),
   ...Array.from({ length: cementGradeCount() }, (_, index) =>
     cementGradeOreCostOf(ECONOMY.casing.cementGrades, index + 1),
   ),

@@ -1,5 +1,5 @@
 {
-  "economyRulesVersion": 5,
+  "economyRulesVersion": 6,
   "ore": {
     "tiersPerPlanet": 3,
     "coreTierBand": 6,
@@ -117,6 +117,12 @@
       "family": "bandOre",
       "band": 5,
       "oreUnitsByLevel": ["6", "8", "10", "12", "14"]
+    },
+    {
+      "id": "cost.charges.blast_radius",
+      "family": "geometricPerPurchase",
+      "base": "50",
+      "ratio": "1.6"
     }
   ],
   "casing": {
@@ -150,15 +156,18 @@
     "rackMax": 8,
     "rackSlotCostCurveId": "cost.charges.rack_slot",
     "botBlastThresholdTicks": 96,
-    "radiusTrack": { "levelDivisor": 16, "exponent": "0.5" },
+    "radiusTrack": {
+      "levelDivisor": 16,
+      "exponent": "0.5",
+      "costCurveId": "cost.charges.blast_radius"
+    },
+    "price": { "kDyn": "0.1", "worthBand": 5, "cellsExponent": "0.850" },
+    "nodePriceAnchors": { "blastCasing": 5, "blastBit": 8 },
     "gateTiers": { "fromPlanet": [7, 7, 9], "newestTierLead": 2 },
     "sizes": {
       "radius": ["2.5", "3.5", "4.5", "6", "8", "10", "13", "16", "20", "24", "30", "37"],
       "type": [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3],
       "breaksGateByType": [[1], [1, 2], [1, 2, 3]],
-      "oreUnitsBand": 5,
-      "oreUnitsBase": "2",
-      "oreUnitsRatio": "1.8",
       "keptBase": "0.4",
       "keptRatio": "0.8",
       "rackSlots": [1, 1, 1, 2, 2, 3, 4, 5, 6, 8, 8, 8],

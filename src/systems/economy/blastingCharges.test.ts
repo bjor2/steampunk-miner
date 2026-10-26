@@ -10,7 +10,10 @@ import {
   type Money,
 } from '../money'
 import {
+  blastBitPriceAnchor,
+  blastCasingPriceAnchor,
   blastEnemyDamage,
+  blastRadiusLevelPrice,
   blastSelfHit,
   keptBlastOreUnits,
   rackCapacity,
@@ -58,10 +61,27 @@ describe('blasting charges economy', () => {
     expect(rackCapacity(rackMaxSlotLevel())).toBe(8)
   })
 
-  it('prices a charge at 2 band-5 ore units of the planet it is bought on', () => {
-    const unit = BAND_5_UNIT_ON_PLANET_7
-    expect(textOf(chargePrice(1, 1, 7))).toBe(textOf(ceilMilli(mul(fromSafeInteger(2), unit))))
-    expect(textOf(chargePrice(1, 3, 7))).toBe(textOf(ceilMilli(mul(fromSafeInteger(6), unit))))
+  it('sells a size-1 charge for 68 on planet 1, money only from the first planet (D6 #865)', () => {
+    expect(textOf(chargePrice(1, 1, 1))).toBe(textOf(fromSafeInteger(68)))
+  })
+
+  it('prices Blast Radius level L -> L + 1 at ceil(50 * 1.6^L) times the planet paceScale', () => {
+    const levels = [0, 1, 2, 10].map((level) => textOf(blastRadiusLevelPrice(level, 1)))
+    expect(levels).toEqual([50, 80, 128, 5498].map((price) => textOf(fromSafeInteger(price))))
+    expect(textOf(blastRadiusLevelPrice(10, 5))).toBe(
+      textOf(mul(fromSafeInteger(5498), paceScale(5))),
+    )
+  })
+
+  it('prices every Blast Radius level with no cap, a million levels up included', () => {
+    const atMillion = blastRadiusLevelPrice(1_000_000, 40)
+    expect(cmp(atMillion, blastRadiusLevelPrice(999_999, 40))).toBe(1)
+    expect(textOf(atMillion)).toMatch(/e\+204121$/)
+  })
+
+  it('anchors the Blast Casing node on planet 5 and blastBit on planet 8', () => {
+    expect(blastCasingPriceAnchor()).toBe(5)
+    expect(blastBitPriceAnchor()).toBe(8)
   })
 
   it('prices the five rack slots at 6, 8, 10, 12 and 14 band-5 ore units', () => {

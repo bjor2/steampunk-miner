@@ -9,19 +9,23 @@
  *   breaks        every ungated tile however hard, never core; gated rock as its gate says (D4
  *                 #863 deleted the band-5 hardness cap)
  *   rack slot     ceilMilli([6, 8, 10, 12, 14][s] * V(t(p, 5)) * paceScale(p)) from slot s to s + 1
- * The prices are the `bandOre` family of the travel fee, the refinery slots (#105) and the gun mount
- * (#107): ore units of band 5 at the planet they are paid on. The rack holds 3 slots and each
- * bought slot adds one, up to 8.
+ *   blast radius  level L -> L + 1 of the Blast Radius track: ceil(50 * 1.6^L) * paceScale(p),
+ *                 the vehicle tracks' per-purchase curve, uncapped and money only (D6 #865)
+ *   node anchors  the planets the Blast Casing and `blastBit` nodes are priced on: 5 and 8 (D6 #865)
+ * The rack prices are the `bandOre` family of the travel fee, the refinery slots (#105) and the
+ * gun mount (#107): ore units of band 5 at the planet they are paid on. The rack holds 3 slots and
+ * each bought slot adds one, up to 8.
  */
 import { MM_PER_METRE } from '../../constants/physics'
 import { add, floor, fromSafeInteger, mul, toSafeInteger, type BigStat, type Money } from '../money'
 import { growGeometric } from './curveFamilies'
 import { ECONOMY } from './economy'
 import { bandOrePrice } from './bandOreCost'
-import { bandOreCurveOf } from './costCurveLookup'
+import { bandOreCurveOf, perPurchaseCurveOf, perPurchaseRowAt } from './costCurveLookup'
 import type { BandOreCostCurve, EnemyKind } from './economyDefinition'
 import { enemyHealth, enemyTier } from './enemyStats'
 import { keptFractionOf, selfHitScaleOf } from './chargeSizes'
+import { paceScale } from './planetEconomy'
 
 const { blastingCharges: charges } = ECONOMY
 
@@ -68,6 +72,25 @@ export function blastEnemyDamage(kind: EnemyKind, planetIndex: number, band: num
 export function keptBlastOreUnits(units: number, dither: Money, size: number): number {
   const share = mul(fromSafeInteger(units), keptFractionOf(size))
   return toSafeInteger(floor(add(share, dither)))
+}
+
+/**
+ * Raising the Blast Radius track from `level` to `level + 1` on planet `planetIndex`: the track's
+ * row times the planet's `paceScale`, never a planet gate. It reprices no charge in stock.
+ */
+export function blastRadiusLevelPrice(level: number, planetIndex: number): Money {
+  const row = perPurchaseRowAt(perPurchaseCurveOf(charges.radiusTrack.costCurveId), level)
+  return mul(row, paceScale(planetIndex))
+}
+
+/** The planet the Blast Casing node (D3 #862) is priced on, as the tree's `unlockTier`. */
+export function blastCasingPriceAnchor(): number {
+  return charges.nodePriceAnchors.blastCasing
+}
+
+/** The planet the `blastBit` drill node (D5 #864) is priced on, as the tree's `unlockTier`. */
+export function blastBitPriceAnchor(): number {
+  return charges.nodePriceAnchors.blastBit
 }
 
 export function botBlastThresholdTicks(): number {

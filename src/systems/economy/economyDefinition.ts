@@ -356,8 +356,33 @@ export interface BlastingChargeRules {
   /** The bot blasts a tile whose drill time would be over this many ticks (4x the old 24-tick floor). */
   botBlastThresholdTicks: number
   radiusTrack: BlastRadiusTrack
+  price: ChargePriceRows
+  nodePriceAnchors: BlastNodePriceAnchors
   gateTiers: BlastGateTiers
   sizes: ChargeSizeLadder
+}
+
+/**
+ * What one charge costs (D6 rows on #865, the VS update of 25 Oct): `kDyn * V(t_top(g)) *
+ * cells(L_i)^cellsExponent`, rounded up to whole money. `t_top(g)` is band `worthBand`'s ore tier
+ * on the planet it is bought on and `cells(L_i)` the tiles of the size's base disc, so the Blast
+ * Radius level never reprices a charge. Money only: no planet opens a size.
+ */
+export interface ChargePriceRows {
+  kDyn: Money
+  worthBand: number
+  /** A rational exponent (0.85, or 0.9 if the soft targets ask), applied without a float root. */
+  cellsExponent: BigStat
+}
+
+/**
+ * The planet each dynamite tech node's price is anchored on (D6 rows on #865): the tree prices a
+ * node from its `unlockTier` (#161), so the anchor is where the median bot affords it. Blast Casing
+ * (D3 #862) around P5-P6, `blastBit` (D5 #864) around P8-P10. Price only, never a planet gate.
+ */
+export interface BlastNodePriceAnchors {
+  blastCasing: number
+  blastBit: number
 }
 
 /**
@@ -379,6 +404,8 @@ export interface BlastGateTiers {
 export interface BlastRadiusTrack {
   levelDivisor: number
   exponent: BigStat
+  /** The track's per-purchase curve (D6 #865: uncapped, money only, times the planet's paceScale). */
+  costCurveId: string
 }
 
 /** A charge type (D1 #860): the gate tiers its blast breaks; the types are verbs, sizes scale. */
@@ -386,8 +413,8 @@ export type ChargeGateTiers = readonly number[]
 
 /**
  * The dynamite size ladder (#143 numbers with amendments 2 and 3, #153 design, the #149 locks):
- * size n (1 first) has `radius[n - 1]` tiles, is sold on every planet (D4 #863: price only), costs `oreUnitsBase * oreUnitsRatio^(n - 1)` ore units of band `oreUnitsBand`, keeps
- * `keptBase * keptRatio^(n - 1)` of the ordinary ore it breaks, takes `rackSlots[n - 1]` rack
+ * size n (1 first) has `radius[n - 1]` tiles, is sold on every planet (D4 #863: price only) at
+ * `ChargePriceRows`' price (D6 #865), keeps `keptBase * keptRatio^(n - 1)` of the ordinary ore it breaks, takes `rackSlots[n - 1]` rack
  * slots, and blows `fuseTicks[n - 1]` ticks after planting; a size past the fuse list is remote
  * (the plunger, #149) and is disarmed `remoteDisarmTicks` after planting. A bare blast of size n
  * collapses each bare rim block it rolls under `collapseBp[n - 1]` (D2 #861, rows of D6 #865). From size
@@ -400,9 +427,6 @@ export interface ChargeSizeLadder {
   type: readonly number[]
   /** Per type, the gate tiers its blast breaks (`breaksGate[]`, D4 #863 reads it). */
   breaksGateByType: readonly ChargeGateTiers[]
-  oreUnitsBand: number
-  oreUnitsBase: BigStat
-  oreUnitsRatio: BigStat
   keptBase: BigStat
   keptRatio: BigStat
   rackSlots: readonly number[]
@@ -449,7 +473,8 @@ export interface Economy {
    * golden runs and run metadata record it and a run replays only under the rows that made it. A
    * save stores no prices, so a loaded save simply buys at the rows of the build that loads it.
    * 4 is #894's casing rise (`kCasing` x10, the grade base x5). 5 is D4 #863's money-only
-   * dynamite: no planet opens a charge size, no hardness cap on a blast, gated rock by tier.
+   * dynamite: no planet opens a charge size, no hardness cap on a blast, gated rock by tier. 6 is
+   * D6 #865's charge price `kDyn * V(t_top) * cells^0.85` and the Blast Radius track's curve.
    */
   economyRulesVersion: number
   ore: {

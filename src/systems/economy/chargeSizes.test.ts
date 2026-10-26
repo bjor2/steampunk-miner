@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { ceilMilli, cmp, fromCanonical, mul, toCanonical, type BigStat } from '../money'
-import { bandOrePriceAt, bandOreWorthAt } from './bandOreCost'
+import {
+  cmp,
+  div,
+  fromCanonical,
+  fromSafeInteger,
+  mul,
+  powRatio,
+  toCanonical,
+  type BigStat,
+} from '../money'
 import {
   breaksGateOf,
   chargeTypeBreaking,
@@ -9,8 +17,9 @@ import {
   gateTierFor,
   newestGateTierOn,
   smallestSizeBreaking,
-  chargeCostOf,
+  chargeBaseCellsOf,
   chargePrice,
+  chargeUnitPrice,
   chargeRadiusMm,
   chargeSizeCount,
   chargeSpec,
@@ -28,7 +37,6 @@ import {
 import { readEconomy } from './readEconomy'
 import economyFile from './economy.json'
 import { oreTier, oreValue } from './oreEconomy'
-import { paceScale } from './planetEconomy'
 
 const SIZES = Array.from({ length: 12 }, (_, at) => at + 1)
 
@@ -40,10 +48,9 @@ function decimal(text: string): string {
   return toCanonical(fromCanonical(text))
 }
 
-/** `units` band-5 ore units on planet `p`, rounded up to the milli like every price. */
-function band5Units(units: string, planetIndex: number) {
-  const unit = mul(oreValue(oreTier(planetIndex, 5)), paceScale(planetIndex))
-  return ceilMilli(mul(fromCanonical(units), unit))
+/** `cells(L_i)^0.85` of a size, the price's weight. */
+function cellsPower(size: number) {
+  return powRatio(fromSafeInteger(chargeBaseCellsOf(size)), fromCanonical('0.85'))
 }
 
 function economyWithSizes(sizes: Record<string, unknown>) {
@@ -113,26 +120,39 @@ describe('charge size ladder', () => {
     expect(textOf(keptFractionOf(10))).toBe(decimal('0.0536870912'))
   })
 
-  it('prices a charge of size n at 2 * 1.8^(n - 1) band-5 ore units of the planet it is bought on', () => {
-    expect(textOf(chargePrice(1, 1, 7))).toBe(textOf(band5Units('2', 7)))
-    expect(textOf(chargePrice(4, 1, 16))).toBe(textOf(band5Units('11.664', 16)))
-    expect(textOf(chargePrice(10, 1, 34))).toBe(textOf(band5Units('396.718580736', 34)))
+  it('counts 21 to 4293 tiles in the base discs, the level-0 disc the blast stamps', () => {
+    expect(SIZES.map(chargeBaseCellsOf)).toEqual([
+      21, 37, 69, 113, 197, 317, 529, 797, 1257, 1793, 2821, 4293,
+    ])
   })
 
-  it('charges every size on planets 7 to 40 through bandOrePriceAt, ceiled, never the raw worth', () => {
+  it('prices one charge at ceil(0.1 * V(t_top) * cells^0.85), 68 for size 1 on planet 1', () => {
+    expect(SIZES.map((size) => textOf(chargeUnitPrice(size, 1)))).toEqual(
+      ['68', '109', '186', '282', '452', '677', '1046', '1482', '2182', '2951', '4338', '6198'].map(
+        decimal,
+      ),
+    )
+    expect(textOf(chargeUnitPrice(1, 5))).toBe(decimal('8737'))
+    expect(textOf(chargeUnitPrice(12, 5))).toBe(decimal('804095'))
+  })
+
+  it('reads no paceScale: a price over V(t_top) stays within 10% of the unrounded rate on every planet', () => {
     for (const size of SIZES) {
-      const { band, oreUnits } = chargeCostOf(size)
-      for (let planet = 7; planet <= 40; planet++) {
-        const units = mul(fromCanonical('3'), oreUnits)
-        const expected = bandOrePriceAt({ band, oreUnits: units }, planet, planet)
-        expect(textOf(chargePrice(size, 3, planet))).toBe(textOf(expected))
-        expect(cmp(expected, bandOreWorthAt({ band, oreUnits: units }, planet, planet))).toBe(1)
+      const rate = mul(fromCanonical('0.1'), cellsPower(size))
+      for (const planet of [1, 5, 40, 1_000_000]) {
+        const perWorth = div(chargeUnitPrice(size, planet), oreValue(oreTier(planet, 5)))
+        // Never under the rate (the price rounds up) past the 40th digit Money keeps.
+        expect(cmp(perWorth, mul(rate, fromCanonical('0.999999999999999999999999999999')))).toBe(1)
+        expect(cmp(perWorth, mul(rate, fromCanonical('1.1')))).toBe(-1)
       }
     }
   })
 
-  it('rounds a buy of several charges once, as the ceiled bandOre price of all their ore units', () => {
-    expect(textOf(chargePrice(2, 3, 10))).toBe(textOf(band5Units('10.8', 10)))
+  it('charges a stock of several charges their unit price each', () => {
+    expect(textOf(chargePrice(2, 3, 10))).toBe(
+      textOf(mul(fromCanonical('3'), chargeUnitPrice(2, 10))),
+    )
+    expect(textOf(chargePrice(12, 1, 7))).toBe(textOf(chargeUnitPrice(12, 7)))
   })
 
   it('grows the self hit with the radius, 1 at size 1 and 9.6 at size 10', () => {
