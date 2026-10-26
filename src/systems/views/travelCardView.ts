@@ -3,10 +3,17 @@
  * line, and the destination's name and surface gravity as icon-plus-value facts, the gravity
  * through the shared formatter (#681, `planetGravityTraitOf`). No planet number shows bare: the
  * planets go by their display names (#702), and the leg from one to the other sits in the tooltip.
- * Display only.
+ * A planet whose surface asks a higher casing grade than the ladder's (an offset start, ticket 829)
+ * says so as a third fact, so the grade to buy at the dock is shown before the landing. Display
+ * only.
  */
-import { hudLabelIconIdOf } from '../art/icons/iconSet'
-import { planetDisplayNameOf } from '../registries/planetRow'
+import { CASING_ICON_ID, hudLabelIconIdOf } from '../art/icons/iconSet'
+import { formatAmount } from '../displayAmount'
+import {
+  casingSurfaceGradeOf,
+  defaultCasingSurfaceGrade,
+  planetDisplayNameOf,
+} from '../registries/planetRow'
 import type { TravelTransition } from '../sliceProgress'
 import { TRAVEL_CARD_FACT_IDS } from './travelCardIds'
 import { planetGravityTraitOf } from './localGravityReading'
@@ -40,7 +47,11 @@ export function travelCardViewOf(transition: TravelTransition): TravelCardView {
     title: TITLE,
     iconId: STAR_MAP_ICON_ID,
     heading: { id: TRAVEL_CARD_TEXT_ID, oneLine: ONE_LINE, tooltipLines: [legLineOf(transition)] },
-    facts: [destinationFactOf(transition.toPlanet), gravityFactOf(transition.toPlanet)],
+    facts: [
+      destinationFactOf(transition.toPlanet),
+      gravityFactOf(transition.toPlanet),
+      ...casingStartFactsOf(transition.toPlanet),
+    ],
   }
 }
 
@@ -51,6 +62,14 @@ function legLineOf({ fromPlanet, toPlanet }: TravelTransition): string {
 function destinationFactOf(planetIndex: number): TravelCardFact {
   const text = planetDisplayNameOf(planetIndex)
   return { iconId: STAR_MAP_ICON_ID, text, testId: TRAVEL_CARD_FACT_IDS.destination }
+}
+
+/** An offset start's casing grade, Progression's placeholder line; none on the ladder's default. */
+function casingStartFactsOf(planetIndex: number): TravelCardFact[] {
+  const grade = casingSurfaceGradeOf(planetIndex)
+  if (grade <= defaultCasingSurfaceGrade(planetIndex)) return []
+  const text = `Starts at casing grade ${formatAmount(grade)}`
+  return [{ iconId: CASING_ICON_ID, text, testId: TRAVEL_CARD_FACT_IDS.casingStart }]
 }
 
 /** The star map's own gravity fact: the planet glyph and "1.25 g" (#724). */

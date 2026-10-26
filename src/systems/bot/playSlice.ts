@@ -28,7 +28,7 @@ import type { DomainEvent } from '../authority/domainEvent'
 import { canScratch } from '../vehicle/drillRule'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { coreHardness } from '../economy/oreEconomy'
-import { deepestHeldBand, holdsCore } from './botCasing'
+import { deepestHeldBand, holdsCore, type CasingPolicy } from './botCasing'
 import { DEFAULT_BORE_POLICY, mountBoreGunWhenForced, type BorePolicy } from './botBore'
 import { restockSizeOf, type ChargePolicy } from './botCharges'
 import { restockCrates, type KitPolicy } from './botCrates'
@@ -108,6 +108,8 @@ export interface SliceRunOptions {
    * the casing check, `diagonalHeavy.lane.test.ts`.
    */
   digPolicy?: DigPolicy
+  /** On the curve (the default), one grade short, or no casing at all (ticket 829's lane). */
+  casingPolicy?: CasingPolicy
   listener?: BotListener
   /** `used` (the default) from the Refinery bay's planet; `ignored` plays as if it had none. */
   refinery?: RefineryUse
@@ -140,7 +142,13 @@ const CORE_TRIP_MAX_TICKS_PER_TILE = 20 * TICKS_PER_SECOND
  */
 export type PlayOnOptions = Omit<
   SliceRunOptions,
-  'playerId' | 'startCommands' | 'listener' | 'borePolicy' | 'kitPolicy' | 'digPolicy'
+  | 'playerId'
+  | 'startCommands'
+  | 'listener'
+  | 'borePolicy'
+  | 'kitPolicy'
+  | 'digPolicy'
+  | 'casingPolicy'
 >
 
 export function playSlice(start: AuthorityState, options: SliceRunOptions): SliceRun {
@@ -160,6 +168,7 @@ function firstBotPlanetOf(session: BotSession, options: SliceRunOptions): BotPla
     newDownBoreTally(),
     options.kitPolicy,
     options.digPolicy,
+    options.casingPolicy,
   )
 }
 
@@ -266,6 +275,7 @@ function shopAtUpgradeBay(session: BotSession, planet: BotPlanet, run: BotRun): 
     chainPolicy: run.chainPolicy,
     arrivalLevels: planet.arrivalLevels,
     hasRetreated: planet.hasRetreatedHere === true,
+    casingPolicy: planet.casingPolicy,
   }
   if (!hasPurchase(session, situation)) return
   driveToUpgradeBay(session, planet)
@@ -296,10 +306,10 @@ function chooseGoalAboveClosedRoutes(session: BotSession, planet: BotPlanet): Tr
 function chooseOreGoal(
   session: BotSession,
   planet: BotPlanet,
-  deepestBand = deepestHeldBand(session),
+  deepestBand = deepestHeldBand(session, planet.casingPolicy),
 ): TripGoal | null {
   const means = meansOfVehicle(session.vehicle())
-  const deepest = Math.min(deepestBand, deepestHeldBand(session))
+  const deepest = Math.min(deepestBand, deepestHeldBand(session, planet.casingPolicy))
   const plan = bestOrePlan(planet.layout, means, deepest)
   return plan === null ? null : { kind: 'ore', band: plan.band }
 }
@@ -312,9 +322,9 @@ function chooseOreGoal(
 function chooseRetreatGoal(
   session: BotSession,
   planet: BotPlanet,
-  deepestBand = deepestHeldBand(session),
+  deepestBand = deepestHeldBand(session, planet.casingPolicy),
 ): TripGoal | null {
-  const deepest = Math.min(deepestBand, deepestHeldBand(session))
+  const deepest = Math.min(deepestBand, deepestHeldBand(session, planet.casingPolicy))
   if (!areBandsBoredOut(session, planet, deepest)) return null
   const hasWidened = widenShallowestBand(planet.layout, deepest)
   if (!hasWidened) return null
@@ -336,7 +346,7 @@ function isCoreDiggable(session: BotSession, planet: BotPlanet): boolean {
   const vehicle = session.vehicle()
   return (
     isCoreTheGoal(session, planet) &&
-    holdsCore(session) &&
+    holdsCore(session, planet.casingPolicy) &&
     canReachCore(planet.layout, meansOfVehicle(vehicle)) &&
     isCoreDugWithin(vehicle.levels, session.state().planet.index, CORE_TRIP_MAX_TICKS_PER_TILE)
   )

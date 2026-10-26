@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { TITLE_WORDS_MAX, ONE_LINE_WORDS_MAX } from '../../constants/uiParts'
+import { withRegistrations } from '../../registries/registrar'
+import { offsetStartSlice } from '../registries/casingOffsetFixtures'
 import { planetDisplayNameOf } from '../registries/planetRow'
 import { planetGravityTraitOf } from './localGravityReading'
 import { TRAVEL_CARD_FACT_IDS } from './travelCardIds'
@@ -46,5 +48,18 @@ describe('travel card view (ticket 885)', () => {
 
   it('keeps the title the jump specs wait on', () => {
     expect(travelCardViewOf(HOP).title).toBe('Core drive engaged')
+  })
+
+  // Ticket 829 (Progression): the planet card shows an offset start, so the dock's buy is known.
+  it("names an offset start's casing grade as a fact, and none on the ladder's default", () => {
+    const toThree = { fromPlanet: 2, toPlanet: 3, seconds: 10 }
+    const casingFactsOf = () =>
+      travelCardViewOf(toThree).facts.filter(
+        ({ testId }) => testId === TRAVEL_CARD_FACT_IDS.casingStart,
+      )
+    expect(casingFactsOf()).toEqual([])
+    expect(withRegistrations([offsetStartSlice(3, 1n)], casingFactsOf)).toEqual([
+      expect.objectContaining({ text: 'Starts at casing grade 10', iconId: 'icon-casing' }),
+    ])
   })
 })

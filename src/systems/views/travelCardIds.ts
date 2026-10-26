@@ -3,8 +3,9 @@
 /** The card's root. */
 export const TRAVEL_CARD_TEST_ID = 'travel-card'
 
-/** The facts: the destination's name and its gravity. */
+/** The facts: the destination's name, its gravity, and an offset start's casing grade. */
 export const TRAVEL_CARD_FACT_IDS = {
   destination: 'travel-card-destination',
   gravity: 'travel-card-gravity',
+  casingStart: 'travel-card-casing-start',
 } as const

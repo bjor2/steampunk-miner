@@ -161,6 +161,15 @@ describe('gauge cluster dials (ticket 716)', () => {
     expect(depth?.text).toBe(`${RUN_DEPTH} m`)
   })
 
+  it('shows the casing grade its band needs on the depth dial, its badge and its hover (ticket 829)', () => {
+    const model = hudOf(createScriptedSession(), RUN_DEPTH)
+    const depth = dialOf(gaugeClusterOf(model, 'desktop').dials, 'depth')
+    const grade = model.depth.neededGrade
+    expect(grade).not.toBeNull()
+    expect(depth?.badge).toBe(`G${grade}`)
+    expect(depth?.hoverLines).toEqual([depth?.longText, `Needs casing grade ${grade}.`])
+  })
+
   it("tints the depth dial with the plate of its band's casing grade, and no other dial (ticket 830)", () => {
     const model = hudOf(createScriptedSession(), RUN_DEPTH)
     const dials = gaugeClusterOf(model, 'phone').dials

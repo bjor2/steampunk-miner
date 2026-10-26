@@ -41,7 +41,7 @@ import { stepPrice } from '../economy/upgradePrices'
 import { stepsToNextLevel } from '../economy/upgradeSteps'
 import { onCurveStep, type UpgradeLevels } from '../economy/vehicleStats'
 import { add, sub, ZERO_MONEY } from '../money'
-import { isCasingGradeShort } from './botCasing'
+import { isCasingGradeShort, type CasingPolicy } from './botCasing'
 import { startBotHold, stepOfHold, type ChainPolicy } from './botChains'
 import { isBoilerStepDue } from './botBoiler'
 import { forcedCoreTrack } from './botCoreRule'
@@ -94,6 +94,8 @@ export interface ShoppingSituation {
   arrivalLevels?: UpgradeLevels
   /** It widened a held band here because none paid a trip (#216), so it saves for casing (#894). */
   hasRetreated?: boolean
+  /** How it keeps its casing (ticket 829); absent is on the curve. */
+  casingPolicy?: CasingPolicy
 }
 
 export function serviceAtDock(session: BotSession): void {
@@ -217,7 +219,7 @@ function isSavingForCasing(session: BotSession, situation: ShoppingSituation): b
 function isCasingWanted(session: BotSession, situation: ShoppingSituation): boolean {
   const wantedBand = plannedBand(situation.layout, session.vehicle().levels)
   const wanted = { isCoreTheGoal: situation.isCoreTheGoal, wantedBand }
-  return isCasingGradeShort(session, wanted)
+  return isCasingGradeShort(session, wanted, situation.casingPolicy)
 }
 
 /** The band a full tank with these levels would mine best, whatever the casing grade holds. */

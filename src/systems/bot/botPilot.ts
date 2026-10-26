@@ -37,6 +37,7 @@ import {
 import { faceThreats } from './botCombat'
 import type { KitPolicy } from './botCrates'
 import { uncorkOnFiredampEntry } from './botFlask'
+import type { CasingPolicy } from './botCasing'
 import type { ChargePolicy } from './botCharges'
 import type { RouteDeaths } from './botDeathReplay'
 import { setGunsForEnergy } from './botGuns'
@@ -102,6 +103,11 @@ export interface BotPlanet {
    * ore went on tracks and the grade was never paid. Absent is never.
    */
   hasRetreatedHere?: boolean
+  /**
+   * How it keeps its casing (ticket 829, `botCasing.ts`), carried planet to planet; absent is on
+   * the curve.
+   */
+  casingPolicy?: CasingPolicy
   /** Deaths per route here, and the routes it retreated from (#198, `botDeathReplay.ts`). */
   routeDeaths: RouteDeaths
   /**

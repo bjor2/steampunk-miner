@@ -3,6 +3,7 @@
  * goes as soon as the core is done, and each planet gets a fresh mine and fresh planet-scoped habits, so a rack wanted
  * (#129), flanks watched after a death (#130) or routes closed after replayed deaths (#198) on one planet do not carry to the next.
  */
+import { DEFAULT_CASING_POLICY, type CasingPolicy } from './botCasing'
 import type { AuthorityState } from '../authority/authorityState'
 import { dockedBayOf } from '../authority/dockRules'
 import { dockSiteOfPlanet, systemOfPlanet } from '../authority/planetOfState'
@@ -38,6 +39,7 @@ export function botPlanetOf(
   downBores: DownBoreTally = newDownBoreTally(),
   kitPolicy: KitPolicy = DEFAULT_KIT_POLICY,
   digPolicy: DigPolicy = DEFAULT_DIG_POLICY,
+  casingPolicy: CasingPolicy = DEFAULT_CASING_POLICY,
 ): BotPlanet {
   const site = dockSiteOfPlanet(session.state().planet)
   if (site === null) throw new Error('the bot plays only on a generated planet')
@@ -45,6 +47,7 @@ export function botPlanetOf(
     layout: newMineLayout(paramsOfSession(session.state()), site, digPolicy),
     pilot: { position: bayRestTileOf(site, 'sell'), facing: 1, borePolicy, kitPolicy, digPolicy },
     chargePolicy,
+    ...(casingPolicy === DEFAULT_CASING_POLICY ? {} : { casingPolicy }),
     hasMetBlastTile: false,
     shellChargeSize: 0,
     hasBeenDestroyedHere: false,
@@ -75,6 +78,7 @@ export function travelWhenReady(session: BotSession, planet: BotPlanet): BotPlan
     planet.downBores,
     planet.pilot.kitPolicy,
     planet.pilot.digPolicy,
+    planet.casingPolicy,
   )
 }
 

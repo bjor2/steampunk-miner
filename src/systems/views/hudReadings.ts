@@ -94,6 +94,11 @@ function casingBadgeTextOf(grade: bigint, isShort: boolean, isGnawed: boolean): 
   return [casingGradeTextOf(grade), ...marks].join(' ')
 }
 
+/** Progression's hover line for the grade a band needs (ticket 829). */
+export function neededGradeLineOf(grade: bigint): string {
+  return `Needs casing grade ${formatAmount(grade)}.`
+}
+
 /** A casing grade as the HUD writes it: `G` and the grade in the shared compact form (#681). */
 export function casingGradeTextOf(grade: bigint): string {
   return `G${formatAmount(grade)}`

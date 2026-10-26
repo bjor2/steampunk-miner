@@ -93,7 +93,7 @@ function StripDial({ face, isPulsing }: { face: DialFace; isPulsing: boolean }) 
         <DialMeter face={face} />
         {isRevealed && <DialNumber face={face} />}
       </TitleOneLine>
-      {isHovered && <HoverPlate id={`dial:${face.id}`} lines={[face.longText]} side="below" />}
+      {isHovered && <HoverPlate id={`dial:${face.id}`} lines={face.hoverLines} side="below" />}
     </div>
   )
 }

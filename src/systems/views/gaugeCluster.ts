@@ -21,7 +21,7 @@ import { uiArtVariableOfPart } from '../art/uiArt'
 import { formatAmount } from '../displayAmount'
 import { DESIGN_TOKENS, type DesignTokens, type LayoutKind } from './designSystem'
 import { depthBandTintOf } from './depthBandTint'
-import { casingGradeTextOf } from './hudReadings'
+import { casingGradeTextOf, neededGradeLineOf } from './hudReadings'
 import { depthDialOf, type DepthMarker } from './depthDial'
 import { buyCueOfDials, type BuyCueMark } from './dialBuyCue'
 import {
@@ -63,6 +63,11 @@ export interface DialFace {
   exact: string
   /** The full value a desktop hover shows beside it, in the formatter's long mode (ticket 768). */
   longText: string
+  /**
+   * What the desktop hover plate lists: the long value, and on the depth dial the casing grade its
+   * band needs (ticket 829, Progression's hover line).
+   */
+  hoverLines: readonly string[]
   /** The cargo chain's link count past the rig's own hold; null with one link. */
   badge: string | null
   /** The depth dial's band and core marks; none on the others. */
@@ -104,6 +109,7 @@ type FaceReading = Pick<
   | 'text'
   | 'exact'
   | 'longText'
+  | 'hoverLines'
   | 'badge'
   | 'markers'
   | 'bandTint'
@@ -291,11 +297,18 @@ function depthReadingOf(model: HudModel, tokens: DesignTokens): FaceReading {
     text: depthStripTextOf(depthTiles, tokens),
     exact: String(depthTiles),
     longText: `${longAmountOfExact(String(depthTiles))} m`,
+    hoverLines: depthHoverLinesOf(depthTiles, model.depth.neededGrade),
     badge: neededGradeBadgeOf(model.depth.neededGrade),
     markers: dial.markers,
     bandTint: depthBandTintOf(model.depth.neededGrade),
     isHeld: false,
   }
+}
+
+/** The depth in full, then the grade its band needs (ticket 829), none above the ground. */
+function depthHoverLinesOf(depthTiles: number, neededGrade: bigint | null): string[] {
+  const depth = `${longAmountOfExact(String(depthTiles))} m`
+  return neededGrade === null ? [depth] : [depth, neededGradeLineOf(neededGrade)]
 }
 
 /** The grade the band needs, on the depth dial's badge (ticket 829); none above the ground. */
@@ -310,6 +323,7 @@ function plainFaceOf(gauge: GaugeReading, fill: number): Omit<FaceReading, 'left
     text: gauge.text,
     exact: gauge.exact,
     longText: longAmountOfExact(gauge.exact),
+    hoverLines: [longAmountOfExact(gauge.exact)],
     badge: null,
     markers: NO_MARKERS,
     bandTint: null,

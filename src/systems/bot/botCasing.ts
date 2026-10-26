@@ -5,28 +5,39 @@
  * would: four grades a planet on the ladder, and a biome's +1 before the bot's trip reaches its
  * ground, since a trip's band asks the biome's grade too. Its trips stay in the bands its grade
  * holds, so the on-curve bot never lays under-grade lining and never bursts.
+ *
+ * Two off-curve policies carry ticket 829's bot rows (`casingPolicy.lane.test.ts`): `one-short`
+ * buys and camps one grade under what each band needs, so it lays lining one grade short and lives
+ * with its 20 s bursts; `skip` buys no grade and treats every band as held, re-drilling what bursts.
  */
-import { isCasingGradeEnough, requiredCasingGrade } from '../economy/casingGrades'
+import { casingLadderOf, requiredGradeOnLadder, type CasingLadder } from '../economy/casingGrades'
 import { ECONOMY } from '../economy/economy'
 import type { BotSession } from './botSession'
 
+/** How the bot keeps its casing: on the curve (the default), one grade short, or not at all. */
+export type CasingPolicy = 'on-curve' | 'one-short' | 'skip'
+
+export const DEFAULT_CASING_POLICY: CasingPolicy = 'on-curve'
+
 const FIRST_BAND = 1
 const LAST_ORE_BAND = ECONOMY.ore.coreTierBand - 1
+const CORE_BAND = ECONOMY.ore.coreTierBand
 
 /** The deepest ore band on this planet the vehicle's casing grade holds; 0 when it holds none. */
-export function deepestHeldBand(session: BotSession): number {
-  const planetIndex = session.state().planet.index
-  const grade = session.vehicle().casingGrade
-  let deepest = 0
-  for (let band = FIRST_BAND; band <= LAST_ORE_BAND; band++) {
-    if (grade >= requiredCasingGrade({ planetIndex, band })) deepest = band
-  }
-  return deepest
+export function deepestHeldBand(
+  session: BotSession,
+  policy: CasingPolicy = DEFAULT_CASING_POLICY,
+): number {
+  if (policy === 'skip') return LAST_ORE_BAND
+  return deepestBandHeldOnLadder(ladderOfSession(session), heldGradeOf(session, policy))
 }
 
-export function holdsCore(session: BotSession): boolean {
-  const cell = { planetIndex: session.state().planet.index, band: ECONOMY.ore.coreTierBand }
-  return isCasingGradeEnough(session.vehicle().casingGrade, cell)
+export function holdsCore(
+  session: BotSession,
+  policy: CasingPolicy = DEFAULT_CASING_POLICY,
+): boolean {
+  if (policy === 'skip') return true
+  return !isGradeShortOnLadder(ladderOfSession(session), heldGradeOf(session, policy), CORE_BAND)
 }
 
 /**
@@ -36,8 +47,35 @@ export function holdsCore(session: BotSession): boolean {
 export function isCasingGradeShort(
   session: BotSession,
   wanted: { isCoreTheGoal: boolean; wantedBand: number },
+  policy: CasingPolicy = DEFAULT_CASING_POLICY,
 ): boolean {
-  const band = wanted.isCoreTheGoal ? ECONOMY.ore.coreTierBand : wanted.wantedBand
-  const cell = { planetIndex: session.state().planet.index, band }
-  return !isCasingGradeEnough(session.vehicle().casingGrade, cell)
+  if (policy === 'skip') return false
+  const band = wanted.isCoreTheGoal ? CORE_BAND : wanted.wantedBand
+  return isGradeShortOnLadder(ladderOfSession(session), heldGradeOf(session, policy), band)
+}
+
+/** The deepest ore band `grade` holds on `ladder`; 0 when it holds none. */
+export function deepestBandHeldOnLadder(ladder: CasingLadder, grade: bigint): number {
+  let deepest = 0
+  for (let band = FIRST_BAND; band <= LAST_ORE_BAND; band++) {
+    if (grade >= requiredGradeOnLadder(ladder, band)) deepest = band
+  }
+  return deepest
+}
+
+/** Whether `band` on `ladder` needs more than `grade`: the grade to buy before the trip. */
+export function isGradeShortOnLadder(ladder: CasingLadder, grade: bigint, band: number): boolean {
+  return grade < requiredGradeOnLadder(ladder, band)
+}
+
+/** The grade the policy reads the vehicle's as: one more for `one-short`, which camps a grade under. */
+function heldGradeOf(session: BotSession, policy: CasingPolicy): bigint {
+  const grade = session.vehicle().casingGrade
+  return policy === 'one-short' ? grade + ONE_GRADE_SHORT : grade
+}
+
+const ONE_GRADE_SHORT = BigInt(1)
+
+function ladderOfSession(session: BotSession): CasingLadder {
+  return casingLadderOf(session.state().planet.index)
 }
