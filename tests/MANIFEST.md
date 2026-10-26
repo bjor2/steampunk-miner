@@ -1160,17 +1160,18 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/economy/assayPricing.test.ts` | 4 | 4 |
 | `src/systems/economy/bandOreCost.test.ts` | 5 | 5 |
-| `src/systems/economy/blastingCharges.test.ts` | 12 | 12 |
+| `src/systems/economy/blastingCharges.test.ts` | 15 | 15 |
 | `src/systems/economy/brassSteps.test.ts` | 5 | 2 |
 | `src/systems/economy/casingCementGrades.test.ts` | 7 | 7 |
 | `src/systems/economy/casingGrades.test.ts` | 10 | 10 |
 | `src/systems/economy/casingPrices.test.ts` | 18 | 12 |
-| `src/systems/economy/chargeSizes.test.ts` | 32 | 32 |
+| `src/systems/economy/chargeSizes.test.ts` | 33 | 33 |
 | `src/systems/economy/collapseCrush.test.ts` | 2 | 2 |
 | `src/systems/economy/costCurveLookup.test.ts` | 3 | 3 |
 | `src/systems/economy/depthDensityCurve.test.ts` | 7 | 7 |
 | `src/systems/economy/drillGearCaps.test.ts` | 20 | 20 |
 | `src/systems/economy/drillPowerRows.test.ts` | 21 | 14 |
+| `src/systems/economy/dynamiteEconomyRows.test.ts` | 8 | 8 |
 | `src/systems/economy/economyGrowth.test.ts` | 5 | 5 |
 | `src/systems/economy/economySourceScan.test.ts` | 6 | 6 |
 | `src/systems/economy/economyTables.test.ts` | 10 | 5 |
@@ -1261,6 +1262,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/casingPriceBars.test.ts` | 8 | 8 |
 | `src/logging/casingSpend.test.ts` | 4 | 4 |
 | `src/logging/chargeDetonationLine.test.ts` | 4 | 4 |
+| `src/logging/chargeOpening.lane.test.ts` | 1 | 1 |
 | `src/logging/chargeSharePayoffReport.test.ts` | 3 | 3 |
 | `src/logging/commandLog.test.ts` | 17 | 17 |
 | `src/logging/commandLogPoseRuns.test.ts` | 13 | 11 |
@@ -1715,7 +1717,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/fastForward.test.ts` | 4 | 4 |
 | `src/systems/fixedStepClock.test.ts` | 10 | 6 |
 | `src/systems/globalSheetGuard.test.ts` | 5 | 5 |
-| `src/systems/money.test.ts` | 61 | 43 |
+| `src/systems/money.test.ts` | 64 | 46 |
 | `src/systems/moneyAsDoubleLint.test.ts` | 6 | 3 |
 | `src/systems/scenario.test.ts` | 19 | 19 |
 | `src/systems/seededRandom.test.ts` | 6 | 6 |

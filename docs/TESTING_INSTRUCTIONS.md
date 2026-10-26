@@ -816,7 +816,13 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   minute, the next useful upgrade and its wait, upgrades bought, deaths by cause, each trip's sale
   by its deepest band). It gates nothing and writes `balance-report/economy-trace.ndjson` and
   `economy-trace.md`, which replaces the baseline `docs/economy/economy-trace-p1-p5.md`; the fold
-  is unit-specced in `economyTrace.test.ts` and the rows in `economyTraceReport.test.ts`. `src/logging/pacingGate.test.ts` fails on a
+  is unit-specced in `economyTrace.test.ts` and the rows in `economyTraceReport.test.ts`.
+  D6's soft opening target for the dynamite rows (ticket 865: a
+  size-1 charge costs at most 5% of the money the bot holds within its first 5 minutes on P1) is
+  the lane `src/logging/chargeOpening.lane.test.ts`, which prints each seed's peak wallet and
+  first affording tick and gates nothing but the runs; the price rows themselves are pinned in
+  `src/systems/economy/dynamiteEconomyRows.test.ts` (goldens at g = 1, 5, 40, 1e6 and L = 0, 10,
+  1e6). `src/logging/pacingGate.test.ts` fails on a
   missed pacing target (`src/constants/pacingTargets.ts`), an unregistered event or field, a broken
   #2 sequence or core events and commands in the first hour over 1.3x the bytes ticket 420
   measured with drill spans folded (about 2.4 MB, never above #11 am. 2's 4 MB; it prints the bytes
