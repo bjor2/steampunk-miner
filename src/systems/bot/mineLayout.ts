@@ -10,8 +10,14 @@
  * a pocket, the bot bores along the shaft's bottom row to a clear column and carries on down
  * there. Each such jog is remembered; a row's shaft tile is in the column of the last jog at or
  * above it. On a planet without lava the shaft is one straight column, as before.
+ *
+ * The diagonal-heavy bot (ticket 899, `digPolicy`) bores its ore galleries as zigzags of 45°
+ * legs instead (`zigzagGallery.ts`), each leg as deep as the galleries are apart: the same rows,
+ * every gallery in step with the next, so each tile keeps an untouched row above and below and the
+ * tunnel runs all at 45°. Core galleries stay level: they cross the core disc to harvest it.
  */
 import { bandOfTile, isCoreTile, isInsidePlanet } from '../world/planetGeometry'
+import { zigzagDipOf } from './zigzagGallery'
 import { bayRestTileOf, hasBay } from '../world/dockBays'
 import type { DockSite } from '../world/dockSite'
 import type { PlanetParams } from '../world/planetParams'
@@ -51,6 +57,11 @@ export interface MineLayout {
   galleries: Map<number, Gallery>
   /** How far a band's ore galleries reach once the bot has widened them (#216). */
   oreReachByBand: Map<number, number>
+  /**
+   * The tiles of each 45° leg of a zigzag ore gallery, for the diagonal-heavy bot (ticket 899);
+   * absent is level.
+   */
+  zigzagLegTiles?: number
 }
 
 /** The shaft is this many columns off the pad, so the pad's edge tile stays whole. */
@@ -67,9 +78,24 @@ const SURFACE_MARGIN_ROWS = 2
  */
 export const ORE_GALLERY_REACH = 20
 
-export function newMineLayout(params: PlanetParams, site: DockSite): MineLayout {
+/**
+ * How the bot digs its ore galleries (ticket 899): level (the default, every pacing row's), or at
+ * 45° for the diagonal-heavy casing check, selected by a run's flag.
+ */
+export type DigPolicy = 'cardinal' | 'diagonal_heavy'
+
+export const DEFAULT_DIG_POLICY: DigPolicy = 'cardinal'
+
+/** A zigzag gallery's legs go down to the next gallery's row and back: the spacing. */
+const ZIGZAG_LEG_TILES = GALLERY_SPACING_ROWS
+
+export function newMineLayout(
+  params: PlanetParams,
+  site: DockSite,
+  digPolicy: DigPolicy = DEFAULT_DIG_POLICY,
+): MineLayout {
   const travelRow = site.padRow + 1
-  return {
+  const layout: MineLayout = {
     params,
     shaftColumn: shaftColumnOf(site),
     shaftJogs: [],
@@ -81,6 +107,8 @@ export function newMineLayout(params: PlanetParams, site: DockSite): MineLayout 
     galleries: new Map(),
     oreReachByBand: new Map(),
   }
+  if (digPolicy === DEFAULT_DIG_POLICY) return layout
+  return { ...layout, zigzagLegTiles: ZIGZAG_LEG_TILES }
 }
 
 /** Two tiles past the pad edge nearer the dock point; east when both are as near. */
@@ -152,16 +180,36 @@ export function bandOfRow(layout: MineLayout, row: number): number {
 
 /** The tile a gallery side bores next. */
 export function galleryFaceOf(layout: MineLayout, row: number, side: GallerySide): TilePoint {
-  const gallery = galleryOf(layout, row)
-  const reach = side === 'east' ? gallery.east + 1 : -(gallery.west + 1)
-  return { tx: shaftColumnAt(layout, row) + reach, ty: row }
+  return galleryTileAt(layout, row, side, reachOf(galleryOf(layout, row), side) + 1)
 }
 
 /** The open end of a gallery side, where the vehicle stands to bore its face. */
 export function galleryEndOf(layout: MineLayout, row: number, side: GallerySide): TilePoint {
-  const gallery = galleryOf(layout, row)
-  const reach = side === 'east' ? gallery.east : -gallery.west
-  return { tx: shaftColumnAt(layout, row) + reach, ty: row }
+  return galleryTileAt(layout, row, side, reachOf(galleryOf(layout, row), side))
+}
+
+/** The gallery's tile `reach` tiles from the shaft on `side`: along its row, or on its zigzag. */
+export function galleryTileAt(
+  layout: MineLayout,
+  row: number,
+  side: GallerySide,
+  reach: number,
+): TilePoint {
+  const across = side === 'east' ? reach : -reach
+  const legTiles = zigzagLegTilesAt(layout, row)
+  const dip = legTiles === null ? 0 : zigzagDipOf(reach, legTiles)
+  return { tx: shaftColumnAt(layout, row) + across, ty: row - dip }
+}
+
+/** The legs of the gallery off `row` where it zigzags (an ore gallery's); null where it is level. */
+export function zigzagLegTilesAt(layout: MineLayout, row: number): number | null {
+  return layout.zigzagLegTiles === undefined || isCoreRow(layout, row)
+    ? null
+    : layout.zigzagLegTiles
+}
+
+function reachOf(gallery: Gallery, side: GallerySide): number {
+  return side === 'east' ? gallery.east : gallery.west
 }
 
 export function isSideDone(layout: MineLayout, row: number, side: GallerySide): boolean {

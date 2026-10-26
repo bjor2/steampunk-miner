@@ -31,7 +31,7 @@ import { shellChargeSizeOf } from './botGates'
 import { isVehicleActive } from '../vehicle/vehicleState'
 import type { TilePoint } from '../world/tileGrid'
 import { moveStraight, type BotPlanet } from './botPilot'
-import { facingTowards, NO_TICKS, reportPoseIntent } from './botPose'
+import { aimTowards, NO_TICKS, reportAimedPoseIntent } from './botPose'
 import type { BotSession } from './botSession'
 import { tileKindAt } from './botWorld'
 
@@ -140,7 +140,7 @@ export function blastOpen(
 }
 
 function plantFacing(session: BotSession, from: TilePoint, tile: TilePoint, size: number) {
-  session.submit(reportPoseIntent(from, facingTowards(from, tile), NO_TICKS))
+  session.submit(reportAimedPoseIntent(from, aimTowards(from, tile), NO_TICKS))
   session.submit(plantChargeCommand(size))
   return session.vehicle().charges.planted !== null
 }

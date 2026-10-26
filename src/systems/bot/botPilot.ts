@@ -52,7 +52,7 @@ import type { GateRouteBlock } from './gateRouteBlocks'
 import { descentLegOf, type DownBoreTally, type DownLeg } from './downBores'
 import type { SidewaysBoreTally } from './sidewaysBores'
 import { botMoveSpeedOf, DIAGONAL_STEP_METRES, moveTicks, tileKindAt } from './botWorld'
-import type { MineLayout } from './mineLayout'
+import type { DigPolicy, MineLayout } from './mineLayout'
 
 /** A bore reports at least this often, like the client's 5 Hz pose reports. */
 const BORE_REPORT_TICKS = 60
@@ -70,6 +70,8 @@ export interface BotPilot {
   borePolicy?: BorePolicy
   /** What it does with the planet kits (ticket 850, `botCrates.ts`); absent is every field off. */
   kitPolicy?: KitPolicy
+  /** Whether it digs its ore galleries level or at 45° (ticket 899, `mineLayout.ts`); absent is level. */
+  digPolicy?: DigPolicy
   /** Whether its last report stood it in a drain pocket (ticket 881, `botFlask.ts`); absent is no. */
   isInDrainPocket?: boolean
   /** The ticks each enemy has held it facing (`faceThreats`, ticket 418); absent is none yet. */

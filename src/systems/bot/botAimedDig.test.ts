@@ -72,10 +72,10 @@ function liningRingsOf(events: readonly DomainEvent[]): CasingLined[] {
 }
 
 function lastReportedAimOf(session: BotSession): number | undefined {
-  const report = session
+  const reports = session
     .commands()
-    .findLast((command) => command.type === 'reportPose' && command.payload.drilling === false)
-  return report?.type === 'reportPose' ? report.payload.aim : undefined
+    .flatMap((command) => (command.type === 'reportPose' ? [command.payload] : []))
+  return reports.at(-1)?.aim
 }
 
 describe('pacing bot aims (ticket 899)', () => {

@@ -23,11 +23,12 @@ import type { MerchantPolicy } from './botKitBuys'
 import { cargoUnitsOf, statsOfVehicle } from '../vehicle/vehicleState'
 import { wouldAccept } from './botDryRun'
 import { canAffordMoveTo } from './botEnergy'
-import { moveStraight, type BotPlanet } from './botPilot'
+import type { BotPlanet } from './botPilot'
 import type { BotSession } from './botSession'
 import { moveAlongShaft } from './botShaft'
 import { canPayForBrass } from './botWallet'
-import { shaftTileAt } from './mineLayout'
+import { moveBackToShaft, moveOutAlongGallery } from './galleryMoves'
+import { galleryRowOfTile } from './galleryWays'
 import type { TripGoal } from './tripGoal'
 
 /** Whether the bot carries crates: never (the default), or dropping its hold whenever it fills. */
@@ -95,12 +96,14 @@ function restockOf(session: BotSession, provider: BotCrateProvider) {
   return isPaid && wouldAccept(session, intent) ? intent : null
 }
 
-/** Down the shaft to the crate's row and along it: the way the bot opened when it dropped it. */
+/**
+ * Down the shaft to the crate's gallery and along it: the way the bot opened when it dropped it,
+ * level or at 45° (ticket 899).
+ */
 function driveToCrate(session: BotSession, planet: BotPlanet, crate: BotCrate): void {
-  const { layout, pilot } = planet
-  moveStraight(session, planet, shaftTileAt(layout, pilot.position.ty))
-  moveAlongShaft(session, planet, crate.cell.ty)
-  moveStraight(session, planet, crate.cell)
+  moveBackToShaft(session, planet)
+  moveAlongShaft(session, planet, galleryRowOfTile(planet.layout, crate.cell))
+  moveOutAlongGallery(session, planet, crate.cell)
 }
 
 function isHoldFull(session: BotSession): boolean {

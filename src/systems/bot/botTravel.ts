@@ -21,13 +21,13 @@ import type { GateRouteBlock } from './gateRouteBlocks'
 import { newDownBoreTally, type DownBoreTally } from './downBores'
 import { newSidewaysBoreTally, type SidewaysBoreTally } from './sidewaysBores'
 import { paramsOfSession } from './botWorld'
-import { newMineLayout } from './mineLayout'
+import { DEFAULT_DIG_POLICY, newMineLayout, type DigPolicy } from './mineLayout'
 import { driveToSellBay } from './botTrip'
 
 /**
  * The bot on the planet its session is on, at the Sell bay with a mine not yet dug; the run's
- * gate route blocks (ticket 237), its bore policy (ticket 347) and its kit policy (ticket 850) go
- * on from the planet before.
+ * gate route blocks (ticket 237), its bore policy (ticket 347), its kit policy (ticket 850) and
+ * its dig policy (ticket 899) go on from the planet before.
  */
 export function botPlanetOf(
   session: BotSession,
@@ -37,12 +37,13 @@ export function botPlanetOf(
   sidewaysBores: SidewaysBoreTally = newSidewaysBoreTally(),
   downBores: DownBoreTally = newDownBoreTally(),
   kitPolicy: KitPolicy = DEFAULT_KIT_POLICY,
+  digPolicy: DigPolicy = DEFAULT_DIG_POLICY,
 ): BotPlanet {
   const site = dockSiteOfPlanet(session.state().planet)
   if (site === null) throw new Error('the bot plays only on a generated planet')
   return {
-    layout: newMineLayout(paramsOfSession(session.state()), site),
-    pilot: { position: bayRestTileOf(site, 'sell'), facing: 1, borePolicy, kitPolicy },
+    layout: newMineLayout(paramsOfSession(session.state()), site, digPolicy),
+    pilot: { position: bayRestTileOf(site, 'sell'), facing: 1, borePolicy, kitPolicy, digPolicy },
     chargePolicy,
     hasMetBlastTile: false,
     shellChargeSize: 0,
@@ -73,6 +74,7 @@ export function travelWhenReady(session: BotSession, planet: BotPlanet): BotPlan
     planet.sidewaysBores,
     planet.downBores,
     planet.pilot.kitPolicy,
+    planet.pilot.digPolicy,
   )
 }
 

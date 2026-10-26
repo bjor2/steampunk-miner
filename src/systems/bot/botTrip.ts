@@ -5,7 +5,10 @@
  * max (#113, `botHeat.ts`). A trip ends docked at the Sell bay, or towed after a strand or a death,
  * which the bot never causes on purpose but combat can. Under a crate policy (ticket 850,
  * `botCrates.ts`) it first collects its crates, going home with them if they fill the hold, and
- * drops a full hold as a crate on an ore trip rather than turn back.
+ * drops a full hold as a crate on an ore trip rather than turn back. The diagonal-heavy bot
+ * (ticket 899) walks and bores its ore galleries as zigzags of 45° legs (`mineLayout.ts`), comes
+ * back to the shaft along the gallery it stands in (`galleryMoves.ts`), and ends a gallery where
+ * its zigzag would dip into a band its casing grade does not hold.
  */
 import { coreNeededOf } from '../authority/coreBay'
 import { dockCommand, undockCommand } from '../platform/platformCommands'
@@ -34,6 +37,9 @@ import {
   type GallerySide,
   type MineLayout,
 } from './mineLayout'
+import { deepestHeldBand } from './botCasing'
+import { moveBackToShaft, moveOutAlongGallery } from './galleryMoves'
+import { isPastHeldBand } from './galleryWays'
 import { nextRow, sideFor, type TripGoal } from './tripGoal'
 
 type GalleryEnd = 'stop' | 'ended'
@@ -85,10 +91,10 @@ function mineUntilTurnBack(session: BotSession, planet: BotPlanet, goal: TripGoa
 
 /** Down the open shaft, then bores it deeper; false when it cannot or should not go on. */
 function reachRow(session: BotSession, planet: BotPlanet, row: number): boolean {
-  const { layout, pilot } = planet
+  const { layout } = planet
   const openBottom = shaftTileAt(layout, Math.max(row, layout.shaftBottomRow))
   if (!canAffordMoveTo(session, planet, openBottom)) return false
-  moveStraight(session, planet, shaftTileAt(layout, pilot.position.ty))
+  moveBackToShaft(session, planet)
   moveAlongShaft(session, planet, openBottom.ty)
   return boreShaftDownTo(session, planet, row)
 }
@@ -111,12 +117,12 @@ function mineGallerySide(
 ): GalleryEnd {
   const end = galleryEndOf(planet.layout, row, side)
   if (!canAffordMoveTo(session, planet, end)) return 'stop'
-  moveStraight(session, planet, end)
+  moveOutAlongGallery(session, planet, end)
   for (;;) {
     dropFullHold(session, planet, goal)
     if (!harvestBesides(session, planet, goal)) return 'stop'
     const face = galleryFaceOf(planet.layout, row, side)
-    if (isGalleryEnd(session, planet.layout, face, side, goal)) {
+    if (isGalleryEnd(session, planet.layout, { row, side, face }, goal)) {
       markSideDone(planet.layout, row, side)
       return 'ended'
     }
@@ -154,16 +160,23 @@ function isWanted(kind: BotTileKind, goal: TripGoal): boolean {
   return goal.kind === 'core' && kind === 'core'
 }
 
+/** A gallery side's face: the row it leaves the shaft at, its side and the tile it bores next. */
+interface GalleryFace {
+  row: number
+  side: GallerySide
+  face: TilePoint
+}
+
 function isGalleryEnd(
   session: BotSession,
   layout: MineLayout,
-  face: TilePoint,
-  side: GallerySide,
+  { row, side, face }: GalleryFace,
   goal: TripGoal,
 ): boolean {
   const state = session.state()
-  const reach = Math.abs(face.tx - shaftColumnAt(layout, face.ty))
+  const reach = Math.abs(face.tx - shaftColumnAt(layout, row))
   if (goal.kind === 'ore' && reach > oreReachOf(layout, goal.band)) return true
+  if (isPastHeldBand(layout, row, face, deepestHeldBand(session))) return true
   if (!isInsideWorld(state, face) || isNearSurface(layout, face)) return true
   if (tileKindAt(state, face) === 'pad') return true
   if (goal.kind === 'ore') return isCoreTileAt(layout, face)
@@ -190,8 +203,8 @@ function isCoreCarriedEnough(session: BotSession): boolean {
 }
 
 function returnAndDock(session: BotSession, planet: BotPlanet): void {
-  const { layout, pilot } = planet
-  moveStraight(session, planet, shaftTileAt(layout, pilot.position.ty))
+  const { layout } = planet
+  moveBackToShaft(session, planet)
   moveAlongShaft(session, planet, layout.travelRow)
   moveStraight(session, planet, layout.sellBay)
   if (isVehicleActive(session.vehicle())) session.submit(dockCommand('sell'))

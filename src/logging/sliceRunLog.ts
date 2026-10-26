@@ -10,6 +10,7 @@ import { createAuthorityState, type AuthorityState } from '../systems/authority/
 import type { DomainEvent } from '../systems/authority/domainEvent'
 import { planetParamsOf } from '../systems/authority/planetOfState'
 import type { BorePolicy } from '../systems/bot/botBore'
+import type { DigPolicy } from '../systems/bot/mineLayout'
 import type { ChainPolicy } from '../systems/bot/botChains'
 import type { ChargePolicy } from '../systems/bot/botCharges'
 import type { GunPolicy } from '../systems/bot/botGuns'
@@ -57,6 +58,8 @@ export interface LoggedRunOptions {
   chainPolicy?: ChainPolicy
   /** Whether the bot fires the bore gun (ticket 347); default `never`, `forced` for `balance:bore`. */
   borePolicy?: BorePolicy
+  /** Whether the bot digs its ore galleries level (the default) or at 45° (ticket 899). */
+  digPolicy?: DigPolicy
   /** `spans` (the default), or `cells` for the pre-compaction lines a spec compares (ticket 420). */
   drillLines?: DrillLines
   /** Told each command's events with the state they left, as the log is (the save bytes, #479). */
@@ -123,6 +126,7 @@ export function playSliceIntoSink(
     refinery: options.refinery,
     chainPolicy: options.chainPolicy,
     borePolicy: options.borePolicy,
+    digPolicy: options.digPolicy,
     playerId: PLAYER_ID,
     startCommands: startCommandsOf(scenario),
     listener: {

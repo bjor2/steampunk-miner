@@ -43,7 +43,7 @@ import { measureSpree, visitOf, type SpreeMeasure, type SpreeVisit } from './spr
 import { createBotSession, type BotListener, type BotSession } from './botSession'
 import type { BotPlanet } from './botPilot'
 import { driveToUpgradeBay, runTrip } from './botTrip'
-import { widenShallowestBand } from './mineLayout'
+import { widenShallowestBand, type DigPolicy } from './mineLayout'
 import { botPlanetOf, travelWhenReady } from './botTravel'
 import type { GateRouteBlock } from './gateRouteBlocks'
 import { newDownBoreTally, type DownBoreTally } from './downBores'
@@ -103,6 +103,11 @@ export interface SliceRunOptions {
    * the merchants (the default), or buy each planet's own kit (ticket 826).
    */
   kitPolicy?: KitPolicy
+  /**
+   * Dig the ore galleries level (the default), or at 45° (ticket 899): the diagonal-heavy run of
+   * the casing check, `diagonalHeavy.lane.test.ts`.
+   */
+  digPolicy?: DigPolicy
   listener?: BotListener
   /** `used` (the default) from the Refinery bay's planet; `ignored` plays as if it had none. */
   refinery?: RefineryUse
@@ -130,12 +135,12 @@ interface BotRun {
 const CORE_TRIP_MAX_TICKS_PER_TILE = 20 * TICKS_PER_SECOND
 
 /**
- * What playing on from a session under way needs: the run's options past its start. The bore and
- * kit policies ride on the planet's pilot (`botPlanetOf`), so they are not among them.
+ * What playing on from a session under way needs: the run's options past its start. The bore,
+ * kit and dig policies ride on the planet's pilot (`botPlanetOf`), so they are not among them.
  */
 export type PlayOnOptions = Omit<
   SliceRunOptions,
-  'playerId' | 'startCommands' | 'listener' | 'borePolicy' | 'kitPolicy'
+  'playerId' | 'startCommands' | 'listener' | 'borePolicy' | 'kitPolicy' | 'digPolicy'
 >
 
 export function playSlice(start: AuthorityState, options: SliceRunOptions): SliceRun {
@@ -154,6 +159,7 @@ function firstBotPlanetOf(session: BotSession, options: SliceRunOptions): BotPla
     newSidewaysBoreTally(),
     newDownBoreTally(),
     options.kitPolicy,
+    options.digPolicy,
   )
 }
 
