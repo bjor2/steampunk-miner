@@ -4,16 +4,18 @@
  * walked along the front's line, each cell at its own gated drill time. Both the front's step
  * (`frontStepMmAt`) and the body's `vCut` read it, so the body keeps pace with the cut.
  *
- * The line starts where a riding cut's stamp sits at no step (`sweptStampAheadMmOf`), the cell
- * there unpriced as the carry walk leaves its start, and runs to the cutting bound. Open ground
- * and a cell the drill may not cut cost nothing, as the slab's lead leaves them out: the carry
- * walk stops at such a cell, and the body drives up to its face.
+ * The line starts where a riding cut's stamp sits at no step (`sweptStampAheadMmOf`) and runs to
+ * the cutting bound. Its start cell is priced like any other for the mm the line still crosses in
+ * it (ticket 921): left free, its rest was a gift every tick, up to a cell, so the rigs just past a
+ * cell a tick read a quarter over the law. A cell the cut already cleared is open ground, and open
+ * ground and a cell the drill may not cut cost nothing, as the slab's lead leaves them out: the
+ * carry walk stops at such a cell, and the body drives up to its face.
  */
 import { widthLevelOf } from '../registries/boreWidth'
 import { aimOfPose, aimVectorOfPose } from '../vehicle/aim'
 import { sweptStampAheadMmOf } from '../vehicle/drillStamp'
 import { isWithinOneCell, stepPaidAlongMm, type FrontLine } from '../vehicle/lineCellStep'
-import { tileOfMillimetres, type VehiclePose } from '../vehicle/vehiclePose'
+import type { VehiclePose } from '../vehicle/vehiclePose'
 import type { PlanetParams } from '../world/planetParams'
 import type { TilePoint } from '../world/tileGrid'
 import { isRemovableCell } from '../world/worldCell'
@@ -45,7 +47,7 @@ export function lawStepMmOf(
 
 function stepAlongFrontLineMm(state: AuthorityState, playerId: string, at: StepAt): number {
   const line = frontLineOf(state, playerId, at.pose)
-  const timeAt = lineCellTimeReader(state, playerId, at.params, line)
+  const timeAt = lineCellTimeReader(state, playerId, at.params)
   return stepPaidAlongMm(line, timeAt, drillQuantumAt(state, playerId))
 }
 
@@ -60,15 +62,14 @@ function frontLineOf(state: AuthorityState, playerId: string, pose: VehiclePose)
   return { from, aim, limitMm: stepBoundsAt(state, playerId).cuttingMm }
 }
 
-/** Each cell's drill time along the line, read once: 0 in its start cell, open ground or a stop. */
+/** Each cell's drill time along the line, read once: 0 in open ground or a stop. */
 function lineCellTimeReader(
   state: AuthorityState,
   playerId: string,
   params: PlanetParams,
-  { from }: FrontLine,
 ): (tile: TilePoint) => number {
   const timeOf = standingCellTimeReader(state, playerId, params)
-  const times = new Map<string, number>([[keyOf(tileOfMillimetres(from.xMm, from.yMm)), 0]])
+  const times = new Map<string, number>()
   return (tile) => {
     const key = keyOf(tile)
     if (!times.has(key)) times.set(key, timeOf(tile))
