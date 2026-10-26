@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-26T07:53:53+01:00",
+  "updated_at": "2026-10-26T08:10:31+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -125,7 +125,7 @@
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 2,
     "max": 3
   },
   "tester": {
@@ -386,15 +386,40 @@
     "parallel": 1,
     "list": [
       {
-        "number": 917,
+        "number": 920,
+        "key": "878-3A",
+        "map": 878,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "blocked",
+        "tickets": [
+          908
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
+        "number": 919,
         "key": "878-1D",
         "map": 878,
         "lane": "remote",
         "mode": "solo",
+        "state": "ready",
+        "tickets": [
+          918
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
+        "number": 917,
+        "key": "878-2B",
+        "map": 878,
+        "lane": "hitl",
+        "mode": "bench",
         "state": "paused",
         "tickets": [
-          916,
-          908
+          916
         ],
         "done": [],
         "live": 0
@@ -441,7 +466,7 @@
       },
       {
         "number": 896,
-        "key": "878-1I",
+        "key": "878-4A",
         "map": 878,
         "lane": "hitl",
         "mode": "bench",
