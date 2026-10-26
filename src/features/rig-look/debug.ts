@@ -3,11 +3,12 @@
  * each track's look step without reading pixels: `getLooks` answers, per track of the table, the
  * local player's owned purchases and the band, step, finish band, pips, part, tint, finish and
  * hover line their rig shows,
- * from the same frames the vehicle look sources paint. Read-only, so no command and no log line.
+ * from the same frames the vehicle look sources paint; `items` answers each drill type's item
+ * track (ticket 623): its `n` and the parts it asks for. Read-only, so no command and no log line.
  */
 import type { DebugAction } from '../../debug/debugActionRegistry'
-import { readRigLookReadings } from './store/rigLookReads'
+import { readRigItemLookReadings, readRigLookReadings } from './store/rigLookReads'
 
 export const rigLookDebugActions: Readonly<Record<string, DebugAction>> = {
-  getLooks: () => ({ ok: true, looks: readRigLookReadings() }),
+  getLooks: () => ({ ok: true, looks: readRigLookReadings(), items: readRigItemLookReadings() }),
 }

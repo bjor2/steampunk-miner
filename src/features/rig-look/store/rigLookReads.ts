@@ -1,7 +1,13 @@
-/** What each track of the local player's rig shows now, as their replica holds it (the debug read). */
+/**
+ * What each track of the local player's rig shows now, as their replica holds it (the debug read),
+ * the drill types' item tracks apart (ticket 623).
+ */
 import { readAuthorityState } from '../../../store/authorityLink'
 import { useGameStore } from '../../../store/gameStore'
 import type { AuthorityState } from '../../../systems/authority/authorityState'
+import { readActiveForkBranch } from './forkBranchReads'
+import { itemLookCountOf, itemLookOfPlayer } from '../systems/rigItemLookCounts'
+import type { RigItemLookFrames } from '../systems/render/rigItemLooks'
 import { rigLookIndexOf } from '../systems/render/rigLookIndex'
 import type { TrackLookFrames } from '../systems/render/rigLookFrames'
 import { plaqueFactOf } from '../systems/rigLookPlaque'
@@ -44,4 +50,31 @@ function readingOf(
   const index = rigLookIndexOf(frames.rows, purchases)
   const fitting = plaqueFactOf(frames, purchases)
   return { track: frames.rows.track, purchases, ...index, partId, assetId, tint, finish, fitting }
+}
+
+/** What one item track of the local player's rig asks for now (ticket 623). */
+export interface RigItemLookReading {
+  track: string
+  /** 0 while the item is not equipped, else its owned Mark. */
+  n: number
+  /** The parts its step swaps in, none at n = 0; a type that loses the point still lists them. */
+  partIds: readonly string[]
+  /** The asset the parts are cut from, null with none. */
+  assetId: string | null
+}
+
+export function readRigItemLookReadings(): RigItemLookReading[] {
+  const state = readAuthorityState()
+  const playerId = useGameStore.getState().playerId
+  return SHIPPED_RIG_LOOKS.items.map((frames) => itemReadingOf(frames, state, playerId))
+}
+
+function itemReadingOf(
+  frames: RigItemLookFrames,
+  state: AuthorityState,
+  playerId: string,
+): RigItemLookReading {
+  const n = itemLookCountOf(frames.rows, state, playerId, readActiveForkBranch)
+  const { partIds = [], assetId } = itemLookOfPlayer(frames, state, playerId, readActiveForkBranch)
+  return { track: frames.rows.track, n, partIds, assetId }
 }

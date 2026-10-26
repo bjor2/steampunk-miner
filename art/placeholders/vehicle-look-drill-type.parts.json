@@ -1,0 +1,117 @@
+{
+  "assetId": "vehicle-look-drill-type",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-look-drill-type/vehicle-look-drill-type.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [512, 1024],
+  "maps": {
+    "albedo": "vehicle-look-drill-type.albedo.ktx2",
+    "normal": "vehicle-look-drill-type.normal.ktx2",
+    "emissive": "vehicle-look-drill-type.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "boom-barrel",
+      "tier": 1,
+      "rect": [224, 767, 57, 58],
+      "sizeM": [0.11, 0.112],
+      "pivotM": [0.007, 0.056],
+      "atM": [0.0, 0.0],
+      "z": 9
+    },
+    {
+      "id": "boom-ram",
+      "tier": 1,
+      "rect": [206, 631, 244, 74],
+      "sizeM": [0.4754, 0.1428],
+      "pivotM": [0.004, 0.0714],
+      "atM": [0.0, 0.0],
+      "z": 7
+    },
+    {
+      "id": "cutter-arm-down-1",
+      "tier": 1,
+      "rect": [121, 347, 87, 185],
+      "sizeM": [0.168, 0.3598],
+      "pivotM": [0.072, 0.3418],
+      "atM": [0.06, -0.03],
+      "z": 10
+    },
+    {
+      "id": "cutter-arm-down-2",
+      "tier": 1,
+      "rect": [347, 8, 97, 268],
+      "sizeM": [0.188, 0.522],
+      "pivotM": [0.082, 0.504],
+      "atM": [0.06, -0.03],
+      "z": 10
+    },
+    {
+      "id": "cutter-arm-up-1",
+      "tier": 1,
+      "rect": [224, 347, 87, 185],
+      "sizeM": [0.168, 0.3598],
+      "pivotM": [0.072, 0.018],
+      "atM": [0.06, 0.03],
+      "z": 10
+    },
+    {
+      "id": "cutter-arm-up-2",
+      "tier": 1,
+      "rect": [8, 347, 97, 268],
+      "sizeM": [0.188, 0.522],
+      "pivotM": [0.082, 0.018],
+      "atM": [0.06, 0.03],
+      "z": 10
+    },
+    {
+      "id": "cutter-yoke-1",
+      "tier": 1,
+      "rect": [8, 767, 92, 58],
+      "sizeM": [0.1781, 0.1122],
+      "pivotM": [0.004, 0.0561],
+      "atM": [0.0, 0.0],
+      "z": 9
+    },
+    {
+      "id": "cutter-yoke-2",
+      "tier": 1,
+      "rect": [116, 767, 92, 58],
+      "sizeM": [0.1781, 0.1122],
+      "pivotM": [0.004, 0.0561],
+      "atM": [0.0, 0.0],
+      "z": 9
+    },
+    {
+      "id": "gallery-reamers",
+      "tier": 1,
+      "rect": [8, 8, 323, 323],
+      "sizeM": [0.63, 0.63],
+      "pivotM": [0.245, 0.315],
+      "atM": [0.0, 0.0],
+      "z": 9
+    },
+    {
+      "id": "plunge-crown",
+      "tier": 1,
+      "rect": [8, 841, 259, 50],
+      "sizeM": [0.504, 0.0966],
+      "pivotM": [0.004, 0.0483],
+      "atM": [0.0, 0.0],
+      "z": 9
+    },
+    {
+      "id": "twin-bit-head",
+      "tier": 1,
+      "rect": [8, 631, 182, 120],
+      "sizeM": [0.354, 0.2336],
+      "pivotM": [0.004, 0.1168],
+      "atM": [0.0, 0.0],
+      "z": 9
+    }
+  ]
+}

@@ -8,14 +8,24 @@ import { vehicleBodyQuadsOf } from '../../../systems/render/vehicleLook'
 import { RIG_LOOK_TABLE } from './rigLookTable'
 
 const LOOK_ASSET_IDS = Object.keys(RIG_LOOK_TABLE.lookAssets)
+/** The drill types' asset (ticket 622): its cutter arms are authored with their hinge as origin. */
+const DRILL_TYPE_ASSET_ID = 'vehicle-look-drill-type'
+/** Each hinged part's origin in the slot's frame: the hinge blocks of #622's `drillTypeLooks.json`. */
+const DRILL_TYPE_HINGES: Readonly<Record<string, readonly [number, number]>> = {
+  'cutter-arm-up-1': [0.06, 0.03],
+  'cutter-arm-up-2': [0.06, 0.03],
+  'cutter-arm-down-1': [0.06, -0.03],
+  'cutter-arm-down-2': [0.06, -0.03],
+}
 
 describe('rig look art (ticket 640)', () => {
-  it('ships the boiler, cargo hold, drill power, drill tip, drive and hull look assets through r.artAssets', () => {
+  it('ships the boiler, cargo hold, drill power, drill tip, drill type, drive and hull look assets through r.artAssets', () => {
     expect(LOOK_ASSET_IDS).toEqual([
       'vehicle-look-boiler',
       'vehicle-look-cargo-hold',
       'vehicle-look-drill-power',
       'vehicle-look-drill-tip',
+      'vehicle-look-drill-type',
       'vehicle-look-drive',
       'vehicle-look-hull',
     ])
@@ -35,7 +45,10 @@ describe('rig look art (ticket 640)', () => {
 
   it.each(LOOK_ASSET_IDS)("authors every %s part with its track's slot at the origin", (id) => {
     const parts = exportedSidecarOf(SHIPPED_ART, id)?.parts ?? []
-    expect(parts.map((part) => part.atM)).toEqual(parts.map(() => [0, 0]))
+    const origins = parts.map((part) =>
+      id === DRILL_TYPE_ASSET_ID ? DRILL_TYPE_HINGES[part.id] : null,
+    )
+    expect(parts.map((part) => part.atM)).toEqual(origins.map((hinge) => hinge ?? [0, 0]))
   })
 
   it('draws the twin-drum boiler on hull.boiler in place of the rig boiler', () => {

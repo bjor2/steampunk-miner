@@ -7,7 +7,9 @@
  * `pointHoldersShown()`, which copies its list each step;
  * the drill tip's steps have parts from 70 purchases (ticket 579), the cargo hold's from 23
  * (ticket 581) and the engine's from 2 (ticket 587), the other tracks' rows once their wiring
- * tickets land the art.
+ * tickets land the art. The drill types' item tracks (ticket 623) come first, in row order, so the
+ * equipped type wins the drill head over the drill tip's step; their `n` reads the loadout and the
+ * tech tree's fork choice, imported here and not in the slice's index, which the tree imports.
  */
 import { pointHoldersShown } from '../../../scene/mountedPartsPresence'
 import { readAuthorityState } from '../../../store/authorityLink'
@@ -16,8 +18,10 @@ import type {
   PartMotionRequest,
   PartMotionRequestSource,
 } from '../../../systems/registries/partMotionRequests'
+import { readActiveForkBranch } from '../store/forkBranchReads'
 import type { RigLookFrame } from '../systems/render/rigLookFrames'
 import { isSwappingParts, partSwapsOf } from '../systems/render/rigLookParts'
+import { itemLookOfPlayer } from '../systems/rigItemLookCounts'
 import { rigLookOfPlayer } from '../systems/rigLookSource'
 import { SHIPPED_RIG_LOOKS } from '../systems/rigLooks'
 
@@ -37,6 +41,8 @@ function readOwnedLooks(): void {
   const state = readAuthorityState()
   const playerId = useGameStore.getState().playerId
   owned.length = 0
+  for (const frames of SHIPPED_RIG_LOOKS.items)
+    owned.push(itemLookOfPlayer(frames, state, playerId, readActiveForkBranch))
   for (const frames of SHIPPED_RIG_LOOKS.tracks)
     owned.push(rigLookOfPlayer(frames, state, playerId))
 }

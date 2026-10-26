@@ -3,6 +3,7 @@
  * vehicle look sources, the part swaps, the plaque and the debug read all ask. `rigLookOf` and
  * `rigLookPlaqueFactOf` are the shipped table's answers for a track and an owned purchase count.
  */
+import { createItemLookFrames, type RigItemLookFrames } from './render/rigItemLooks'
 import {
   createTrackLookFrames,
   lookFrameAt,
@@ -18,6 +19,8 @@ import type { RigLookTable } from './rigLookTableChecks'
 export interface RigLooks {
   /** In table order. */
   tracks: readonly TrackLookFrames[]
+  /** The item tracks (ticket 623), in table order: their precedence on a shared point. */
+  items: readonly RigItemLookFrames[]
   /** The glint a band crossing plays (ticket 809). */
   glint: RigLookGlint
   /** The finishes a band past the art wears, by id. */
@@ -27,6 +30,7 @@ export interface RigLooks {
 export function createRigLooks(table: RigLookTable): RigLooks {
   return {
     tracks: table.tracks.map((rows) => createTrackLookFrames(rows, table.finishes)),
+    items: (table.itemTracks ?? []).map(createItemLookFrames),
     glint: table.glint,
     finishes: table.finishes,
   }

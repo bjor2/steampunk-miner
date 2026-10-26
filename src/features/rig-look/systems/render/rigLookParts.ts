@@ -5,8 +5,12 @@
  * part shows under the module. A step cut from a look asset of its own (ticket 640) names that
  * asset and the `vehicle` slot it hides; a `vehicle` step's request is the plain swap it always
  * was. A track that covers items (ticket 892) carries them on its swap and does not yield a point
- * held only by their art, which steps aside while the swap shows. Pure: the caller says which
- * looks are owned and what holds each point; one request per frame, made once and kept.
+ * held only by their art, which steps aside while the swap shows. Where looks share a point (the
+ * table's `sharedSlots`, ticket 623), only the first showing one in the owned order swaps: the
+ * caller lists the item tracks in row order ahead of the upgrade tracks, so the equipped drill
+ * type wins the head frame and a losing type swaps nothing, keeping its own item art. Pure: the
+ * caller says which looks are owned and what holds each point; one request per frame, made once
+ * and kept.
  */
 import type { PartSwapRequest } from '../../../../systems/registries/partMotionRequests'
 import { isAttachId } from '../../../../systems/registries/vehicleAttach'
@@ -15,12 +19,16 @@ import { VEHICLE_LOOK_ASSET_ID, type RigLookFrame } from './rigLookFrames'
 
 const keptRequests = new Map<RigLookFrame, PartSwapRequest>()
 
-/** The swaps the owned looks ask for, minus those whose point another mount holds, in track order. */
+/**
+ * The swaps the owned looks ask for, minus those whose point another mount holds or an earlier
+ * look took, in the owned order.
+ */
 export function partSwapsOf(
   owned: readonly RigLookFrame[],
   holders: readonly PointHolder[],
 ): PartSwapRequest[] {
-  return owned.filter((frame) => isSwapShown(frame, holders)).map(keptRequestOf)
+  const shown = owned.filter((frame) => isSwapShown(frame, holders))
+  return shown.filter(isFirstOnItsPoint).map(keptRequestOf)
 }
 
 /** Whether any owned look swaps a part in, before any point is taken. */
@@ -32,6 +40,14 @@ function isSwapShown(frame: RigLookFrame, holders: readonly PointHolder[]): bool
   return frame.partId !== null && !isPointHeldBesides(holders, frame.slot, frame.covers)
 }
 
+function isFirstOnItsPoint(
+  frame: RigLookFrame,
+  at: number,
+  shown: readonly RigLookFrame[],
+): boolean {
+  return shown.findIndex((each) => each.slot === frame.slot) === at
+}
+
 function keptRequestOf(frame: RigLookFrame): PartSwapRequest {
   const kept = keptRequests.get(frame) ?? requestOf(frame)
   keptRequests.set(frame, kept)
@@ -40,7 +56,8 @@ function keptRequestOf(frame: RigLookFrame): PartSwapRequest {
 
 function requestOf(frame: RigLookFrame): PartSwapRequest {
   if (frame.partId === null || !isAttachId(frame.slot)) throw new Error(`no part on ${frame.slot}`)
-  const swap: PartSwapRequest = { kind: 'swap', attach: frame.slot, partIds: [frame.partId] }
+  const partIds = frame.partIds ?? [frame.partId]
+  const swap: PartSwapRequest = { kind: 'swap', attach: frame.slot, partIds }
   return withCovers(isLookAssetPart(frame) ? withLookAsset(swap, frame) : swap, frame)
 }
 

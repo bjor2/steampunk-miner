@@ -8,14 +8,17 @@
 import { bareCatalogueIdProblems } from '../../../systems/registries/catalogueIds'
 import type { TrackLookRows } from './render/rigLookIndex'
 
+/** Any track that may cover items: an upgrade track or an item track (ticket 623). */
+type CoveringTrack = Pick<TrackLookRows, 'track' | 'covers'>
+
 const NO_COVERS: readonly string[] = []
 
 /** Every problem with the tracks' covers; empty when they load. */
-export function coverProblemsOf(tracks: readonly TrackLookRows[]): string[] {
+export function coverProblemsOf(tracks: readonly CoveringTrack[]): string[] {
   return [...tracks.flatMap(trackCoverProblemsOf), ...coverLoopProblemsOf(tracks)]
 }
 
-function trackCoverProblemsOf(rows: TrackLookRows): string[] {
+function trackCoverProblemsOf(rows: CoveringTrack): string[] {
   const covers = coversOf(rows)
   const problems = covers.flatMap((itemId) =>
     bareCatalogueIdProblems(itemId).length > 0 ? [`covers ${itemId}, which is not an item id`] : [],
@@ -25,14 +28,14 @@ function trackCoverProblemsOf(rows: TrackLookRows): string[] {
 }
 
 /** A track on a loop of covers through other tracks, listed once per track on it. */
-function coverLoopProblemsOf(tracks: readonly TrackLookRows[]): string[] {
+function coverLoopProblemsOf(tracks: readonly CoveringTrack[]): string[] {
   return tracks
     .filter((rows) => isOnCoverLoop(tracks, rows.track))
     .map((rows) => `${rows.track}: covers loop back to it through another track`)
 }
 
 /** Whether a walk along covers from `track`, never through `track` itself, comes back to it. */
-function isOnCoverLoop(tracks: readonly TrackLookRows[], track: string): boolean {
+function isOnCoverLoop(tracks: readonly CoveringTrack[], track: string): boolean {
   const seen = new Set<string>()
   const next = othersCoveredBy(tracks, track)
   while (next.length > 0) {
@@ -45,16 +48,16 @@ function isOnCoverLoop(tracks: readonly TrackLookRows[], track: string): boolean
 }
 
 /** The tracks `track`'s rows cover, its own id aside. */
-function othersCoveredBy(tracks: readonly TrackLookRows[], track: string): string[] {
+function othersCoveredBy(tracks: readonly CoveringTrack[], track: string): string[] {
   const rows = tracks.find((each) => each.track === track)
   if (rows === undefined) return []
   return coversOf(rows).filter((itemId) => itemId !== track && isTrack(tracks, itemId))
 }
 
-function isTrack(tracks: readonly TrackLookRows[], id: string): boolean {
+function isTrack(tracks: readonly CoveringTrack[], id: string): boolean {
   return tracks.some((rows) => rows.track === id)
 }
 
-function coversOf(rows: TrackLookRows): readonly string[] {
+function coversOf(rows: CoveringTrack): readonly string[] {
   return rows.covers ?? NO_COVERS
 }

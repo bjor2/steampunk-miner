@@ -1,5 +1,5 @@
 {
-  "$comment": "The rig look ladder (#577; G&V spec on #157, GD lock 6300553486; TD shape on #577), one row block per upgrade track, keyed by owned purchase count. Since ticket 809 (LK1; GD lock of 24 Oct 14:54 and the VS ruling of 24 Oct 14:58 via Systems on #809) every track steps on the power-decade band rule: `band.step` = max(1, min(`band.decadeStep`, `band.twoPlanetBuys`)) purchases a band. `decadeStep` is the purchases that raise the line's power tenfold, ceil(ln 10 / ln r) levels of its economy.json ratio (engine: its own speed term, 1.05, never thrust-to-weight), times 10 on the two-tier drill_tip and hull: drill_power 11, drill_tip 110 (11 levels), engine 48, boiler 25, cargo_hold 25, hull 210 (21 levels); a spec finds them again from economy.json with bigints. `twoPlanetBuys` is the median, over every two neighbouring planets of three seeds' bot runs, of the line's purchases on them: frozen from the P1-P8 bot traces on the pacing seeds 27182, 31415 and 83921 (the ticket 762 runs of 23 Oct, the box's newest; the bot lane rigLookPlanets.lane.test.ts measures main again and warns). `band.edges` are the bands' first counts, step, 2 step, ..., to about P40 on the median path (P8's median level plus 32 planets at half the two-planet buys; drill_tip and hull on their on-curve levels, 1240 and 2360): the ladder the art fills. The look depends on the count alone. `steps` are the authored steps, one on each of the first edges, in the order #554, #579-#590 and #640 drew them; `part` is the part a step swaps in, null for #554's glow-only drill_power rows. A step's optional `asset` names the look asset its part is cut from, one of `lookAssets`; absent, `part` is a tiered `vehicle` part. A track's optional `replaces` is the vehicle part slot such a look part stands in place of and hides; absent, the look lies over the rig. Past the authored steps each band wears the next finish of `band.finishes` (ids into `finishes`: a material, its name the hover's band name) over the top step's part, and pips counting decades of power, floor(band start / decadeStep), drawn on a badge at the track's slot; the cycle is long enough (at least ceil(decadeStep / step)) that no finish and pip count repeat. A band crossed by a purchase plays `glint` on the track's glow slots once. A track's optional `plaque` holds the Outfitter hover line: `step` names an authored band's `card` as `{bandName}`, `tail` the finish band's name and the exact level (`{level}`, #681 long mode). Band names are 3 words at most. glowCaps: every glow stays below its track's cap, summed per part slot across tracks, and a glint over a track's brightest look under its own; the drill nose (drill-bit) is the brightest part, the rest of the rig stays under rigBody. Cosmetic only, never in state, a save or a digest; `slot` is the track's own vehicle-attach point (the #180 showcase point), never a module or wagon point.",
+  "$comment": "The rig look ladder (#577; G&V spec on #157, GD lock 6300553486; TD shape on #577), one row block per upgrade track, keyed by owned purchase count. Since ticket 809 (LK1; GD lock of 24 Oct 14:54 and the VS ruling of 24 Oct 14:58 via Systems on #809) every track steps on the power-decade band rule: `band.step` = max(1, min(`band.decadeStep`, `band.twoPlanetBuys`)) purchases a band. `decadeStep` is the purchases that raise the line's power tenfold, ceil(ln 10 / ln r) levels of its economy.json ratio (engine: its own speed term, 1.05, never thrust-to-weight), times 10 on the two-tier drill_tip and hull: drill_power 11, drill_tip 110 (11 levels), engine 48, boiler 25, cargo_hold 25, hull 210 (21 levels); a spec finds them again from economy.json with bigints. `twoPlanetBuys` is the median, over every two neighbouring planets of three seeds' bot runs, of the line's purchases on them: frozen from the P1-P8 bot traces on the pacing seeds 27182, 31415 and 83921 (the ticket 762 runs of 23 Oct, the box's newest; the bot lane rigLookPlanets.lane.test.ts measures main again and warns). `band.edges` are the bands' first counts, step, 2 step, ..., to about P40 on the median path (P8's median level plus 32 planets at half the two-planet buys; drill_tip and hull on their on-curve levels, 1240 and 2360): the ladder the art fills. The look depends on the count alone. `steps` are the authored steps, one on each of the first edges, in the order #554, #579-#590 and #640 drew them; `part` is the part a step swaps in, null for #554's glow-only drill_power rows. A step's optional `asset` names the look asset its part is cut from, one of `lookAssets`; absent, `part` is a tiered `vehicle` part. A track's optional `replaces` is the vehicle part slot such a look part stands in place of and hides; absent, the look lies over the rig. Past the authored steps each band wears the next finish of `band.finishes` (ids into `finishes`: a material, its name the hover's band name) over the top step's part, and pips counting decades of power, floor(band start / decadeStep), drawn on a badge at the track's slot; the cycle is long enough (at least ceil(decadeStep / step)) that no finish and pip count repeat. A band crossed by a purchase plays `glint` on the track's glow slots once. A track's optional `plaque` holds the Outfitter hover line: `step` names an authored band's `card` as `{bandName}`, `tail` the finish band's name and the exact level (`{level}`, #681 long mode). Band names are 3 words at most. glowCaps: every glow stays below its track's cap, summed per part slot across tracks, and a glint over a track's brightest look under its own; the drill nose (drill-bit) is the brightest part, the rest of the rig stays under rigBody. Cosmetic only, never in state, a save or a digest; `slot` is the track's own vehicle-attach point (the #180 showcase point), never a module or wagon point. `itemTracks` (ticket 623, GD lock of 25 Oct on #623) are the drill types, each a track keyed by its item id: n is 0 while the item is not equipped and its owned Mark while it is (`equip`: slotted in any loadout slot whatever its toggle, or a fork branch while active; `marks` are later Marks, each an owned item), each step swapping `parts` of a look asset in from n = `from`, the top step holding past the last. Their row order is the precedence on a point named in `sharedSlots`: there the first equipped item track shows, ahead of the one upgrade track on it, whose level look stays on as the tint (the type parts join drill_tip's and drill_power's nose glow groups); a losing type swaps nothing and keeps its own item art.",
   "glowCaps": {
     "drillNose": 3,
     "rigBody": 1
@@ -91,6 +91,19 @@
       "streaked-crown",
       "toothed-crown",
       "vortex-crown"
+    ],
+    "vehicle-look-drill-type": [
+      "boom-barrel",
+      "boom-ram",
+      "cutter-arm-down-1",
+      "cutter-arm-down-2",
+      "cutter-arm-up-1",
+      "cutter-arm-up-2",
+      "cutter-yoke-1",
+      "cutter-yoke-2",
+      "gallery-reamers",
+      "plunge-crown",
+      "twin-bit-head"
     ],
     "vehicle-look-drive": [
       "aether-hub-track",
@@ -217,6 +230,61 @@
     "colour": "#fff2c8",
     "glow": 0.25
   },
+  "sharedSlots": ["drill.head"],
+  "itemTracks": [
+    {
+      "track": "gear.twin_bit",
+      "equip": { "kind": "slotted" },
+      "slot": "drill.head",
+      "replaces": "drill-bit",
+      "covers": ["gear.twin_bit"],
+      "steps": [{ "from": 1, "parts": ["twin-bit-head"], "asset": "vehicle-look-drill-type" }]
+    },
+    {
+      "track": "gear.gallery_reamers",
+      "equip": { "kind": "fork", "lane": "drill-gear", "branch": "wide" },
+      "slot": "drill.head",
+      "replaces": "drill-bit",
+      "steps": [{ "from": 1, "parts": ["gallery-reamers"], "asset": "vehicle-look-drill-type" }]
+    },
+    {
+      "track": "gear.plunge_crown",
+      "equip": { "kind": "fork", "lane": "drill-gear", "branch": "deep" },
+      "slot": "drill.head",
+      "replaces": "drill-bit",
+      "steps": [{ "from": 1, "parts": ["plunge-crown"], "asset": "vehicle-look-drill-type" }]
+    },
+    {
+      "track": "gear.side_cutters",
+      "equip": { "kind": "slotted" },
+      "marks": [{ "mark": 2, "itemId": "gear.side_cutters_mark_2" }],
+      "slot": "drill.head",
+      "replaces": "drill-bit",
+      "covers": ["gear.side_cutters"],
+      "steps": [
+        {
+          "from": 1,
+          "parts": ["cutter-yoke-1", "cutter-arm-up-1", "cutter-arm-down-1"],
+          "asset": "vehicle-look-drill-type"
+        },
+        {
+          "from": 2,
+          "parts": ["cutter-yoke-2", "cutter-arm-up-2", "cutter-arm-down-2"],
+          "asset": "vehicle-look-drill-type"
+        }
+      ]
+    },
+    {
+      "track": "gear.reach_boom",
+      "equip": { "kind": "slotted" },
+      "slot": "drill.head",
+      "replaces": "drill-bit",
+      "covers": ["gear.reach_boom"],
+      "steps": [
+        { "from": 1, "parts": ["boom-barrel", "boom-ram"], "asset": "vehicle-look-drill-type" }
+      ]
+    }
+  ],
   "tracks": [
     {
       "track": "drill_power",
@@ -247,7 +315,18 @@
           "double-halo-crown",
           "fanned-crown",
           "vortex-crown",
-          "aether-vortex-crown"
+          "aether-vortex-crown",
+          "twin-bit-head",
+          "gallery-reamers",
+          "plunge-crown",
+          "cutter-yoke-1",
+          "cutter-arm-up-1",
+          "cutter-arm-down-1",
+          "cutter-yoke-2",
+          "cutter-arm-up-2",
+          "cutter-arm-down-2",
+          "boom-barrel",
+          "boom-ram"
         ],
         ["drill-head"],
         [
@@ -467,7 +546,18 @@
           "double-halo-crown",
           "fanned-crown",
           "vortex-crown",
-          "aether-vortex-crown"
+          "aether-vortex-crown",
+          "twin-bit-head",
+          "gallery-reamers",
+          "plunge-crown",
+          "cutter-yoke-1",
+          "cutter-arm-up-1",
+          "cutter-arm-down-1",
+          "cutter-yoke-2",
+          "cutter-arm-up-2",
+          "cutter-arm-down-2",
+          "boom-barrel",
+          "boom-ram"
         ]
       ],
       "glowCap": "drillNose",

@@ -24,12 +24,18 @@ function brightestGlowOf(frames: TrackLookFrames, group: number): number {
   return Math.max(...everyLookFrameOf(frames).map((frame) => frame.glows[group]))
 }
 
-/** `drill-bit` and every look part standing in its place. */
+/** `drill-bit` and every look part standing in its place, the drill types' too (ticket 623). */
 function noseSlots(): Set<string> {
   const standIns = RIG_LOOK_TABLE.tracks
     .filter((rows) => rows.replaces === NOSE_SLOT)
     .flatMap((rows) => rows.steps.flatMap((step) => (step.part === null ? [] : [step.part])))
-  return new Set([NOSE_SLOT, ...standIns])
+  return new Set([NOSE_SLOT, ...standIns, ...drillTypeParts()])
+}
+
+function drillTypeParts(): string[] {
+  return (RIG_LOOK_TABLE.itemTracks ?? [])
+    .filter((rows) => rows.replaces === NOSE_SLOT)
+    .flatMap((rows) => rows.steps.flatMap((step) => step.parts))
 }
 
 describe('rig look readability', () => {
@@ -53,6 +59,6 @@ describe('rig look readability', () => {
       'gem-set-crown',
       'aether-cut-crown',
     ])
-    expect([...noseSlots()].sort()).toEqual(['drill-bit', ...crowns].sort())
+    expect([...noseSlots()].sort()).toEqual(['drill-bit', ...crowns, ...drillTypeParts()].sort())
   })
 })

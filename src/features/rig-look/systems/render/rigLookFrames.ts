@@ -29,6 +29,11 @@ export interface RigLookFrame {
   step: number
   /** The part swapped onto `slot`, null for the base part (or a step whose art is not in). */
   partId: string | null
+  /**
+   * Every part the step swaps in, `partId` first, on an item track whose look is several parts
+   * (the cutters' yoke and arms, ticket 623); absent, `partId` alone.
+   */
+  partIds?: readonly string[]
   /** The asset `partId` is cut from (`vehicle` unless the row names one), null with no part. */
   assetId: string | null
   slot: string
