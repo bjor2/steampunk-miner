@@ -215,7 +215,7 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
     const digest = takeSessionSnapshot().digest
     game().moveFocus(1)
     const model = upgradeBayModel()
-    expect(model.casing).toMatchObject({ grade: 1n, gradeText: '1 → 2', cost: { text: '240' } })
+    expect(model.casing).toMatchObject({ grade: 1, gradeText: '1 → 2', cost: { text: '240' } })
     expect(model.preview).toMatchObject({
       highlight: 'drill_tip',
       visualTier: 1,

@@ -6,10 +6,10 @@
  * ground agree. The faintness is the dial's CSS; this names the metal. Off a planet, or on its
  * surface with no band, there is no tint.
  */
-import { casingGradeLookOf, casingLookGradeOf } from '../render/casingGradeLook'
+import { casingGradeLookOf } from '../render/casingGradeLook'
 
 /** `#rrggbb` of the plate of the grade the band needs, or null with none. */
-export function depthBandTintOf(neededGrade: bigint | null): string | null {
+export function depthBandTintOf(neededGrade: number | null): string | null {
   if (neededGrade === null) return null
-  return casingGradeLookOf(casingLookGradeOf(neededGrade)).plate.colour
+  return casingGradeLookOf(neededGrade).plate.colour
 }

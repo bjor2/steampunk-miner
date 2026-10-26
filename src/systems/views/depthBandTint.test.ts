@@ -10,9 +10,9 @@ describe('depth gauge band tint (ticket 830)', () => {
   it('tints each band with the plate of the grade it needs', () => {
     for (const band of [1, 2, 3, 4, 5, 6]) {
       const grade = requiredCasingGrade({ planetIndex: 2, band })
-      expect(depthBandTintOf(grade)).toBe(casingGradeLookOf(Number(grade)).plate.colour)
+      expect(depthBandTintOf(Number(grade))).toBe(casingGradeLookOf(Number(grade)).plate.colour)
     }
-    expect(depthBandTintOf(1n)).toBe('#dcb35a')
+    expect(depthBandTintOf(1)).toBe('#dcb35a')
   })
 
   it('shows no tint off a planet or above the first band', () => {
@@ -21,7 +21,7 @@ describe('depth gauge band tint (ticket 830)', () => {
 
   it('never gives two neighbouring bands the same tint', () => {
     const tints = [1, 2, 3, 4, 5].map((band) =>
-      depthBandTintOf(requiredCasingGrade({ planetIndex: 1, band })),
+      depthBandTintOf(Number(requiredCasingGrade({ planetIndex: 1, band }))),
     )
     tints.slice(1).forEach((tint, at) => expect(tint).not.toBe(tints[at]))
   })

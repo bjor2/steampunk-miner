@@ -3,6 +3,7 @@
  * or "ALT n" above the surface) and band, the dock arrow and core distance, and the vehicle state
  * with the tow countdown. Each state has a text and an icon id, so none is read by colour alone.
  */
+import { countHeldToSafe } from '../wholeCount'
 import { DESTROY_DELAY_TICKS, STRAND_GRACE_TICKS } from '../../constants/balance'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { AuthorityState } from '../authority/authorityState'
@@ -29,7 +30,7 @@ export interface DepthReading {
    * The highest casing grade the band needs (ticket 829, Progression's row: the depth gauge shows
    * it), its biome's +1 included; null off a planet or above its ground.
    */
-  neededGrade: bigint | null
+  neededGrade: number | null
   /** The depth dial's scale (ticket 716): R(p) and the band and core marks; null off a planet. */
   scale: DepthScale | null
 }
@@ -95,12 +96,12 @@ function casingBadgeTextOf(grade: bigint, isShort: boolean, isGnawed: boolean): 
 }
 
 /** Progression's hover line for the grade a band needs (ticket 829). */
-export function neededGradeLineOf(grade: bigint): string {
+export function neededGradeLineOf(grade: number): string {
   return `Needs casing grade ${formatAmount(grade)}.`
 }
 
 /** A casing grade as the HUD writes it: `G` and the grade in the shared compact form (#681). */
-export function casingGradeTextOf(grade: bigint): string {
+export function casingGradeTextOf(grade: bigint | number): string {
   return `G${formatAmount(grade)}`
 }
 
@@ -134,9 +135,9 @@ export function depthReadingOf(
 }
 
 /** The grade the band at the gauge's depth needs; none off a planet. */
-function neededGradeOf(params: PlanetParams | null, band: number | null): bigint | null {
+function neededGradeOf(params: PlanetParams | null, band: number | null): number | null {
   if (params === null || band === null || band < 1) return null
-  return requiredCasingGrade({ planetIndex: params.planetIndex, band })
+  return countHeldToSafe(requiredCasingGrade({ planetIndex: params.planetIndex, band }))
 }
 
 /** The compass points home to the Sell bay, the first stop of every return (#37). */

@@ -180,8 +180,8 @@ describe('upgrade bay model', () => {
     const casing = upgradeBayOf(atUpgradeBay('500')).casing
     expect(casing).toMatchObject({
       iconId: 'icon-casing',
-      grade: 1n,
-      gradeAfter: 2n,
+      grade: 1,
+      gradeAfter: 2,
       gradeText: '1 → 2',
       cost: { text: '240', exact: '2.4e+2' },
       buyState: 'affordable',
@@ -198,7 +198,7 @@ describe('upgrade bay model', () => {
     session.submit(3, buyCasingGradeCommand(CLICK_CHAIN))
     const casing = upgradeBayOf(session).casing
     const cost = { exact: toCanonical(casingUpgradePrice(2n)) }
-    expect(casing).toMatchObject({ grade: 2n, gradeText: '2 → 3', cost })
+    expect(casing).toMatchObject({ grade: 2, gradeText: '2 → 3', cost })
     expect(casing.buy.reason).toBe('money_short')
   })
 

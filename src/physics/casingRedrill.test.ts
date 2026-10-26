@@ -1,4 +1,5 @@
 import RAPIER from '@dimforge/rapier3d-compat'
+import { requiredCasingGrade } from '../systems/economy/casingGrades'
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { UP_VECTOR_SCALE } from '../constants/physics'
 import { createMemorySink } from '../logging/eventSink'
@@ -36,7 +37,8 @@ import { createRig, type Rig } from './cutFollowFixtures'
 // Each row arrives on a planet with the previous planet's on-curve kit, or on planet 2 with a few
 // tip pips short of the first major (the reported case: red before ticket 843), at the shipped
 // bore and a wider side clearance (#661). Standing in its own shaft, it meets a bore of its own
-// width three metres to the side or below, lined at grade 5 as the vehicle lines one, and drives
+// width three metres to the side or below, lined at its planet's band-5 grade as the vehicle lines
+// one (ticket 829's ladder: on planet 2 grade 9, the rock old grade 5 was there), and drives
 // into it: through the near lining, across the bore and out through the far lining. Lining that
 // hard for the tip holds the rig a few seconds; ten seconds of drive must see it through.
 //
@@ -45,7 +47,6 @@ import { createRig, type Rig } from './cutFollowFixtures'
 // circle near its edge, and cannot start down from rest on planet 2 before any lining: findings
 // for the width work, not casing.
 
-const CASING_GRADE = 5
 const FRAMES_PER_SECOND = 60
 const CUT_TICKS = 600
 /** How far ahead of the rig, centre to centre, the lined bore it drives into lies. */
@@ -120,12 +121,12 @@ interface Crossed {
 function crossLinedBore({ arrival, clearanceMm, cut }: CasingCrossing): Crossed {
   return withDrillSideClearance(clearanceMm, () => {
     const rig = createRig(RAPIER, arrival.levels, FRAMES_PER_SECOND, undefined, arrival.planetIndex)
-    useGameStore.getState().setCasingGrade(CASING_GRADE)
+    useGameStore.getState().setCasingGrade(band5GradeOn(arrival.planetIndex))
     standInOwnShaft(rig)
     const start = poseNow()
     const along = facingVectorOf(start.upx, start.upy, cut.facing)
     const farEdgeMm = BORE_AHEAD_MM + drillStampRadiusMm() + LINING_MM
-    layLinedBoreAhead(start, along)
+    layLinedBoreAhead(start, along, band5GradeOn(arrival.planetIndex))
     const liningOnLine = liningOnLineOf(start, along, farEdgeMm)
     rig.hold(buildIntent([cut.aim]), CUT_TICKS)
     return {
@@ -134,6 +135,11 @@ function crossLinedBore({ arrival, clearanceMm, cut }: CasingCrossing): Crossed 
       throughMm: farEdgeMm + HALF_BODY_MM,
     }
   })
+}
+
+/** The grade the planet's band 5 needs: the hardest lining a rig meets there, which never bursts. */
+function band5GradeOn(planetIndex: number): number {
+  return Number(requiredCasingGrade({ planetIndex, band: 5 }))
 }
 
 /** Off the dock, clear of its pad, and a short shaft down, settled on its bottom. */
@@ -145,14 +151,14 @@ function standInOwnShaft(rig: Rig): void {
 }
 
 /** A bore of the rig's own width centred `BORE_AHEAD_MM` along the aim, lined as the rig lines. */
-function layLinedBoreAhead(start: VehiclePose, along: IntegerVector): void {
+function layLinedBoreAhead(start: VehiclePose, along: IntegerVector, grade: number): void {
   const centre = {
     x: start.x + Math.floor((along.x * BORE_AHEAD_MM) / UP_VECTOR_SCALE),
     y: start.y + Math.floor((along.y * BORE_AHEAD_MM) / UP_VECTOR_SCALE),
   }
   const store = useGameStore.getState()
   store.carveCircle({ ...centre, radius: drillStampRadiusMm(), amount: SOLID_DENSITY })
-  store.lineCasing({ ...centre, grade: CASING_GRADE })
+  store.lineCasing({ ...centre, grade })
 }
 
 function poseNow(): VehiclePose {
@@ -202,7 +208,7 @@ function casingAt(sx: number, sy: number): number {
 const ROW = '$arrival.name, side clearance $clearanceMm mm, from $cut.from'
 
 describe('drilling through laid casing (ticket 843)', () => {
-  it.each(ROWS)(`cuts in and out through a grade-5 lined bore, ${ROW}`, (row) => {
+  it.each(ROWS)(`cuts in and out through a band-5-grade lined bore, ${ROW}`, (row) => {
     const { liningOnLine, movedMm, throughMm } = crossLinedBore(row)
     expect(liningOnLine).toBeGreaterThan(0)
     expect(movedMm).toBeGreaterThanOrEqual(throughMm)

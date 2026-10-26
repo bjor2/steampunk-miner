@@ -306,13 +306,13 @@ function depthReadingOf(model: HudModel, tokens: DesignTokens): FaceReading {
 }
 
 /** The depth in full, then the grade its band needs (ticket 829), none above the ground. */
-function depthHoverLinesOf(depthTiles: number, neededGrade: bigint | null): string[] {
+function depthHoverLinesOf(depthTiles: number, neededGrade: number | null): string[] {
   const depth = `${longAmountOfExact(String(depthTiles))} m`
   return neededGrade === null ? [depth] : [depth, neededGradeLineOf(neededGrade)]
 }
 
 /** The grade the band needs, on the depth dial's badge (ticket 829); none above the ground. */
-function neededGradeBadgeOf(neededGrade: bigint | null): string | null {
+function neededGradeBadgeOf(neededGrade: number | null): string | null {
   return neededGrade === null ? null : casingGradeTextOf(neededGrade)
 }
 

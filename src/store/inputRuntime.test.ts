@@ -205,7 +205,7 @@ describe('input: no direct mutation (#33 acceptance 3)', () => {
     game().teleportToDock('upgrade')
     const confirmed = submittedDuring(() => tap('ui_confirm'))
     expect(confirmed).toEqual(['buyCasingGrade'])
-    expect(readUpgradeBayModel().casing.grade).toBe(3n)
+    expect(readUpgradeBayModel().casing.grade).toBe(3)
   })
 
   it('submits the quick action at the Upgrade bay too (#170), and no casing buy at the Sell bay', () => {
@@ -216,7 +216,7 @@ describe('input: no direct mutation (#33 acceptance 3)', () => {
     game().undock()
     game().teleportToDock('sell')
     expect(submittedDuring(() => game().pressScreenButton('upgradebay-casing-buy'))).toEqual([])
-    expect(readUpgradeBayModel().casing.grade).toBe(1n)
+    expect(readUpgradeBayModel().casing.grade).toBe(1)
   })
 
   it('submits nothing for an action outside its context or a disabled button', () => {

@@ -31,8 +31,9 @@ import { NO_DRIVE } from '../vehicle/driveSigns'
 const FULL_TANK = 150 * 240
 
 /** A lined tunnel falling in (#43): the block's collapse and the ground it filled. */
+/** A collapse's lines, a burst's (ticket 829) among them. */
 function isCollapseEvent(event: DomainEvent): boolean {
-  return event.type === 'CollapseStarted' || event.type === 'GroundChanged'
+  return ['CollapseStarted', 'CasingBurst', 'GroundChanged'].includes(event.type)
 }
 const SIX_TRACKS = ['cargo_hold', 'boiler', 'engine', 'hull', 'drill_power', 'drill_tip']
 

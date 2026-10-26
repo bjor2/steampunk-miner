@@ -24,14 +24,7 @@ export function useScreenModel<T>(read: () => T): T {
 }
 
 function unlessUnchanged<T>(shown: T, next: T): T {
-  return modelTextOf(shown) === modelTextOf(next) ? shown : next
-}
-
-/** A model as comparable text; an uncapped count (a casing grade, ticket 829) is a bigint. */
-function modelTextOf(model: unknown): string {
-  return JSON.stringify(model, (_key, value: unknown) =>
-    typeof value === 'bigint' ? `${value}n` : value,
-  )
+  return JSON.stringify(shown) === JSON.stringify(next) ? shown : next
 }
 
 /** The replica objects are rebuilt only when they change, so a reference check is enough. */
