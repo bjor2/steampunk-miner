@@ -14,6 +14,7 @@ import {
   isNonNegativeMoneyText,
   mul,
   nthRoot,
+  powRatio,
   powInt,
   roundToWhole,
   sub,
@@ -166,6 +167,29 @@ describe('money: whole roots of growth ratios', () => {
     expect(() => nthRoot(m('1.2'), 0)).toThrow(/degree/)
     expect(() => nthRoot(m('1.2'), 2.5)).toThrow(/degree/)
     expect(() => nthRoot(m('100'), 10)).toThrow(/growth ratio/)
+  })
+})
+
+describe('money: rational powers from 1 (D6 #865)', () => {
+  it('raises a count to 0.85 so that its 20th power is the count to the 17th, to 30 digits', () => {
+    for (const count of ['1', '21', '797', '4293', '1000003']) {
+      const back = powInt(powRatio(m(count), m('0.85')), 20)
+      const exact = powInt(m(count), 17)
+      expect(cmp(div(sub(back, exact), exact), m('1e-30'))).toBe(-1)
+      expect(cmp(div(sub(exact, back), exact), m('1e-30'))).toBe(-1)
+    }
+  })
+
+  it('gives back the base itself for an exponent of 1, to 35 digits', () => {
+    const gap = sub(powRatio(m('4293'), m('1')), m('4293'))
+    expect(cmp(gap, m('1e-35'))).toBe(-1)
+    expect(cmp(sub(m('0'), gap), m('1e-35'))).toBe(-1)
+  })
+
+  it('refuses a base under 1 and an exponent of 0 or below', () => {
+    expect(() => powRatio(m('0.5'), m('0.85'))).toThrow(/base from 1/)
+    expect(() => powRatio(m('21'), m('0'))).toThrow(/positive rational/)
+    expect(() => powRatio(m('21'), m('-0.5'))).toThrow(/positive rational/)
   })
 })
 

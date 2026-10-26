@@ -108,6 +108,38 @@ export function nthRoot(base: Money, n: number): Money {
   return wrap(x)
 }
 
+const TWO = new MoneyDecimal(2)
+
+/**
+ * `base^exponent` for a base from 1 and a positive rational exponent `a / b` (D6 #865: the charge
+ * price's `cells^0.85`). The base splits into `2^k * m` with `m` in [1, 2), so both `2` and `m` are
+ * growth ratios `nthRoot` takes; each part takes its b-th root and then the whole power `a`. Only
+ * add, mul, div and `powInt` run, so every OS computes the same digits.
+ */
+export function powRatio(base: Money, exponent: Money): Money {
+  const b = unwrap(base)
+  const [power, degree] = rationalPartsOf(unwrap(exponent))
+  if (b.lessThan(1)) throw new RangeError(`powRatio takes a base from 1, got ${b.toString()}`)
+  let doublings = 0
+  let scale = new MoneyDecimal(1)
+  while (scale.times(TWO).lessThanOrEqualTo(b)) {
+    scale = scale.times(TWO)
+    doublings++
+  }
+  const twoPart = unwrap(nthRoot(wrap(TWO), degree)).pow(power * doublings)
+  const mantissaPart = unwrap(nthRoot(wrap(b.dividedBy(scale)), degree)).pow(power)
+  return wrap(twoPart.times(mantissaPart))
+}
+
+/** A positive exponent as its whole numerator and denominator, both safe integers. */
+function rationalPartsOf(exponent: Decimal): [number, number] {
+  const [num, den] = exponent.toFraction().map((part) => part.toNumber())
+  if (!exponent.isPositive() || exponent.isZero() || !Number.isSafeInteger(num * den)) {
+    throw new RangeError(`powRatio needs a positive rational exponent, got ${exponent.toString()}`)
+  }
+  return [num, den]
+}
+
 function assertRootArguments(base: Decimal, n: number): void {
   if (!Number.isSafeInteger(n) || n < 1) {
     throw new RangeError(`nthRoot needs a whole degree >= 1, got ${n}`)
