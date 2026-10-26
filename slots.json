@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-26T12:20:40+01:00",
+  "updated_at": "2026-10-26T12:21:45+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -362,9 +362,9 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-26 10:50 CET",
+    "at": "2026-10-26 12:21 CET",
     "mode": "refill-dev",
-    "triggers": "#921",
+    "triggers": "#829",
     "started": "",
     "note": "no pickable build ticket"
   },
