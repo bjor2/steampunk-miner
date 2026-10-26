@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-10-26T06:16:21+01:00",
+  "updated_at": "2026-10-26T06:19:35+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
-    "claude_enabled": 4,
+    "claude_enabled": 10,
     "dev": 8,
     "planner": 4,
     "gate": 3,
@@ -14,8 +14,8 @@
       "id": "A1",
       "account": 1,
       "label": "Claude Max 1",
-      "enabled": false,
-      "reason": "signed in, but the claude -p ping failed",
+      "enabled": true,
+      "reason": "signed in",
       "slots": [
         {
           "slot": "C1",
@@ -28,32 +28,33 @@
         },
         {
           "slot": "C2",
-          "state": "disabled",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 913,
+          "grok_slot": 2,
+          "kind": "dev",
+          "since": "2026-10-26T06:18:00+01:00",
+          "wave": "308-3D"
         },
         {
           "slot": "C3",
-          "state": "busy",
-          "ticket": 833,
-          "grok_slot": 4,
-          "kind": "dev",
-          "since": "2026-10-26T05:17:00+01:00",
-          "wave": "647-7X"
-        },
-        {
-          "slot": "C4",
-          "state": "disabled",
+          "state": "free",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
           "since": null
         },
         {
+          "slot": "C4",
+          "state": "busy",
+          "ticket": 890,
+          "grok_slot": 6,
+          "kind": "dev",
+          "since": "2026-10-26T06:18:00+01:00",
+          "wave": "878-1C"
+        },
+        {
           "slot": "C5",
-          "state": "disabled",
+          "state": "free",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
@@ -61,7 +62,7 @@
         },
         {
           "slot": "C6",
-          "state": "disabled",
+          "state": "free",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
@@ -69,8 +70,8 @@
         }
       ],
       "size": 6,
-      "used": 2,
-      "free": 0,
+      "used": 3,
+      "free": 3,
       "claims_last_hour": 2,
       "name": "Claude Max 1"
     },
@@ -92,20 +93,20 @@
         },
         {
           "slot": "C8",
-          "state": "busy",
-          "ticket": 911,
-          "grok_slot": 5,
-          "kind": "dev",
-          "since": "2026-10-26T05:17:00+01:00",
-          "wave": "308-3C"
-        },
-        {
-          "slot": "C9",
           "state": "free",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
           "since": null
+        },
+        {
+          "slot": "C9",
+          "state": "busy",
+          "ticket": 899,
+          "grok_slot": 7,
+          "kind": "dev",
+          "since": "2026-10-26T06:18:00+01:00",
+          "wave": "878-1E"
         },
         {
           "slot": "C10",
@@ -196,9 +197,11 @@
     },
     {
       "slot": 2,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 913,
+      "since": "2026-10-26T06:18:00+01:00",
+      "claude_slot": 2,
+      "wave": "308-3D"
     },
     {
       "slot": 3,
@@ -210,31 +213,31 @@
     },
     {
       "slot": 4,
-      "state": "dev",
-      "ticket": 833,
-      "since": "2026-10-26T05:17:00+01:00",
-      "claude_slot": 3,
-      "wave": "647-7X"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 5,
-      "state": "dev",
-      "ticket": 911,
-      "since": "2026-10-26T05:17:00+01:00",
-      "claude_slot": 8,
-      "wave": "308-3C"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 6,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 890,
+      "since": "2026-10-26T06:18:00+01:00",
+      "claude_slot": 4,
+      "wave": "878-1C"
     },
     {
       "slot": 7,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 899,
+      "since": "2026-10-26T06:18:00+01:00",
+      "claude_slot": 9,
+      "wave": "878-1E"
     },
     {
       "slot": 8,
@@ -279,47 +282,44 @@
     },
     {
       "slot": 2,
-      "state": "disabled",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "reason": "signed in, but the claude -p ping failed",
-      "account": 1
+      "state": "busy",
+      "ticket": 913,
+      "grok_slot": 2,
+      "since": "2026-10-26T06:18:00+01:00",
+      "account": 1,
+      "wave": "308-3D"
     },
     {
       "slot": 3,
-      "state": "busy",
-      "ticket": 833,
-      "grok_slot": 4,
-      "since": "2026-10-26T05:17:00+01:00",
-      "account": 1,
-      "wave": "647-7X"
-    },
-    {
-      "slot": 4,
-      "state": "disabled",
+      "state": "free",
       "ticket": null,
       "grok_slot": null,
       "since": null,
-      "reason": "signed in, but the claude -p ping failed",
       "account": 1
     },
     {
+      "slot": 4,
+      "state": "busy",
+      "ticket": 890,
+      "grok_slot": 6,
+      "since": "2026-10-26T06:18:00+01:00",
+      "account": 1,
+      "wave": "878-1C"
+    },
+    {
       "slot": 5,
-      "state": "disabled",
+      "state": "free",
       "ticket": null,
       "grok_slot": null,
       "since": null,
-      "reason": "signed in, but the claude -p ping failed",
       "account": 1
     },
     {
       "slot": 6,
-      "state": "disabled",
+      "state": "free",
       "ticket": null,
       "grok_slot": null,
       "since": null,
-      "reason": "signed in, but the claude -p ping failed",
       "account": 1
     },
     {
@@ -333,20 +333,20 @@
     },
     {
       "slot": 8,
-      "state": "busy",
-      "ticket": 911,
-      "grok_slot": 5,
-      "since": "2026-10-26T05:17:00+01:00",
-      "account": 2,
-      "wave": "308-3C"
-    },
-    {
-      "slot": 9,
       "state": "free",
       "ticket": null,
       "grok_slot": null,
       "since": null,
       "account": 2
+    },
+    {
+      "slot": 9,
+      "state": "busy",
+      "ticket": 899,
+      "grok_slot": 7,
+      "since": "2026-10-26T06:18:00+01:00",
+      "account": 2,
+      "wave": "878-1E"
     },
     {
       "slot": 10,
@@ -367,17 +367,17 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 4,
-      "dev": 4,
+      "used": 5,
+      "dev": 5,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
     },
     "claude": {
       "size": 10,
-      "enabled": 4,
-      "used": 4,
-      "free": 2,
+      "enabled": 10,
+      "used": 5,
+      "free": 5,
       "external": 0
     }
   },
@@ -391,12 +391,12 @@
         "map": 308,
         "lane": "remote",
         "mode": "solo",
-        "state": "ready",
+        "state": "running",
         "tickets": [
           913
         ],
         "done": [],
-        "live": 0
+        "live": 1
       },
       {
         "number": 912,
@@ -409,7 +409,7 @@
           911
         ],
         "done": [],
-        "live": 1
+        "live": 0
       },
       {
         "number": 910,
@@ -430,12 +430,12 @@
         "map": 878,
         "lane": "remote",
         "mode": "solo",
-        "state": "ready",
+        "state": "running",
         "tickets": [
           899
         ],
         "done": [],
-        "live": 0
+        "live": 1
       },
       {
         "number": 898,
@@ -491,7 +491,7 @@
         "map": 878,
         "lane": "remote",
         "mode": "solo",
-        "state": "ready",
+        "state": "running",
         "tickets": [
           888,
           889,
@@ -501,7 +501,7 @@
           888,
           889
         ],
-        "live": 0
+        "live": 1
       },
       {
         "number": 870,
@@ -564,7 +564,7 @@
           749,
           750
         ],
-        "live": 1
+        "live": 0
       },
       {
         "number": 694,
