@@ -17,4 +17,15 @@ describe('dynamite charge rings (ticket 860)', () => {
       groundRadiusMm: 6000,
     })
   })
+
+  it('widens only the ground ring at the Blast Radius level the planter owns (D9 #869)', () => {
+    const blaster = sizedBlasterOn(16, 4)
+    blaster.session.submit(0, { type: 'debug.setBlastRadiusLevel', payload: { level: 48 } })
+    plantSized(blaster.session, blaster, 4, 1)
+    expect(liveChargeRingsOf(blaster.session.state(), 'p1')).toEqual({
+      ...blaster.wall,
+      baseRadiusMm: 6000,
+      groundRadiusMm: 12000,
+    })
+  })
 })

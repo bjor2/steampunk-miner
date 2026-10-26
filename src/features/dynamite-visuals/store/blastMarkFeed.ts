@@ -9,13 +9,11 @@ import { PLANTED_CHARGE_SLOTS } from '../../../constants/scene'
 import { readAuthorityState } from '../../../store/authorityLink'
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { vehicleOf } from '../../../systems/authority/authorityState'
-import {
-  groundRadiusMmOf,
-  UNOWNED_RADIUS_LEVEL,
-} from '../../../systems/authority/charges/blastDisc'
+import { groundRadiusMmOf } from '../../../systems/authority/charges/blastDisc'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import { planetParamsOf } from '../../../systems/authority/planetOfState'
 import { chargeRadiusMm, chargeTypeOf } from '../../../systems/economy/chargeSizes'
+import { blastRadiusLevelOf } from '../../../systems/vehicle/vehicleCharges'
 import type { LaidCasing } from '../systems/render/chargeTypeLook'
 import {
   cratersAfter,
@@ -58,31 +56,29 @@ export function createRingMarks(): RingMark[] {
 
 /**
  * Fills `into` with every vehicle's live charge's rings, in slot order; the count written. The
- * planter's Blast Radius level is 0 until D9 (#869) saves one, and no casing tint until D3.
+ * ground ring is at the level its planter owns (D9 #869), the level its blast will read; no casing
+ * tint until D3.
  */
 export function readRingMarksInto(into: RingMark[]): number {
   const state = readAuthorityState()
   let written = 0
   for (const playerId in state.players) {
-    const planted = state.players[playerId].vehicle.charges.planted
+    const charges = state.players[playerId].vehicle.charges
+    const planted = charges.planted
     if (planted === null || written === into.length) continue
-    const groundMm = groundRadiusOn(state, {
-      size: planted.size,
-      radiusLevel: UNOWNED_RADIUS_LEVEL,
-    })
+    const radiusLevel = blastRadiusLevelOf(charges)
+    const groundMm = groundRadiusOn(state, { size: planted.size, radiusLevel })
     if (groundMm === null) continue
     const baseMm = chargeRadiusMm(planted.size)
-    writeRingMark(
-      planted,
-      chargeTypeOf(planted.size),
-      baseMm,
-      groundMm,
-      UNOWNED_RADIUS_LEVEL,
-      null,
-      into[written++],
-    )
+    const type = chargeTypeOf(planted.size)
+    writeRingMark(planted, type, baseMm, groundMm, radiusLevel, null, into[written++])
   }
   return written
+}
+
+/** The planet's radius in metres (a tile a metre), where the ground rings stop; 0 off a planet. */
+export function readPlanetRadiusM(): number {
+  return planetParamsOf(readAuthorityState().planet)?.radiusTiles ?? 0
 }
 
 function groundRadiusOn(

@@ -71,8 +71,8 @@ export const DECALS_PER_CRATER = 2
 export const FUSE_SPARKS_PER_TYPE = 14
 /** Sparks leave the lamp in a cone this wide about the planet's radial up. */
 export const FUSE_SPARK_SPREAD_RADIANS = 0.9
-/** The danger ring is dashed this many times round. */
-export const RING_DASHES = 24
+/** The ground ring's dash and gap together, in metres of its rim: the same on every size of ring. */
+export const RING_DASH_M = 0.75
 export const RING_OPACITY = 0.85
 /** The decal greys are authored around mid grey; the tint is lifted so a plate reads as its metal. */
 export const DECAL_TINT_GAIN = 1.6

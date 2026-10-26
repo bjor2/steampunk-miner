@@ -52,7 +52,7 @@ export function rackPanelOf(source: RackPanelSource): RackPanel | null {
   return {
     size,
     iconId: dynamiteSizeIconIdOf(size),
-    sizeText: sizeTextOf(source.state, size),
+    sizeText: sizeTextOf(source, size),
     cutText: cutTextOf(source, size),
     carried: carriedOf(charges, size),
     nextSizeText: nextSizeTextOf(charges, source),
@@ -61,8 +61,8 @@ export function rackPanelOf(source: RackPanelSource): RackPanel | null {
 }
 
 /** The size and the ground it clears at the planter's level, its own radius off a planet. */
-function sizeTextOf(state: AuthorityState, size: number): string {
-  const radiusMm = groundReachMmOf(state, size) ?? chargeRadiusMm(size)
+function sizeTextOf({ state, playerId }: RackPanelSource, size: number): string {
+  const radiusMm = groundReachMmOf(state, playerId, size) ?? chargeRadiusMm(size)
   return `Size ${size} · ${metresTextOf(radiusMm)} m`
 }
 

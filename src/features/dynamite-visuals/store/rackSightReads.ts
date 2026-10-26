@@ -1,13 +1,13 @@
 /**
  * What the dynamite rack shows from, as the local player's replica holds it now: the same rule
- * the rack piece draws and the debug read reports, so a spec reads what the car carries. The
- * Blast Radius level (#869) and the Blast Casing node (#862) are not yet on the vehicle: until
- * their tickets land, the rack reads level 0 and the node unowned, the shipped look.
+ * the rack piece draws and the debug read reports, so a spec reads what the car carries. Its
+ * sticks grow with the Blast Radius level the rig owns (D9 #869). The Blast Casing node (#862) is
+ * not yet on the vehicle: until it lands, the rack reads the node unowned, the shipped look.
  */
 import { readAuthorityState } from '../../../store/authorityLink'
 import { useGameStore } from '../../../store/gameStore'
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
-import { UNOWNED_RADIUS_LEVEL } from '../../../systems/authority/charges/blastDisc'
+import { blastRadiusLevelOf } from '../../../systems/vehicle/vehicleCharges'
 import { rackPartIdsOf, type RackSight } from '../systems/render/rackLook'
 
 export function readRackSight(): RackSight {
@@ -25,7 +25,7 @@ function rackSightOf(state: AuthorityState, playerId: string): RackSight {
   return {
     isRackMounted: charges.isRackMounted,
     carriedBySize: charges.carriedBySize,
-    radiusLevel: UNOWNED_RADIUS_LEVEL,
+    radiusLevel: blastRadiusLevelOf(charges),
     isBlastCasingOwned: false,
   }
 }

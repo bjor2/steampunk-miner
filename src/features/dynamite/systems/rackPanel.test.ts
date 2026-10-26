@@ -33,6 +33,12 @@ describe('dynamite rack panel', () => {
     expect(panelOn(sizedBlasterOn(7, 1).session.state())?.sizeText).toBe('Size 1 · 2.5 m')
   })
 
+  it('reads the radius the size clears at the Blast Radius level the rig owns (D9 #869)', () => {
+    const { session } = sizedBlasterOn(7, 1)
+    session.submit(1, { type: 'debug.setBlastRadiusLevel', payload: { level: 48 } })
+    expect(panelOn(session.state())?.sizeText).toBe('Size 1 · 5 m')
+  })
+
   it('names the size key once the rack holds two sizes', () => {
     const { session } = sizedBlasterOn(16, 4, 1)
     session.submit(1, { type: 'debug.setMoney', payload: { amount: '1e30' } })

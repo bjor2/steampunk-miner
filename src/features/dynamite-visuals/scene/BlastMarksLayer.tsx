@@ -1,8 +1,8 @@
 /**
  * The marks a charge leaves and wears (D7, ticket 866): the crater decals of the planet's last
  * blasts, cut from `prop-blast-crater` and tinted in the type's soot or the laid casing's plate and
- * trim; the two rings round every live charge, the danger zone dashed inside the ground ring, in
- * the type's colour; and the fuse sparks a burning charge throws from its lamp, a pool per type in
+ * trim; the two rings round every live charge, the danger zone solid inside the dashed ground ring
+ * (cut off at the planet's edge), in the type's colour; and the fuse sparks a burning charge throws from its lamp, a pool per type in
  * its spark colour. Fixed pools placed in `useFrame`, never through React; it never writes the
  * authority, the camera or the sound. The decals wait for the atlas under a `Suspense`, so the
  * rings and sparks draw while it loads.
@@ -17,7 +17,12 @@ import { readLiveChargesInto } from '../../../store/chargeReads'
 import { readCollapse } from '../../../store/collapseReads'
 import type { AtlasMaps } from '../../../systems/art/assetLook'
 import type { PlantedCharge } from '../../../systems/vehicle/vehicleCharges'
-import { createRingMarks, hearBlastMarks, readRingMarksInto } from '../store/blastMarkFeed'
+import {
+  createRingMarks,
+  hearBlastMarks,
+  readPlanetRadiusM,
+  readRingMarksInto,
+} from '../store/blastMarkFeed'
 import { blastMarksBudgetOf } from '../systems/render/blastMarks'
 import { chargeTypes } from '../systems/render/chargeTypeLook'
 import { craterAtlasOf } from '../systems/render/craterAtlas'
@@ -58,7 +63,7 @@ export function BlastMarksLayer() {
   useEffect(() => listenForDomainEvents(hearBlastMarks), [])
   useFrame((_, delta) => {
     const ringCount = readRingMarksInto(marks)
-    drawRings(rings, marks, ringCount)
+    drawRings(rings, marks, ringCount, readPlanetRadiusM())
     const tick = readLiveChargesInto(live)
     stepFuseSparks(sparks, delta)
     throwFuseSparks(sparks, live, tick, delta)
