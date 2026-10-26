@@ -1,14 +1,14 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-26T05:35:33Z",
+  "updated_at": "2026-10-26T05:42:51Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
       "slot": "1",
       "state": "idle",
       "issue": null,
-      "note": "free; #864 landed on main and closed",
-      "updated_at": "2026-10-26T05:22:14Z",
+      "note": "free",
+      "updated_at": "2026-10-26T05:42:51Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
@@ -16,8 +16,8 @@
       "slot": "2",
       "state": "working",
       "issue": 913,
-      "note": "tier hard, attempt 1/2 (session running)",
-      "updated_at": "2026-10-26T05:29:29Z",
+      "note": "started 2026-10-26 06:18 CET",
+      "updated_at": "2026-10-26T05:42:51Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
@@ -25,8 +25,8 @@
       "slot": "3",
       "state": "working",
       "issue": 829,
-      "note": "tier hard, attempt 1/2 (session running)",
-      "updated_at": "2026-10-26T05:35:19Z",
+      "note": "started 2026-10-26 06:20 CET",
+      "updated_at": "2026-10-26T05:42:51Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
@@ -34,8 +34,8 @@
       "slot": "4",
       "state": "working",
       "issue": 890,
-      "note": "tier hard, attempt 1/2 (session running)",
-      "updated_at": "2026-10-26T05:29:25Z",
+      "note": "started 2026-10-26 06:18 CET",
+      "updated_at": "2026-10-26T05:42:51Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
@@ -43,9 +43,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "5/10 Claude slots busy, 0/4 planner slots; status check",
+      "note": "4/10 Claude slots busy, 0/4 planner slots; status check",
       "extra": {
-        "active": 5,
+        "active": 4,
         "max": 10,
         "max_attempts": 2,
         "attempts": {
@@ -639,10 +639,11 @@
           "905": 1,
           "890": 1,
           "864": 2,
-          "869": 1,
+          "869": 0,
           "911": 0,
           "899": 1,
-          "913": 1
+          "913": 1,
+          "829": 1
         },
         "tester_grants": {
           "123": {
@@ -779,7 +780,7 @@
         "planner": [],
         "push_pending": null
       },
-      "updated_at": "2026-10-26T05:20:21Z",
+      "updated_at": "2026-10-26T05:42:51Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
@@ -797,7 +798,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-26T05:20:21Z",
+      "updated_at": "2026-10-26T05:42:51Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/6": {
@@ -806,7 +807,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-26T05:20:21Z",
+      "updated_at": "2026-10-26T05:42:51Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/7": {
@@ -814,8 +815,8 @@
       "slot": "7",
       "state": "idle",
       "issue": null,
-      "note": "free; #869 not accepted (needs-fix), will retry",
-      "updated_at": "2026-10-26T05:35:33Z",
+      "note": "free",
+      "updated_at": "2026-10-26T05:42:51Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/8": {
@@ -824,7 +825,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-26T05:20:21Z",
+      "updated_at": "2026-10-26T05:42:51Z",
       "host": "grok-bot-vm-452660841"
     },
     "tester": {
@@ -843,7 +844,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-26T05:20:21Z",
+      "updated_at": "2026-10-26T05:42:51Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/11": {
@@ -869,8 +870,8 @@
       "slot": "9",
       "state": "working",
       "issue": 899,
-      "note": "tier hard, attempt 1/2 (session running)",
-      "updated_at": "2026-10-26T05:29:17Z",
+      "note": "started 2026-10-26 06:18 CET",
+      "updated_at": "2026-10-26T05:42:51Z",
       "host": "grok-bot-vm-452660841"
     }
   },
