@@ -21,6 +21,7 @@ import { uiArtVariableOfPart } from '../art/uiArt'
 import { formatAmount } from '../displayAmount'
 import { DESIGN_TOKENS, type DesignTokens, type LayoutKind } from './designSystem'
 import { depthBandTintOf } from './depthBandTint'
+import { casingGradeTextOf } from './hudReadings'
 import { depthDialOf, type DepthMarker } from './depthDial'
 import { buyCueOfDials, type BuyCueMark } from './dialBuyCue'
 import {
@@ -290,11 +291,16 @@ function depthReadingOf(model: HudModel, tokens: DesignTokens): FaceReading {
     text: depthStripTextOf(depthTiles, tokens),
     exact: String(depthTiles),
     longText: `${longAmountOfExact(String(depthTiles))} m`,
-    badge: null,
+    badge: neededGradeBadgeOf(model.depth.neededGrade),
     markers: dial.markers,
-    bandTint: depthBandTintOf(model.depth.band),
+    bandTint: depthBandTintOf(model.depth.neededGrade),
     isHeld: false,
   }
+}
+
+/** The grade the band needs, on the depth dial's badge (ticket 829); none above the ground. */
+function neededGradeBadgeOf(neededGrade: bigint | null): string | null {
+  return neededGrade === null ? null : casingGradeTextOf(neededGrade)
 }
 
 function plainFaceOf(gauge: GaugeReading, fill: number): Omit<FaceReading, 'leftPermille'> {

@@ -4,6 +4,8 @@
  * on its curve there, and a 40 m tunnel dug and lined at grade 2 on planet 6, long enough for its
  * route to call a wrecker.
  */
+import { countAsSafeInteger } from '../../wholeCount'
+import { requiredCasingGrade } from '../../economy/casingGrades'
 import { onCurveStep } from '../../economy/vehicleStats'
 import type { CommandIntent } from '../authorityCommand'
 import { digAlong, parkAt } from '../collapse/collapseFixtures'
@@ -40,7 +42,7 @@ function isAnyWreckerGnawing(session: ScriptedSession): boolean {
   return session.state().combat.enemies.some(({ phase }) => phase === 'gnaw')
 }
 
-/** On `planetIndex`, the drill on its curve there, lining at grade 2. */
+/** On `planetIndex`, the drill on its curve there, lining at the grade its band 2 needs. */
 export function onPlanet(planetIndex: number): ScriptedSession {
   const session = createScriptedSession()
   onPlanetIntents(planetIndex).forEach((intent) => session.submit(0, intent))
@@ -58,8 +60,13 @@ function onPlanetIntents(planetIndex: number): CommandIntent[] {
     { type: 'debug.setPlanet', payload: { planetIndex } },
     onCurveDrill('drill_tip', planetIndex),
     onCurveDrill('drill_power', planetIndex),
-    { type: 'debug.setCasingGrade', payload: { grade: 2 } },
+    { type: 'debug.setCasingGrade', payload: { grade: band2GradeOf(planetIndex) } },
   ]
+}
+
+/** The ladder's band-2 grade on the planet (ticket 829): 2 on planet 1, 22 on planet 6. */
+export function band2GradeOf(planetIndex: number): number {
+  return countAsSafeInteger(requiredCasingGrade({ planetIndex, band: 2 }))
 }
 
 function onCurveDrill(upgradeId: 'drill_tip' | 'drill_power', planetIndex: number): CommandIntent {

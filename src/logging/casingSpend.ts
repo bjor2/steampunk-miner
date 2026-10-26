@@ -57,7 +57,7 @@ function planetSpendOf(
   tally: CasingSpendTally,
   planet: number,
   wallet: Money,
-  casingGrade: number,
+  casingGrade: bigint,
 ): PlanetCasingSpend {
   const known = tally.planets.get(planet)
   if (known !== undefined) return known

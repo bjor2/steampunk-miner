@@ -45,7 +45,10 @@ export interface GroundEdit {
   yielded: YieldedCell[]
 }
 
-/** Casing samples an edit drilled away (#41 `casing_drilled`), and the highest grade among them. */
+/**
+ * Casing samples an edit drilled away (#41 `casing_drilled`), and the highest grade among them as
+ * a slot of the planet's window (`casingGradeWindow.ts`), which the authority reads as a grade.
+ */
 export interface CasingCleared {
   samples: number
   grade: number

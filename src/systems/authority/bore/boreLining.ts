@@ -30,7 +30,7 @@ export function lineEndedBore(
 
 /** What a bore lines in: the casing grade and the lining type. */
 export interface BoreLining {
-  grade: number
+  grade: bigint
   liningType: string
 }
 
@@ -77,6 +77,6 @@ function layWallsOf(
   )
 }
 
-function casingPlacedOf(laid: LaidWalls, grade: number): DomainEventBody {
+function casingPlacedOf(laid: LaidWalls, grade: bigint): DomainEventBody {
   return { type: 'CasingPlaced', samples: laid.samples, relined: laid.relined, grade }
 }

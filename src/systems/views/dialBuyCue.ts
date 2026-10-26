@@ -8,6 +8,7 @@
  * table's notches, so it keeps moving past any level. A dial folded into the overflow count hands
  * its cue to the "+N" cell, so a buy never goes unseen on a phone's narrow surface strip. Pure.
  */
+import { countHeldToSafe } from '../wholeCount'
 import type { VehicleState } from '../vehicle/vehicleState'
 import { CASING_COUNT, GAUGE_CLUSTER, type DialBuyCue } from './gaugeClusterTable'
 
@@ -23,7 +24,7 @@ export interface BuyCueMark {
 const PERMILLE = 1000
 
 export function upgradeCountsOf(vehicle: VehicleState): UpgradeCounts {
-  return { ...vehicle.levels, [CASING_COUNT]: vehicle.casingGrade }
+  return { ...vehicle.levels, [CASING_COUNT]: countHeldToSafe(vehicle.casingGrade) }
 }
 
 /** The cue of these dials together; null when the table lists no count under any of them. */

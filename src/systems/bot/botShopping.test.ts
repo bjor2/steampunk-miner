@@ -239,19 +239,19 @@ describe('bot: saving for casing after a retreat (#894)', () => {
   it('buys no track while it saves for the grade its next trip wants', () => {
     const session = botAtUpgradeBayOn(1, '200')
     expect(shopForBandTwo(session, true)).toEqual([])
-    expect(session.vehicle().casingGrade).toBe(1)
+    expect(session.vehicle().casingGrade).toBe(1n)
   })
 
   it('buys the grade first once the savings pay for it', () => {
     const session = botAtUpgradeBayOn(1, '300')
     const [first] = shopForBandTwo(session, true)
     expect(first).toMatchObject({ purchaseId: 'buyCasingGrade' })
-    expect(session.vehicle().casingGrade).toBe(2)
+    expect(session.vehicle().casingGrade).toBe(2n)
   })
 
   it('still buys tracks meanwhile on a planet it never retreated on', () => {
     const session = botAtUpgradeBayOn(1, '200')
     expect(shopForBandTwo(session, false).length).toBeGreaterThan(0)
-    expect(session.vehicle().casingGrade).toBe(1)
+    expect(session.vehicle().casingGrade).toBe(1n)
   })
 })

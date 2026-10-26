@@ -49,7 +49,7 @@ describe('second-slice golden runs (S11)', () => {
     const { events } = replayedGolden('collapse-band-2-grade-1')
     const warned = ofType(events, 'CollapseWarned')
     expect(warned.length).toBeGreaterThan(0)
-    expect(warned.every((event) => event.band === 2 && event.weakestGrade === 1)).toBe(true)
+    expect(warned.every((event) => event.band === 2 && event.weakestGrade === 1n)).toBe(true)
     expect(ofType(events, 'CollapseStarted').length).toBeGreaterThan(0)
   })
 

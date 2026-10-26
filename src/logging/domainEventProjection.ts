@@ -23,7 +23,7 @@ import { resourceCollectedDataOf } from './resourceCollectedLine'
 import type { RunEventData, RunEventName } from './eventNames'
 import { sliceEventProjectionOf, type SliceRunLogLine } from './registries/eventProjections'
 import type { CommandRef } from './runEvent'
-import { countToJson } from '../systems/wholeCount'
+import { countAsSafeInteger, countToJson } from '../systems/wholeCount'
 
 /** An event name with the payload registered for it. */
 export type RunLogLine = { [N in RunEventName]: { event: N; data: RunEventData<N> } }[RunEventName]
@@ -77,27 +77,35 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
   GroundChanged: () => null,
   CasingPlaced: ({ samples, relined, grade }) => ({
     event: 'casing_placed',
-    data: { samples, relined, grade },
+    data: { samples, relined, grade: gradeToLog(grade) },
   }),
   CasingLined: ({ lengthMm, band, grade, liningType, price }) => ({
     event: 'casing_lined',
-    data: { lengthMm, band, grade, type: liningType, price },
+    data: { lengthMm, band, grade: gradeToLog(grade), type: liningType, price },
   }),
   // A breach per chunk replicates the gnaw; `ring_gnawed` is its one log line per ring (#111).
   CasingBreached: () => null,
   RingGnawed: ({ ring, band }) => ({ event: 'ring_gnawed', data: { ring, band } }),
-  CasingDrilled: ({ samples, grade }) => ({ event: 'casing_drilled', data: { samples, grade } }),
+  CasingDrilled: ({ samples, grade }) => ({
+    event: 'casing_drilled',
+    data: { samples, grade: gradeToLog(grade) },
+  }),
   CasingGradeInsufficient: ({ band, grade, required }) => ({
     event: 'casing_grade_insufficient',
-    data: { band, grade, required },
+    data: { band, grade: gradeToLog(grade), required: gradeToLog(required) },
   }),
   CasingGradeSufficient: ({ band, grade }) => ({
     event: 'casing_grade_sufficient',
-    data: { band, grade },
+    data: { band, grade: gradeToLog(grade) },
   }),
   CollapseWarned: ({ block, band, weakestGrade, required }) => ({
     event: 'collapse_warning',
-    data: { block, band, weakestGrade, required },
+    data: {
+      block,
+      band,
+      weakestGrade: gradeToLog(weakestGrade),
+      required: gradeToLog(required),
+    },
   }),
   CollapseBraced: ({ block, by }) => ({
     event: 'collapse_braced',
@@ -436,7 +444,7 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
   }),
   CasingUpgraded: ({ from, to, price, ...held }) => ({
     event: 'casing_upgraded',
-    data: { from, to, price, ...heldStepFieldsOf(held) },
+    data: { from: gradeToLog(from), to: gradeToLog(to), price, ...heldStepFieldsOf(held) },
   }),
   UpgradePurchased: (purchase) => ({
     event: 'upgrade_purchased',
@@ -483,4 +491,12 @@ function soldItemLineOf({ tier, amount }: SoldItem): { tier: number; amount: num
 
 export function causeOf(event: DomainEvent): { cmd?: CommandRef } {
   return isCommandCaused(event) ? { cmd: [event.tick, event.seq] } : {}
+}
+
+/**
+ * A casing grade as the log's integer field (ticket 829): the ladder's grades are bigint in the
+ * state, and stay safe integers wherever a planet index is one (`campaignIndex.ts`).
+ */
+function gradeToLog(grade: bigint): number {
+  return countAsSafeInteger(grade)
 }

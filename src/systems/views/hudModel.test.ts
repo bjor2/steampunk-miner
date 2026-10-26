@@ -298,7 +298,7 @@ describe('HUD model: casing badge (#41)', () => {
     const { session, tick } = digPlanet6Tunnel()
     parkUntilGnawing(session, tick)
     expect(session.state().combat.enemies.some(({ phase }) => phase === 'gnaw')).toBe(true)
-    expect(hudOf(session).casing).toEqual({ text: 'G2 GNAW', state: 'gnawed' })
+    expect(hudOf(session).casing).toEqual({ text: 'G22 GNAW', state: 'gnawed' })
   })
 
   it('hides the badge while docked', () => {

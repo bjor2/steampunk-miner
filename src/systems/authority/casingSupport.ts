@@ -1,7 +1,8 @@
 /**
  * The casing grade telegraph (decision #41 Log events and casing feel): when an accepted pose puts
  * the vehicle's centre in a band its casing grade does not hold (or the core below grade 5),
- * `CasingGradeInsufficient`; back where the grade holds, `CasingGradeSufficient`. Edge-triggered on
+ * `CasingGradeInsufficient`; back where the grade holds, `CasingGradeSufficient`. The grade the
+ * pose's cell needs is the ladder's (`requiredCasingGrade`, ticket 829). Edge-triggered on
  * the pose report, so the HUD's amber badge and the log follow within one report (12 ticks). The
  * core is reported as band 6, the core material's band in #6.
  */
@@ -19,11 +20,12 @@ export function followCasingSupport(state: AuthorityState, playerId: string): Ru
   const vehicle = vehicleOf(state, playerId)
   if (params === null || vehicle.pose === null) return unchanged(state)
   const band = supportBandOfPose(params, vehicle.pose)
-  const shortBand = shortBandOf(vehicle.casingGrade, band)
+  const required = requiredCasingGrade({ planetIndex: params.planetIndex, band })
+  const shortBand = shortBandOf(vehicle.casingGrade, band, required)
   if (shortBand === vehicle.casingShortBand) return unchanged(state)
   return {
     state: withVehicle(state, playerId, { ...vehicle, casingShortBand: shortBand }),
-    events: [supportEventOf(vehicle.casingGrade, band, shortBand)],
+    events: [supportEventOf(vehicle.casingGrade, band, required, shortBand)],
   }
 }
 
@@ -33,11 +35,16 @@ function supportBandOfPose(params: PlanetParams, pose: VehiclePose): number {
   return casingBandOfTile(params, tx, ty)
 }
 
-function shortBandOf(grade: number, band: number): number | null {
-  return grade >= requiredCasingGrade(band) ? null : band
+function shortBandOf(grade: bigint, band: number, required: bigint): number | null {
+  return grade >= required ? null : band
 }
 
-function supportEventOf(grade: number, band: number, shortBand: number | null): DomainEventBody {
+function supportEventOf(
+  grade: bigint,
+  band: number,
+  required: bigint,
+  shortBand: number | null,
+): DomainEventBody {
   if (shortBand === null) return { type: 'CasingGradeSufficient', band, grade }
-  return { type: 'CasingGradeInsufficient', band, grade, required: requiredCasingGrade(band) }
+  return { type: 'CasingGradeInsufficient', band, grade, required }
 }

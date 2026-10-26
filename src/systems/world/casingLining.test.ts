@@ -159,7 +159,7 @@ describe('casing lining', () => {
 
   it('lines every rock sample of the ring that touches air, at the grade, leaving its density', () => {
     const hole = boredHole()
-    const lined = lineRing(hole, params, RING, 2)
+    const lined = lineRing(hole, params, RING, 2n)
     for (const { sx, sy } of samplesNearCentre()) {
       const shouldLine =
         isInRing(sx, sy) && densityAt(hole, sx, sy) > 128 && touchesAir(hole, sx, sy)
@@ -173,7 +173,7 @@ describe('casing lining', () => {
   it('lines a level tunnel’s floor under the axis across the wheels’ width, above the annulus too (GD lock on #662, Q3)', () => {
     const tunnel = levelTunnel()
     const ring = casingRingAround(LEVEL_AXIS.xMm, LEVEL_AXIS.yMm)
-    const lined = lineRing(tunnel, params, ring, 2).world
+    const lined = lineRing(tunnel, params, ring, 2n).world
     const floor = floorSamplesUnder(tunnel, LEVEL_AXIS)
     expect(floor.length).toBeGreaterThan(0)
     expect(floor.some(({ sx, sy }) => !isInAnnulusOf(LEVEL_AXIS, sx, sy))).toBe(true)
@@ -192,7 +192,7 @@ describe('casing lining', () => {
     const wall = { sx: 1250 / MM_PER_SAMPLE, sy: CENTRE.yMm / MM_PER_SAMPLE }
     expect(densityAt(hole, wall.sx, wall.sy)).toBeGreaterThan(128)
     expect(touchesAir(hole, wall.sx, wall.sy)).toBe(true)
-    const lined = lineRing(hole, params, casingRingAround(cut.xMm + 20, cut.yMm), 2).world
+    const lined = lineRing(hole, params, casingRingAround(cut.xMm + 20, cut.yMm), 2n).world
     expect(casingAt(lined, wall.sx, wall.sy)).toBe(2)
   })
 
@@ -208,8 +208,8 @@ describe('casing lining', () => {
       },
       255,
     ).world
-    const first = lineRing(tunnel, params, RING, 2).world
-    const second = lineRing(first, params, casingRingAround(CENTRE.xMm + 500, CENTRE.yMm), 2)
+    const first = lineRing(tunnel, params, RING, 2n).world
+    const second = lineRing(first, params, casingRingAround(CENTRE.xMm + 500, CENTRE.yMm), 2n)
     const lined = samplesNearCentre().filter(({ sx, sy }) => casingAt(second.world, sx, sy) > 0)
     expect(lined.length).toBeGreaterThan(0)
     expect(lined.every(({ sx, sy }) => touchesAir(second.world, sx, sy))).toBe(true)
@@ -220,48 +220,48 @@ describe('casing lining', () => {
     const halfCut = clearDisc(EMPTY_WORLD, params, edge, 127).world
     expect(densityAt(halfCut, 0, 1120)).toBe(128)
     const ring = { xMm: 0, yMm: 1120 * MM_PER_SAMPLE, clearMm: 0, widthMm: 300 }
-    const lined = lineRing(halfCut, params, ring, 1)
+    const lined = lineRing(halfCut, params, ring, 1n)
     expect(lined.placed).toBe(4)
     expect(casingAt(lined.world, 0, 1120)).toBe(0)
   })
 
   it('never narrows the bore: the contour is the same lined or not', () => {
     const hole = boredHole()
-    const lined = lineRing(lineRing(hole, params, RING, 2).world, params, RING, 4)
+    const lined = lineRing(lineRing(hole, params, RING, 2n).world, params, RING, 4n)
     expect(keepsDensity(hole, lined.world)).toBe(true)
   })
 
   it('raises lower-grade lining to the new grade when a ring passes again', () => {
-    const weak = lineRing(boredHole(), params, RING, 2)
-    const relined = lineRing(weak.world, params, RING, 4)
+    const weak = lineRing(boredHole(), params, RING, 2n)
+    const relined = lineRing(weak.world, params, RING, 4n)
     expect(relined.relined).toBe(weak.placed)
     const grades = samplesNearCentre().map(({ sx, sy }) => casingAt(relined.world, sx, sy))
     expect(grades.filter((grade) => grade > 0).every((grade) => grade === 4)).toBe(true)
   })
 
   it('reports the rock samples it newly lined, and none when a ring only relines', () => {
-    const first = lineRing(boredHole(), params, RING, 2)
+    const first = lineRing(boredHole(), params, RING, 2n)
     expect(first.linedSamples).toHaveLength(first.placed)
     expect(first.linedSamples.every(({ sx, sy }) => casingAt(first.world, sx, sy) === 2)).toBe(true)
-    const relined = lineRing(first.world, params, RING, 4)
+    const relined = lineRing(first.world, params, RING, 4n)
     expect(relined.linedSamples).toEqual([])
   })
 
   it('keeps a higher grade when a lower ring passes', () => {
-    const strong = lineRing(boredHole(), params, RING, 5)
-    const weak = lineRing(strong.world, params, RING, 2)
+    const strong = lineRing(boredHole(), params, RING, 5n)
+    const weak = lineRing(strong.world, params, RING, 2n)
     expect(weak.relined).toBe(0)
     expect(samplesNearCentre().some(({ sx, sy }) => casingAt(weak.world, sx, sy) === 5)).toBe(true)
   })
 
   it('lines at grade 15 at most, the most a sample holds', () => {
-    const lined = lineRing(boredHole(), params, RING, 40)
+    const lined = lineRing(boredHole(), params, RING, 40n)
     const grades = samplesNearCentre().map(({ sx, sy }) => casingAt(lined.world, sx, sy))
     expect(Math.max(...grades)).toBe(15)
   })
 
   it('reports where it changed the ground', () => {
-    expect(lineRing(boredHole(), params, RING, 1).changes.length).toBeGreaterThan(0)
+    expect(lineRing(boredHole(), params, RING, 1n).changes.length).toBeGreaterThan(0)
   })
 })
 
@@ -294,7 +294,7 @@ describe('casing and the yield rule', () => {
 
   it('yields a lined cell at the same eighth sample as an unlined one', () => {
     const drilled = clearSamples(EMPTY_WORLD, SEVEN)
-    const lined = lineRing(drilled, params, LINING, 1)
+    const lined = lineRing(drilled, params, LINING, 1n)
     expect(lined.placed).toBeGreaterThan(0)
     expect(cellDensitySum(lined.world, params, TILE)).toBe(cellDensitySum(drilled, params, TILE))
     const unlinedEighth = clearDisc(drilled, params, sampleDisc(3, 1121), 255)
@@ -305,8 +305,8 @@ describe('casing and the yield rule', () => {
 
   it('never yields a cell for lining it', () => {
     const drilled = clearSamples(EMPTY_WORLD, SEVEN)
-    expect(lineRing(drilled, params, LINING, 1).yielded).toEqual([])
-    expect(isTileYielded(lineRing(drilled, params, LINING, 1).world, TILE)).toBe(false)
+    expect(lineRing(drilled, params, LINING, 1n).yielded).toEqual([])
+    expect(isTileYielded(lineRing(drilled, params, LINING, 1n).world, TILE)).toBe(false)
   })
 })
 
@@ -317,7 +317,7 @@ describe('re-drilling casing', () => {
   const WIDE = { ...CENTRE, radiusMm: 2000, floorRadiusMm: null }
 
   it('drills lining in the drill time of its grade, then clears its casing at density 0', () => {
-    const lined = lineRing(boredHole(), params, RING, 3)
+    const lined = lineRing(boredHole(), params, RING, 3n)
     const half = carveDisc(lined.world, params, WIDE, { firstTick: 0, ticks: 24 }, SLOWER_CASING)
     expect(half.casingCleared).toEqual({ samples: 0, grade: 0 })
     const linedSample = samplesNearCentre().find(({ sx, sy }) => casingAt(lined.world, sx, sy) > 0)
@@ -376,7 +376,7 @@ describe('casing lining: a trail ring along its stretch of axis (the TD’s Q1 r
 
   /** Rings at each point, each standing for the half metre above it, as a dig down lays them. */
   function linedDown(world: WorldState, ringAt: (y: number) => CasingRing): WorldState {
-    return RING_YS.reduce((lined, y) => lineRing(lined, params, ringAt(y), 2).world, world)
+    return RING_YS.reduce((lined, y) => lineRing(lined, params, ringAt(y), 2n).world, world)
   }
 
   it('lines all the wall rock between its points, which the circles round them leave', () => {
@@ -395,8 +395,8 @@ describe('casing lining: a trail ring along its stretch of axis (the TD’s Q1 r
     const shaft = boredShaft()
     const below = casingRingAlong(SHAFT_X, 284_000, { xMm: SHAFT_X, yMm: 284_500 }, NO_RING_SWEEP)
     const above = casingRingAlong(SHAFT_X, 284_500, { xMm: SHAFT_X, yMm: 285_000 }, NO_RING_SWEEP)
-    const first = lineRing(shaft, params, below, 2)
-    const second = lineRing(first.world, params, above, 2)
+    const first = lineRing(shaft, params, below, 2n)
+    const second = lineRing(first.world, params, above, 2n)
     expect(first.placed).toBeGreaterThan(0)
     expect(first.linedSamples.every(({ sy }) => sy * MM_PER_SAMPLE <= 284_500)).toBe(true)
     expect(second.placed).toBeGreaterThan(0)
@@ -452,7 +452,7 @@ describe('casing lining: a trail ring swept by its cut (the GD’s (e) ruling on
   function linedDown(world: WorldState, sweep: { xMm: number; yMm: number }): WorldState {
     return RING_YS.reduce((lined, y) => {
       const from = { xMm: BODY_X, yMm: y + CASING_RING_SPACING_MM }
-      return lineRing(lined, params, casingRingAlong(BODY_X, y, from, sweep), 2).world
+      return lineRing(lined, params, casingRingAlong(BODY_X, y, from, sweep), 2n).world
     }, world)
   }
 
@@ -503,7 +503,7 @@ describe('casing lining: a trail ring swept by its cut (the GD’s (e) ruling on
   it('still lines nothing behind its stretch’s start, which the stretch before’s ring bills', () => {
     const shaft = slantedShaft()
     const from = { xMm: BODY_X, yMm: 284_500 }
-    const lined = lineRing(shaft, params, casingRingAlong(BODY_X, 284_000, from, SWEEP), 2)
+    const lined = lineRing(shaft, params, casingRingAlong(BODY_X, 284_000, from, SWEEP), 2n)
     expect(lined.placed).toBeGreaterThan(0)
     expect(lined.linedSamples.every(({ sy }) => sy * MM_PER_SAMPLE < 284_500)).toBe(true)
   })
@@ -511,7 +511,7 @@ describe('casing lining: a trail ring swept by its cut (the GD’s (e) ruling on
   it('lines no further ahead of its point than its stretch’s own band, the ground its drill turns into', () => {
     const shaft = slantedShaft()
     const from = { xMm: BODY_X, yMm: 284_500 }
-    const lined = lineRing(shaft, params, casingRingAlong(BODY_X, 284_000, from, SWEEP), 2)
+    const lined = lineRing(shaft, params, casingRingAlong(BODY_X, 284_000, from, SWEEP), 2n)
     const reach = drillStampRadiusMm() + 250
     expect(lined.placed).toBeGreaterThan(0)
     expect(lined.linedSamples.every(({ sy }) => sy * MM_PER_SAMPLE > 284_000 - reach)).toBe(true)

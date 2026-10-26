@@ -79,8 +79,8 @@ describe('breached casing in play (#94 acceptance 5 and 9)', () => {
     expect(warned.map(({ block }) => block)).toContain(GNAWED_BLOCK)
     expect(warned.find(({ block }) => block === GNAWED_BLOCK)).toMatchObject({
       band: 2,
-      weakestGrade: 1,
-      required: 2,
+      weakestGrade: 1n,
+      required: 2n,
     })
   })
 

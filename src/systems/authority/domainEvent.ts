@@ -241,17 +241,17 @@ export interface KernelDomainEventBodies {
     version: number
   }
   /** One ring of lining (#41): air samples lined and lower-grade casing raised, at `grade`. */
-  CasingPlaced: { samples: number; relined: number; grade: number }
+  CasingPlaced: { samples: number; relined: number; grade: bigint }
   /**
    * A ring's first-placed lining charged (#76): `lengthMm` of new lining in `liningType` (#113)
    * against the wall's `band`, its canonical `price` added to the vehicle's lining bill (paid at the
    * next sale, #115).
    */
-  CasingLined: { lengthMm: number; band: number; grade: number; liningType: string; price: string }
+  CasingLined: { lengthMm: number; band: number; grade: bigint; liningType: string; price: string }
   /** The vehicle entered a band (6: the core) its casing grade does not hold (#41). */
-  CasingGradeInsufficient: { band: number; grade: number; required: number }
+  CasingGradeInsufficient: { band: number; grade: bigint; required: bigint }
   /** The vehicle is back where its casing grade holds (#41). */
-  CasingGradeSufficient: { band: number; grade: number }
+  CasingGradeSufficient: { band: number; grade: bigint }
   /**
    * A ring of lining gnawed (#111): `samples` of chunk `cx,cy` turned breached, by the tunnel
    * wrecker `enemyId` (null for `debug.gnawCasing`). Guests learn of the breach from this.
@@ -260,13 +260,13 @@ export interface KernelDomainEventBodies {
   /** The same gnaw once per ring: its axis point `x,y` in mm and the deepest band of its wall. */
   RingGnawed: { ring: string; band: number }
   /** The drill cleared lining (#41): casing samples drilled to air, the highest grade among them. */
-  CasingDrilled: { samples: number; grade: number }
+  CasingDrilled: { samples: number; grade: bigint }
   /**
    * Collapse (#43): a weak block near a vehicle starts its 60-tick telegraph, naming the weakest
    * lining's grade and the band it sits in; guests learn of a collapse from this, then from the
    * refill's ordinary `GroundChanged`.
    */
-  CollapseWarned: { block: string; band: number; weakestGrade: number; required: number }
+  CollapseWarned: { block: string; band: number; weakestGrade: bigint; required: bigint }
   /**
    * A slice braced a warning block (ticket 331): it holds in its warning and never refills while
    * braced; `by` names the bracing providers, sorted. When the brace ends the block warns afresh
@@ -659,7 +659,7 @@ export interface KernelDomainEventBodies {
   /** One Blast Radius level bought: level `from` to `to`, for `price` (D9 #869). */
   BlastRadiusUpgraded: PurchaseChainStamp & { from: number; to: number; price: string }
   /** One casing grade bought (#41): `price` as a canonical string. */
-  CasingUpgraded: PurchaseChainStamp & { from: number; to: number; price: string }
+  CasingUpgraded: PurchaseChainStamp & { from: bigint; to: bigint; price: string }
   UpgradePurchased: PurchaseChainStamp & {
     upgradeId: string
     kind: 'vertical'

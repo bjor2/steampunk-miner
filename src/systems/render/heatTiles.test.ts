@@ -22,7 +22,7 @@ const REFRACTORY = 1
 function batchOf(world: WorldState, cx: number, cy: number): ChunkTileBatch {
   const halo = chunkDensityHaloOf((x, y) => currentDensityOfChunk(world, params, x, y), cx, cy)
   const cells = materialCellsOfChunk(world, params, cx, cy)
-  const lining = liningCellsOf(currentCasingOfChunk(world, cx, cy))
+  const lining = liningCellsOf(currentCasingOfChunk(world, cx, cy), params.planetIndex)
   return buildChunkTileBatch(params, cx, cy, cells, halo, lining)
 }
 
@@ -61,8 +61,8 @@ describe('heat planet tiles (#113 Visibility)', () => {
       255,
     )
     const ring = casingRingAround(centre.xMm, centre.yMm)
-    const refractory = lineRing(hole.world, params, ring, 3, REFRACTORY).world
-    const standard = lineRing(hole.world, params, ring, 3).world
+    const refractory = lineRing(hole.world, params, ring, 3n, REFRACTORY).world
+    const standard = lineRing(hole.world, params, ring, 3n).world
     const wall = { tx: 20, ty: 501 }
     expect(stylesAt(refractory, wall.tx, wall.ty)).toEqual([TILE_STYLE.ground, 1])
     expect(stylesAt(standard, wall.tx, wall.ty)).toEqual([TILE_STYLE.ground, 0])

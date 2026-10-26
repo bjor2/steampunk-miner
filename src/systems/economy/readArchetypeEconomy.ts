@@ -52,9 +52,11 @@ function readArchetype(
     tail: readTail(reader, `${path}.tail`, archetype.tail),
     liningType: reader.text(`${path}.liningType`, archetype.liningType),
     liningMultiplier: reader.money(`${path}.liningMultiplier`, archetype.liningMultiplier),
+    casingBiomeDelta: reader.safeInteger(`${path}.casingBiomeDelta`, archetype.casingBiomeDelta),
   }
   checkBandCounts(reader, path, read, coreTierBand - 1)
   checkGauge(reader, path, read)
+  checkBiomeDelta(reader, path, read.casingBiomeDelta)
   return read
 }
 
@@ -117,4 +119,9 @@ function checkGauge(reader: FieldReader, path: string, archetype: HazardArchetyp
   if (archetype.throttleAt <= 0 || archetype.throttleAt >= archetype.gaugeMax) {
     reader.record(`${path}.throttleAt must lie inside the gauge, above 0 and below gaugeMax`)
   }
+}
+
+/** The GD re-lock on ticket 829: a biome asks its band's grade or one more, never two. */
+function checkBiomeDelta(reader: FieldReader, path: string, delta: number): void {
+  if (delta !== 0 && delta !== 1) reader.record(`${path}.casingBiomeDelta must be 0 or 1`)
 }

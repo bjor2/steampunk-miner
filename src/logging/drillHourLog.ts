@@ -125,12 +125,12 @@ function linedRings(hour: LoggedHour, metresPerTick: number): DomainEventBody[] 
   hour.ringMmOwed += metresPerTick * MM_PER_METRE
   const bodies: DomainEventBody[] = []
   for (; hour.ringMmOwed >= RING_MM; hour.ringMmOwed -= RING_MM) {
-    bodies.push({ type: 'CasingPlaced', samples: 12, relined: 0, grade: 1 })
+    bodies.push({ type: 'CasingPlaced', samples: 12, relined: 0, grade: 1n })
     bodies.push({
       type: 'CasingLined',
       lengthMm: RING_MM,
       band: 1,
-      grade: 1,
+      grade: 1n,
       liningType: 'iron',
       price: '2.5e+0',
     })

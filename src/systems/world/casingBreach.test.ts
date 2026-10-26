@@ -39,7 +39,7 @@ function carveTunnel(world: WorldState, y: number, fromX = FROM_X, toX = TO_X): 
 function lineTunnel(
   world: WorldState,
   y: number,
-  grade: number,
+  grade: bigint,
   toX = TO_X,
   fromX = FROM_X,
 ): WorldState {
@@ -78,7 +78,7 @@ const middleBlock = (y: number) => blockContaining({ xMm: MIDDLE_X, yMm: y })
 
 describe('breached casing', () => {
   it('breaches every lined sample of a gnawed ring, grade 1 to 15, and nothing else', () => {
-    const lined = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_1_Y), BAND_1_Y, 3)
+    const lined = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_1_Y), BAND_1_Y, 3n)
     const before = ringCasing(lined, MIDDLE_X, BAND_1_Y)
     const gnaw = breachRing(lined, params, casingRingAround(MIDDLE_X, BAND_1_Y))
     const after = ringCasing(gnaw.world, MIDDLE_X, BAND_1_Y)
@@ -95,64 +95,68 @@ describe('breached casing', () => {
     expect(onRock.breachedSamples).toEqual([])
     expect(onRock.changes).toEqual([])
     expect(digestAt(onRock.world, MIDDLE_X, BAND_1_Y)).toBe(digestAt(unlined, MIDDLE_X, BAND_1_Y))
-    const once = breachRing(lineTunnel(unlined, BAND_1_Y, 1), params, ring).world
+    const once = breachRing(lineTunnel(unlined, BAND_1_Y, 1n), params, ring).world
     const twice = breachRing(once, params, ring)
     expect(twice.breachedSamples).toEqual([])
     expect(digestAt(twice.world, MIDDLE_X, BAND_1_Y)).toBe(digestAt(once, MIDDLE_X, BAND_1_Y))
   })
 
   it('changes the chunk digest when a ring is breached, so host and guest can tell', () => {
-    const lined = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_1_Y), BAND_1_Y, 1)
+    const lined = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_1_Y), BAND_1_Y, 1n)
     const gnawed = breachRing(lined, params, casingRingAround(MIDDLE_X, BAND_1_Y)).world
     expect(digestAt(gnawed, MIDDLE_X, BAND_1_Y)).not.toBe(digestAt(lined, MIDDLE_X, BAND_1_Y))
   })
 
   it('answers whether a ring still holds lining a gnaw would breach', () => {
     const ring = casingRingAround(MIDDLE_X, BAND_1_Y)
-    const lined = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_1_Y), BAND_1_Y, 1)
+    const lined = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_1_Y), BAND_1_Y, 1n)
     expect(hasIntactLining(carveTunnel(EMPTY_WORLD, BAND_1_Y), ring)).toBe(false)
     expect(hasIntactLining(lined, ring)).toBe(true)
     expect(hasIntactLining(breachRing(lined, params, ring).world, ring)).toBe(false)
   })
 
   it('holds a band-1 block lined at grade 1 once a stretch is breached: a gnaw never goes below 1 (#676)', () => {
-    const lined = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_1_Y), BAND_1_Y, 1)
+    const lined = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_1_Y), BAND_1_Y, 1n)
     expect(weaknessOfBlock(gnawMiddle(lined, BAND_1_Y), params, middleBlock(BAND_1_Y))).toBeNull()
   })
 
   it('makes a band-2 block lined at grade 2 weak at grade 1 once a stretch is breached', () => {
-    const lined = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_2_Y), BAND_2_Y, 2)
+    const lined = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_2_Y), BAND_2_Y, 2n)
     expect(weaknessOfBlock(lined, params, middleBlock(BAND_2_Y))).toBeNull()
-    expect(weaknessOfBlock(gnawMiddle(lined, BAND_2_Y), params, middleBlock(BAND_2_Y))).toEqual({
+    expect(
+      weaknessOfBlock(gnawMiddle(lined, BAND_2_Y), params, middleBlock(BAND_2_Y)),
+    ).toMatchObject({
       band: 2,
-      weakestGrade: 1,
-      required: 2,
+      weakestGrade: 1n,
+      required: 2n,
     })
   })
 
   it('makes a band-5 block lined at grade 5 weak at grade 4 once a stretch is breached', () => {
     const { y, fromX, toX } = BAND_5
-    const lined = lineTunnel(carveTunnel(EMPTY_WORLD, y, fromX, toX), y, 5, toX, fromX)
+    const lined = lineTunnel(carveTunnel(EMPTY_WORLD, y, fromX, toX), y, 5n, toX, fromX)
     const block = blockContaining({ xMm: 0, yMm: y })
     expect(weaknessOfBlock(lined, params, block)).toBeNull()
-    expect(weaknessOfBlock(gnawMiddle(lined, y, 0), params, block)).toEqual({
+    expect(weaknessOfBlock(gnawMiddle(lined, y, 0), params, block)).toMatchObject({
       band: 5,
-      weakestGrade: 4,
-      required: 5,
+      weakestGrade: 4n,
+      required: 5n,
     })
   })
 
   it('reads a breach the same whatever grade the lining held: the band decides, not the lining', () => {
-    const lined = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_2_Y), BAND_2_Y, 9)
-    expect(weaknessOfBlock(gnawMiddle(lined, BAND_2_Y), params, middleBlock(BAND_2_Y))).toEqual({
+    const lined = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_2_Y), BAND_2_Y, 9n)
+    expect(
+      weaknessOfBlock(gnawMiddle(lined, BAND_2_Y), params, middleBlock(BAND_2_Y)),
+    ).toMatchObject({
       band: 2,
-      weakestGrade: 1,
-      required: 2,
+      weakestGrade: 1n,
+      required: 2n,
     })
   })
 
   it('still ignores never-lined rock beside a breached ring', () => {
-    const halfLined = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_2_Y), BAND_2_Y, 2, MIDDLE_X - 6000)
+    const halfLined = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_2_Y), BAND_2_Y, 2n, MIDDLE_X - 6000)
     let gnawed = halfLined
     for (let x = FROM_X; x <= MIDDLE_X - 6000; x += 500) {
       gnawed = breachRing(gnawed, params, casingRingAround(x, BAND_2_Y)).world
@@ -166,8 +170,11 @@ describe('breached casing', () => {
   })
 
   it('relines a breached ring at the vehicle grade as relining, never as new lining', () => {
-    const gnawed = gnawMiddle(lineTunnel(carveTunnel(EMPTY_WORLD, BAND_1_Y), BAND_1_Y, 1), BAND_1_Y)
-    const reline = lineRing(gnawed, params, casingRingAround(MIDDLE_X, BAND_1_Y), 1)
+    const gnawed = gnawMiddle(
+      lineTunnel(carveTunnel(EMPTY_WORLD, BAND_1_Y), BAND_1_Y, 1n),
+      BAND_1_Y,
+    )
+    const reline = lineRing(gnawed, params, casingRingAround(MIDDLE_X, BAND_1_Y), 1n)
     expect(reline.placed).toBe(0)
     expect(reline.linedSamples).toEqual([])
     expect(reline.relined).toBeGreaterThan(5)
@@ -177,22 +184,28 @@ describe('breached casing', () => {
   it('keeps the lining type of a breached ring: free to reline in it, charged in another (#113)', () => {
     const ring = casingRingAround(MIDDLE_X, BAND_1_Y)
     const tunnel = carveTunnel(EMPTY_WORLD, BAND_1_Y)
-    const refractory = breachRing(lineRing(tunnel, params, ring, 2, 1).world, params, ring).world
-    const sameType = lineRing(refractory, params, ring, 2, 1)
+    const refractory = breachRing(lineRing(tunnel, params, ring, 2n, 1).world, params, ring).world
+    const sameType = lineRing(refractory, params, ring, 2n, 1)
     expect([sameType.placed, sameType.relined > 0]).toEqual([0, true])
-    const standard = breachRing(lineRing(tunnel, params, ring, 2).world, params, ring).world
-    expect(lineRing(standard, params, ring, 2, 1).placed).toBeGreaterThan(0)
+    const standard = breachRing(lineRing(tunnel, params, ring, 2n).world, params, ring).world
+    expect(lineRing(standard, params, ring, 2n, 1).placed).toBeGreaterThan(0)
   })
 
   it('stops a breached block being weak once the stretch is relined', () => {
-    const gnawed = gnawMiddle(lineTunnel(carveTunnel(EMPTY_WORLD, BAND_2_Y), BAND_2_Y, 2), BAND_2_Y)
+    const gnawed = gnawMiddle(
+      lineTunnel(carveTunnel(EMPTY_WORLD, BAND_2_Y), BAND_2_Y, 2n),
+      BAND_2_Y,
+    )
     expect(weaknessOfBlock(gnawed, params, middleBlock(BAND_2_Y))).not.toBeNull()
-    const relined = lineTunnel(gnawed, BAND_2_Y, 2)
+    const relined = lineTunnel(gnawed, BAND_2_Y, 2n)
     expect(weaknessOfBlock(relined, params, middleBlock(BAND_2_Y))).toBeNull()
   })
 
   it('leaves 0 where the drill carves a breached sample', () => {
-    const gnawed = gnawMiddle(lineTunnel(carveTunnel(EMPTY_WORLD, BAND_1_Y), BAND_1_Y, 1), BAND_1_Y)
+    const gnawed = gnawMiddle(
+      lineTunnel(carveTunnel(EMPTY_WORLD, BAND_1_Y), BAND_1_Y, 1n),
+      BAND_1_Y,
+    )
     const disc = { xMm: MIDDLE_X, yMm: BAND_1_Y, radiusMm: 1750, floorRadiusMm: null }
     const widened = clearDisc(gnawed, params, disc, 255).world
     const ring = ringSamplesOf(casingRingAround(MIDDLE_X, BAND_1_Y))
@@ -204,7 +217,7 @@ describe('breached casing', () => {
 
   it('leaves 0 in every sample a collapse refill touched', () => {
     const block = middleBlock(BAND_1_Y)
-    let world = gnawMiddle(lineTunnel(carveTunnel(EMPTY_WORLD, BAND_1_Y), BAND_1_Y, 1), BAND_1_Y)
+    let world = gnawMiddle(lineTunnel(carveTunnel(EMPTY_WORLD, BAND_1_Y), BAND_1_Y, 1n), BAND_1_Y)
     expect(
       samplesOfBlock(block).some(({ sx, sy }) => casingAt(world, sx, sy) === CASING_BREACHED),
     ).toBe(true)

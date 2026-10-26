@@ -51,9 +51,11 @@ export interface VehicleState {
   levels: UpgradeLevels
   /**
    * The casing grade (#41): the player's own vertical counter next to the six tracks, never one
-   * of them, so it is not in the visual-tier sum. Raised one at a time at the Upgrade bay.
+   * of them, so it is not in the visual-tier sum. Raised one at a time at the Upgrade bay, an
+   * uncapped track on the ladder of grades by depth (ticket 829), so a bigint; the rig lays the
+   * best grade it owns.
    */
-  casingGrade: number
+  casingGrade: bigint
   /**
    * The band (6 for the core) the vehicle last reported itself in while its casing grade did not
    * hold it, or null when it does (#41): the edge of `casing_grade_insufficient` and the amber badge.

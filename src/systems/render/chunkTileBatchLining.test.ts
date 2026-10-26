@@ -23,6 +23,8 @@ import { drillStampRadiusMm } from '../vehicle/drillBore'
 
 const params = planetParamsFor(83921, 8)
 const REFRACTORY = 1
+/** Planet 8's band-5 grade on the ladder (ticket 829): inside its window of grades. */
+const RING_GRADE = 33n
 const CENTRE = { xMm: 20500, yMm: 500500 }
 const WALL: TilePoint = { tx: 20, ty: 501 }
 
@@ -30,7 +32,7 @@ function batchOf(world: WorldState, tile: TilePoint): ChunkTileBatch {
   const [cx, cy] = [chunkOfTile(tile.tx), chunkOfTile(tile.ty)]
   const halo = chunkDensityHaloOf((x, y) => currentDensityOfChunk(world, params, x, y), cx, cy)
   const cells = materialCellsOfChunk(world, params, cx, cy)
-  const lining = liningCellsOf(currentCasingOfChunk(world, cx, cy))
+  const lining = liningCellsOf(currentCasingOfChunk(world, cx, cy), params.planetIndex)
   return buildChunkTileBatch(params, cx, cy, cells, halo, lining)
 }
 
@@ -55,7 +57,7 @@ function linedBore(typeIndex?: number): WorldState {
     255,
   )
   const ring = casingRingAround(CENTRE.xMm, CENTRE.yMm)
-  return lineRing(hole.world, params, ring, 3, typeIndex).world
+  return lineRing(hole.world, params, ring, RING_GRADE, typeIndex).world
 }
 
 describe('casing lining in the chunk mesh (ticket 315)', () => {
@@ -80,7 +82,10 @@ describe('casing lining in the chunk mesh (ticket 315)', () => {
   })
 
   it('marks no cell of a chunk with no lining', () => {
-    const { standard, refractory } = liningCellsOf(currentCasingOfChunk(EMPTY_WORLD, 0, 15))
+    const { standard, refractory } = liningCellsOf(
+      currentCasingOfChunk(EMPTY_WORLD, 0, 15),
+      params.planetIndex,
+    )
     expect([...standard, ...refractory].every((mark) => mark === 0)).toBe(true)
     expect(standard).toHaveLength(CHUNK_SIZE * CHUNK_SIZE)
   })
@@ -99,12 +104,12 @@ describe('casing grade looks in the chunk mesh (ticket 830)', () => {
     return null
   }
 
-  it("carries a grade-3 standard ring's plate, finish and type in the wall cell's casing slot", () => {
-    const look = casingGradeLookOf(3)
+  it("carries a grade-33 standard ring's plate, finish and type in the wall cell's casing slot", () => {
+    const look = casingGradeLookOf(33)
     expect(drawnLookAt(linedBore(), WALL)).toEqual({
       plateIndex: look.plateIndex,
       finishIndex: look.finishIndex,
-      drawnPips: 0,
+      drawnPips: look.drawnPips,
       typeIndex: 0,
     })
     expect(look.plate.id).toBe('iron')
@@ -112,14 +117,19 @@ describe('casing grade looks in the chunk mesh (ticket 830)', () => {
 
   it("carries a refractory ring's lining type beside its grade, so the trim draws over the plate", () => {
     expect(drawnLookAt(linedBore(REFRACTORY), WALL)).toMatchObject({
-      plateIndex: casingGradeLookOf(3).plateIndex,
+      plateIndex: casingGradeLookOf(33).plateIndex,
       typeIndex: REFRACTORY,
     })
   })
 
   it('shows a relined cell at its highest grade, the newest lining over the history', () => {
-    const relined = lineRing(linedBore(), params, casingRingAround(CENTRE.xMm, CENTRE.yMm), 5).world
-    expect(drawnLookAt(relined, WALL)?.plateIndex).toBe(casingGradeLookOf(5).plateIndex)
+    const relined = lineRing(
+      linedBore(),
+      params,
+      casingRingAround(CENTRE.xMm, CENTRE.yMm),
+      35n,
+    ).world
+    expect(drawnLookAt(relined, WALL)?.plateIndex).toBe(casingGradeLookOf(35).plateIndex)
   })
 
   it('leaves the casing slot at 0 on a bore with no lining and on every cell of an unlined chunk', () => {
@@ -130,7 +140,7 @@ describe('casing grade looks in the chunk mesh (ticket 830)', () => {
       255,
     )
     expect(drawnLookAt(hole.world, WALL)).toBeNull()
-    const { look } = liningCellsOf(currentCasingOfChunk(EMPTY_WORLD, 0, 15))
+    const { look } = liningCellsOf(currentCasingOfChunk(EMPTY_WORLD, 0, 15), params.planetIndex)
     expect(look.every((value) => value === NO_CASING_LOOK)).toBe(true)
   })
 })

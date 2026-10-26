@@ -20,6 +20,10 @@
  *   741, Systems' final spec on #741): `t_g(p, k) = t_top(p) + Δ_k`, so a gem is worth
  *   `G = V(t_g)`. The provider answers the formula for every planet from 1, whether or not a species
  *   pool binds gems to it; none with no provider. Never stored: no row authors a gem price.
+ * - `casingSurfaceGrade`: q_surface, the casing grade the planet's surface band needs (ticket 829,
+ *   Systems' field): `casingGradeStart + gradesPerPlanet * (g - 1)` generated, so a planet's
+ *   surface asks the planet before's bottom grade and arrival never bursts. A provider may lift it
+ *   (an offset start) within the bounds `casingSurfaceOffsets.ts` checks.
  */
 import { ECONOMY } from '../economy/economy'
 import { planetArchetypeOf } from '../world/planetArchetype'
@@ -60,11 +64,16 @@ export interface PlanetRow {
   gravityMultiplier: number
   /** The tiers the planet's gems sell at, cheapest first; empty with no provider. */
   gemSaleTiers: readonly number[]
+  /** The casing grade the surface band needs (q_surface); the default sits on the ladder. */
+  casingSurfaceGrade: bigint
 }
 
 /** The fields a provider lays over the generated row; one it leaves out keeps the generated one. */
 export type PlanetRowFields = Partial<
-  Pick<PlanetRow, 'displayName' | 'poolId' | 'look' | 'radius' | 'gemSaleTiers'>
+  Pick<
+    PlanetRow,
+    'displayName' | 'poolId' | 'look' | 'radius' | 'gemSaleTiers' | 'casingSurfaceGrade'
+  >
 >
 
 export interface PlanetRowProvider {
@@ -76,6 +85,7 @@ export interface PlanetRowProvider {
 export const PLANET_ROW_REGISTRY = defineOneProviderRegistry<PlanetRowProvider>('planetRow')
 
 const NO_GEMS: readonly number[] = Object.freeze([])
+const FIRST_PLANET = 1
 
 /** The planet's row: the generated one with the provider's fields on top. */
 export function planetRowOf(planetIndex: number): PlanetRow {
@@ -106,6 +116,36 @@ export function gemSaleTiersOfPlanet(planetIndex: number): readonly number[] {
   return planetRowOf(planetIndex).gemSaleTiers
 }
 
+/**
+ * The planet's q_surface, read on every collapse wall test, so a provider's answer is kept per
+ * provider and planet: a fixture provider under `withRegistrations` never shares the shipped one's.
+ */
+export function casingSurfaceGradeOf(planetIndex: number): bigint {
+  const [provider] = entriesOf(PLANET_ROW_REGISTRY)
+  if (provider === undefined) return defaultCasingSurfaceGrade(planetIndex)
+  const kept = surfaceGradesOf(provider)
+  const known = kept.get(planetIndex)
+  if (known !== undefined) return known
+  const grade =
+    provider.rowOf(planetIndex).casingSurfaceGrade ?? defaultCasingSurfaceGrade(planetIndex)
+  kept.set(planetIndex, grade)
+  return grade
+}
+
+/** `casingGradeStart + gradesPerPlanet * (g - 1)`: the planet before's bottom grade. */
+export function defaultCasingSurfaceGrade(planetIndex: number): bigint {
+  const { casingGradeStart, gradesPerPlanet } = ECONOMY.casing
+  return BigInt(casingGradeStart) + BigInt(gradesPerPlanet) * BigInt(planetIndex - FIRST_PLANET)
+}
+
+const surfaceGradesByProvider = new WeakMap<PlanetRowProvider, Map<number, bigint>>()
+
+function surfaceGradesOf(provider: PlanetRowProvider): Map<number, bigint> {
+  const kept = surfaceGradesByProvider.get(provider) ?? new Map<number, bigint>()
+  surfaceGradesByProvider.set(provider, kept)
+  return kept
+}
+
 /** The solar system a planet sits in: the last `planets.surfaceLayer.systems` row it reached (#306). */
 export function solarSystemOf(planetIndex: number): number {
   const reached = ECONOMY.planets.surfaceLayer.systems.filter(
@@ -124,6 +164,7 @@ function generatedRowOf(planetIndex: number): PlanetRow {
     radius: null,
     gravityMultiplier: planetArchetypeOf(planetIndex).gravityMultiplier,
     gemSaleTiers: NO_GEMS,
+    casingSurfaceGrade: defaultCasingSurfaceGrade(planetIndex),
   }
 }
 
@@ -135,5 +176,6 @@ function withFields(row: PlanetRow, fields: PlanetRowFields): PlanetRow {
     look: fields.look ?? row.look,
     radius: fields.radius ?? row.radius,
     gemSaleTiers: fields.gemSaleTiers ?? row.gemSaleTiers,
+    casingSurfaceGrade: fields.casingSurfaceGrade ?? row.casingSurfaceGrade,
   }
 }

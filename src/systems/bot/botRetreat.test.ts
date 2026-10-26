@@ -174,7 +174,7 @@ const typesOf = (events: readonly DomainEvent[]) => events.map((event) => event.
 /** Each tile broken with the casing grade held then (the #65 casing rule), from grade 1. */
 function digsWithGrade(events: readonly DomainEvent[]) {
   const params = planetParamsFor(WORLD_SEED, 1)
-  let held = 1
+  let held = 1n
   return events.flatMap((event) => {
     if (event.type === 'CasingUpgraded') held = event.to
     if (event.type !== 'TileDestroyed' || event.kind === 'core') return []
@@ -187,7 +187,7 @@ describe('pacing bot retreat (#216)', () => {
     expect(typesOf(rescuedDeadEnd().session.events())).toContain('RescueTriggered')
     expect(deadEndOf(rescuedDeadEnd())).toEqual({
       mode: 'docked',
-      casingGrade: 1,
+      casingGrade: 1n,
       hasNoOrePlan: true,
       hasNoOrePlanOnFullTank: true,
       isGradeUnaffordable: true,
@@ -203,13 +203,15 @@ describe('pacing bot retreat (#216)', () => {
   it('sells the ore of its retreat and buys the next casing grade with it', () => {
     const { run } = retreatPlayedOn()
     expect(typesOf(run.events)).toContain('ResourceSold')
-    expect(run.state.players.p1.vehicle.casingGrade).toBeGreaterThan(1)
+    expect(run.state.players.p1.vehicle.casingGrade).toBeGreaterThan(1n)
   })
 
   it('retreats only into bands its casing grade holds', () => {
     const digs = digsWithGrade(retreatPlayedOn().run.events)
     expect(digs.length).toBeGreaterThan(0)
-    expect(digs.filter((dig) => dig.grade < requiredCasingGrade(dig.band))).toEqual([])
+    expect(
+      digs.filter((dig) => dig.grade < requiredCasingGrade({ planetIndex: 1, band: dig.band })),
+    ).toEqual([])
   })
 })
 

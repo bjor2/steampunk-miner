@@ -32,7 +32,7 @@ function dockOnPlanet(planetTier: number): void {
   game().giveMoney('1e9')
 }
 
-function casingGrade(): number {
+function casingGrade(): bigint {
   return readUpgradeBayModel().casing.grade
 }
 
@@ -64,6 +64,6 @@ describe('pressing a bay entry (ticket 344)', () => {
       dockOnPlanet(1)
       const grade = casingGrade()
       expect(game().pressScreenButton(RACK_BUY)).toBe(true)
-      expect(casingGrade()).toBe(grade + 1)
+      expect(casingGrade()).toBe(grade + 1n)
     }))
 })

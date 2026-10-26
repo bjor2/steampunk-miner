@@ -272,5 +272,5 @@ function bought(upgradeId: string): DomainEventBody {
 }
 
 function casingBought(): DomainEventBody {
-  return { type: 'CasingUpgraded', chain: 0, from: 1, to: 2, price: '240' }
+  return { type: 'CasingUpgraded', chain: 0, from: 1n, to: 2n, price: '240' }
 }

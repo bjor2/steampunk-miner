@@ -26,7 +26,9 @@
  * shaft's own air and lines nothing new.
  *
  * Never refused: a grade too low for the band still lines (#41). The dock pad is never lined, as it
- * is never carved. A player grade above 15 lines at 15, the most a sample holds.
+ * is never carved. A sample keeps the grade it was laid at as a slot of its planet's window
+ * (`casingGradeWindow.ts`, ticket 829), so a later buy never upgrades old casing: only a ring laid
+ * over it relines it.
  */
 import { DRILL_BORE_ROWS, STANDARD_CASING_KIND } from '../../constants/balance'
 import { UP_VECTOR_SCALE } from '../../constants/physics'
@@ -38,9 +40,9 @@ import {
   effectiveCasingGrade,
   isLined,
   liningTypeIndexOfValue,
-  MAX_SAMPLE_CASING_GRADE,
   STANDARD_CASING_TYPE_INDEX,
 } from './chunkDelta'
+import { casingSlotOfGrade } from './casingGradeWindow'
 import {
   casingGradeOf,
   closeSession,
@@ -69,7 +71,7 @@ export interface Lining extends GroundEdit {
   relined: number
 }
 
-/** The ring's lining: its grade and its type (0 = standard, #113). */
+/** The ring's lining: its grade as a window slot and its type (0 = standard, #113). */
 interface RingLining {
   grade: number
   typeIndex: number
@@ -126,7 +128,7 @@ export function lineRing(
   world: WorldState,
   params: PlanetParams,
   ring: CasingRing,
-  grade: number,
+  grade: bigint,
   typeIndex: number = STANDARD_CASING_TYPE_INDEX,
 ): Lining {
   return lineRingSamples(world, params, ringSamplesOf(ring), grade, typeIndex)
@@ -140,7 +142,7 @@ export function lineCellWalls(
   world: WorldState,
   params: PlanetParams,
   tile: TilePoint,
-  grade: number,
+  grade: bigint,
   typeIndex: number,
 ): Lining {
   return lineRingSamples(world, params, cellWallSamplesOf(tile), grade, typeIndex)
@@ -170,11 +172,11 @@ export function lineRingSamples(
   world: WorldState,
   params: PlanetParams,
   samples: readonly WeightedSample[],
-  grade: number,
+  grade: bigint,
   typeIndex: number,
 ): Lining {
   const session = openSession(world, params)
-  const ringLining = { grade: Math.min(grade, MAX_SAMPLE_CASING_GRADE), typeIndex }
+  const ringLining = { grade: casingSlotOfGrade(params.planetIndex, grade), typeIndex }
   const steps = samples.map((sample) => ({
     sample,
     step: ringStepOf(session, sample, ringLining),

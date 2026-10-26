@@ -25,7 +25,7 @@ import { unchanged, type RuleEffect } from './commandRule'
 export interface FirstLining {
   wall: readonly WeightedSample[]
   lengthMm: number
-  grade: number
+  grade: bigint
   liningType: string
 }
 

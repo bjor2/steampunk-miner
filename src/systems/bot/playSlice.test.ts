@@ -52,7 +52,7 @@ describe('pacing bot', () => {
 function planet1DigsWithGrade(events: readonly DomainEvent[]) {
   const params = planetParamsFor(WORLD_SEED, 1)
   const travelled = events.findIndex((event) => event.type === 'TravelStarted')
-  let grade = 1
+  let grade = 1n
   return events.slice(0, travelled).flatMap((event) => {
     if (event.type === 'CasingUpgraded') grade = event.to
     if (event.type !== 'TileDestroyed') return []
@@ -62,17 +62,21 @@ function planet1DigsWithGrade(events: readonly DomainEvent[]) {
 }
 
 describe('pacing bot casing (S11, #65 Systems & Economy note 2)', () => {
-  it('buys every casing grade from 2 to 5 on planet 1', () => {
-    const grades = sliceRun()
-      .events.filter((event) => event.type === 'CasingUpgraded')
-      .map((event) => (event.type === 'CasingUpgraded' ? event.to : 0))
-    expect(grades).toEqual([2, 3, 4, 5])
+  it('buys every casing grade from 2 to 5 on planet 1, then 6 to 9 on planet 2 (ticket 829)', () => {
+    const { events } = sliceRun()
+    const travelled = events.findIndex((event) => event.type === 'TravelStarted')
+    const gradesOf = (from: readonly DomainEvent[]) =>
+      from.flatMap((event) => (event.type === 'CasingUpgraded' ? [event.to] : []))
+    expect(gradesOf(events.slice(0, travelled))).toEqual([2n, 3n, 4n, 5n])
+    expect(gradesOf(events.slice(travelled))).toEqual([6n, 7n, 8n, 9n])
   })
 
   it('holds the grade a band needs before it breaks a tile there, and grade 5 before core', () => {
     const digs = planet1DigsWithGrade(sliceRun().events)
     expect(digs.some((dig) => dig.band === 6)).toBe(true)
-    expect(digs.filter((dig) => dig.grade < requiredCasingGrade(dig.band))).toEqual([])
+    expect(
+      digs.filter((dig) => dig.grade < requiredCasingGrade({ planetIndex: 1, band: dig.band })),
+    ).toEqual([])
   })
 })
 

@@ -14,6 +14,9 @@
  *
  * The quick action is the Sell bay's (#170): the Outfitter (ticket 687) draws no button for it.
  */
+import { casingLookGradeOf } from '../render/casingGradeLook'
+import { formatAmount } from '../displayAmount'
+import { countHeldToSafe } from '../wholeCount'
 import { buttonIconIdOf, CASING_ICON_ID, PREVIEW_TIER_ICON_ID } from '../art/icons/iconSet'
 import type { AuthorityState } from '../authority/authorityState'
 import { nextCasingPrice } from '../authority/casingRules'
@@ -64,9 +67,9 @@ export interface CasingRow {
   /** The seventh vector icon (#54 scope review). */
   iconId: string
   label: string
-  grade: number
-  gradeAfter: number
-  /** "G -> G+1", the before and after of the next buy. */
+  grade: bigint
+  gradeAfter: bigint
+  /** "G -> G+1", the before and after of the next buy, in the shared compact form (#681). */
   gradeText: string
   cost: AmountReading
   buy: ScreenButton
@@ -147,7 +150,7 @@ export function selectUpgradeBayModel(
       focusedId: focusOnScreen(focusStops, ui.focusedId, focusStops[0].id),
       tracks,
       casingBuyId: casing.buy.id,
-      casingGradeAfter: casing.gradeAfter,
+      casingGradeAfter: casingLookGradeOf(casing.gradeAfter),
       installing: ui.installingUpgradeId,
     }),
     footer,
@@ -175,8 +178,8 @@ function casingRowOf(state: AuthorityState, playerId: string): CasingRow {
     iconId: CASING_ICON_ID,
     label: 'Casing',
     grade,
-    gradeAfter: grade + 1,
-    gradeText: `${grade} → ${grade + 1}`,
+    gradeAfter: grade + 1n,
+    gradeText: `${formatAmount(grade)} → ${formatAmount(grade + 1n)}`,
     cost,
     buy,
     buyState: buyStateOf(buy),
@@ -187,7 +190,7 @@ function casingRowOf(state: AuthorityState, playerId: string): CasingRow {
       iconId: CASING_ICON_ID,
       name: 'Casing',
       cost,
-      level: grade,
+      level: countHeldToSafe(grade),
       buy,
       source: SHOP_SOURCE,
     }),

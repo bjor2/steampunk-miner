@@ -38,7 +38,7 @@ function weakTunnel(): WorldState {
     ).world
   }
   for (let x = FROM_X; x <= TO_X; x += 500) {
-    world = lineRing(world, params, casingRingAround(x, Y), 1).world
+    world = lineRing(world, params, casingRingAround(x, Y), 1n).world
   }
   return world
 }

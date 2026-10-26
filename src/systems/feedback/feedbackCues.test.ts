@@ -67,9 +67,9 @@ describe('feedback cues', () => {
       type: 'CasingPlaced',
       samples,
       relined,
-      grade: 2,
+      grade: 2n,
     })
-    const drilled: DomainEvent = { ...stamp('p1'), type: 'CasingDrilled', samples: 3, grade: 2 }
+    const drilled: DomainEvent = { ...stamp('p1'), type: 'CasingDrilled', samples: 3, grade: 2n }
     expect(feedbackCuesOf([placed(5, 0), placed(0, 2), drilled], 'p1')).toEqual([
       { kind: 'casingHiss' },
       { kind: 'casingPop' },
@@ -82,7 +82,7 @@ describe('feedback cues', () => {
       type: 'CasingPlaced',
       samples: 0,
       relined: 0,
-      grade: 2,
+      grade: 2n,
     }
     expect(feedbackCuesOf([idle], 'p1')).toEqual([])
   })
@@ -93,8 +93,8 @@ describe('feedback cues', () => {
       type: 'CollapseWarned',
       block,
       band: 2,
-      weakestGrade: 1,
-      required: 2,
+      weakestGrade: 1n,
+      required: 2n,
     })
     const started: DomainEvent = {
       tick: 660,

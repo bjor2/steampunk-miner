@@ -47,7 +47,7 @@ function linedHole(typeIndex: number): { world: WorldState; loose: TilePoint[] }
     { ...HOLE, radiusMm: drillStampRadiusMm(), floorRadiusMm: null },
     255,
   )
-  const lined = lineRing(carved.world, PARAMS, casingRingAround(HOLE.xMm, HOLE.yMm), 5, typeIndex)
+  const lined = lineRing(carved.world, PARAMS, casingRingAround(HOLE.xMm, HOLE.yMm), 5n, typeIndex)
   const opened = carved.yielded.map(({ tile }) => tile)
   return { world: lined.world, loose: lavaBesideOpenings(lined.world, PARAMS, opened) }
 }

@@ -220,8 +220,8 @@ describe('descriptions side table: gear, services, bays and artefacts', () => {
 
   it('pins the casing’s lining hardness to the kernel at this planet', () => {
     const [, hardness] = linesOf(KERNEL_ITEMS.casing, 3)
-    expect(hardness.now).toBe(shownStat(casingHardness(PLANET, 3)))
-    expect(hardness.next).toBe(shownStat(casingHardness(PLANET, 4)))
+    expect(hardness.now).toBe(shownStat(casingHardness(PLANET, 3n)))
+    expect(hardness.next).toBe(shownStat(casingHardness(PLANET, 4n)))
   })
 
   it('pins the repair to the hull the vehicle’s level holds, with no next', () => {

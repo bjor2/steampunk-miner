@@ -43,6 +43,7 @@ describe('planet row', () => {
       radius: null,
       gravityMultiplier: 1.25,
       gemSaleTiers: [],
+      casingSurfaceGrade: 9n,
     })
     expect(readWith([], () => gemSaleTiersOfPlanet(3))).toEqual([])
     expect(readWith([], () => planetDisplayNameOf(3))).toBe('Planet 3')
@@ -63,6 +64,7 @@ describe('planet row', () => {
       radius: FROZEN_421,
       gravityMultiplier: 1.25,
       gemSaleTiers: [],
+      casingSurfaceGrade: 5n,
     })
     expect(readWith([provider], () => planetDisplayNameOf(12))).toBe('Planet 12')
   })

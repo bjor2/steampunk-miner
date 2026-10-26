@@ -7,6 +7,7 @@ import type { DrillGearCaps } from './drillGearCaps'
 import type { ItemHookCaps } from './itemHookCaps'
 import type { ItemEffectCaps } from './itemEffectCaps'
 import type { CasingCementGrades } from './casingCementGrades'
+import type { CasingSurfaceOffsetRules } from './casingLadderRules'
 import type { MagnetCaps } from './magnetCaps'
 import type { TurretCaps } from './turretCaps'
 import type { MagneticHazardCaps } from './magneticHazardCaps'
@@ -465,6 +466,11 @@ export interface HazardArchetype {
   /** The lining type that seals the pockets and cools the tunnel, and its price on the #76 charge. */
   liningType: string
   liningMultiplier: BigStat
+  /**
+   * The act's biome: what its ground below band 1 asks of the casing on top of its band's grade,
+   * 0 or 1 (ticket 829, the GD re-lock: "the biome decides the casing grade").
+   */
+  casingBiomeDelta: number
 }
 
 export interface Economy {
@@ -556,8 +562,15 @@ export interface Economy {
   costCurves: readonly CostCurve[]
   /**
    * The casing grade (#41 Systems & Economy): a separate counter, not a seventh track. It starts
-   * at `casingGradeStart` and each grade is bought at the Upgrade bay along `costCurveId`. Grade
-   * `G` holds bands `1..G`; the core needs `casingGradeCoreMin`. `collapseCrush` is the hull
+   * at `casingGradeStart` and each grade is bought at the Upgrade bay along `costCurveId`. The
+   * grades by depth (ticket 829, the GD lock re-pinning #41 by name): a planet's surface needs
+   * `q_surface`, `casingGradeStart + gradesPerPlanet * (g - 1)` unless its row sets more, and each
+   * band one grade more, so a planet's bottom grade is the next one's surface. Past the first
+   * planet's bottom grade a grade and a metre of lining cost `planetPriceRatio` (3.375) more a
+   * planet, `r = planetPriceRatio^(1 / gradesPerPlanet)` a grade. `surfaceOffset` bounds a row's
+   * higher surface: at most `maxLead` grades over the default, and its catch-up at most
+   * `catchUpShareBp` of the median bot's money held after the fuel fee, as measured on arrival
+   * and written in `moneyHeldAfterFuel` (none yet: no offset ships). `collapseCrush` is the hull
    * fraction a collapse takes off a vehicle caught in it (#43), for bands 1 to 5 and then the core.
    * `kCasing` is the fraction of `V(t(p, b))` one metre of first-placed lining costs (#76): 0.02
    * since #894 (Bjor's playtest: casing far too cheap), ten times #115's 0.002, as the grade
@@ -569,7 +582,9 @@ export interface Economy {
   casing: {
     costCurveId: string
     casingGradeStart: number
-    casingGradeCoreMin: number
+    gradesPerPlanet: number
+    planetPriceRatio: BigStat
+    surfaceOffset: CasingSurfaceOffsetRules
     gnawMaxDrop: number
     kCasing: BigStat
     collapseCrush: readonly BigStat[]

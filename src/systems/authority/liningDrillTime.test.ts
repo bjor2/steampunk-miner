@@ -49,22 +49,24 @@ describe('re-drilling lining (ticket 843)', () => {
     },
   )
 
-  it("re-drills planet 1's core grade on planet 2 before the first tip major", () => {
+  // Planet 2's core grade on the ladder (ticket 829) is 9, the rock of its band 5.
+  it("re-drills planet 2's core grade before the first tip major", () => {
     const drill = drillWithTipPips(9)
-    expect(ticksPerTile(drill, casingHardness(2, 5))).toBeNull()
-    expect(liningTicksOf(2, drill, 5)).not.toBeNull()
+    expect(ticksPerTile(drill, casingHardness(2, 9n))).toBeNull()
+    expect(liningTicksOf(2, drill, 9)).not.toBeNull()
   })
 
   it('takes longer to re-drill higher-grade lining on the same planet', () => {
     const drill = drillWithTipPips(3)
-    const ticks = GRADES.map((grade) => liningTicksOf(2, drill, grade) as number)
+    const planet2Grades = GRADES.map((grade) => grade + 4)
+    const ticks = planet2Grades.map((grade) => liningTicksOf(2, drill, grade) as number)
     ticks.slice(1).forEach((slower, index) => expect(slower).toBeGreaterThan(ticks[index]))
   })
 
   it('times lining a scratching tip cuts exactly as band-G rock, as before', () => {
     const drill = vehicleStatsAt(onCurveSteps(2))
     GRADES.forEach((grade) => {
-      const hardness = casingHardness(2, grade)
+      const hardness = casingHardness(2, BigInt(grade))
       expect(liningTicksOf(2, drill, grade)).toBe(ticksPerTile(drill, hardness))
       expect(liningSubStepsOf(2, drill, grade)).toBe(
         subStepsPerTileAt(DRILL_SUBSTEPS_PER_TICK, drill, hardness),

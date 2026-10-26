@@ -178,7 +178,7 @@ function boredEffectOf(
     state: wakeLavaBeside(paid, params, cut.yielded, ask.tick),
     events: [
       ...groundChangedEventsOf(cut),
-      ...casingDrilledEvents(cut),
+      ...casingDrilledEvents(params, cut),
       ...cut.yielded.flatMap((yielded) => boredTileEvents(yielded, gates)),
     ],
   }

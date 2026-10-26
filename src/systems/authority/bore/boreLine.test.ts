@@ -115,10 +115,18 @@ function cellsOpenedOf(session: ScriptedSession): number {
   return endedOf(session).reduce((sum, ended) => sum + ended.cellsOpened, 0)
 }
 
+/** Events carry bigint grades (ticket 829): written as their digits. */
+function bigintAsText(_key: string, value: unknown): unknown {
+  return typeof value === 'bigint' ? value.toString() : value
+}
+
 function playedWith(slice: SliceDefinition) {
   return withRegistrations([slice], () => {
     const session = shootEast()
-    return { events: JSON.stringify(session.events()), digest: stateDigest(session.state()) }
+    return {
+      events: JSON.stringify(session.events(), bigintAsText),
+      digest: stateDigest(session.state()),
+    }
   })
 }
 

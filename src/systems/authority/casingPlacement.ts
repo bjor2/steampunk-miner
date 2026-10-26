@@ -152,7 +152,7 @@ interface DueRing {
 
 /** What a vehicle's rings are laid as: its casing grade, in its active lining type. */
 interface LaidLining {
-  grade: number
+  grade: bigint
   liningType: string
 }
 
@@ -226,7 +226,7 @@ export function layCasingRing(
   state: AuthorityState,
   params: PlanetParams,
   point: RingPoint,
-  grade: number,
+  grade: bigint,
   typeIndex: number,
 ): RuleEffect {
   const samples = ringSamplesOf(casingRingAround(point.xMm, point.yMm))
@@ -243,7 +243,7 @@ function lineCasingRing(
   state: AuthorityState,
   params: PlanetParams,
   samples: readonly WeightedSample[],
-  grade: number,
+  grade: bigint,
   typeIndex: number,
 ): LinedRing {
   const lined = lineRingSamples(state.world, params, samples, grade, typeIndex)

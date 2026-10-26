@@ -134,7 +134,7 @@ const platformEvents: DomainEvent[] = [
     visualTier: 1,
     statsAfter: { hullMax: '1.12e+2', energyMax: '1.5e+2' },
   },
-  { ...commandStamp, type: 'CasingUpgraded', from: 1, to: 2, price: '4.8e+1', chain: 0 },
+  { ...commandStamp, type: 'CasingUpgraded', from: 1n, to: 2n, price: '4.8e+1', chain: 0 },
   { ...commandStamp, type: 'RefineQueued', slot: 0, tier: 7, units: 5n, requestedUnits: 9n },
   { tick: 11000, playerId: 'p1', type: 'RefineReady', slot: 0, tier: 7, units: 5n },
   {
@@ -205,7 +205,7 @@ const combatEvents: DomainEvent[] = [
 ]
 
 const collapseEvents: DomainEvent[] = [
-  { tick: 600, type: 'CollapseWarned', block: '0,8#17', band: 2, weakestGrade: 1, required: 2 },
+  { tick: 600, type: 'CollapseWarned', block: '0,8#17', band: 2, weakestGrade: 1n, required: 2n },
   { tick: 610, type: 'CollapseCancelled', block: '0,8#18' },
   { tick: 660, type: 'CollapseStarted', block: '0,8#17', samplesFilled: 96, vehiclesHit: 1 },
   {
@@ -447,7 +447,7 @@ describe('domain event log', () => {
       { ...held, type: 'GunMounted', level: 10, price: '3e+2' },
       { ...held, type: 'GunUpgraded', from: 10, to: 11, price: '4e+1' },
       { ...held, type: 'ChargeRackUpgraded', from: 0, to: 1, price: '7e+1' },
-      { ...held, type: 'CasingUpgraded', from: 1, to: 2, price: '4.8e+1' },
+      { ...held, type: 'CasingUpgraded', from: 1n, to: 2n, price: '4.8e+1' },
       {
         ...commandStamp,
         type: 'CommandRejected',

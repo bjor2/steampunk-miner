@@ -54,8 +54,8 @@ describe('chunk desync repair (#36 acceptance 5)', () => {
 describe('chunk desync repair: casing (#41)', () => {
   it('finds a guest chunk whose lining differs from the host and repairs it', () => {
     const ring = { xMm: 31000, yMm: 284000, clearMm: 700, widthMm: 500 }
-    const host = lineRing(hostWorld(), params, ring, 3).world
-    const guest = lineRing(hostWorld(), params, ring, 2).world
+    const host = lineRing(hostWorld(), params, ring, 3n).world
+    const guest = lineRing(hostWorld(), params, ring, 2n).world
     const mismatched = mismatchedChunks(host, guest, params, touchedChunksOf(host, guest))
     expect(mismatched.length).toBeGreaterThan(0)
     const repaired = mismatched.reduce(
@@ -69,7 +69,7 @@ describe('chunk desync repair: casing (#41)', () => {
 describe('chunk desync repair: breached casing (#111)', () => {
   it('finds a guest that missed a gnaw and repairs it by resending the host delta', () => {
     const ring = { xMm: 31000, yMm: 284000, clearMm: 700, widthMm: 500 }
-    const lined = lineRing(hostWorld(), params, ring, 3).world
+    const lined = lineRing(hostWorld(), params, ring, 3n).world
     const host = breachRing(lined, params, ring).world
     const mismatched = mismatchedChunks(host, lined, params, touchedChunksOf(host, lined))
     expect(mismatched.length).toBeGreaterThan(0)

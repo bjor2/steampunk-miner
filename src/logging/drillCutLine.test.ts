@@ -77,7 +77,7 @@ function drilledBodies(tx: number): DomainEventBody[] {
   ]
 }
 
-function lined(band: number, grade: number, price: string): DomainEventBody {
+function lined(band: number, grade: bigint, price: string): DomainEventBody {
   return { type: 'CasingLined', lengthMm: 500, band, grade, liningType: 'iron', price }
 }
 
@@ -244,8 +244,8 @@ describe('drill_cut span line (ticket 420)', () => {
 
   it('writes one casing_lined line per lining run, its rings, lengths and prices summed exactly', () => {
     const session = sessionOf()
-    send(session, 1, DRILL_STEP, [lined(1, 1, TEN), lined(1, 1, FIFTEEN_AND_A_HALF)])
-    send(session, 2, DRILL_STEP, [lined(1, 1, TEN), lined(1, 2, TEN)])
+    send(session, 1, DRILL_STEP, [lined(1, 1n, TEN), lined(1, 1n, FIFTEEN_AND_A_HALF)])
+    send(session, 2, DRILL_STEP, [lined(1, 1n, TEN), lined(1, 2n, TEN)])
     session.runLog.flushDrillSpans()
     const casing = session.lines.filter((line) => line.event === 'casing_lined')
     expect(casing.map(({ tick, data }) => [tick, data])).toEqual([

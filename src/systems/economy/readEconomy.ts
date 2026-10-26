@@ -10,6 +10,7 @@ import {
 } from './economyFieldReader'
 import { checkUpgradeSet, readUpgrade } from './readUpgradeEconomy'
 import { liningTypesWithoutGrade, readCasingCementGrades } from './casingCementGrades'
+import { readCasingLadder } from './casingLadderRules'
 import { readArchetypes } from './readArchetypeEconomy'
 import { readBlastingCharges } from './readBlastingEconomy'
 import { readEnemies } from './readEnemyEconomy'
@@ -189,7 +190,7 @@ function readCasing(
   return {
     costCurveId,
     casingGradeStart: reader.safeInteger('casing.casingGradeStart', casing.casingGradeStart),
-    casingGradeCoreMin: reader.safeInteger('casing.casingGradeCoreMin', casing.casingGradeCoreMin),
+    ...readCasingLadder(reader, casing),
     gnawMaxDrop: readGnawMaxDrop(reader, casing.gnawMaxDrop),
     kCasing: reader.money('casing.kCasing', casing.kCasing),
     collapseCrush: readCollapseCrush(reader, casing.collapseCrush, coreTierBand),

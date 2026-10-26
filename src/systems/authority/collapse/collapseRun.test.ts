@@ -87,8 +87,8 @@ describe('collapse: a straight dig (#43 acceptance 8, 3)', () => {
     const faceBlock = blockContaining(face)
     const warned = ofType(session.events(), 'CollapseWarned')
     expect(warned.length).toBeGreaterThan(4)
-    expect(warned.every(({ band, required }) => band === 2 && required === 2)).toBe(true)
-    expect(warned.every(({ weakestGrade }) => weakestGrade === 1)).toBe(true)
+    expect(warned.every(({ band, required }) => band === 2 && required === 2n)).toBe(true)
+    expect(warned.every(({ weakestGrade }) => weakestGrade === 1n)).toBe(true)
     expect(warned.map(({ block }) => block)).not.toContain(blockIdOf(faceBlock))
     const faceFrom = xSpanOf(faceBlock).from
     expect(warned.every(({ block }) => xSpanOf(blockOfId(block)!).to <= faceFrom)).toBe(true)
@@ -364,7 +364,7 @@ describe('collapse: the debug command (#43 debug API)', () => {
     buildWeakTunnel(session, 10)
     const report = collapseReportOf(session.state())
     expect(report.weakBlocks.length).toBeGreaterThan(4)
-    expect(report.weakBlocks[0]).toMatchObject({ band: 2, weakestGrade: 1, required: 2 })
+    expect(report.weakBlocks[0]).toMatchObject({ band: 2, weakestGrade: 1n, required: 2n })
     expect(report.collapsing.map(({ block }) => block).sort()).toEqual(
       report.weakBlocks.map(({ block }) => block).sort(),
     )

@@ -6,8 +6,9 @@
  * 315, `casingLiningLook.ts`), and since ticket 830 every lined cell's plate in its grade's metal
  * with its lining type's trim, from the casing look channel (`casingLookBits.ts`): the cell's
  * highest intact grade and that sample's type, so a wall relined higher shows its newest grade
- * while the rest of the wall keeps its history. Breached lining (#111) holds no grade and shows as
- * bare rock.
+ * while the rest of the wall keeps its history. A sample's grade is its slot in its planet's window
+ * (`casingGradeWindow.ts`, ticket 829), so the plate is the grade it was laid at on the ladder.
+ * Breached lining (#111) holds no grade and shows as bare rock.
  */
 import { REFRACTORY_LINING_TYPE } from '../art/artIds'
 import { liningTypeIndexOf } from '../vehicle/liningType'
@@ -18,6 +19,8 @@ import {
 } from '../world/chunkDelta'
 import { localSampleOf, sampleIndexOf, SAMPLES_PER_TILE } from '../world/sampleGrid'
 import { CHUNK_CELLS, CHUNK_SIZE } from '../world/tileGrid'
+import { casingGradeOfSlot } from '../world/casingGradeWindow'
+import { casingLookGradeOf } from './casingGradeLook'
 import { casingLookBitsOf, NO_CASING_LOOK } from './casingLookBits'
 
 /** 1 per cell holding each type of lining, in cell order; the look channel's value per cell. */
@@ -35,12 +38,15 @@ export const UNLINED_CHUNK: ChunkLining = {
   look: new Float32Array(CHUNK_CELLS),
 }
 
-/** The cells of the casing layer `casing` holding standard and refractory lining, and their looks. */
-export function liningCellsOf(casing: Uint8Array): ChunkLining {
+/**
+ * The cells of planet `planetIndex`'s casing layer `casing` holding standard and refractory
+ * lining, and their looks.
+ */
+export function liningCellsOf(casing: Uint8Array, planetIndex: number): ChunkLining {
   return {
     standard: cellsLinedWith(casing, STANDARD_CASING_TYPE_INDEX),
     refractory: refractoryCellsOf(casing),
-    look: casingLooksOf(casing),
+    look: casingLooksOf(casing, planetIndex),
   }
 }
 
@@ -50,9 +56,11 @@ export function refractoryCellsOf(casing: Uint8Array): Uint8Array {
 }
 
 /** The look channel's value for each cell: its strongest intact lining sample, in cell order. */
-export function casingLooksOf(casing: Uint8Array): Float32Array {
+export function casingLooksOf(casing: Uint8Array, planetIndex: number): Float32Array {
   const looks = new Float32Array(CHUNK_CELLS)
-  for (let index = 0; index < CHUNK_CELLS; index++) looks[index] = cellLookOf(casing, index)
+  for (let index = 0; index < CHUNK_CELLS; index++) {
+    looks[index] = cellLookOf(casing, index, planetIndex)
+  }
   return looks
 }
 
@@ -73,7 +81,7 @@ function hasLiningOfType(casing: Uint8Array, cell: number, typeIndex: number): b
 }
 
 /** The highest intact grade among the cell's samples, with that sample's type; 0 for none. */
-function cellLookOf(casing: Uint8Array, cell: number): number {
+function cellLookOf(casing: Uint8Array, cell: number, planetIndex: number): number {
   let strongest = 0
   forEachSampleOfCell(cell, (sample) => {
     const typeIndex = casingTypeIndexOf(casing[sample])
@@ -85,9 +93,9 @@ function cellLookOf(casing: Uint8Array, cell: number): number {
     }
   })
   const typeIndex = casingTypeIndexOf(strongest)
-  return typeIndex === null
-    ? NO_CASING_LOOK
-    : casingLookBitsOf(effectiveCasingGrade(strongest), typeIndex)
+  if (typeIndex === null) return NO_CASING_LOOK
+  const grade = casingGradeOfSlot(planetIndex, effectiveCasingGrade(strongest))
+  return casingLookBitsOf(casingLookGradeOf(grade), typeIndex)
 }
 
 function forEachSampleOfCell(cell: number, visit: (sample: number) => void): void {

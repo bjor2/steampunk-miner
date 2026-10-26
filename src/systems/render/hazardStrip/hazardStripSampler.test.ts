@@ -229,8 +229,8 @@ describe('hazard strip sampler', () => {
       type: 'CollapseWarned',
       block: blockIdOf(block),
       band: 2,
-      weakestGrade: 1,
-      required: 2,
+      weakestGrade: 1n,
+      required: 2n,
     }
     expect(feedbackCuesOf([warned], 'p1')).toEqual([{ kind: 'collapseRumble' }])
   })

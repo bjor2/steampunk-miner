@@ -1,4 +1,5 @@
 import RAPIER from '@dimforge/rapier3d-compat'
+import { bottomCasingGrade } from '../systems/economy/casingGrades'
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { DEV_FLAGS } from '../constants/devFlags'
 import { CUT_FOLLOW_TICKS } from '../constants/balance'
@@ -44,7 +45,7 @@ const RIGS: readonly Record<string, number>[] = [
  * the rig drives back through. At 15 m/s the third rig lines some 30 m of tunnel in the level leg,
  * and at grade 1 its blocks fall in behind it.
  */
-const HOLDING_CASING_GRADE = ECONOMY.casing.casingGradeCoreMin
+const HOLDING_CASING_GRADE = Number(bottomCasingGrade(1))
 
 /** A step's result with the authority's view after it. */
 interface TickRead {

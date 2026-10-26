@@ -36,7 +36,7 @@ export function buildChunkMeshParts(
     cy,
     materialCellsOfChunk(world, params, cx, cy),
     halo,
-    liningCellsOfChunk(world, cx, cy),
+    liningCellsOfChunk(params, world, cx, cy),
   )
   return { batch, halo }
 }
@@ -57,7 +57,12 @@ export function buffersOfMeshParts({ batch, halo }: ChunkMeshParts): ArrayBuffer
 }
 
 /** The cells to draw as lining (#113, ticket 315); none, without a copy, for an unlined chunk. */
-function liningCellsOfChunk(world: WorldState, cx: number, cy: number): ChunkLining {
+function liningCellsOfChunk(
+  params: PlanetParams,
+  world: WorldState,
+  cx: number,
+  cy: number,
+): ChunkLining {
   const casing = currentCasingOfChunk(world, cx, cy)
-  return casing === NO_CASING ? UNLINED_CHUNK : liningCellsOf(casing)
+  return casing === NO_CASING ? UNLINED_CHUNK : liningCellsOf(casing, params.planetIndex)
 }

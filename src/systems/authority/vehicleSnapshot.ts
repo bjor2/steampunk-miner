@@ -1,7 +1,7 @@
 /**
  * The vehicle and world parts of the session snapshot (#11 section 5): the same plain JSON as the
  * state, with the hull BigStat, the lining bill and the visit's lining payment as canonical
- * strings, the hold's units in their JSON spelling (ticket 849), and the loadout as its versioned `loadout` section (K4). Reading checks the shape so a malformed snapshot is refused with listed problems before
+ * strings, the hold's units and the casing grade in their JSON spelling (tickets 849, 829), and the loadout as its versioned `loadout` section (K4). Reading checks the shape so a malformed snapshot is refused with listed problems before
  * anything is built from it; the digest check in `sessionSnapshot.ts` then catches any value that does not match.
  */
 import { BASIS_POINTS } from '../../constants/balance'
@@ -43,12 +43,15 @@ import {
 } from './loadoutSection'
 import { hazardVehicleFieldProblems } from './hazards/hazardVehicleFields'
 import { isJsonObject, isWholeNumber } from './payloadFields'
+import { countOfJson, countToJson, isJsonCount, type JsonCount } from '../wholeCount'
 
 export type PortableVehicle = Omit<
   VehicleState,
-  'hull' | 'liningBill' | 'liningPaidThisVisit' | 'loadout' | 'fuel' | 'cargo'
+  'hull' | 'liningBill' | 'liningPaidThisVisit' | 'loadout' | 'fuel' | 'cargo' | 'casingGrade'
 > & {
   hull: string
+  /** The uncapped casing grade in its JSON spelling (ticket 829): a saved number reads unchanged. */
+  casingGrade: JsonCount
   /** Each tier's units in their JSON spelling (ticket 849). */
   cargo: PortableCargo
   liningBill: string
@@ -80,6 +83,7 @@ export function portableVehicleOf(vehicle: VehicleState): PortableVehicle {
     liningPaidThisVisit: canonicalOrNull(vehicle.liningPaidThisVisit),
     loadout: portableLoadoutOf(vehicle.loadout),
     cargo: portableCargoOf(vehicle.cargo),
+    casingGrade: countToJson(vehicle.casingGrade),
     ...portableFuelField(fuel),
   }
 }
@@ -94,6 +98,7 @@ export function vehicleOfPortable(vehicle: PortableVehicle): VehicleState {
       vehicle.liningPaidThisVisit === null ? null : fromCanonical(vehicle.liningPaidThisVisit),
     loadout: loadoutOfPortable(vehicle.loadout),
     cargo: cargoOfPortable(vehicle.cargo),
+    casingGrade: countOfJson(vehicle.casingGrade),
     ...fuelFieldOfPortable(fuel),
   }
 }
@@ -221,7 +226,7 @@ function wholeNumberProblems(
 }
 
 function isCasingGrade(value: unknown): boolean {
-  return isWholeNumber(value) && (value as number) >= 1
+  return isJsonCount(value) && countOfJson(value) >= 1n
 }
 
 function isPortableCasingTrail(trail: unknown): boolean {

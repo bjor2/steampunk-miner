@@ -1,5 +1,5 @@
 {
-  "economyRulesVersion": 6,
+  "economyRulesVersion": 7,
   "ore": {
     "tiersPerPlanet": 3,
     "coreTierBand": 6,
@@ -128,7 +128,9 @@
   "casing": {
     "costCurveId": "cost.casing.upgrade",
     "casingGradeStart": 1,
-    "casingGradeCoreMin": 5,
+    "gradesPerPlanet": 4,
+    "planetPriceRatio": "3.375",
+    "surfaceOffset": { "maxLead": 1, "catchUpShareBp": 800, "moneyHeldAfterFuel": [] },
     "gnawMaxDrop": 1,
     "kCasing": "0.020",
     "collapseCrush": ["0.080", "0.080", "0.080", "0.080", "0.080", "0.080"],
@@ -279,7 +281,8 @@
       "hazardPocketVolume": ["0", "0.010", "0.020", "0.030", "0.040"],
       "tail": { "ratio": "1.040", "cap": "1.350" },
       "liningType": "refractory",
-      "liningMultiplier": "1.5"
+      "liningMultiplier": "1.5",
+      "casingBiomeDelta": 0
     }
   ],
   "visualTiers": [

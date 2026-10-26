@@ -164,8 +164,8 @@ describe('gauge cluster dials (ticket 716)', () => {
   it("tints the depth dial with the plate of its band's casing grade, and no other dial (ticket 830)", () => {
     const model = hudOf(createScriptedSession(), RUN_DEPTH)
     const dials = gaugeClusterOf(model, 'phone').dials
-    expect(model.depth.band).not.toBeNull()
-    expect(dialOf(dials, 'depth')?.bandTint).toBe(depthBandTintOf(model.depth.band))
+    expect(model.depth.neededGrade).not.toBeNull()
+    expect(dialOf(dials, 'depth')?.bandTint).toBe(depthBandTintOf(model.depth.neededGrade))
     expect(dialOf(dials, 'depth')?.bandTint).toMatch(/^#[0-9a-f]{6}$/)
     expect(dialOf(dials, 'hull')?.bandTint).toBeNull()
   })

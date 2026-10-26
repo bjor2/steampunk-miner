@@ -35,6 +35,7 @@ import type { PlanetParams } from '../../world/planetParams'
 import { withCollapse, type AuthorityState } from '../authorityState'
 import { isBlockReinforced } from './collapseReinforcement'
 import { chainEffects, type RuleEffect } from '../commandRule'
+import type { DomainEventBody } from '../domainEvent'
 import {
   blockOfEntry,
   entryOfBlock,
@@ -97,7 +98,7 @@ export function startWarning(
   const entry = { block, startTick: state.tick, isForced }
   return {
     state: withCollapse(state, withCollapsingBlock(state.collapse, entry)),
-    events: [{ type: 'CollapseWarned', block, ...weak.weakness }],
+    events: [collapseWarnedOf(block, weak.weakness)],
   }
 }
 
@@ -110,8 +111,14 @@ export function startBlastWarning(state: AuthorityState, weak: WeakBlock): RuleE
   const entry = { block, startTick: state.tick, isForced: false, isBlast: true as const }
   return {
     state: withCollapse(state, withCollapsingBlock(state.collapse, entry)),
-    events: [{ type: 'CollapseWarned', block, ...weak.weakness }],
+    events: [collapseWarnedOf(block, weak.weakness)],
   }
+}
+
+/** `CollapseWarned` as #43 logs it: the weakest lining's grade, its band and the grade it needs. */
+export function collapseWarnedOf(block: string, weakness: BlockWeakness): DomainEventBody {
+  const { band, weakestGrade, required } = weakness
+  return { type: 'CollapseWarned', block, band, weakestGrade, required }
 }
 
 /** Every weak block within 16 m of some vehicle, in processing order. */
@@ -137,7 +144,8 @@ export function forcedWeaknessOf(
   const centre = blockCentreMm(block)
   const { tx, ty } = tileOfMillimetres(centre.xMm, centre.yMm)
   const band = casingBandOfTile(params, tx, ty)
-  return { band, weakestGrade: 0, required: requiredCasingGrade(band) }
+  const required = requiredCasingGrade({ planetIndex: params.planetIndex, band })
+  return { band, weakestGrade: 0n, required, tile: { tx, ty } }
 }
 
 /** Every vehicle with a pose, in player id order, where it last stood. */

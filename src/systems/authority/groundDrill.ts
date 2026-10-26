@@ -35,6 +35,7 @@
 import { widthLevelOf } from '../registries/boreWidth'
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { casingHardness } from '../economy/casingGrades'
+import { casingGradeOfSlot } from '../world/casingGradeWindow'
 import { coreHardness, blockHardness, oreSalePrice, oreTier } from '../economy/oreEconomy'
 import { ZERO_MONEY, toCanonical, type BigStat } from '../money'
 import { pickedUpUnitOf, type PickedUp, type PickupFind } from '../registries/orePickup'
@@ -427,7 +428,7 @@ function chargeAndCollect(
     events: [
       ...damageEventsOf(params, state.world, target.tile, drill, carved.ticksUsed),
       ...groundChangedEventsOf(carved),
-      ...casingDrilledEvents(carved),
+      ...casingDrilledEvents(params, carved),
       ...collected.events,
       ...gates.refusedEvents(),
     ],
@@ -472,9 +473,13 @@ export function drillSubStepsOfCells(
         )
 }
 
-/** Lining re-drills as band-G rock of its grade on this planet, in its system (ticket 759). */
-function liningHardnessOn(params: PlanetParams, casingGrade: number): BigStat {
-  return groundHardnessInSystem(params, casingHardness(params.planetIndex, casingGrade))
+/**
+ * Lining re-drills as the rock of the band its grade holds on this planet, in its system (ticket
+ * 759), the grade read from the sample's slot (`casingGradeWindow.ts`, ticket 829).
+ */
+function liningHardnessOn(params: PlanetParams, casingSlot: number): BigStat {
+  const grade = casingGradeOfSlot(params.planetIndex, casingSlot)
+  return groundHardnessInSystem(params, casingHardness(params.planetIndex, grade))
 }
 
 /**
@@ -679,8 +684,15 @@ function damageEvent(
   return { type: 'DrillDamageDealt', tx: tile.tx, ty: tile.ty, ticks, damage }
 }
 
-/** The lining the drill cleared (#41), logged once per drill command (#56 Q3); nothing when none. */
-export function casingDrilledEvents({ casingCleared }: Carve): DomainEventBody[] {
+/**
+ * The lining the drill cleared (#41), logged once per drill command (#56 Q3), its highest slot
+ * read as the grade it names on this planet (`casingGradeWindow.ts`); nothing when none.
+ */
+export function casingDrilledEvents(
+  params: PlanetParams,
+  { casingCleared }: Carve,
+): DomainEventBody[] {
   if (casingCleared.samples === 0) return []
-  return [{ type: 'CasingDrilled', ...casingCleared }]
+  const grade = casingGradeOfSlot(params.planetIndex, casingCleared.grade)
+  return [{ type: 'CasingDrilled', samples: casingCleared.samples, grade }]
 }

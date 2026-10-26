@@ -415,7 +415,7 @@ describe('ground gun: the bore-disturbance collapse (ticket 313, #309 tests 4 an
       const warned = ofType(session.events(), 'CollapseWarned')
       expect(warned.map(({ block }) => block).sort()).toEqual([...disturbedBlocks].sort())
       expect(warned.map(({ tick }) => tick)).toEqual(disturbedBlocks.map(() => END_TICK + 30))
-      expect(warned[0]).toMatchObject({ band: 1, weakestGrade: 0, required: 1 })
+      expect(warned[0]).toMatchObject({ band: 1, weakestGrade: 0n, required: 1n })
     }))
 
   it('still refills the bored blocks at check + warn + fill after the rig drives 20 m away', () =>

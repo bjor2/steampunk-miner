@@ -22,12 +22,12 @@ function dockedWithMoney(money: string, bay: 'sell' | 'upgrade' = 'upgrade') {
 
 describe('casing grade', () => {
   it('starts at grade 1', () => {
-    expect(createScriptedSession().vehicle().casingGrade).toBe(1)
+    expect(createScriptedSession().vehicle().casingGrade).toBe(1n)
   })
 
   it('ends at grade 5 after four buys, logging each and charging exactly its curve prices', () => {
     const session = dockedWithMoney('1500')
-    const fromGrades = [1, 2, 3, 4]
+    const fromGrades = [1n, 2n, 3n, 4n]
     const prices = fromGrades.map(casingUpgradePrice)
     const events = [2, 3, 4, 5].flatMap((tick) =>
       session.submit(tick, buyCasingGradeCommand(CLICK_CHAIN)),
@@ -37,12 +37,12 @@ describe('casing grade', () => {
         expect.objectContaining({
           type: 'CasingUpgraded',
           from,
-          to: from + 1,
+          to: from + 1n,
           price: toCanonical(prices[index]),
         }),
       ),
     )
-    expect(session.vehicle().casingGrade).toBe(5)
+    expect(session.vehicle().casingGrade).toBe(5n)
     expect(session.state().players.p1.wallet).toEqual(
       sub(fromCanonical('1500'), prices.reduce(add, ZERO_MONEY)),
     )
@@ -58,7 +58,7 @@ describe('casing grade', () => {
   it('refuses a buy the wallet cannot pay with money_short, leaving the grade', () => {
     const session = dockedWithMoney('239.999')
     expect(rejectionOf(session.submit(2, buyCasingGradeCommand(CLICK_CHAIN)))).toBe('money_short')
-    expect(session.vehicle().casingGrade).toBe(1)
+    expect(session.vehicle().casingGrade).toBe(1n)
     expect(toCanonical(session.state().players.p1.wallet)).toBe('2.39999e+2')
   })
 
@@ -72,7 +72,7 @@ describe('casing grade', () => {
     const session = dockedWithMoney('1e9')
     const ticks = Array.from({ length: 25 }, (_, index) => 2 + index)
     const events = ticks.flatMap((tick) => session.submit(tick, buyCasingGradeCommand(CLICK_CHAIN)))
-    expect(session.vehicle().casingGrade).toBe(26)
+    expect(session.vehicle().casingGrade).toBe(26n)
     expect(typesOf(events)).not.toContain('VehicleConfigurationChanged')
     expect(visualTier(session.vehicle().levels)).toBe(1)
   })

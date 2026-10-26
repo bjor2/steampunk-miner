@@ -8,6 +8,7 @@
  * number of cells a tick. When a span breaks is `spanBreakOf` here; who closes it is the writer
  * (`drillSpanWriter.ts`).
  */
+import { countAsSafeInteger } from '../systems/wholeCount'
 import { DRILL_SPAN_CAP_TICKS } from '../constants/runLog'
 import type { CommandStamp } from '../systems/authority/authorityCommand'
 import type { DomainEvent } from '../systems/authority/domainEvent'
@@ -50,7 +51,7 @@ type Cell = readonly [tx: number, ty: number]
 interface LiningRun {
   stamp: RunEventStamp
   band: number
-  grade: number
+  grade: bigint
   liningType: string
   lengthMm: number
   price: Money
@@ -230,6 +231,13 @@ export function casingLinedLineOf(lining: LiningRun): {
   const { stamp, band, grade, liningType, lengthMm, price, rings } = lining
   return {
     stamp,
-    data: { lengthMm, band, grade, type: liningType, price: toCanonical(price), rings },
+    data: {
+      lengthMm,
+      band,
+      grade: countAsSafeInteger(grade),
+      type: liningType,
+      price: toCanonical(price),
+      rings,
+    },
   }
 }

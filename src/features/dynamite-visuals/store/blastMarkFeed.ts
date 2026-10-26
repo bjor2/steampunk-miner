@@ -5,6 +5,7 @@
  * it in, #862); and every live charge's rings, read without React each frame. Module state,
  * presentation only: nothing here reaches the authority, the store or the log.
  */
+import { casingLookGradeOf } from '../../../systems/render/casingGradeLook'
 import { PLANTED_CHARGE_SLOTS } from '../../../constants/scene'
 import { readAuthorityState } from '../../../store/authorityLink'
 import type { AuthorityState } from '../../../systems/authority/authorityState'
@@ -97,5 +98,6 @@ function groundRadiusOn(
 function laidCasingOf(state: AuthorityState, playerId: string): LaidCasing | null {
   const vehicle = state.players[playerId]?.vehicle ?? null
   if (vehicle === null) return null
-  return { grade: vehicleOf(state, playerId).casingGrade, liningType: vehicle.lining.active }
+  const grade = casingLookGradeOf(vehicleOf(state, playerId).casingGrade)
+  return { grade, liningType: vehicle.lining.active }
 }

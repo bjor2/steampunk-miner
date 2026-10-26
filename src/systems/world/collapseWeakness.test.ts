@@ -28,7 +28,7 @@ function carveTunnel(world: WorldState, y: number): WorldState {
 }
 
 /** Rings along the tunnel's axis every 0.5 m, as the vehicle lays them, at `grade`. */
-function lineTunnel(world: WorldState, y: number, grade: number): WorldState {
+function lineTunnel(world: WorldState, y: number, grade: bigint): WorldState {
   let lined = world
   for (let x = FROM_X; x <= TO_X; x += 500) {
     lined = lineRing(lined, params, casingRingAround(x, y), grade).world
@@ -73,16 +73,16 @@ describe('collapse weakness', () => {
   })
 
   it('never makes a band-1 tunnel lined at grade 1 weak', () => {
-    const world = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_1_Y), BAND_1_Y, 1)
+    const world = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_1_Y), BAND_1_Y, 1n)
     expect(weaknessOfBlock(world, params, middleBlockAt(BAND_1_Y))).toBeNull()
   })
 
   it('makes a band-2 tunnel lined at grade 1 weak, naming its band and grades', () => {
-    const world = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_2_Y), BAND_2_Y, 1)
-    expect(weaknessOfBlock(world, params, middleBlockAt(BAND_2_Y))).toEqual({
+    const world = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_2_Y), BAND_2_Y, 1n)
+    expect(weaknessOfBlock(world, params, middleBlockAt(BAND_2_Y))).toMatchObject({
       band: 2,
-      weakestGrade: 1,
-      required: 2,
+      weakestGrade: 1n,
+      required: 2n,
     })
   })
 
@@ -92,14 +92,14 @@ describe('collapse weakness', () => {
   })
 
   it('holds a band-2 tunnel lined at grade 2', () => {
-    const world = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_2_Y), BAND_2_Y, 2)
+    const world = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_2_Y), BAND_2_Y, 2n)
     expect(weaknessOfBlock(world, params, middleBlockAt(BAND_2_Y))).toBeNull()
   })
 
   it('stops being weak once the tunnel is relined at the grade its band needs', () => {
-    const weak = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_2_Y), BAND_2_Y, 1)
+    const weak = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_2_Y), BAND_2_Y, 1n)
     expect(weaknessOfBlock(weak, params, middleBlockAt(BAND_2_Y))).not.toBeNull()
-    const relined = lineTunnel(weak, BAND_2_Y, 2)
+    const relined = lineTunnel(weak, BAND_2_Y, 2n)
     expect(weaknessOfBlock(relined, params, middleBlockAt(BAND_2_Y))).toBeNull()
   })
 
@@ -113,7 +113,7 @@ describe('collapse weakness', () => {
         lined,
         params,
         casingRingAround(sx * MM_PER_SAMPLE, sy * MM_PER_SAMPLE),
-        1,
+        1n,
       )
       lined = ring.world
       placed += ring.placed
@@ -123,7 +123,7 @@ describe('collapse weakness', () => {
   })
 
   it('stops being weak once the drill cuts the weak lining away', () => {
-    const weak = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_2_Y), BAND_2_Y, 1)
+    const weak = lineTunnel(carveTunnel(EMPTY_WORLD, BAND_2_Y), BAND_2_Y, 1n)
     const block = middleBlockAt(BAND_2_Y)
     let widened = weak
     for (let x = FROM_X - 2000; x <= TO_X + 2000; x += MM_PER_SAMPLE) {
@@ -176,10 +176,10 @@ describe('collapse weakness across a chunk border', () => {
 
   it('follows the lining in the neighbouring chunk each time only that chunk changes', () => {
     expect(weaknessOfBlock(edgeWorld({ grade: 2 }), params, EDGE_BLOCK)).toBeNull()
-    expect(weaknessOfBlock(edgeWorld({ grade: 1 }), params, EDGE_BLOCK)).toEqual({
+    expect(weaknessOfBlock(edgeWorld({ grade: 1 }), params, EDGE_BLOCK)).toMatchObject({
       band: 2,
-      weakestGrade: 1,
-      required: 2,
+      weakestGrade: 1n,
+      required: 2n,
     })
     expect(weaknessOfBlock(edgeWorld({ grade: 2 }), params, EDGE_BLOCK)).toBeNull()
   })

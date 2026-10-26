@@ -33,7 +33,13 @@ import {
   withCollapsingBlock,
   type CollapsingBlock,
 } from './collapseState'
-import { cancelCollapse, forcedWeaknessOf, isCollapseHeld, weaknessOf } from './collapseWatch'
+import {
+  cancelCollapse,
+  collapseWarnedOf,
+  forcedWeaknessOf,
+  isCollapseHeld,
+  weaknessOf,
+} from './collapseWatch'
 
 /** Where the sync runs in a tick: before the collapse step moves blocks, or after it. */
 export type BraceSyncPoint = 'beforeCollapseStep' | 'afterCollapseStep'
@@ -125,7 +131,7 @@ function warnAfresh(
 ): RuleEffect {
   return {
     state: withCollapse(state, withCollapsingBlock(state.collapse, entry)),
-    events: [{ type: 'CollapseWarned', block: entry.block, ...weakness }],
+    events: [collapseWarnedOf(entry.block, weakness)],
   }
 }
 

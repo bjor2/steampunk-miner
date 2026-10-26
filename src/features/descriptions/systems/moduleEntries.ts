@@ -73,7 +73,7 @@ export function moduleEntries(): readonly DescribedEntry[] {
       [
         levelledLine('Casing grade', 'linearInt', (grade) => grade),
         levelledLine('Lining hardness', 'geometric', (grade, ctx) =>
-          casingHardness(ctx.planetIndex, grade),
+          casingHardness(ctx.planetIndex, BigInt(grade)),
         ),
       ],
     ),

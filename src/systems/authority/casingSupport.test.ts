@@ -34,7 +34,12 @@ describe('casing grade telegraph', () => {
     session.submit(0, FREEZE_ENEMIES)
     expect(casingEdges(session.submit(1, poseIn(firstTileOfBand(1))))).toEqual([])
     expect(casingEdges(session.submit(13, poseIn(firstTileOfBand(2))))).toEqual([
-      expect.objectContaining({ type: 'CasingGradeInsufficient', band: 2, grade: 1, required: 2 }),
+      expect.objectContaining({
+        type: 'CasingGradeInsufficient',
+        band: 2,
+        grade: 1n,
+        required: 2n,
+      }),
     ])
     expect(casingEdges(session.submit(25, poseIn(firstTileOfBand(2))))).toEqual([])
     expect(session.vehicle().casingShortBand).toBe(2)
@@ -45,7 +50,7 @@ describe('casing grade telegraph', () => {
     session.submit(0, FREEZE_ENEMIES)
     session.submit(1, poseIn(firstTileOfBand(3)))
     expect(casingEdges(session.submit(13, poseIn(firstTileOfBand(1))))).toEqual([
-      expect.objectContaining({ type: 'CasingGradeSufficient', band: 1, grade: 1 }),
+      expect.objectContaining({ type: 'CasingGradeSufficient', band: 1, grade: 1n }),
     ])
     expect(session.vehicle().casingShortBand).toBeNull()
   })
@@ -63,7 +68,12 @@ describe('casing grade telegraph', () => {
     session.submit(0, { type: 'debug.setCasingGrade', payload: { grade: 4 } })
     const [core] = coreTiles(1)
     expect(casingEdges(session.submit(1, poseIn(core)))).toEqual([
-      expect.objectContaining({ type: 'CasingGradeInsufficient', band: 6, grade: 4, required: 5 }),
+      expect.objectContaining({
+        type: 'CasingGradeInsufficient',
+        band: 6,
+        grade: 4n,
+        required: 5n,
+      }),
     ])
   })
 })

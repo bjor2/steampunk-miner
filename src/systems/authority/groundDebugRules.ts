@@ -101,7 +101,7 @@ function lineCasingRing(
   const params = planetParamsOf(state.planet)
   if (params === null) return unchanged(state)
   const typeIndex = liningTypeIndexOf(vehicleOf(state, playerId).lining.active)
-  return layCasingRing(state, params, { xMm: x, yMm: y }, grade, typeIndex)
+  return layCasingRing(state, params, { xMm: x, yMm: y }, BigInt(grade), typeIndex)
 }
 
 function circleCommandRejection(state: AuthorityState, payload: GroundCircle): Rejection | null {

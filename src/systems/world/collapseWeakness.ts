@@ -3,8 +3,8 @@
  * Option A, and the Technical Director's build note 1):
  *
  *   a 4x4 m block is weak if any solid sample bordering its carved air (an 8-neighbour) holds
- *   lining with 0 < casing < required, where required is the grade the sample's band needs (5 in
- *   the core). Unlined walls (casing 0) are ignored, so the unlined face and the last ~2.15 m behind
+ *   lining with 0 < casing < required, where required is the grade the sample's cell needs
+ *   (`requiredCasingGrade`, ticket 829: its planet's surface grade, its band and its biome). Unlined walls (casing 0) are ignored, so the unlined face and the last ~2.15 m behind
  *   the drill never make a block weak, and carving a lined sample clears it from the test.
  *
  * Breached lining (#111) still counts as lined, at its band's native grade less the gnaw and never
@@ -33,11 +33,15 @@ import {
 import { weakerWall } from './wallWeakness'
 import type { WorldState } from './worldState'
 
-/** What `collapse_warning` reports: the weakest lining's grade and the band it sits in. */
+/**
+ * What `collapse_warning` reports: the weakest lining's grade, the grade its cell needs and the
+ * band it sits in, with the cell itself for the burst's lines (ticket 829).
+ */
 export interface BlockWeakness {
   band: number
-  weakestGrade: number
-  required: number
+  weakestGrade: bigint
+  required: bigint
+  tile: { tx: number; ty: number }
 }
 
 /** A world density sample. */

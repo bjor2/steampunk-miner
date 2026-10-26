@@ -80,7 +80,7 @@ describe('re-drilling casing', () => {
   it('lines the wall beside a mined hole through debug.lineCasing and logs the ring', () => {
     const { session, ore, events } = oreWall(2)
     expect(events).toContainEqual(
-      expect.objectContaining({ type: 'CasingPlaced', grade: 2, relined: 0 }),
+      expect.objectContaining({ type: 'CasingPlaced', grade: 2n, relined: 0 }),
     )
     expect(typesOf(events)).toContain('GroundChanged')
     expect(typesOf(events).at(-1)).toBe('DebugCommandApplied')
@@ -114,7 +114,7 @@ describe('re-drilling casing', () => {
     const { session, ore } = oreWall(2)
     const events = drillOre(session, ore)
     expect(events).toContainEqual(
-      expect.objectContaining({ type: 'CasingDrilled', samples: 4, grade: 2 }),
+      expect.objectContaining({ type: 'CasingDrilled', samples: 4, grade: 2n }),
     )
     expect(casingSamplesOf(session, ore)).toBe(0)
   })

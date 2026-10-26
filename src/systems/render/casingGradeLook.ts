@@ -116,6 +116,23 @@ export function casingGradeLookOf(
   }
 }
 
+/**
+ * The safe-integer grade whose look a ladder grade wears (ticket 829's bigint track): itself while
+ * it is safe, else the grade of the same plate and finish with every pip drawn, so a grade past
+ * 2^53 still reads as its metal.
+ */
+export function casingLookGradeOf(
+  grade: bigint,
+  table: CasingLookTable = CASING_GRADE_LOOKS,
+): number {
+  if (grade <= LARGEST_SAFE_GRADE) return Number(grade)
+  const cycle = BigInt(table.plates.length * table.finishes.length)
+  const turn = Number((grade - 1n) % cycle)
+  return firstGradeWithFullPips(table) + turn
+}
+
+const LARGEST_SAFE_GRADE = BigInt(Number.MAX_SAFE_INTEGER)
+
 /** Grades at and past this one all draw the same pips; the rule still counts theirs. */
 export function firstGradeWithFullPips(table: CasingLookTable = CASING_GRADE_LOOKS): number {
   return table.pips.most * table.plates.length * table.finishes.length + 1

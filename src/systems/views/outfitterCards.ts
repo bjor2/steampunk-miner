@@ -9,6 +9,7 @@
  * ticket 585), after the gain. Under the price, once a trip is done, the guidance: "Affordable" or
  * "{N} trips away" (ticket 719, `shopGuidance.ts`).
  */
+import { countHeldToSafe } from '../wholeCount'
 import type { UpgradeId } from '../economy/economyDefinition'
 import { fromCanonical } from '../money'
 import { guidanceTextOf, type ShopGuidance } from './shopGuidance'
@@ -115,7 +116,7 @@ function trackGainTextOf(row: WorkshopRow): string {
 function casingCardOf(row: CasingRow): OutfitterCard {
   return {
     ...buyCardOf('casing', row.label, row.iconId, row.cost, row.buy),
-    isNewCapability: isNewCapabilityBuy(row.card.item, row.grade),
+    isNewCapability: isNewCapabilityBuy(row.card.item, countHeldToSafe(row.grade)),
     line: CASING_LINE,
   }
 }

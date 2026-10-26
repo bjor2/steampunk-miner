@@ -63,7 +63,7 @@ describe('automatic casing placement', () => {
     const { session } = digTwentyMetres()
     const placed = placedOf(session.events())
     expect(placed).toHaveLength(40)
-    expect(placed.every((event) => event.grade === 1)).toBe(true)
+    expect(placed.every((event) => event.grade === 1n)).toBe(true)
   })
 
   it('keeps the rings behind the drill while it digs, so it never re-drills fresh lining', () => {
@@ -88,7 +88,7 @@ describe('automatic casing placement', () => {
     driveThrough(session, dug, stepsBetween(START.x + 9900, START.x - 2200), 0)
     const placed = placedOf(session.events())
     expect(placed).toHaveLength(20)
-    expect(placed.every((event) => event.grade === 3)).toBe(true)
+    expect(placed.every((event) => event.grade === 3n)).toBe(true)
   })
 
   it('relines the tunnel at the new grade when the vehicle drills back through it after an upgrade', () => {
@@ -106,7 +106,7 @@ describe('automatic casing placement', () => {
     )
     driveThrough(session, back, stepsBetween(START.x + 9900, START.x - 2200), 0)
     const relaid = placedOf(session.events().slice(before))
-    expect(relaid.every((event) => event.grade === 3)).toBe(true)
+    expect(relaid.every((event) => event.grade === 3n)).toBe(true)
     expect(relaid.reduce((sum, event) => sum + event.relined, 0)).toBeGreaterThan(0)
   })
 

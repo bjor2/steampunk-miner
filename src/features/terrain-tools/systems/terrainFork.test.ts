@@ -171,8 +171,8 @@ describe('terrain fork', () => {
       tick: state.tick,
       block,
       band: 1,
-      weakestGrade: 0,
-      required: 1,
+      weakestGrade: 0n,
+      required: 1n,
     }))
     const propped = propWarnedBlocks(state, heard).state
     expect(propClaimsOf(propped)).toEqual([
@@ -190,8 +190,8 @@ describe('terrain fork', () => {
         tick: 1,
         block: near,
         band: 1,
-        weakestGrade: 0,
-        required: 1,
+        weakestGrade: 0n,
+        required: 1n,
       },
     ]
     expect(propWarnedBlocks(state, heard).state).toBe(state)

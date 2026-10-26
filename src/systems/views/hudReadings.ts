@@ -8,6 +8,8 @@ import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { AuthorityState } from '../authority/authorityState'
 import { enemiesOwnedBy } from '../authority/combat/combatState'
 import { dockSiteOfPlanet, planetParamsOf } from '../authority/planetOfState'
+import { formatAmount } from '../displayAmount'
+import { requiredCasingGrade } from '../economy/casingGrades'
 import { vehicleStateIconIdOf } from '../art/icons/iconSet'
 import { tileOfPose, type VehiclePose } from '../vehicle/vehiclePose'
 import { VEHICLE_MODES, type VehicleMode, type VehicleState } from '../vehicle/vehicleState'
@@ -23,6 +25,11 @@ export interface DepthReading {
   depthTiles: number
   altitudeTiles: number
   band: number | null
+  /**
+   * The highest casing grade the band needs (ticket 829, Progression's row: the depth gauge shows
+   * it), its biome's +1 included; null off a planet or above its ground.
+   */
+  neededGrade: bigint | null
   /** The depth dial's scale (ticket 716): R(p) and the band and core marks; null off a planet. */
   scale: DepthScale | null
 }
@@ -82,9 +89,14 @@ export function casingBadgeOf(state: AuthorityState, playerId: string): CasingBa
   }
 }
 
-function casingBadgeTextOf(grade: number, isShort: boolean, isGnawed: boolean): string {
+function casingBadgeTextOf(grade: bigint, isShort: boolean, isGnawed: boolean): string {
   const marks = [...(isShort ? ['WEAK'] : []), ...(isGnawed ? ['GNAW'] : [])]
-  return [`G${grade}`, ...marks].join(' ')
+  return [casingGradeTextOf(grade), ...marks].join(' ')
+}
+
+/** A casing grade as the HUD writes it: `G` and the grade in the shared compact form (#681). */
+export function casingGradeTextOf(grade: bigint): string {
+  return `G${formatAmount(grade)}`
 }
 
 /** A tunnel wrecker hunting this vehicle's route is gnawing a ring of it now. */
@@ -105,13 +117,21 @@ export function depthReadingOf(
   const params = planetParamsOf(state.planet)
   const altitudeTiles = altitudeOf(params, state.players[playerId].vehicle.pose)
   const isAboveGround = depthTiles === 0 && altitudeTiles > 0
+  const band = params === null ? null : bandAtDepth(params, depthTiles)
   return {
     text: isAboveGround ? `ALT ${altitudeTiles}` : String(depthTiles),
     depthTiles,
     altitudeTiles,
-    band: params === null ? null : bandAtDepth(params, depthTiles),
+    band,
+    neededGrade: neededGradeOf(params, band),
     scale: params === null ? null : depthScaleOf(params),
   }
+}
+
+/** The grade the band at the gauge's depth needs; none off a planet. */
+function neededGradeOf(params: PlanetParams | null, band: number | null): bigint | null {
+  if (params === null || band === null || band < 1) return null
+  return requiredCasingGrade({ planetIndex: params.planetIndex, band })
 }
 
 /** The compass points home to the Sell bay, the first stop of every return (#37). */

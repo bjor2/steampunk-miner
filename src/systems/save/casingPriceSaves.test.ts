@@ -51,7 +51,7 @@ describe('casing prices on an old save (#894)', () => {
   it('loads the pre-#894 save with its casing grade and money as saved', () => {
     const state = restoredState(PLANET_1_SAVE)
     const saved = PLANET_1_SAVE.profile.players[PLAYER]
-    expect(state.players[PLAYER].vehicle.casingGrade).toBe(saved.vehicle.casingGrade)
+    expect(state.players[PLAYER].vehicle.casingGrade).toBe(BigInt(saved.vehicle.casingGrade))
     expect(toCanonical(walletOf(state))).toBe(toCanonical(fromCanonical(saved.wallet)))
   })
 
@@ -69,11 +69,11 @@ describe('casing prices on an old save (#894)', () => {
     session.submit(tick + 3, dockAt('upgrade'), PLAYER)
     const bought = session.submit(tick + 4, buyCasingGradeCommand(CLICK_CHAIN), PLAYER)
     expect(casingBuysOf(bought)).toEqual([
-      expect.objectContaining({ from: 2, to: 3, price: '2.94e+2' }),
+      expect.objectContaining({ from: 2n, to: 3n, price: '2.94e+2' }),
     ])
-    expect(toCanonical(casingUpgradePrice(2))).toBe('2.94e+2')
+    expect(toCanonical(casingUpgradePrice(2n))).toBe('2.94e+2')
     expect(rejectionsOf(session.events())).toEqual([])
-    expect(walletOf(session.state())).toEqual(sub(beforeJump, casingUpgradePrice(2)))
+    expect(walletOf(session.state())).toEqual(sub(beforeJump, casingUpgradePrice(2n)))
   })
 
   it.todo('pays the C2 core cost on its first jump to P4 (the planet unlock of #895)')
